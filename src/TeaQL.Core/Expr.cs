@@ -18,7 +18,7 @@ public abstract record Expr
     private Expr() { }
 
     public sealed record ColumnExpr(string Name) : Expr;
-    public sealed record ValueExpr(Value Value) : Expr;
+    public sealed record ValueExpr(Value NodeValue) : Expr;
     public sealed record FunctionExpr(ExprFunction Fn, List<Expr> Args) : Expr;
     public sealed record BinaryExpr(Expr Left, BinaryOp Op, Expr Right) : Expr;
     public sealed record SubQueryExpr(Expr Left, BinaryOp Op, EntityDescriptor Entity, SelectQuery Query) : Expr;
@@ -138,7 +138,7 @@ public abstract record Expr
 
     public static Expr Negate(Expr expr) => new NotExpr(expr);
 
-    public Expr AndExpr(Expr other)
+    public Expr And(Expr other)
     {
         if (this == other) return this;
         
@@ -155,7 +155,7 @@ public abstract record Expr
         return new AndExpr(new List<Expr> { this, other });
     }
 
-    public Expr OrExpr(Expr other)
+    public Expr Or(Expr other)
     {
         if (this == other) return this;
         

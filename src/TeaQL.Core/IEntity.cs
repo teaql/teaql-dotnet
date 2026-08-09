@@ -18,7 +18,7 @@ public interface IEntity : ITeaqlEntity
     string? GetComment() => null;
     void SetComment(string comment) {}
     
-    Audited<IEntity> AuditAs(string comment) => new Audited<IEntity>(this, comment);
+    
     
     System.Text.Json.Nodes.JsonNode? IntoJson() => IntoRecord().ToJsonValue();
     

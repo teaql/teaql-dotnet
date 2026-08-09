@@ -7,7 +7,7 @@ public enum SortDirection { Asc, Desc }
 
 public record NamedExpr(string Alias, Expr Expr);
 
-public record OrderBy(string Field, Expr? Expr, SortDirection Direction)
+public record OrderBy(string Field, Expr? ExprValue, SortDirection Direction)
 {
     public static OrderBy New(string field, SortDirection direction) => new(field, null, direction);
     public static OrderBy Expr(Core.Expr expr, SortDirection direction) => new("", expr, direction);
@@ -140,13 +140,13 @@ public record SelectQuery
 
     public SelectQuery AndFilter(Expr filter)
     {
-        FilterCondition = FilterCondition != null ? FilterCondition.AndExpr(filter) : filter;
+        FilterCondition = FilterCondition != null ? FilterCondition.And(filter) : filter;
         return this;
     }
 
     public SelectQuery OrFilter(Expr filter)
     {
-        FilterCondition = FilterCondition != null ? FilterCondition.OrExpr(filter) : filter;
+        FilterCondition = FilterCondition != null ? FilterCondition.Or(filter) : filter;
         return this;
     }
 
@@ -158,13 +158,13 @@ public record SelectQuery
 
     public SelectQuery AndHaving(Expr having)
     {
-        HavingCondition = HavingCondition != null ? HavingCondition.AndExpr(having) : having;
+        HavingCondition = HavingCondition != null ? HavingCondition.And(having) : having;
         return this;
     }
 
     public SelectQuery OrHaving(Expr having)
     {
-        HavingCondition = HavingCondition != null ? HavingCondition.OrExpr(having) : having;
+        HavingCondition = HavingCondition != null ? HavingCondition.Or(having) : having;
         return this;
     }
 

@@ -654,7 +654,7 @@ public abstract class SqlDialect
             case Expr.ColumnExpr col:
                 return ColumnSql(entity, col.Name);
             case Expr.ValueExpr val:
-                paramsList.Add(val.Value);
+                paramsList.Add(val.NodeValue);
                 return Placeholder(paramsList.Count);
             case Expr.FunctionExpr func:
                 return CompileFunction(entity, func.Fn, func.Args, paramsList);
@@ -783,7 +783,7 @@ public abstract class SqlDialect
             _ => throw new InvalidOperationException("Unreachable")
         };
 
-        if (right is Expr.ValueExpr valExpr && valExpr.Value is Value.ListValue listVal)
+        if (right is Expr.ValueExpr valExpr && valExpr.NodeValue is Value.ListValue listVal)
         {
             if (listVal.Values.Count == 0)
             {
@@ -815,9 +815,9 @@ public abstract class SqlDialect
 
     public virtual string ResolveOrderField(EntityDescriptor entity, OrderBy orderBy, List<Value> paramsList)
     {
-        if (orderBy.Expr != null)
+        if (orderBy.ExprValue != null)
         {
-            return CompileExpr(entity, orderBy.Expr, paramsList);
+            return CompileExpr(entity, orderBy.ExprValue, paramsList);
         }
         return ColumnSql(entity, orderBy.Field);
     }

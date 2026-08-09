@@ -2,37 +2,37 @@
 
 TeaQL .NET SDK is the C#/.NET implementation of the TeaQL framework, designed to bring the highly abstract, efficient, and robust data modeling and SQL execution engine to the modern .NET ecosystem.
 
-## 1. 最小的版本需求 (Minimum Requirements)
+## 1. Minimum Version Requirements
 
 *   **.NET SDK**: .NET 8.0+ (C# 12+)
 *   *(Optional)* **Third-party Services**: Redis (For CacheIntegration Module), Sqlite/PostgreSQL/MySQL (For Data Providers)
 
-## 2. 我们已经做过哪些测试 (Tests Performed)
+## 2. Tests Performed
 
-本项目包含完整的单元测试验证机制，主要已完成以下测试：
-*   ✅ **`TeaQL.Core` 核心测试**：包括 `ValueTests`（基础类型及空值判别）、`EntityGraphTests`（节点和关系的建立与删除）、`SelectQueryTests`（查询条件及组合 AST）、`SafeExpressionTests` 和 `EvalTests`（表达式计算与安全求值）。
-*   ✅ **实体抽象及元数据测试**：如 `DescriptorsTests` 及 `TimestampTests`。
-*   ✅ **基础数据结构测试**：包括 `SmartListTests` 和 `TrimmedStringConverterTests` 等自定义数据结构的边界条件。
-*   ✅ **API 跨语言对比对齐**：API 签名设计参考了 Rust/Golang/Python 版的最佳实践并针对 .NET 特性进行了深度适配和对齐。
+This project incorporates a comprehensive unit testing suite, having successfully completed the following verifications:
+*   ✅ **`TeaQL.Core` Tests**: Includes `ValueTests` (base types and nullability evaluation), `EntityGraphTests` (creation and deletion of nodes and relationships), `SelectQueryTests` (query conditions and AST composition), and `SafeExpressionTests` & `EvalTests` (expression evaluation and safe execution).
+*   ✅ **Entity Abstraction & Metadata Tests**: Validated metadata behaviors via `DescriptorsTests` and `TimestampTests`.
+*   ✅ **Fundamental Data Structure Tests**: Tested boundary conditions for custom data structures like `SmartListTests` and `TrimmedStringConverterTests`.
+*   ✅ **Cross-Language API Parity**: API signatures are heavily inspired by best practices from the Rust, Golang, and Python equivalents, specifically adapted and aligned for .NET features.
 
-## 3. 有哪些模块 (Available Modules)
+## 3. Available Modules
 
-为了保证扩展性与依赖隔离，本项目采用多工程的架构：
-*   **`TeaQL.Core`**: 基础核心结构（实体元数据、`Value`、AST 节点抽象等）。
-*   **`TeaQL.DataService`**: 平台无关的数据服务契约抽象层 (`QueryRequest`, `QueryResult` 等)。
-*   **`TeaQL.Sql`**: SQL 编译与执行引擎 (`SqlDialect`, `SqlDataServiceExecutor`)。
-*   **`TeaQL.Runtime`**: 运行时应用上下文处理 (`UserContext`, `RuntimeModule`)。
-*   **`TeaQL.Provider.*`**: 多家关系型数据库的物理传输实现模块（`Sqlite`, `PostgreSql`, `MySql`）。
-*   **`TeaQL.CacheIntegration.Redis`**: 分布式透明缓存提供者扩展。
-*   **`TeaQL.WebIntegration.AspNetCore`**: 面向 ASP.NET Core 环境的无缝 Web 接口集成及端点挂载中间件。
+To ensure high extensibility and dependency isolation, this project adopts a multi-project architecture:
+*   **`TeaQL.Core`**: Foundational core structures (Entity Metadata, `Value`, AST node abstractions, etc.).
+*   **`TeaQL.DataService`**: Platform-agnostic data service contract abstraction layer (e.g., `QueryRequest`, `QueryResult`).
+*   **`TeaQL.Sql`**: SQL compilation and execution engine (`SqlDialect`, `SqlDataServiceExecutor`).
+*   **`TeaQL.Runtime`**: Application runtime context handling (`UserContext`, `RuntimeModule`).
+*   **`TeaQL.Provider.*`**: Physical transport implementation modules for various relational databases (`Sqlite`, `PostgreSql`, `MySql`).
+*   **`TeaQL.CacheIntegration.Redis`**: Transparent distributed cache provider extension.
+*   **`TeaQL.WebIntegration.AspNetCore`**: Seamless web interface integration and endpoint mounting middleware tailored for ASP.NET Core environments.
 
-## 4. 里面有什么功能 (Features)
+## 4. Features
 
-*   **Core Architecture**: 提供基于 `Value` 包装类型的强类型系统映射机制，彻底解决装箱拆箱及跨库 NULL 值处理的困扰，并提供了完整的 Entity Descriptor 建模机制。
-*   **SQL Dialect Generator**: 高度安全的 SQL 抽象语法树构建，能动态翻译为针对 Sqlite、Postgres 和 MySQL 的原生带参 SQL 查询/变更命令，防止 SQL 注入。
-*   **Unified Runtime Context**: 一站式的 `UserContext` 运行时，天然支持链式存储传递和依赖注入，保障环境参数随请求在各个服务间无损透传。
-*   **ASP.NET Core Web Endpoint**: 可极速对接 `Microsoft.AspNetCore.Builder`，仅用数行代码便可将底层抽象数据服务暴露为 RESTful 端点。
-*   **Redis Cache Decorator**: `RedisDataServiceDecorator` 允许一键开启底层数据交互的透明分布式缓存能力。
+*   **Core Architecture**: Provides a strong-typing system mapping mechanism based on the `Value` wrapper type, completely eliminating boxing/unboxing overheads and cross-database NULL handling issues, alongside a robust Entity Descriptor modeling system.
+*   **SQL Dialect Generator**: Highly secure SQL AST construction that dynamically translates into native parameterized SQL queries/commands for Sqlite, Postgres, and MySQL, inherently preventing SQL injection.
+*   **Unified Runtime Context**: A centralized `UserContext` runtime that natively supports chained storage propagation and dependency injection, ensuring environment variables seamlessly pass through various services alongside the request.
+*   **ASP.NET Core Web Endpoint**: Integrates instantly with `Microsoft.AspNetCore.Builder`, exposing underlying abstract data services as RESTful endpoints with just a few lines of code.
+*   **Redis Cache Decorator**: The `RedisDataServiceDecorator` enables transparent, underlying distributed caching for data interactions out-of-the-box.
 
 ## Quick Start
 

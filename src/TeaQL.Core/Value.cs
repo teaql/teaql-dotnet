@@ -91,15 +91,15 @@ public abstract record Value
     public JsonNode? ToJsonValue() => this switch
     {
         NullValue => null,
-        BoolValue(var v) => JsonValue.Create(v),
-        I64Value(var v) => JsonValue.Create(v),
-        U64Value(var v) => JsonValue.Create(v),
-        F64Value(var v) => JsonValue.Create(v),
-        DecimalValue(var v) => JsonValue.Create(v.ToString()),
-        TextValue(var v) => JsonValue.Create(v),
+        BoolValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
+        I64Value(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
+        U64Value(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
+        F64Value(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
+        DecimalValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v.ToString()),
+        TextValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
         Value.JsonValue(var v) => v?.DeepClone(),
-        DateValue(var v) => JsonValue.Create(v.ToString("yyyy-MM-dd")),
-        TimestampValue(var v) => JsonValue.Create(v),
+        DateValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v.ToString("yyyy-MM-dd")),
+        TimestampValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
         ObjectValue(var v) => v.ToJsonValue(),
         ListValue(var v) => new JsonArray(v.Select(item => item.ToJsonValue()).ToArray()),
         TypedNullValue => null,
@@ -112,7 +112,7 @@ public abstract record Value
         TypedNullValue => true,
         TextValue(var v) => string.IsNullOrEmpty(v),
         ObjectValue(var v) => v.Count == 0,
-        ListValue(var v) => v.Values.Count == 0,
+        ListValue(var v) => v.Count == 0,
         _ => false
     };
 

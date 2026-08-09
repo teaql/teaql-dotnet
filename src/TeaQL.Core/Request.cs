@@ -160,7 +160,7 @@ public static class RequestHelpers
         {
             var relations = new List<RelationLoad>(currentQuery.RelationLoads);
             relations.Add(new RelationLoad(selection.Name, selection.IntoQuery()));
-            currentQuery = currentQuery with { Relations = relations };
+            currentQuery = currentQuery with { RelationLoads = relations };
         }
         return currentQuery;
     }
@@ -168,14 +168,14 @@ public static class RequestHelpers
     public static SelectQuery ApplyRuntimeMetadata(SelectQuery query, QueryOptions options, IEnumerable<QuerySelection> childEnhancements)
     {
         var q = query;
-        if (options.CommentText != null)
+        if (options.Comment != null)
         {
-            q = q with { Comment = options.CommentText };
+            q = q with { CommentText = options.Comment };
         }
         q = q with
         {
-            RawSql = options.RawSqlText,
-            RawSqlSearchCriteria = options.RawSqlSearchCriteriaItems.ToList(),
+            RawSqlText = options.RawSql,
+            RawSqlSearchCriteriaItems = options.RawSqlSearchCriteria.ToList(),
             DynamicProperties = options.DynamicProperties.Select(p => new RawSqlProjection(p.PropertyName, p.RawSqlSegment)).ToList(),
             RawProjections = options.RawProjections.Select(p => new RawSqlProjection(p.PropertyName, p.RawSqlSegment)).ToList(),
             ObjectGroupBys = options.ObjectGroupBys.Select(g => new ObjectGroupBy(g.PropertyName, g.StorageField, g.Query.IntoQuery())).ToList(),
@@ -207,7 +207,7 @@ public static class RequestHelpers
                     ? outerQuery.FilterCondition
                     : new Expr.AndExpr(new List<Expr> { aggregate.Query.Query.FilterCondition, outerQuery.FilterCondition });
                 
-                var newQuery = aggregate.Query.Query with { Filter = newFilter };
+                var newQuery = aggregate.Query.Query with { FilterCondition = newFilter };
                 aggregate.Query.Query = newQuery;
             }
         }
