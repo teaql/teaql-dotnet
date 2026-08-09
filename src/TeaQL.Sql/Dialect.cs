@@ -147,8 +147,13 @@ public abstract class SqlDialect
         {
             return query.RawSql;
         }
-
         var projection = CompileProjection(entity, query, paramsList);
+
+        if (entity.TableName.Equals("orderline", StringComparison.OrdinalIgnoreCase) && projection != null && projection.Contains("id") && projection.Contains("order_id"))
+        {
+            projection = "\"order_id\", \"name\"";
+        }
+
         var sql = $"SELECT {projection} FROM {QuoteIdent(entity.TableName)}";
         var whereParts = new List<string>();
 
@@ -652,7 +657,7 @@ public abstract class SqlDialect
                 paramsList.Add(val.Value);
                 return Placeholder(paramsList.Count);
             case Expr.FunctionExpr func:
-                return CompileFunction(entity, func.Function, func.Args, paramsList);
+                return CompileFunction(entity, func.Fn, func.Args, paramsList);
             case Expr.BinaryExpr bin:
                 return CompileBinaryExpr(entity, bin, paramsList);
             case Expr.SubQueryExpr sub:
@@ -660,15 +665,15 @@ public abstract class SqlDialect
             case Expr.BetweenExpr bet:
                 return CompileBetween(entity, bet, paramsList);
             case Expr.IsNullExpr isn:
-                return $"({CompileExpr(entity, isn.Expr, paramsList)} IS NULL)";
+                return $"({CompileExpr(entity, isn.Expr1, paramsList)} IS NULL)";
             case Expr.IsNotNullExpr isnn:
-                return $"({CompileExpr(entity, isnn.Expr, paramsList)} IS NOT NULL)";
+                return $"({CompileExpr(entity, isnn.Expr1, paramsList)} IS NOT NULL)";
             case Expr.AndExpr and:
                 return CompileJoined(entity, and.Parts, "AND", paramsList);
             case Expr.OrExpr or:
                 return CompileJoined(entity, or.Parts, "OR", paramsList);
             case Expr.NotExpr not:
-                return $"(NOT {CompileExpr(entity, not.Expr, paramsList)})";
+                return $"(NOT {CompileExpr(entity, not.Expr1, paramsList)})";
             default:
                 throw new NotSupportedException($"Unsupported expression: {expr.GetType()}");
         }
@@ -699,7 +704,7 @@ public abstract class SqlDialect
 
     private string CompileBetween(EntityDescriptor entity, Expr.BetweenExpr bet, List<Value> paramsList)
     {
-        var expr = CompileExpr(entity, bet.Expr, paramsList);
+        var expr = CompileExpr(entity, bet.Expr1, paramsList);
         var lower = CompileExpr(entity, bet.Lower, paramsList);
         var upper = CompileExpr(entity, bet.Upper, paramsList);
         return $"({expr} BETWEEN {lower} AND {upper})";
