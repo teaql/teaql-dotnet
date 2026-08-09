@@ -10,13 +10,13 @@ public record NamedExpr(string Alias, Expr Expr);
 public record OrderBy(string Field, Expr? Expr, SortDirection Direction)
 {
     public static OrderBy New(string field, SortDirection direction) => new(field, null, direction);
-    public static OrderBy WithExpr(Expr expr, SortDirection direction) => new("", expr, direction);
+    public static OrderBy Expr(Core.Expr expr, SortDirection direction) => new("", expr, direction);
     
     public static OrderBy Asc(string field) => New(field, SortDirection.Asc);
     public static OrderBy Desc(string field) => New(field, SortDirection.Desc);
     
-    public static OrderBy AscExpr(Expr expr) => WithExpr(expr, SortDirection.Asc);
-    public static OrderBy DescExpr(Expr expr) => WithExpr(expr, SortDirection.Desc);
+    public static OrderBy AscExpr(Core.Expr expr) => Expr(expr, SortDirection.Asc);
+    public static OrderBy DescExpr(Core.Expr expr) => Expr(expr, SortDirection.Desc);
     
     public static OrderBy AscGbk(string field) => AscExpr(Core.Expr.Gbk(Core.Expr.Column(field)));
     public static OrderBy DescGbk(string field) => DescExpr(Core.Expr.Gbk(Core.Expr.Column(field)));
@@ -43,7 +43,10 @@ public record Aggregate(AggregateFunction Function, string Field, string Alias)
 
 public record Slice(ulong? Limit, ulong Offset);
 
-public record RelationLoad(string Name, SelectQuery? Query = null);
+public record RelationLoad(string Name, SelectQuery? Query = null)
+{
+    public static RelationLoad WithQuery(string name, SelectQuery query) => new(name, query);
+}
 
 public record RelationAggregate(string RelationName, string Alias, SelectQuery Query, bool SingleResult);
 
@@ -51,13 +54,13 @@ public record RawSqlProjection(string PropertyName, string RawSqlSegment);
 
 public record ObjectGroupBy(string PropertyName, string StorageField, SelectQuery Query);
 
-public record AggregationCacheOptions(bool Enabled, ulong CacheExpiredMillis, bool Propagate, ulong PropagateCacheExpiredMillis)
+public record AggregationCacheOptions(bool EnabledValue, ulong CacheExpiredMillis, bool PropagateValue, ulong PropagateCacheExpiredMillis)
 {
-    public static AggregationCacheOptions CreateEnabled(ulong cacheExpiredMillis) => 
+    public static AggregationCacheOptions Enabled(ulong cacheExpiredMillis) => 
         new(true, cacheExpiredMillis, false, 0);
 
-    public AggregationCacheOptions WithPropagate(ulong cacheExpiredMillis) =>
-        this with { Propagate = true, PropagateCacheExpiredMillis = cacheExpiredMillis };
+    public AggregationCacheOptions Propagate(ulong cacheExpiredMillis) =>
+        this with { PropagateValue = true, PropagateCacheExpiredMillis = cacheExpiredMillis };
 }
 
 public record StreamConfig(int ChunkSize = 1000);
@@ -67,19 +70,19 @@ public record SelectQuery
     public string Entity { get; set; } = "";
     public List<string> Projection { get; set; } = new();
     public List<NamedExpr> ExprProjection { get; set; } = new();
-    public string? SearchWithText { get; set; }
-    public Expr? Filter { get; set; }
-    public Expr? Having { get; set; }
-    public List<OrderBy> OrderBy { get; set; } = new();
+    public string? SearchText { get; set; }
+    public Expr? FilterCondition { get; set; }
+    public Expr? HavingCondition { get; set; }
+    public List<OrderBy> OrderByItems { get; set; } = new();
     public Slice? Slice { get; set; }
-    public List<Aggregate> Aggregates { get; set; } = new();
-    public List<string> GroupBy { get; set; } = new();
-    public List<RelationLoad> Relations { get; set; } = new();
+    public List<Aggregate> AggregateItems { get; set; } = new();
+    public List<string> GroupByItems { get; set; } = new();
+    public List<RelationLoad> RelationLoads { get; set; } = new();
     public AggregationCacheOptions? AggregationCache { get; set; }
-    public string? Comment { get; set; }
+    public string? CommentText { get; set; }
     public List<TraceNode> TraceChain { get; set; } = new();
-    public string? RawSql { get; set; }
-    public List<string> RawSqlSearchCriteria { get; set; } = new();
+    public string? RawSqlText { get; set; }
+    public List<string> RawSqlSearchCriteriaItems { get; set; } = new();
     public List<RawSqlProjection> DynamicProperties { get; set; } = new();
     public List<RawSqlProjection> RawProjections { get; set; } = new();
     public List<ObjectGroupBy> ObjectGroupBys { get; set; } = new();
@@ -123,117 +126,117 @@ public record SelectQuery
         return this;
     }
 
-    public SelectQuery WithSearchWithText(string text)
+    public SelectQuery SearchWithText(string text)
     {
-        SearchWithText = text;
+        SearchText = text;
         return this;
     }
 
-    public SelectQuery WithFilter(Expr filter)
+    public SelectQuery Filter(Expr filter)
     {
-        Filter = filter;
+        FilterCondition = filter;
         return this;
     }
 
     public SelectQuery AndFilter(Expr filter)
     {
-        Filter = Filter != null ? Filter.AndExprMethod(filter) : filter;
+        FilterCondition = FilterCondition != null ? FilterCondition.AndExpr(filter) : filter;
         return this;
     }
 
     public SelectQuery OrFilter(Expr filter)
     {
-        Filter = Filter != null ? Filter.OrExprMethod(filter) : filter;
+        FilterCondition = FilterCondition != null ? FilterCondition.OrExpr(filter) : filter;
         return this;
     }
 
-    public SelectQuery WithHaving(Expr having)
+    public SelectQuery Having(Expr having)
     {
-        Having = having;
+        HavingCondition = having;
         return this;
     }
 
     public SelectQuery AndHaving(Expr having)
     {
-        Having = Having != null ? Having.AndExprMethod(having) : having;
+        HavingCondition = HavingCondition != null ? HavingCondition.AndExpr(having) : having;
         return this;
     }
 
     public SelectQuery OrHaving(Expr having)
     {
-        Having = Having != null ? Having.OrExprMethod(having) : having;
+        HavingCondition = HavingCondition != null ? HavingCondition.OrExpr(having) : having;
         return this;
     }
 
-    public SelectQuery WithOrderBy(OrderBy order)
+    public SelectQuery OrderBy(OrderBy order)
     {
-        OrderBy.Add(order);
+        OrderByItems.Add(order);
         return this;
     }
 
-    public SelectQuery OrderAsc(string field) => WithOrderBy(Core.OrderBy.Asc(field));
-    public SelectQuery OrderDesc(string field) => WithOrderBy(Core.OrderBy.Desc(field));
-    public SelectQuery OrderExprAsc(Expr expr) => WithOrderBy(Core.OrderBy.AscExpr(expr));
-    public SelectQuery OrderExprDesc(Expr expr) => WithOrderBy(Core.OrderBy.DescExpr(expr));
-    public SelectQuery OrderGbkAsc(string field) => WithOrderBy(Core.OrderBy.AscGbk(field));
-    public SelectQuery OrderGbkDesc(string field) => WithOrderBy(Core.OrderBy.DescGbk(field));
+    public SelectQuery OrderAsc(string field) => OrderBy(Core.OrderBy.Asc(field));
+    public SelectQuery OrderDesc(string field) => OrderBy(Core.OrderBy.Desc(field));
+    public SelectQuery OrderExprAsc(Expr expr) => OrderBy(Core.OrderBy.AscExpr(expr));
+    public SelectQuery OrderExprDesc(Expr expr) => OrderBy(Core.OrderBy.DescExpr(expr));
+    public SelectQuery OrderGbkAsc(string field) => OrderBy(Core.OrderBy.AscGbk(field));
+    public SelectQuery OrderGbkDesc(string field) => OrderBy(Core.OrderBy.DescGbk(field));
 
-    public SelectQuery WithGroupBy(string field)
+    public SelectQuery GroupBy(string field)
     {
-        GroupBy.Add(field);
+        GroupByItems.Add(field);
         return this;
     }
 
-    public SelectQuery WithAggregate(Aggregate aggregate)
+    public SelectQuery Aggregate(Aggregate aggregate)
     {
-        Aggregates.Add(aggregate);
+        AggregateItems.Add(aggregate);
         return this;
     }
 
-    public SelectQuery Count(string alias) => WithAggregate(Aggregate.Count(alias));
-    public SelectQuery CountField(string field, string alias) => WithAggregate(Aggregate.CountField(field, alias));
-    public SelectQuery Sum(string field, string alias) => WithAggregate(Aggregate.Sum(field, alias));
-    public SelectQuery Avg(string field, string alias) => WithAggregate(Aggregate.Avg(field, alias));
-    public SelectQuery Min(string field, string alias) => WithAggregate(Aggregate.Min(field, alias));
-    public SelectQuery Max(string field, string alias) => WithAggregate(Aggregate.Max(field, alias));
-    public SelectQuery Stddev(string field, string alias) => WithAggregate(Aggregate.Stddev(field, alias));
-    public SelectQuery StddevPop(string field, string alias) => WithAggregate(Aggregate.StddevPop(field, alias));
-    public SelectQuery VarSamp(string field, string alias) => WithAggregate(Aggregate.VarSamp(field, alias));
-    public SelectQuery VarPop(string field, string alias) => WithAggregate(Aggregate.VarPop(field, alias));
-    public SelectQuery BitAnd(string field, string alias) => WithAggregate(Aggregate.BitAnd(field, alias));
-    public SelectQuery BitOr(string field, string alias) => WithAggregate(Aggregate.BitOr(field, alias));
-    public SelectQuery BitXor(string field, string alias) => WithAggregate(Aggregate.BitXor(field, alias));
+    public SelectQuery Count(string alias) => Aggregate(Core.Aggregate.Count(alias));
+    public SelectQuery CountField(string field, string alias) => Aggregate(Core.Aggregate.CountField(field, alias));
+    public SelectQuery Sum(string field, string alias) => Aggregate(Core.Aggregate.Sum(field, alias));
+    public SelectQuery Avg(string field, string alias) => Aggregate(Core.Aggregate.Avg(field, alias));
+    public SelectQuery Min(string field, string alias) => Aggregate(Core.Aggregate.Min(field, alias));
+    public SelectQuery Max(string field, string alias) => Aggregate(Core.Aggregate.Max(field, alias));
+    public SelectQuery Stddev(string field, string alias) => Aggregate(Core.Aggregate.Stddev(field, alias));
+    public SelectQuery StddevPop(string field, string alias) => Aggregate(Core.Aggregate.StddevPop(field, alias));
+    public SelectQuery VarSamp(string field, string alias) => Aggregate(Core.Aggregate.VarSamp(field, alias));
+    public SelectQuery VarPop(string field, string alias) => Aggregate(Core.Aggregate.VarPop(field, alias));
+    public SelectQuery BitAnd(string field, string alias) => Aggregate(Core.Aggregate.BitAnd(field, alias));
+    public SelectQuery BitOr(string field, string alias) => Aggregate(Core.Aggregate.BitOr(field, alias));
+    public SelectQuery BitXor(string field, string alias) => Aggregate(Core.Aggregate.BitXor(field, alias));
 
     public SelectQuery EnableAggregationCache() => EnableAggregationCacheFor(0);
 
     public SelectQuery EnableAggregationCacheFor(ulong cacheExpiredMillis)
     {
-        AggregationCache = AggregationCacheOptions.CreateEnabled(cacheExpiredMillis);
+        AggregationCache = AggregationCacheOptions.Enabled(cacheExpiredMillis);
         return this;
     }
 
     public SelectQuery PropagateAggregationCache(ulong cacheExpiredMillis)
     {
-        AggregationCache = (AggregationCache ?? AggregationCacheOptions.CreateEnabled(0)).WithPropagate(cacheExpiredMillis);
+        AggregationCache = (AggregationCache ?? AggregationCacheOptions.Enabled(0)).Propagate(cacheExpiredMillis);
         return this;
     }
 
-    public SelectQuery WithComment(string comment)
+    public SelectQuery Comment(string comment)
     {
-        Comment = comment;
+        CommentText = comment;
         TraceChain.Add(new TraceNode(Entity, null, comment));
         return this;
     }
 
-    public SelectQuery WithRawSql(string rawSql)
+    public SelectQuery RawSql(string rawSql)
     {
-        RawSql = rawSql;
+        RawSqlText = rawSql;
         return this;
     }
 
-    public SelectQuery WithRawSqlSearchCriteria(string rawSql)
+    public SelectQuery RawSqlSearchCriteria(string rawSql)
     {
-        RawSqlSearchCriteria.Add(rawSql);
+        RawSqlSearchCriteriaItems.Add(rawSql);
         return this;
     }
 
@@ -251,13 +254,13 @@ public record SelectQuery
 
     public SelectQuery Relation(string name)
     {
-        Relations.Add(new RelationLoad(name));
+        RelationLoads.Add(new RelationLoad(name));
         return this;
     }
 
     public SelectQuery RelationQuery(string name, SelectQuery query)
     {
-        Relations.Add(new RelationLoad(name, query));
+        RelationLoads.Add(new RelationLoad(name, query));
         return this;
     }
 

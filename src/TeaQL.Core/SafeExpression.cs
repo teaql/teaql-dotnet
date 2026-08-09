@@ -47,6 +47,8 @@ public class SafeExpression<R, T>
         _evaluator = evaluator;
     }
 
+    public R Root() => _root;
+
     public (bool HasValue, T Value) Eval()
     {
         return _evaluator(_root);

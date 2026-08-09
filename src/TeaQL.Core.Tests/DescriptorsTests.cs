@@ -17,7 +17,7 @@ public class DescriptorsTests
             .Version();
 
         Assert.Equal("username", prop.Name);
-        Assert.Equal("user_name", prop.ColumnName);
+        Assert.Equal("user_name", prop.ColumnNameString);
         Assert.Equal(DataType.Text, prop.DataType);
         Assert.False(prop.Nullable);
         Assert.True(prop.IsId);
@@ -64,7 +64,7 @@ public class DescriptorsTests
               .WithRelation(ordersRel);
 
         Assert.Equal("User", entity.Name);
-        Assert.Equal("users", entity.TableName);
+        Assert.Equal("users", entity.TableNameValue);
         Assert.Equal("auth_db", entity.DataService);
         Assert.Equal(new List<string> { "password" }, entity.AuditMaskFields);
         Assert.Equal(255, entity.AuditValueMaxLen);

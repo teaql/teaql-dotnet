@@ -7,7 +7,7 @@ public record BaseEntityData
 {
     public ulong Id { get; set; }
     public long Version { get; set; }
-    public Record Dynamic { get; set; } = new();
+    public Record DynamicRecord { get; set; } = new();
 
     public BaseEntityData WithId(ulong id)
     {
@@ -23,31 +23,31 @@ public record BaseEntityData
 
     public BaseEntityData WithDynamic(string key, Value value)
     {
-        Dynamic[key] = value;
+        DynamicRecord[key] = value;
         return this;
     }
 
-    public Value? DynamicValue(string key) => Dynamic.TryGetValue(key, out var v) ? v : null;
+    public Value? Dynamic(string key) => DynamicRecord.TryGetValue(key, out var v) ? v : null;
 
-    public long? DynamicI64(string key) => DynamicValue(key) is Value.I64Value i ? i.Value : null;
-    public ulong? DynamicU64(string key) => DynamicValue(key) is Value.U64Value u ? u.Value : null;
-    public decimal? DynamicDecimal(string key) => DynamicValue(key) is Value.DecimalValue d ? d.Value : null;
-    public double? DynamicF64(string key) => DynamicValue(key) is Value.F64Value f ? f.Value : null;
-    public string? DynamicText(string key) => DynamicValue(key) is Value.TextValue t ? t.Value : null;
-    public bool? DynamicBool(string key) => DynamicValue(key) is Value.BoolValue b ? b.Value : null;
+    public long? DynamicI64(string key) => Dynamic(key) is Value.I64Value i ? i.Value : null;
+    public ulong? DynamicU64(string key) => Dynamic(key) is Value.U64Value u ? u.Value : null;
+    public decimal? DynamicDecimal(string key) => Dynamic(key) is Value.DecimalValue d ? d.Value : null;
+    public double? DynamicF64(string key) => Dynamic(key) is Value.F64Value f ? f.Value : null;
+    public string? DynamicText(string key) => Dynamic(key) is Value.TextValue t ? t.Value : null;
+    public bool? DynamicBool(string key) => Dynamic(key) is Value.BoolValue b ? b.Value : null;
 
     public Value? PutDynamic(string key, Value value)
     {
-        Dynamic.TryGetValue(key, out var old);
-        Dynamic[key] = value;
+        DynamicRecord.TryGetValue(key, out var old);
+        DynamicRecord[key] = value;
         return old;
     }
 
     public Value? RemoveDynamic(string key)
     {
-        if (Dynamic.TryGetValue(key, out var old))
+        if (DynamicRecord.TryGetValue(key, out var old))
         {
-            Dynamic.Remove(key);
+            DynamicRecord.Remove(key);
             return old;
         }
         return null;
@@ -60,7 +60,7 @@ public record BaseEntityData
             ["id"] = new Value.U64Value(Id),
             ["version"] = new Value.I64Value(Version)
         };
-        foreach (var kvp in Dynamic)
+        foreach (var kvp in DynamicRecord)
         {
             record[kvp.Key] = kvp.Value;
         }
@@ -84,8 +84,8 @@ public record BaseEntityData
             else if (vVal is not Value.NullValue) throw new EntityError("BaseEntity", "invalid version field");
         }
 
-        var dynamic = new Record(record.Where(k => k.Key != "id" && k.Key != "version").ToDictionary(k => k.Key, k => k.Value));
+        var dynamicRecord = new Record(record.Where(k => k.Key != "id" && k.Key != "version").ToDictionary(k => k.Key, k => k.Value));
 
-        return new BaseEntityData { Id = id, Version = version, Dynamic = dynamic };
+        return new BaseEntityData { Id = id, Version = version, DynamicRecord = dynamicRecord };
     }
 }

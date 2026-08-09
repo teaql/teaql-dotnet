@@ -29,7 +29,7 @@ public class XlsBlock
 
     [JsonPropertyName("value")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public JsonNode? Value { get; set; }
+    public JsonNode? NodeValue { get; set; }
 
     [JsonPropertyName("properties")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -44,12 +44,12 @@ public class XlsBlock
         Bottom = y;
         Left = x;
         Right = x;
-        Value = value;
+        NodeValue = value;
     }
 
     public static XlsBlock FromContext(XlsBlockBuildContext context, JsonNode? value)
     {
-        return new XlsBlock(context.Page, context.X, context.Y, value);
+        return new XlsBlock(context.PageName, context.X, context.Y, value);
     }
 
     public XlsBlock Region(int left, int top, int right, int bottom)
@@ -68,9 +68,9 @@ public class XlsBlock
         return this;
     }
 
-    public XlsBlock SetValue(JsonNode? value)
+    public XlsBlock Value(JsonNode? value)
     {
-        Value = value;
+        NodeValue = value;
         return this;
     }
 
@@ -109,7 +109,7 @@ public class XlsBlock
 public class XlsBlockBuildContext
 {
     [JsonPropertyName("page")]
-    public string Page { get; set; } = string.Empty;
+    public string PageName { get; set; } = string.Empty;
 
     [JsonPropertyName("startX")]
     public int StartX { get; set; }
@@ -126,7 +126,7 @@ public class XlsBlockBuildContext
     {
         X = Math.Max(0, x);
         Y = Math.Max(0, y);
-        Page = page;
+        PageName = page;
         StartX = X;
     }
 
@@ -135,11 +135,13 @@ public class XlsBlockBuildContext
         return new XlsBlockBuildContext(page, 0, 0);
     }
 
+    public static XlsBlockBuildContext Page(string page) => FromPage(page);
+
     public XlsBlockBuildContext Next()
     {
         return new XlsBlockBuildContext
         {
-            Page = Page,
+            PageName = PageName,
             StartX = StartX,
             X = X + 1,
             Y = Y
@@ -150,7 +152,7 @@ public class XlsBlockBuildContext
     {
         return new XlsBlockBuildContext
         {
-            Page = Page,
+            PageName = PageName,
             StartX = StartX,
             X = 0,
             Y = Y + 1
@@ -161,7 +163,7 @@ public class XlsBlockBuildContext
     {
         return new XlsBlockBuildContext
         {
-            Page = Page,
+            PageName = PageName,
             StartX = StartX,
             X = StartX,
             Y = Y + 1

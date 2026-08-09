@@ -31,42 +31,42 @@ public abstract record Expr
 
     public static Expr Column(string name) => new ColumnExpr(name);
 
-    public static Expr Val(Value value) => new ValueExpr(value);
+    public static Expr Value(Value value) => new ValueExpr(value);
 
-    public static Expr Func(ExprFunction function, IEnumerable<Expr> args) => 
+    public static Expr Function(ExprFunction function, IEnumerable<Expr> args) => 
         new FunctionExpr(function, args.ToList());
 
-    public static Expr Soundex(Expr expr) => Func(ExprFunction.Soundex, new[] { expr });
-    public static Expr Gbk(Expr expr) => Func(ExprFunction.Gbk, new[] { expr });
-    public static Expr CountAll() => Func(ExprFunction.Count, new Expr[0]);
-    public static Expr CountExpr(Expr expr) => Func(ExprFunction.Count, new[] { expr });
-    public static Expr SumExpr(Expr expr) => Func(ExprFunction.Sum, new[] { expr });
-    public static Expr AvgExpr(Expr expr) => Func(ExprFunction.Avg, new[] { expr });
-    public static Expr MinExpr(Expr expr) => Func(ExprFunction.Min, new[] { expr });
-    public static Expr MaxExpr(Expr expr) => Func(ExprFunction.Max, new[] { expr });
-    public static Expr StddevExpr(Expr expr) => Func(ExprFunction.Stddev, new[] { expr });
-    public static Expr StddevPopExpr(Expr expr) => Func(ExprFunction.StddevPop, new[] { expr });
-    public static Expr VarSampExpr(Expr expr) => Func(ExprFunction.VarSamp, new[] { expr });
-    public static Expr VarPopExpr(Expr expr) => Func(ExprFunction.VarPop, new[] { expr });
-    public static Expr BitAndExpr(Expr expr) => Func(ExprFunction.BitAnd, new[] { expr });
-    public static Expr BitOrExpr(Expr expr) => Func(ExprFunction.BitOr, new[] { expr });
-    public static Expr BitXorExpr(Expr expr) => Func(ExprFunction.BitXor, new[] { expr });
+    public static Expr Soundex(Expr expr) => Function(ExprFunction.Soundex, new[] { expr });
+    public static Expr Gbk(Expr expr) => Function(ExprFunction.Gbk, new[] { expr });
+    public static Expr CountAll() => Function(ExprFunction.Count, new Expr[0]);
+    public static Expr CountExpr(Expr expr) => Function(ExprFunction.Count, new[] { expr });
+    public static Expr SumExpr(Expr expr) => Function(ExprFunction.Sum, new[] { expr });
+    public static Expr AvgExpr(Expr expr) => Function(ExprFunction.Avg, new[] { expr });
+    public static Expr MinExpr(Expr expr) => Function(ExprFunction.Min, new[] { expr });
+    public static Expr MaxExpr(Expr expr) => Function(ExprFunction.Max, new[] { expr });
+    public static Expr StddevExpr(Expr expr) => Function(ExprFunction.Stddev, new[] { expr });
+    public static Expr StddevPopExpr(Expr expr) => Function(ExprFunction.StddevPop, new[] { expr });
+    public static Expr VarSampExpr(Expr expr) => Function(ExprFunction.VarSamp, new[] { expr });
+    public static Expr VarPopExpr(Expr expr) => Function(ExprFunction.VarPop, new[] { expr });
+    public static Expr BitAndExpr(Expr expr) => Function(ExprFunction.BitAnd, new[] { expr });
+    public static Expr BitOrExpr(Expr expr) => Function(ExprFunction.BitOr, new[] { expr });
+    public static Expr BitXorExpr(Expr expr) => Function(ExprFunction.BitXor, new[] { expr });
 
     public static Expr SoundLike(string column, Value value) => 
-        Binary(Soundex(Column(column)), BinaryOp.Eq, Soundex(Val(value)));
+        Binary(Soundex(Column(column)), BinaryOp.Eq, Soundex(Value(value)));
 
-    public static Expr Eq(string column, Value value) => Binary(Column(column), BinaryOp.Eq, Val(value));
-    public static Expr Ne(string column, Value value) => Binary(Column(column), BinaryOp.Ne, Val(value));
-    public static Expr Gt(string column, Value value) => Binary(Column(column), BinaryOp.Gt, Val(value));
-    public static Expr Gte(string column, Value value) => Binary(Column(column), BinaryOp.Gte, Val(value));
-    public static Expr Lt(string column, Value value) => Binary(Column(column), BinaryOp.Lt, Val(value));
-    public static Expr Lte(string column, Value value) => Binary(Column(column), BinaryOp.Lte, Val(value));
+    public static Expr Eq(string column, Value value) => Binary(Column(column), BinaryOp.Eq, Value(value));
+    public static Expr Ne(string column, Value value) => Binary(Column(column), BinaryOp.Ne, Value(value));
+    public static Expr Gt(string column, Value value) => Binary(Column(column), BinaryOp.Gt, Value(value));
+    public static Expr Gte(string column, Value value) => Binary(Column(column), BinaryOp.Gte, Value(value));
+    public static Expr Lt(string column, Value value) => Binary(Column(column), BinaryOp.Lt, Value(value));
+    public static Expr Lte(string column, Value value) => Binary(Column(column), BinaryOp.Lte, Value(value));
     
     public static Expr Like(string column, string pattern) => 
-        Binary(Column(column), BinaryOp.Like, Val(new Value.TextValue(pattern)));
+        Binary(Column(column), BinaryOp.Like, Value(new Core.Value.TextValue(pattern)));
         
     public static Expr NotLike(string column, string pattern) => 
-        Binary(Column(column), BinaryOp.NotLike, Val(new Value.TextValue(pattern)));
+        Binary(Column(column), BinaryOp.NotLike, Value(new Core.Value.TextValue(pattern)));
 
     public static Expr Contain(string column, string value) => Like(column, $"%{value}%");
     public static Expr NotContain(string column, string value) => NotLike(column, $"%{value}%");
@@ -81,16 +81,16 @@ public abstract record Expr
         Binary(Column(leftColumn), op, Column(rightColumn));
 
     public static Expr InList(string column, IEnumerable<Value> values) => 
-        Binary(Column(column), BinaryOp.In, Val(new Value.ListValue(values.ToList())));
+        Binary(Column(column), BinaryOp.In, Value(new Core.Value.ListValue(values.ToList())));
 
     public static Expr NotInList(string column, IEnumerable<Value> values) => 
-        Binary(Column(column), BinaryOp.NotIn, Val(new Value.ListValue(values.ToList())));
+        Binary(Column(column), BinaryOp.NotIn, Value(new Core.Value.ListValue(values.ToList())));
 
     public static Expr InLarge(string column, IEnumerable<Value> values) => 
-        Binary(Column(column), BinaryOp.InLarge, Val(new Value.ListValue(values.ToList())));
+        Binary(Column(column), BinaryOp.InLarge, Value(new Core.Value.ListValue(values.ToList())));
 
     public static Expr NotInLarge(string column, IEnumerable<Value> values) => 
-        Binary(Column(column), BinaryOp.NotInLarge, Val(new Value.ListValue(values.ToList())));
+        Binary(Column(column), BinaryOp.NotInLarge, Value(new Core.Value.ListValue(values.ToList())));
 
     public static Expr InSubquery(string column, EntityDescriptor entity, SelectQuery query, string field) => 
         Subquery(Column(column), BinaryOp.In, entity, query, field);
@@ -105,7 +105,7 @@ public abstract record Expr
     }
 
     public static Expr Between(string column, Value lower, Value upper) => 
-        new BetweenExpr(Column(column), Val(lower), Val(upper));
+        new BetweenExpr(Column(column), Value(lower), Value(upper));
 
     public static Expr IsNull(string column) => new IsNullExpr(Column(column));
     public static Expr IsNotNull(string column) => new IsNotNullExpr(Column(column));
@@ -138,7 +138,7 @@ public abstract record Expr
 
     public static Expr Negate(Expr expr) => new NotExpr(expr);
 
-    public Expr AndExprMethod(Expr other)
+    public Expr AndExpr(Expr other)
     {
         if (this == other) return this;
         
@@ -155,7 +155,7 @@ public abstract record Expr
         return new AndExpr(new List<Expr> { this, other });
     }
 
-    public Expr OrExprMethod(Expr other)
+    public Expr OrExpr(Expr other)
     {
         if (this == other) return this;
         

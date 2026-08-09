@@ -39,8 +39,8 @@ public class RequestTests
 
         var result = RequestHelpers.ApplyRuntimeMetadata(query, options, new List<QuerySelection>());
 
-        Assert.Equal("test comment", result.Comment);
-        Assert.Equal("SELECT * FROM Users", result.RawSql);
+        Assert.Equal("test comment", result.CommentText);
+        Assert.Equal("SELECT * FROM Users", result.RawSqlText);
     }
 
     [Fact]
