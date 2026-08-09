@@ -10,7 +10,7 @@ public class XlsTests
     public void TestXlsBlock()
     {
         var block = new XlsBlock("page1", 10, 20, JsonValue.Create("test"));
-        Assert.Equal("page1", block.Page);
+        Assert.Equal("page1", block.PageName);
         Assert.Equal(10, block.Left);
         Assert.Equal(10, block.Right);
         Assert.Equal(20, block.Top);
@@ -31,8 +31,8 @@ public class XlsTests
     [Fact]
     public void TestXlsBlockBuildContext()
     {
-        var ctx = XlsBlockBuildContext.FromPage("page1");
-        Assert.Equal("page1", ctx.Page);
+        var ctx = XlsBlockBuildContext.Page("page1");
+        Assert.Equal("page1", ctx.PageName);
         Assert.Equal(0, ctx.X);
         Assert.Equal(0, ctx.Y);
 

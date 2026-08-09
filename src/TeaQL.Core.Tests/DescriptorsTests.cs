@@ -11,7 +11,7 @@ public class DescriptorsTests
     public void TestPropertyDescriptorBuilder()
     {
         var prop = TeaQL.Core.PropertyDescriptor.New("username", DataType.Text)
-            .WithColumnName("user_name")
+            .ColumnName("user_name")
             .NotNull()
             .Id()
             .Version();
@@ -28,29 +28,29 @@ public class DescriptorsTests
     public void TestRelationDescriptorBuilder()
     {
         var rel = TeaQL.Core.RelationDescriptor.New("orders", "Order")
-            .WithLocalKey("user_id")
-            .WithForeignKey("customer_id")
-            .IsMany()
+            .LocalKey("user_id")
+            .ForeignKey("customer_id")
+            .Many()
             .Detached()
             .KeepMissing();
 
         Assert.Equal("orders", rel.Name);
         Assert.Equal("Order", rel.TargetEntity);
-        Assert.Equal("user_id", rel.LocalKey);
-        Assert.Equal("customer_id", rel.ForeignKey);
-        Assert.True(rel.Many);
-        Assert.False(rel.Attach);
-        Assert.False(rel.DeleteMissing);
+        Assert.Equal("user_id", rel.LocalKeyValue);
+        Assert.Equal("customer_id", rel.ForeignKeyValue);
+        Assert.True(rel.IsMany);
+        Assert.False(rel.IsAttach);
+        Assert.False(rel.IsDeleteMissing);
     }
 
     [Fact]
     public void TestEntityDescriptorBuilderAndLookups()
     {
         var entity = TeaQL.Core.EntityDescriptor.New("User")
-            .WithTableName("users")
-            .WithDataService("auth_db")
-            .WithAuditMaskFields(new List<string> { "password" })
-            .WithAuditValueMaxLen(255);
+            .TableName("users")
+            .DataService("auth_db")
+            .AuditMaskFields(new List<string> { "password" })
+            .AuditValueMaxLen(255);
 
         var idProp = TeaQL.Core.PropertyDescriptor.New("id", DataType.I64).Id();
         var nameProp = TeaQL.Core.PropertyDescriptor.New("name", DataType.Text);
@@ -58,16 +58,16 @@ public class DescriptorsTests
 
         var ordersRel = TeaQL.Core.RelationDescriptor.New("orders", "Order");
 
-        entity.WithProperty(idProp)
-              .WithProperty(nameProp)
-              .WithProperty(versionProp)
-              .WithRelation(ordersRel);
+        entity.Property(idProp)
+              .Property(nameProp)
+              .Property(versionProp)
+              .Relation(ordersRel);
 
         Assert.Equal("User", entity.Name);
         Assert.Equal("users", entity.TableNameValue);
-        Assert.Equal("auth_db", entity.DataService);
-        Assert.Equal(new List<string> { "password" }, entity.AuditMaskFields);
-        Assert.Equal(255, entity.AuditValueMaxLen);
+        Assert.Equal("auth_db", entity.DataServiceName);
+        Assert.Equal(new List<string> { "password" }, entity.AuditMaskFieldList);
+        Assert.Equal(255, entity.AuditValueMaxLenValue);
 
         // Lookups
         Assert.Equal(nameProp, entity.PropertyByName("name"));
