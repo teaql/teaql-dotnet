@@ -14,7 +14,7 @@ public class EntityGraphTests
         public static EntityDescriptor EntityDescriptor()
         {
             return TeaQL.Core.EntityDescriptor.New("Dummy")
-                .WithProperty(TeaQL.Core.PropertyDescriptor.New("id", DataType.I64).Id());
+                .Property(TeaQL.Core.PropertyDescriptor.New("id", DataType.I64).Id());
         }
 
         public Record IntoRecord() => Record;

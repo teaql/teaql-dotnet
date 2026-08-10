@@ -10,7 +10,7 @@ public class XlsTests
     public void TestXlsBlock()
     {
         var block = new XlsBlock("page1", 10, 20, JsonValue.Create("test"));
-        Assert.Equal("page1", block.PageName);
+        Assert.Equal("page1", block.Page);
         Assert.Equal(10, block.Left);
         Assert.Equal(10, block.Right);
         Assert.Equal(20, block.Top);
@@ -51,14 +51,14 @@ public class XlsTests
         var workbook = new XlsWorkbook();
         var page = new XlsPage("Sheet1");
         
-        var block = new XlsBlock("Sheet1", 0, 0, JsonValue.Create("header"));
+        var block = new XlsBlock { Page = "Sheet1", Top = 0, Left = 0, Bottom = 10, Right = 10 };
         page.PushBlock(block);
         
         workbook.PushPage(page);
         
         Assert.NotNull(workbook.Page("Sheet1"));
         Assert.NotNull(workbook.Page("Sheet1")?.BlockAt(0, 0));
-        Assert.Null(workbook.Page("Sheet1")?.BlockAt(1, 1));
+        Assert.Null(workbook.Page("Sheet1")?.BlockAt(11, 11));
         
         var json = workbook.ToJsonValue();
         Assert.NotNull(json);
