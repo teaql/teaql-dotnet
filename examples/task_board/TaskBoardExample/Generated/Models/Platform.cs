@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using TeaQL.Core.Api;
-using TeaQL.Core.Types;
+using TeaQL.Core;
 
 namespace Generated.Models
 {

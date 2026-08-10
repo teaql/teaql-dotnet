@@ -87,77 +87,57 @@ class Program
         await transport.ExecuteSqlAsync(new CompiledQuery("CREATE TABLE task_execution_log (id INTEGER PRIMARY KEY, task INTEGER, action TEXT, detail TEXT, version INTEGER)", new List<Value>()));
 
         Console.WriteLine("Inserting Platform and TaskStatus...");
-        var pId = new Value.I64Value(1);
-        await executor.MutateAsync(new InsertMutationRequest(
-            new InsertCommand { 
-                Entity = "Platform", 
-                Values = new Record { 
-                    ["id"] = pId, 
-                    ["name"] = new Value.TextValue("Robot System"), 
-                    ["founded"] = new Value.I64Value(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()), 
-                    ["user_email"] = new Value.TextValue("admin@robots.com"), 
-                    ["version"] = new Value.I64Value(1) 
-                }
-            }
-        ));
+        var pId = 1L;
+        var p = new Generated.Models.Platform {
+            Id = pId,
+            Name = "Robot System",
+            Founded = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            UserEmail = "admin@robots.com",
+            Version = 1
+        };
+        await executor.MutateAsync(new InsertMutationRequest(p.ToInsertCommand()));
 
-        var tsId = new Value.I64Value(1001);
-        await executor.MutateAsync(new InsertMutationRequest(
-            new InsertCommand { 
-                Entity = "TaskStatus", 
-                Values = new Record {
-                    ["id"] = tsId,
-                    ["name"] = new Value.TextValue("Planned"),
-                    ["code"] = new Value.TextValue("PLANNED"),
-                    ["color"] = new Value.TextValue("#94A3B8"),
-                    ["display_order"] = new Value.I64Value(10),
-                    ["progress"] = new Value.I64Value(0),
-                    ["platform"] = pId,
-                    ["version"] = new Value.I64Value(1)
-                }
-            }
-        ));
+        var tsId = 1001L;
+        var ts = new Generated.Models.TaskStatus {
+            Id = tsId,
+            Name = "Planned",
+            Code = "PLANNED",
+            Color = "#94A3B8",
+            DisplayOrder = 10,
+            Progress = 0,
+            Platform = pId,
+            Version = 1
+        };
+        await executor.MutateAsync(new InsertMutationRequest(ts.ToInsertCommand()));
 
         Console.WriteLine("Creating Task...");
-        var tId = new Value.I64Value(1);
-        await executor.MutateAsync(new InsertMutationRequest(
-            new InsertCommand { 
-                Entity = "Task", 
-                Values = new Record {
-                    ["id"] = tId,
-                    ["name"] = new Value.TextValue("Initial Robot Task"),
-                    ["status"] = tsId,
-                    ["platform"] = pId,
-                    ["version"] = new Value.I64Value(1)
-                }
-            }
-        ));
+        var tId = 1L;
+        var t = new Generated.Models.Task {
+            Id = tId,
+            Name = "Initial Robot Task",
+            Status = tsId,
+            Platform = pId,
+            Version = 1
+        };
+        await executor.MutateAsync(new InsertMutationRequest(t.ToInsertCommand()));
 
         Console.WriteLine("Updating Task...");
-        await executor.MutateAsync(new UpdateMutationRequest(
-            new UpdateCommand { 
-                Entity = "Task", 
-                Id = tId,
-                Values = new Record {
-                    ["name"] = new Value.TextValue("Updated Robot Task"),
-                    ["version"] = new Value.I64Value(2)
-                }
-            }
-        ));
+        var tUpdate = new Generated.Models.Task {
+            Id = tId,
+            Name = "Updated Robot Task",
+            Version = 2
+        };
+        await executor.MutateAsync(new UpdateMutationRequest(tUpdate.ToUpdateCommand()));
 
         Console.WriteLine("Inserting TaskExecutionLog...");
-        await executor.MutateAsync(new InsertMutationRequest(
-            new InsertCommand { 
-                Entity = "TaskExecutionLog", 
-                Values = new Record {
-                    ["id"] = new Value.I64Value(1),
-                    ["task"] = tId,
-                    ["action"] = new Value.TextValue("Update Name"),
-                    ["detail"] = new Value.TextValue("Changed name to 'Updated Robot Task'"),
-                    ["version"] = new Value.I64Value(1)
-                }
-            }
-        ));
+        var log = new Generated.Models.TaskExecutionLog {
+            Id = 1L,
+            Task = tId,
+            Action = "Update Name",
+            Detail = "Changed name to 'Updated Robot Task'",
+            Version = 1
+        };
+        await executor.MutateAsync(new InsertMutationRequest(log.ToInsertCommand()));
 
         Console.WriteLine("Querying Tasks...");
         var taskQuery = new SelectQuery("Task");

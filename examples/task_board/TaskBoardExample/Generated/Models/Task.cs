@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using TeaQL.Core.Api;
-using TeaQL.Core.Types;
+using TeaQL.Core;
 
 namespace Generated.Models
 {
@@ -20,9 +19,9 @@ namespace Generated.Models
 
                     if (Name != null) record["name"] = new Value.TextValue(Name);
 
-                    if (Status.HasValue) record["Task Status"] = new Value.I64Value(Status.Value);
+                    if (Status.HasValue) record["status"] = new Value.I64Value(Status.Value);
 
-                    if (Platform.HasValue) record["Platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
 
                     if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 
@@ -34,9 +33,9 @@ namespace Generated.Models
             var record = new Record();
                     if (Name != null) record["name"] = new Value.TextValue(Name);
 
-                    if (Status.HasValue) record["Task Status"] = new Value.I64Value(Status.Value);
+                    if (Status.HasValue) record["status"] = new Value.I64Value(Status.Value);
 
-                    if (Platform.HasValue) record["Platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
 
                     if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 

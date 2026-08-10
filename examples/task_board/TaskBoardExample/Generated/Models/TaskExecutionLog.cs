@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using TeaQL.Core.Api;
-using TeaQL.Core.Types;
+using TeaQL.Core;
 
 namespace Generated.Models
 {
@@ -18,7 +17,7 @@ namespace Generated.Models
             var record = new Record();
                     if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
 
-                    if (Task.HasValue) record["Task"] = new Value.I64Value(Task.Value);
+                    if (Task.HasValue) record["task"] = new Value.I64Value(Task.Value);
 
                     if (Action != null) record["action"] = new Value.TextValue(Action);
 
@@ -32,7 +31,7 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Task.HasValue) record["Task"] = new Value.I64Value(Task.Value);
+                    if (Task.HasValue) record["task"] = new Value.I64Value(Task.Value);
 
                     if (Action != null) record["action"] = new Value.TextValue(Action);
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using TeaQL.Core.Api;
-using TeaQL.Core.Types;
+using TeaQL.Core;
 
 namespace Generated.Models
 {
@@ -31,7 +30,7 @@ namespace Generated.Models
 
                     if (Progress.HasValue) record["progress"] = new Value.I64Value(Progress.Value);
 
-                    if (Platform.HasValue) record["Platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
 
                     if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 
@@ -51,7 +50,7 @@ namespace Generated.Models
 
                     if (Progress.HasValue) record["progress"] = new Value.I64Value(Progress.Value);
 
-                    if (Platform.HasValue) record["Platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
 
                     if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 
