@@ -21,12 +21,17 @@ public static class DialectUtils
 
     public static string QuoteIdentifierIfNeeded(string ident, char quote)
     {
+        return QuoteIdentifierIfNeeded(ident, quote, quote);
+    }
+
+    public static string QuoteIdentifierIfNeeded(string ident, char openQuote, char closeQuote)
+    {
         if (IsWrappedIdentifier(ident)) return ident;
         if (NeedsQuotedIdentifier(ident))
         {
-            var quoteString = quote.ToString();
-            var escaped = ident.Replace(quoteString, quoteString + quoteString);
-            return $"{quote}{escaped}{quote}";
+            var closeQuoteString = closeQuote.ToString();
+            var escaped = ident.Replace(closeQuoteString, closeQuoteString + closeQuoteString);
+            return $"{openQuote}{escaped}{closeQuote}";
         }
         return ident;
     }

@@ -10,7 +10,8 @@ public enum DatabaseKind
 {
     PostgreSql,
     Sqlite,
-    MySql
+    MySql,
+    SqlServer
 }
 
 public class CompiledQuery
@@ -43,6 +44,7 @@ public class CompiledQuery
             DatabaseKind.PostgreSql => ReplacePostgresPlaceholders(Sql, Params),
             DatabaseKind.Sqlite => ReplacePositionalPlaceholders(Sql, Params, DatabaseKind.Sqlite),
             DatabaseKind.MySql => ReplacePositionalPlaceholders(Sql, Params, DatabaseKind.MySql),
+            DatabaseKind.SqlServer => ReplaceSqlServerPlaceholders(Sql, Params),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }
@@ -92,6 +94,53 @@ public class CompiledQuery
                     continue;
                 }
                 output.Append('$');
+                output.Append(indexStr);
+                i = j - 1;
+                continue;
+            }
+            output.Append(ch);
+        }
+        return output.ToString();
+    }
+
+    private static string ReplaceSqlServerPlaceholders(string sql, List<Value> parameters)
+    {
+        var output = new System.Text.StringBuilder(sql.Length);
+        bool inString = false;
+        
+        for (int i = 0; i < sql.Length; i++)
+        {
+            char ch = sql[i];
+            if (ch == '\'')
+            {
+                output.Append('\'');
+                if (inString && i + 1 < sql.Length && sql[i + 1] == '\'')
+                {
+                    output.Append('\'');
+                    i++;
+                }
+                else
+                {
+                    inString = !inString;
+                }
+                continue;
+            }
+            if (!inString && ch == '@' && i + 1 < sql.Length && sql[i + 1] == 'p' && i + 2 < sql.Length && char.IsDigit(sql[i + 2]))
+            {
+                var indexStr = new System.Text.StringBuilder();
+                int j = i + 2;
+                while (j < sql.Length && char.IsDigit(sql[j]))
+                {
+                    indexStr.Append(sql[j]);
+                    j++;
+                }
+                if (int.TryParse(indexStr.ToString(), out int index) && index > 0 && index <= parameters.Count)
+                {
+                    output.Append(SqlLiteral(parameters[index - 1], DatabaseKind.SqlServer));
+                    i = j - 1;
+                    continue;
+                }
+                output.Append("@p");
                 output.Append(indexStr);
                 i = j - 1;
                 continue;
