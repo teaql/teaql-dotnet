@@ -71,6 +71,9 @@ namespace TeaQL.TfpEndpoint
                 }
             }
 
+            // Implicit soft delete filter: version > 0
+            q.Filter(Expr.Gt("version", new Value.I64Value(0)));
+
             if (tfpQuery.SelectItems != null)
                 q.Projects(tfpQuery.SelectItems.ToArray());
 
@@ -131,11 +134,20 @@ namespace TeaQL.TfpEndpoint
 
             Value idVal = MapToValue(tfpMut.Id);
 
+            long? expectedVersion = null;
+            if (tfpMut.Payload != null && tfpMut.Payload.TryGetValue("version", out var versionObj))
+            {
+                if (versionObj is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.Number)
+                {
+                    expectedVersion = je.GetInt64();
+                }
+            }
+
             MutationRequest mutReq = tfpMut.Action switch
             {
                 "Create" => new InsertMutationRequest(new InsertCommand { Entity = tfpMut.Entity, Values = record, TraceChain = trace }),
-                "Update" => new UpdateMutationRequest(new UpdateCommand { Entity = tfpMut.Entity, Id = idVal, Values = record, TraceChain = trace }),
-                "Delete" => new DeleteMutationRequest(new DeleteCommand { Entity = tfpMut.Entity, Id = idVal, SoftDelete = true, TraceChain = trace }),
+                "Update" => new UpdateMutationRequest(new UpdateCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, Values = record, TraceChain = trace }),
+                "Delete" => new DeleteMutationRequest(new DeleteCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, SoftDelete = true, TraceChain = trace }),
                 "Recover" => new RecoverMutationRequest(new RecoverCommand { Entity = tfpMut.Entity, Id = idVal, TraceChain = trace }),
                 _ => throw new ArgumentException($"Unknown mutation action: {tfpMut.Action}")
             };

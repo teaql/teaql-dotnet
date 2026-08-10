@@ -15,6 +15,8 @@
     <ProjectReference Include="..\..\src\TeaQL.Core\TeaQL.Core.csproj" />
     <ProjectReference Include="..\..\src\TeaQL.Provider.PostgreSql\TeaQL.Provider.PostgreSql.csproj" />
     <ProjectReference Include="..\..\src\TeaQL.Sql\TeaQL.Sql.csproj" />
+    <ProjectReference Include="..\..\src\TeaQL.TfpEndpoint\TeaQL.TfpEndpoint.csproj" />
+    <ProjectReference Include="..\..\src\TeaQL.Provider.Sqlite\TeaQL.Provider.Sqlite.csproj" />
   </ItemGroup>
 
 </Project>
