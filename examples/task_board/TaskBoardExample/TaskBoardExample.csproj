@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\TeaQL.Core\TeaQL.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\TeaQL.Runtime\TeaQL.Runtime.csproj" />
+    <ProjectReference Include="..\..\..\src\TeaQL.Provider.Sqlite\TeaQL.Provider.Sqlite.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
