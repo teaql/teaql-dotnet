@@ -1,0 +1,165 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Threading.Tasks;
+using TeaQL.Core;
+using TeaQL.DataService;
+
+namespace TeaQL.TfpEndpoint
+{
+    public class TfpEndpointHandler
+    {
+        private readonly IDataService _dataService;
+
+        public TfpEndpointHandler(IDataService dataService)
+        {
+            _dataService = dataService;
+        }
+
+        private Value MapToValue(object? obj)
+        {
+            if (obj == null) return new Value.NullValue();
+            return obj switch
+            {
+                bool b => new Value.BoolValue(b),
+                int i => new Value.I64Value(i),
+                long l => new Value.I64Value(l),
+                uint ui => new Value.U64Value(ui),
+                ulong ul => new Value.U64Value(ul),
+                double d => new Value.F64Value(d),
+                decimal dec => new Value.DecimalValue(dec),
+                string s => new Value.TextValue(s),
+                JsonElement e => MapJsonElementToValue(e),
+                _ => new Value.TextValue(obj.ToString() ?? "")
+            };
+        }
+
+        private Value MapJsonElementToValue(JsonElement e)
+        {
+            return e.ValueKind switch
+            {
+                JsonValueKind.Null => new Value.NullValue(),
+                JsonValueKind.True => new Value.BoolValue(true),
+                JsonValueKind.False => new Value.BoolValue(false),
+                JsonValueKind.Number => e.TryGetInt64(out var l) ? new Value.I64Value(l) : new Value.F64Value(e.GetDouble()),
+                JsonValueKind.String => new Value.TextValue(e.GetString() ?? ""),
+                _ => new Value.TextValue(e.GetRawText())
+            };
+        }
+
+        public async Task<Dictionary<string, object>> HandleQueryAsync(string payloadJson)
+        {
+            var tfpQuery = JsonSerializer.Deserialize<TfpSelectQuery>(payloadJson);
+            if (tfpQuery == null)
+                throw new ArgumentException("Failed to parse JSON payload");
+
+            var q = new SelectQuery(tfpQuery.Entity);
+            
+            if (tfpQuery.LimitValue.HasValue)
+                q.Limit(tfpQuery.LimitValue.Value);
+                
+            if (tfpQuery.OffsetValue.HasValue)
+                q.Offset(tfpQuery.OffsetValue.Value);
+
+            if (tfpQuery.OrderItems != null)
+            {
+                foreach (var o in tfpQuery.OrderItems)
+                {
+                    var dir = o.Direction == "Desc" ? SortDirection.Desc : SortDirection.Asc;
+                    q.OrderBy(Core.OrderBy.New(o.Field, dir));
+                }
+            }
+
+            if (tfpQuery.SelectItems != null)
+                q.Projects(tfpQuery.SelectItems.ToArray());
+
+            if (tfpQuery.GroupByItems != null)
+            {
+                foreach (var g in tfpQuery.GroupByItems)
+                {
+                    q.GroupBy(g);
+                }
+            }
+
+            if (tfpQuery.CommentText != null)
+                q.Comment(tfpQuery.CommentText);
+
+            var req = new QueryRequest
+            {
+                Query = q,
+                Comment = tfpQuery.CommentText
+            };
+
+            var res = await _dataService.QueryAsync(req);
+
+            var rows = new List<Dictionary<string, object?>>();
+            foreach (var r in res.Rows)
+            {
+                var dict = new Dictionary<string, object?>();
+                foreach (var kvp in r)
+                {
+                    dict[kvp.Key] = kvp.Value.ToJsonValue();
+                }
+                rows.Add(dict);
+            }
+
+            return new Dictionary<string, object>
+            {
+                ["data"] = rows,
+                ["resultCode"] = 0,
+                ["status"] = "YES"
+            };
+        }
+
+        public async Task<Dictionary<string, object>> HandleMutationAsync(string payloadJson)
+        {
+            var tfpMut = JsonSerializer.Deserialize<TfpMutationQuery>(payloadJson);
+            if (tfpMut == null)
+                throw new ArgumentException("Failed to parse JSON payload");
+
+            var trace = new List<TraceNode> { new TraceNode(tfpMut.Entity, null, tfpMut.Comment ?? "") };
+
+            var record = new Record();
+            if (tfpMut.Payload != null)
+            {
+                foreach (var kv in tfpMut.Payload)
+                {
+                    record[kv.Key] = MapToValue(kv.Value);
+                }
+            }
+
+            Value idVal = MapToValue(tfpMut.Id);
+
+            MutationRequest mutReq = tfpMut.Action switch
+            {
+                "Create" => new InsertMutationRequest(new InsertCommand { Entity = tfpMut.Entity, Values = record, TraceChain = trace }),
+                "Update" => new UpdateMutationRequest(new UpdateCommand { Entity = tfpMut.Entity, Id = idVal, Values = record, TraceChain = trace }),
+                "Delete" => new DeleteMutationRequest(new DeleteCommand { Entity = tfpMut.Entity, Id = idVal, SoftDelete = true, TraceChain = trace }),
+                "Recover" => new RecoverMutationRequest(new RecoverCommand { Entity = tfpMut.Entity, Id = idVal, TraceChain = trace }),
+                _ => throw new ArgumentException($"Unknown mutation action: {tfpMut.Action}")
+            };
+
+            var res = await _dataService.MutateAsync(mutReq);
+
+            var dataArr = new List<Dictionary<string, object?>>();
+            if (res.GeneratedValues != null && res.GeneratedValues.Count > 0)
+            {
+                var m = new Dictionary<string, object?>();
+                foreach (var kv in res.GeneratedValues)
+                {
+                    m[kv.Key] = kv.Value.ToJsonValue();
+                }
+                dataArr.Add(m);
+            }
+
+            return new Dictionary<string, object>
+            {
+                ["affectedRows"] = res.AffectedRows,
+                ["resultCode"] = 0,
+                ["status"] = "YES",
+                ["data"] = dataArr
+            };
+        }
+    }
+}
