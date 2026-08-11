@@ -21,3 +21,16 @@ public interface ITeaqlRuntime
 {
     UserContext UserContext { get; }
 }
+
+public interface IRemoteCacheProvider
+{
+    void Put(string key, object value, int? timeToLiveInSeconds = null);
+    T? Get<T>(string key);
+    void Remove(string key);
+}
+
+public interface IRemoteLockProvider
+{
+    bool TryLock(string key, long timeoutMillis, long expireMillis);
+    void Unlock(string key);
+}

@@ -106,4 +106,54 @@ public class UserContext
     {
         return _locals.TryRemove(key, out var value) ? value : null;
     }
+
+    // ==========================================
+    // Context Attribute
+    // ==========================================
+    public void PutAttribute(string key, object value) { }
+    public T? GetAttribute<T>(string key) { return default; }
+    public object? GetAttribute(string key) { return null; }
+
+    // ==========================================
+    // Local Cache
+    // ==========================================
+    public void PutToLocalCache(string key, object value, int? timeToLiveInSeconds = null) { }
+    public T? GetFromLocalCache<T>(string key) { return default; }
+    public void RemoveFromLocalCache(string key) { }
+
+    // ==========================================
+    // Remote Cache
+    // ==========================================
+    public void PutToRemoteCache(string key, object value, int? timeToLiveInSeconds = null)
+    {
+        GetResource<IRemoteCacheProvider>()?.Put(key, value, timeToLiveInSeconds);
+    }
+    public T? GetFromRemoteCache<T>(string key)
+    {
+        var provider = GetResource<IRemoteCacheProvider>();
+        return provider != null ? provider.Get<T>(key) : default;
+    }
+    public void RemoveFromRemoteCache(string key)
+    {
+        GetResource<IRemoteCacheProvider>()?.Remove(key);
+    }
+
+    // ==========================================
+    // Local Lock
+    // ==========================================
+    public bool TryLocalLock(string key, long timeoutMillis, long expireMillis) { return true; }
+    public void UnlockLocal(string key) { }
+
+    // ==========================================
+    // Remote Lock
+    // ==========================================
+    public bool TryRemoteLock(string key, long timeoutMillis, long expireMillis)
+    {
+        var provider = GetResource<IRemoteLockProvider>();
+        return provider != null ? provider.TryLock(key, timeoutMillis, expireMillis) : true;
+    }
+    public void UnlockRemote(string key)
+    {
+        GetResource<IRemoteLockProvider>()?.Unlock(key);
+    }
 }
