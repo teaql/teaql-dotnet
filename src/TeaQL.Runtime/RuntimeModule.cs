@@ -7,6 +7,7 @@ public class RuntimeModule
 {
     public InMemoryMetadataStore Metadata { get; } = new();
     public InMemoryEntityRegistry EntityRegistry { get; } = new();
+    private IRawAuditEventSink? _auditEventSink;
 
     public RuntimeModule Entity(EntityDescriptor descriptor)
     {
@@ -15,10 +16,17 @@ public class RuntimeModule
         return this;
     }
 
+    public RuntimeModule AuditEventSink(IRawAuditEventSink sink)
+    {
+        _auditEventSink = sink;
+        return this;
+    }
+
     public void ApplyTo(UserContext ctx)
     {
         ctx.Metadata = Metadata;
         ctx.EntityRegistry = EntityRegistry;
+        if (_auditEventSink is not null) ctx.SetStandardAuditEventSink(_auditEventSink);
     }
 
     public UserContext IntoContext()
