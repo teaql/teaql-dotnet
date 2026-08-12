@@ -75,6 +75,7 @@ public record SelectQuery
     public Expr? HavingCondition { get; set; }
     public List<OrderBy> OrderByItems { get; set; } = new();
     public Slice? Slice { get; set; }
+    public string? PartitionBy { get; set; }
     public List<Aggregate> AggregateItems { get; set; } = new();
     public List<string> GroupByItems { get; set; } = new();
     public List<RelationLoad> RelationLoads { get; set; } = new();
@@ -279,6 +280,12 @@ public record SelectQuery
     }
 
     public SelectQuery Page(ulong offset, ulong limit) => Offset(offset).Limit(limit);
+
+    public SelectQuery PartitionByField(string field)
+    {
+        PartitionBy = field;
+        return this;
+    }
 
     public SelectQuery Stream(int chunkSize)
     {

@@ -62,6 +62,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         {
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
+        await RelationQueryLoader.EnhanceAsync(SchemaProvider, QueryAsync, rows, request);
         var end = DateTimeOffset.UtcNow;
 
         var metadata = new ExecutionMetadata
@@ -240,6 +241,97 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
     }
 }
 
+internal static class RelationQueryLoader
+{
+    public static async Task EnhanceAsync(
+        ISchemaProvider schemaProvider,
+        Func<QueryRequest, Task<QueryResult>> queryAsync,
+        List<Record> parents,
+        QueryRequest request)
+    {
+        if (parents.Count == 0 || request.Query.RelationLoads.Count == 0)
+        {
+            return;
+        }
+        var parentDescriptor = schemaProvider.GetEntity(request.Query.Entity)
+            ?? throw new SqlExecutorException($"SQL compile error: unknown entity {request.Query.Entity}");
+        foreach (var load in request.Query.RelationLoads)
+        {
+            var relation = parentDescriptor.RelationByName(load.Name)
+                ?? throw new SqlExecutorException($"SQL compile error: missing relation {request.Query.Entity}.{load.Name}");
+            var parentIds = parents
+                .Where(parent => parent.ContainsKey(relation.LocalKeyValue))
+                .Select(parent => parent[relation.LocalKeyValue])
+                .ToList();
+            if (parentIds.Count == 0)
+            {
+                Attach(parents, new List<Record>(), load.Name, relation);
+                continue;
+            }
+            var childQuery = Clone(load.Query ?? new SelectQuery(relation.TargetEntity));
+            childQuery.Entity = relation.TargetEntity;
+            if (!childQuery.Projection.Contains(relation.ForeignKeyValue))
+            {
+                childQuery.Projection.Add(relation.ForeignKeyValue);
+            }
+            childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
+            if (childQuery.Slice != null)
+            {
+                childQuery.PartitionByField(relation.ForeignKeyValue);
+            }
+            var childResult = await queryAsync(new QueryRequest
+            {
+                Query = childQuery,
+                TraceChain = request.TraceChain,
+                Comment = request.Comment
+            });
+            foreach (var child in childResult.Rows)
+            {
+                child.Remove("__teaql_partition_rank");
+            }
+            Attach(parents, childResult.Rows, load.Name, relation);
+        }
+    }
+
+    private static SelectQuery Clone(SelectQuery query) => query with
+    {
+        Projection = new List<string>(query.Projection),
+        ExprProjection = new List<NamedExpr>(query.ExprProjection),
+        OrderByItems = new List<OrderBy>(query.OrderByItems),
+        AggregateItems = new List<Aggregate>(query.AggregateItems),
+        GroupByItems = new List<string>(query.GroupByItems),
+        RelationLoads = new List<RelationLoad>(query.RelationLoads),
+        TraceChain = new List<TraceNode>(query.TraceChain),
+        RawSqlSearchCriteriaItems = new List<string>(query.RawSqlSearchCriteriaItems),
+        DynamicProperties = new List<RawSqlProjection>(query.DynamicProperties),
+        RawProjections = new List<RawSqlProjection>(query.RawProjections),
+        ObjectGroupBys = new List<ObjectGroupBy>(query.ObjectGroupBys),
+        ChildEnhancements = new List<SelectQuery>(query.ChildEnhancements)
+    };
+
+    private static void Attach(
+        List<Record> parents,
+        List<Record> children,
+        string relationName,
+        RelationDescriptor relation)
+    {
+        var buckets = children
+            .Where(child => child.ContainsKey(relation.ForeignKeyValue))
+            .GroupBy(child => child[relation.ForeignKeyValue])
+            .ToDictionary(group => group.Key, group => group.ToList());
+        foreach (var parent in parents)
+        {
+            var related = parent.TryGetValue(relation.LocalKeyValue, out var localKey)
+                && buckets.TryGetValue(localKey, out var bucket)
+                ? bucket
+                : new List<Record>();
+            parent[relationName] = relation.IsMany
+                ? new Value.ListValue(related.Select(row => (Value)new Value.ObjectValue(row)).ToList())
+                : related.Count > 0 ? new Value.ObjectValue(related[0]) : new Value.NullValue();
+        }
+    }
+}
+
 public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
 {
     public SqlDialect Dialect { get; }
@@ -289,6 +381,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
         {
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
+        await RelationQueryLoader.EnhanceAsync(SchemaProvider, QueryAsync, rows, request);
         var end = DateTimeOffset.UtcNow;
 
         var metadata = new ExecutionMetadata
