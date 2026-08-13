@@ -14,6 +14,7 @@ namespace TeaQL.Sql.Tests
     {
         private readonly Mock<SqlDialect> _mockDialect;
         private readonly Mock<ISqlTransactionTransport> _mockTransport;
+        private readonly Mock<IStreamingSqlTransport> _mockStreamingTransport;
         private readonly Mock<ISchemaProvider> _mockSchemaProvider;
         private readonly SqlDataServiceExecutor _executor;
 
@@ -21,6 +22,7 @@ namespace TeaQL.Sql.Tests
         {
             _mockDialect = new Mock<SqlDialect>();
             _mockTransport = new Mock<ISqlTransactionTransport>();
+            _mockStreamingTransport = _mockTransport.As<IStreamingSqlTransport>();
             _mockSchemaProvider = new Mock<ISchemaProvider>();
 
             _executor = new SqlDataServiceExecutor(_mockDialect.Object, _mockTransport.Object, _mockSchemaProvider.Object);
@@ -95,14 +97,25 @@ namespace TeaQL.Sql.Tests
             _mockDialect.Setup(d => d.CompileSelect(ed, req.Query)).Returns(compiled);
 
             var rows = new List<Record> { new Record(), new Record(), new Record() };
-            _mockTransport.Setup(t => t.FetchAllSqlAsync(compiled)).ReturnsAsync(rows);
+            _mockStreamingTransport.Setup(t => t.StreamSqlAsync(compiled, default)).Returns(StreamRows(rows));
 
-            var chunks = await _executor.QueryStreamAsync(req, 2);
+            var chunks = new List<StreamChunk>();
+            await foreach (var chunk in _executor.QueryStreamAsync(req, 2))
+                chunks.Add(chunk);
 
             Assert.Equal(2, chunks.Count);
             Assert.Equal(2, chunks[0].Rows.Count);
             Assert.Single(chunks[1].Rows);
             Assert.True(chunks[1].IsLast);
+        }
+
+        private static async IAsyncEnumerable<Record> StreamRows(IEnumerable<Record> rows)
+        {
+            foreach (var row in rows)
+            {
+                await Task.Yield();
+                yield return row;
+            }
         }
 
         [Fact]

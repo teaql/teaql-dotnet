@@ -14,6 +14,7 @@ namespace TeaQL.Sql.Tests
     {
         private readonly Mock<SqlDialect> _mockDialect;
         private readonly Mock<ISqlTransactionTransport> _mockTransport;
+        private readonly Mock<IStreamingSqlTransport> _mockStreamingTransport;
         private readonly Mock<ISchemaProvider> _mockSchemaProvider;
         private readonly SqlDataServiceExecutor _executor;
 
@@ -21,6 +22,7 @@ namespace TeaQL.Sql.Tests
         {
             _mockDialect = new Mock<SqlDialect>();
             _mockTransport = new Mock<ISqlTransactionTransport>();
+            _mockStreamingTransport = _mockTransport.As<IStreamingSqlTransport>();
             _mockSchemaProvider = new Mock<ISchemaProvider>();
 
             _executor = new SqlDataServiceExecutor(_mockDialect.Object, _mockTransport.Object, _mockSchemaProvider.Object);
@@ -84,9 +86,21 @@ namespace TeaQL.Sql.Tests
             var compiled = new CompiledQuery("SELECT 1", new List<Value>());
             _mockDialect.Setup(d => d.CompileSelect(ed, req.Query)).Returns(compiled);
 
-            _mockTransport.Setup(t => t.FetchAllSqlAsync(compiled)).ThrowsAsync(new Exception("db error"));
+            _mockStreamingTransport.Setup(t => t.StreamSqlAsync(compiled, default)).Returns(ThrowingRows());
 
-            await Assert.ThrowsAsync<SqlExecutorException>(() => _executor.QueryStreamAsync(req, 10));
+            await Assert.ThrowsAsync<Exception>(() => ConsumeAsync(_executor.QueryStreamAsync(req, 10)));
+        }
+
+        private static async IAsyncEnumerable<Record> ThrowingRows()
+        {
+            await Task.Yield();
+            if (Environment.TickCount >= int.MinValue) throw new Exception("db error");
+            yield break;
+        }
+
+        private static async Task ConsumeAsync(IAsyncEnumerable<StreamChunk> chunks)
+        {
+            await foreach (var _ in chunks) { }
         }
 
         [Fact]
