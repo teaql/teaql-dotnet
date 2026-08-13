@@ -1,0 +1,50 @@
+name: Publish .NET packages
+
+on:
+  push:
+    tags:
+      - "dotnet-v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          expected="${GITHUB_REF_NAME#dotnet-v}"
+          actual="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props)"
+          test "$expected" = "$actual"
+      - run: dotnet test TeaQL.sln -c Release -p:UseSharedCompilation=false
+      - run: dotnet test tests/TeaQL.Streaming.Tests/TeaQL.Streaming.Tests.csproj -c Release -p:UseSharedCompilation=false
+      - name: Pack public projects
+        shell: bash
+        run: |
+          projects=(
+            TeaQL.Core TeaQL.DataService TeaQL.Sql TeaQL.Runtime
+            TeaQL.Provider.Sqlite TeaQL.Provider.PostgreSql TeaQL.Provider.MySql
+            TeaQL.Provider.SqlServer TeaQL.CacheIntegration.Redis
+            TeaQL.WebIntegration.AspNetCore TeaQL.TfpEndpoint
+          )
+          for project in "${projects[@]}"; do
+            dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore \
+              -p:UseSharedCompilation=false -o artifacts
+          done
+      - uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Publish packages
+        run: >-
+          dotnet nuget push "artifacts/*.nupkg"
+          --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
