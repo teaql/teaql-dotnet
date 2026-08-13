@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Generic;
 using TeaQL.Core;
 
 namespace TeaQL.DataService;
@@ -149,7 +151,7 @@ public class StreamChunk
 
 public interface IStreamQueryExecutor : IDataService
 {
-    Task<List<StreamChunk>> QueryStreamAsync(QueryRequest request, int chunkSize);
+    IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, CancellationToken cancellationToken = default);
 }
 
 public interface ITransaction : IDataService, IDisposable

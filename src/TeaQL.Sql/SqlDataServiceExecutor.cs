@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Runtime.CompilerServices;
 using TeaQL.Core;
 using TeaQL.DataService;
 
@@ -208,37 +210,40 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         return new SqlDataServiceTransaction(Dialect, tx, SchemaProvider);
     }
 
-    public async Task<List<StreamChunk>> QueryStreamAsync(QueryRequest request, int chunkSize)
+    public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var queryResult = await QueryAsync(request);
-        var chunks = new List<StreamChunk>();
+        if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
+        if (request.Query.Relations.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
+            throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
+        if (Transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
+        var entityDesc = SchemaProvider.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
+        var compiled = Dialect.CompileSelect(entityDesc, request.Query);
         var currentChunk = new List<Record>();
+        List<Record>? pendingChunk = null;
         int chunkIndex = 0;
-
-        foreach (var row in queryResult.Rows)
+        await foreach (var row in streaming.StreamSqlAsync(compiled, cancellationToken).WithCancellation(cancellationToken))
         {
             currentChunk.Add(row);
             if (currentChunk.Count >= chunkSize)
             {
-                chunks.Add(new StreamChunk
+                if (pendingChunk != null)
                 {
-                    Rows = currentChunk,
-                    ChunkIndex = chunkIndex,
-                    IsLast = false
-                });
+                    yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
+                }
+                pendingChunk = currentChunk;
                 currentChunk = new List<Record>();
-                chunkIndex++;
             }
         }
 
-        chunks.Add(new StreamChunk
+        if (currentChunk.Count > 0)
         {
-            Rows = currentChunk,
-            ChunkIndex = chunkIndex,
-            IsLast = true
-        });
-
-        return chunks;
+            if (pendingChunk != null) yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
+            yield return new StreamChunk { Rows = currentChunk, ChunkIndex = chunkIndex, IsLast = true };
+        }
+        else if (pendingChunk != null)
+        {
+            yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex, IsLast = true };
+        }
     }
 }
 
@@ -537,36 +542,40 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
         Transport.Dispose();
     }
 
-    public async Task<List<StreamChunk>> QueryStreamAsync(QueryRequest request, int chunkSize)
+    public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var queryResult = await QueryAsync(request);
-        var chunks = new List<StreamChunk>();
+        if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
+        if (request.Query.Relations.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
+            throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
+        if (Transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
+        var entityDesc = SchemaProvider.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
+        var compiled = Dialect.CompileSelect(entityDesc, request.Query);
         var currentChunk = new List<Record>();
+        List<Record>? pendingChunk = null;
         int chunkIndex = 0;
 
-        foreach (var row in queryResult.Rows)
+        await foreach (var row in streaming.StreamSqlAsync(compiled, cancellationToken).WithCancellation(cancellationToken))
         {
             currentChunk.Add(row);
             if (currentChunk.Count >= chunkSize)
             {
-                chunks.Add(new StreamChunk
+                if (pendingChunk != null)
                 {
-                    Rows = currentChunk,
-                    ChunkIndex = chunkIndex,
-                    IsLast = false
-                });
+                    yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
+                }
+                pendingChunk = currentChunk;
                 currentChunk = new List<Record>();
-                chunkIndex++;
             }
         }
 
-        chunks.Add(new StreamChunk
+        if (currentChunk.Count > 0)
         {
-            Rows = currentChunk,
-            ChunkIndex = chunkIndex,
-            IsLast = true
-        });
-
-        return chunks;
+            if (pendingChunk != null) yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
+            yield return new StreamChunk { Rows = currentChunk, ChunkIndex = chunkIndex, IsLast = true };
+        }
+        else if (pendingChunk != null)
+        {
+            yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex, IsLast = true };
+        }
     }
 }

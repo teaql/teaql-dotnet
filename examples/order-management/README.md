@@ -21,3 +21,17 @@ Change the generated filter or ordering in `Program.cs`, then rebuild with share
 ### Materialized-list hard limit
 
 `ExecuteForListAsync` protects the service by applying a default hard limit of 10,000 rows. A requested page size above that ceiling fails explicitly. Trusted application code can call `HardLimit(...)` to override the outer-query ceiling. **Caution:** most applications should not override it; do so only for a reviewed, exceptional requirement. This setting does not describe streaming execution.
+
+### Streaming large root queries
+
+`ExecuteForStreamAsync` returns generated entities through `IAsyncEnumerable<T>` and propagates cancellation to `DbDataReader.ReadAsync`:
+
+```csharp
+await foreach (var order in request.Comment("export orders").Purpose("reviewed export")
+    .ExecuteForStreamAsync(ctx, 500, cancellationToken))
+{
+    await WriteOrderAsync(order, cancellationToken);
+}
+```
+
+The chunk size is the provider fetch bound. **Caution:** normally keep the default 1,000. Streaming relation or aggregate enhancement is rejected; use a root query or `ExecuteForListAsync`. Ordinary federation requires a dedicated streaming protocol.

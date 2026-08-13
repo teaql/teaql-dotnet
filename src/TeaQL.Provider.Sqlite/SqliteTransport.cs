@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
 using TeaQL.Core;
 using TeaQL.Sql;
 
 namespace TeaQL.Provider.Sqlite;
 
-public class SqliteTransport : ISqlTransport
+public class SqliteTransport : IStreamingSqlTransport
 {
     private readonly SqliteConnection _connection;
 
@@ -44,6 +46,31 @@ public class SqliteTransport : ISqlTransport
         }
 
         return records;
+    }
+
+    public async IAsyncEnumerable<Record> StreamSqlAsync(
+        CompiledQuery query,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        using var cmd = _connection.CreateCommand();
+        cmd.CommandText = query.Sql;
+        for (var i = 0; i < query.Params.Count; i++)
+        {
+            var p = cmd.CreateParameter();
+            p.ParameterName = $"@p{i}";
+            BindValue(p, query.Params[i]);
+            cmd.Parameters.Add(p);
+        }
+        using var reader = await cmd.ExecuteReaderAsync(
+            System.Data.CommandBehavior.SequentialAccess,
+            cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var record = new Record();
+            for (var i = 0; i < reader.FieldCount; i++)
+                record[reader.GetName(i)] = ReadValue(reader, i);
+            yield return record;
+        }
     }
 
     public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
