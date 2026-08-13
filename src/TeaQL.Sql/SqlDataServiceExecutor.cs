@@ -213,7 +213,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
     public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
-        if (request.Query.Relations.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
+        if (request.Query.RelationLoads.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
             throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
         if (Transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
         var entityDesc = SchemaProvider.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
@@ -255,19 +255,19 @@ internal static class RelationQueryLoader
         List<Record> parents,
         QueryRequest request)
     {
-        if (parents.Count == 0 || request.Query.Relations.Count == 0)
+        if (parents.Count == 0 || request.Query.RelationLoads.Count == 0)
         {
             return;
         }
         var parentDescriptor = schemaProvider.GetEntity(request.Query.Entity)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {request.Query.Entity}");
-        foreach (var load in request.Query.Relations)
+        foreach (var load in request.Query.RelationLoads)
         {
             var relation = parentDescriptor.RelationByName(load.Name)
                 ?? throw new SqlExecutorException($"SQL compile error: missing relation {request.Query.Entity}.{load.Name}");
             var parentIds = parents
-                .Where(parent => parent.ContainsKey(relation.LocalKey))
-                .Select(parent => parent[relation.LocalKey])
+                .Where(parent => parent.ContainsKey(relation.LocalKeyValue))
+                .Select(parent => parent[relation.LocalKeyValue])
                 .ToList();
             if (parentIds.Count == 0)
             {
@@ -276,14 +276,14 @@ internal static class RelationQueryLoader
             }
             var childQuery = Clone(load.Query ?? new SelectQuery(relation.TargetEntity));
             childQuery.Entity = relation.TargetEntity;
-            if (!childQuery.Projection.Contains(relation.ForeignKey))
+            if (!childQuery.Projection.Contains(relation.ForeignKeyValue))
             {
-                childQuery.Projection.Add(relation.ForeignKey);
+                childQuery.Projection.Add(relation.ForeignKeyValue);
             }
-            childQuery.AndFilter(Expr.InList(relation.ForeignKey, parentIds));
+            childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
             if (childQuery.Slice != null)
             {
-                childQuery.PartitionByField(relation.ForeignKey);
+                childQuery.PartitionByField(relation.ForeignKeyValue);
             }
             var childResult = await queryAsync(new QueryRequest
             {
@@ -303,12 +303,12 @@ internal static class RelationQueryLoader
     {
         Projection = new List<string>(query.Projection),
         ExprProjection = new List<NamedExpr>(query.ExprProjection),
-        OrderBy = new List<OrderBy>(query.OrderBy),
-        Aggregates = new List<Aggregate>(query.Aggregates),
-        GroupBy = new List<string>(query.GroupBy),
-        Relations = new List<RelationLoad>(query.Relations),
+        OrderByItems = new List<OrderBy>(query.OrderByItems),
+        AggregateItems = new List<Aggregate>(query.AggregateItems),
+        GroupByItems = new List<string>(query.GroupByItems),
+        RelationLoads = new List<RelationLoad>(query.RelationLoads),
         TraceChain = new List<TraceNode>(query.TraceChain),
-        RawSqlSearchCriteria = new List<string>(query.RawSqlSearchCriteria),
+        RawSqlSearchCriteriaItems = new List<string>(query.RawSqlSearchCriteriaItems),
         DynamicProperties = new List<RawSqlProjection>(query.DynamicProperties),
         RawProjections = new List<RawSqlProjection>(query.RawProjections),
         ObjectGroupBys = new List<ObjectGroupBy>(query.ObjectGroupBys),
@@ -322,16 +322,16 @@ internal static class RelationQueryLoader
         RelationDescriptor relation)
     {
         var buckets = children
-            .Where(child => child.ContainsKey(relation.ForeignKey))
-            .GroupBy(child => child[relation.ForeignKey])
+            .Where(child => child.ContainsKey(relation.ForeignKeyValue))
+            .GroupBy(child => child[relation.ForeignKeyValue])
             .ToDictionary(group => group.Key, group => group.ToList());
         foreach (var parent in parents)
         {
-            var related = parent.TryGetValue(relation.LocalKey, out var localKey)
+            var related = parent.TryGetValue(relation.LocalKeyValue, out var localKey)
                 && buckets.TryGetValue(localKey, out var bucket)
                 ? bucket
                 : new List<Record>();
-            parent[relationName] = relation.Many
+            parent[relationName] = relation.IsMany
                 ? new Value.ListValue(related.Select(row => (Value)new Value.ObjectValue(row)).ToList())
                 : related.Count > 0 ? new Value.ObjectValue(related[0]) : new Value.NullValue();
         }
@@ -545,7 +545,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
     public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
-        if (request.Query.Relations.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
+        if (request.Query.RelationLoads.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
             throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
         if (Transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
         var entityDesc = SchemaProvider.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");

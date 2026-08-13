@@ -7,19 +7,19 @@ public record PropertyDescriptor(
     string Name,
     DataType DataType,
     bool Nullable = true,
-    string ColumnName = "",
+    string ColumnNameValue = "",
     bool IsId = false,
     bool IsVersion = false
 )
 {
-    public string ColumnName { get; init; } = string.IsNullOrEmpty(ColumnName) ? Name : ColumnName;
+    public string ColumnNameString { get; init; } = string.IsNullOrEmpty(ColumnNameValue) ? Name : ColumnNameValue;
 
     public static PropertyDescriptor New(string name, DataType dataType)
     {
         return new PropertyDescriptor(name, dataType);
     }
 
-    public PropertyDescriptor WithColumnName(string columnName) => this with { ColumnName = columnName };
+    public PropertyDescriptor ColumnName(string columnName) => this with { ColumnNameString = columnName };
     public PropertyDescriptor NotNull() => this with { Nullable = false };
     public PropertyDescriptor Id() => this with { IsId = true };
     public PropertyDescriptor Version() => this with { IsVersion = true };
@@ -28,11 +28,11 @@ public record PropertyDescriptor(
 public record RelationDescriptor(
     string Name,
     string TargetEntity,
-    string LocalKey = "id",
-    string ForeignKey = "id",
-    bool Many = false,
-    bool Attach = true,
-    bool DeleteMissing = true
+    string LocalKeyValue = "id",
+    string ForeignKeyValue = "id",
+    bool IsMany = false,
+    bool IsAttach = true,
+    bool IsDeleteMissing = true
 )
 {
     public static RelationDescriptor New(string name, string targetEntity)
@@ -40,48 +40,48 @@ public record RelationDescriptor(
         return new RelationDescriptor(name, targetEntity);
     }
 
-    public RelationDescriptor WithLocalKey(string key) => this with { LocalKey = key };
-    public RelationDescriptor WithForeignKey(string key) => this with { ForeignKey = key };
-    public RelationDescriptor IsMany() => this with { Many = true };
-    public RelationDescriptor IsAttach() => this with { Attach = true };
-    public RelationDescriptor Detached() => this with { Attach = false };
-    public RelationDescriptor DoDeleteMissing() => this with { DeleteMissing = true };
-    public RelationDescriptor KeepMissing() => this with { DeleteMissing = false };
+    public RelationDescriptor LocalKey(string key) => this with { LocalKeyValue = key };
+    public RelationDescriptor ForeignKey(string key) => this with { ForeignKeyValue = key };
+    public RelationDescriptor Many(bool many = true) => this with { IsMany = many };
+    public RelationDescriptor Attach(bool attach = true) => this with { IsAttach = attach };
+    public RelationDescriptor Detached() => this with { IsAttach = false };
+    public RelationDescriptor DeleteMissing(bool deleteMissing = true) => this with { IsDeleteMissing = deleteMissing };
+    public RelationDescriptor KeepMissing() => this with { IsDeleteMissing = false };
 }
 
 public record EntityDescriptor
 {
     public string Name { get; init; } = "";
-    public string TableName { get; init; } = "";
-    public string? DataService { get; init; }
+    public string TableNameValue { get; init; } = "";
+    public string? DataServiceName { get; init; }
     public List<PropertyDescriptor> Properties { get; init; } = new();
     public List<RelationDescriptor> Relations { get; init; } = new();
-    public List<string> AuditMaskFields { get; init; } = new();
-    public int? AuditValueMaxLen { get; init; }
+    public List<string> AuditMaskFieldList { get; init; } = new();
+    public int? AuditValueMaxLenValue { get; init; }
 
     public static EntityDescriptor New(string name)
     {
         return new EntityDescriptor
         {
             Name = name,
-            TableName = Naming.DefaultTableName(name)
+            TableNameValue = Naming.DefaultTableName(name)
         };
     }
 
-    public EntityDescriptor WithTableName(string tableName) => this with { TableName = tableName };
-    public EntityDescriptor WithDataService(string dataService) => this with { DataService = dataService };
-    public EntityDescriptor WithProperty(PropertyDescriptor property)
+    public EntityDescriptor TableName(string tableName) => this with { TableNameValue = tableName };
+    public EntityDescriptor DataService(string dataService) => this with { DataServiceName = dataService };
+    public EntityDescriptor Property(PropertyDescriptor property)
     {
         Properties.Add(property);
         return this;
     }
-    public EntityDescriptor WithRelation(RelationDescriptor relation)
+    public EntityDescriptor Relation(RelationDescriptor relation)
     {
         Relations.Add(relation);
         return this;
     }
-    public EntityDescriptor WithAuditMaskFields(List<string> fields) => this with { AuditMaskFields = fields };
-    public EntityDescriptor WithAuditValueMaxLen(int? maxLen) => this with { AuditValueMaxLen = maxLen };
+    public EntityDescriptor AuditMaskFields(List<string> fields) => this with { AuditMaskFieldList = fields };
+    public EntityDescriptor AuditValueMaxLen(int? maxLen) => this with { AuditValueMaxLenValue = maxLen };
 
     public PropertyDescriptor? PropertyByName(string name) => Properties.FirstOrDefault(p => p.Name == name);
     public RelationDescriptor? RelationByName(string name) => Relations.FirstOrDefault(r => r.Name == name);

@@ -143,6 +143,7 @@ public class SqliteTransport : IStreamingSqlTransport
         {
             long v = reader.GetInt64(i);
             if (typeName == "BOOLEAN" || typeName == "BOOL") return new Value.BoolValue(v != 0);
+            if (typeName == "TIMESTAMP" || typeName == "DATETIME") return new Value.TimestampValue(v);
             return new Value.I64Value(v);
         }
         else if (fieldType == typeof(double))

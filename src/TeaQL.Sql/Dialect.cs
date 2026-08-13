@@ -21,12 +21,17 @@ public static class DialectUtils
 
     public static string QuoteIdentifierIfNeeded(string ident, char quote)
     {
+        return QuoteIdentifierIfNeeded(ident, quote, quote);
+    }
+
+    public static string QuoteIdentifierIfNeeded(string ident, char openQuote, char closeQuote)
+    {
         if (IsWrappedIdentifier(ident)) return ident;
         if (NeedsQuotedIdentifier(ident))
         {
-            var quoteString = quote.ToString();
-            var escaped = ident.Replace(quoteString, quoteString + quoteString);
-            return $"{quote}{escaped}{quote}";
+            var closeQuoteString = closeQuote.ToString();
+            var escaped = ident.Replace(closeQuoteString, closeQuoteString + closeQuoteString);
+            return $"{openQuote}{escaped}{closeQuote}";
         }
         return ident;
     }
@@ -72,7 +77,7 @@ public abstract class SqlDialect
 
     public virtual string ColumnDefinitionSql(PropertyDescriptor property)
     {
-        var parts = new List<string> { QuoteIdent(property.ColumnName), SchemaTypeSql(property.DataType, property) };
+        var parts = new List<string> { QuoteIdent(property.ColumnNameString), SchemaTypeSql(property.DataType, property) };
         if (property.IsId) parts.Add("PRIMARY KEY");
         if (property.IsId || !property.Nullable) parts.Add("NOT NULL");
         return string.Join(" ", parts);
@@ -81,21 +86,21 @@ public abstract class SqlDialect
     public virtual string CompileCreateTable(EntityDescriptor entity)
     {
         var columns = string.Join(", ", entity.Properties.Select(ColumnDefinitionSql));
-        return $"CREATE TABLE IF NOT EXISTS {QuoteIdent(entity.TableName)} ({columns})";
+        return $"CREATE TABLE IF NOT EXISTS {QuoteIdent(entity.TableNameValue)} ({columns})";
     }
 
     public virtual List<string> SchemaIndexesSqls(EntityDescriptor entity)
     {
         var sqls = new List<string>();
-        var tableNameUpper = entity.TableName.ToUpperInvariant();
-        var quotedTable = QuoteIdent(entity.TableName);
+        var tableNameUpper = entity.TableNameValue.ToUpperInvariant();
+        var quotedTable = QuoteIdent(entity.TableNameValue);
 
         var versionCol = entity.Properties.FirstOrDefault(p => p.IsVersion);
         if (versionCol != null)
         {
-            var idCol = entity.Properties.FirstOrDefault(p => p.IsId)?.ColumnName ?? "id";
+            var idCol = entity.Properties.FirstOrDefault(p => p.IsId)?.ColumnNameString ?? "id";
             var idxName = $"PK_{tableNameUpper}_ID_VERSION";
-            sqls.Add($"CREATE UNIQUE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(idCol)}, {QuoteIdent(versionCol.ColumnName)})");
+            sqls.Add($"CREATE UNIQUE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(idCol)}, {QuoteIdent(versionCol.ColumnNameString)})");
         }
 
         foreach (var p in entity.Properties)
@@ -103,8 +108,8 @@ public abstract class SqlDialect
             if (p.Name.EndsWith("Id") || p.Name.EndsWith("Time") || p.Name.EndsWith("_time") ||
                 p.Name == "create_time" || p.Name == "update_time")
             {
-                var idxName = $"IDX_{tableNameUpper}_{p.ColumnName.ToUpperInvariant()}";
-                sqls.Add($"CREATE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(p.ColumnName)})");
+                var idxName = $"IDX_{tableNameUpper}_{p.ColumnNameString.ToUpperInvariant()}";
+                sqls.Add($"CREATE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(p.ColumnNameString)})");
             }
         }
         return sqls;
@@ -131,51 +136,51 @@ public abstract class SqlDialect
         {
             def += $" DEFAULT {FallbackDefaultValueSql(property.DataType)}";
         }
-        return $"ALTER TABLE {QuoteIdent(entity.TableName)} ADD COLUMN {def}";
+        return $"ALTER TABLE {QuoteIdent(entity.TableNameValue)} ADD COLUMN {def}";
     }
 
     public virtual CompiledQuery CompileSelect(EntityDescriptor entity, SelectQuery query)
     {
         var paramsList = new List<Value>();
         var sql = CompileSelectSql(entity, query, paramsList);
-        return new CompiledQuery(sql, paramsList, query.Comment);
+        return new CompiledQuery(sql, paramsList, query.CommentText);
     }
 
     public virtual string CompileSelectSql(EntityDescriptor entity, SelectQuery query, List<Value> paramsList)
     {
-        if (!string.IsNullOrEmpty(query.RawSql))
+        if (!string.IsNullOrEmpty(query.RawSqlText))
         {
-            return query.RawSql;
+            return query.RawSqlText;
         }
         var projection = CompileProjection(entity, query, paramsList);
         var partitioned = query.PartitionBy != null && query.Slice != null;
         if (partitioned)
         {
             var partitionColumn = ColumnSql(entity, query.PartitionBy!);
-            var windowOrder = query.OrderBy.Count == 0
+            var windowOrder = query.OrderByItems.Count == 0
                 ? ""
-                : $" ORDER BY {string.Join(", ", query.OrderBy.Select(order => OrderBySql(entity, order, paramsList)))}";
+                : $" ORDER BY {string.Join(", ", query.OrderByItems.Select(order => OrderBySql(entity, order, paramsList)))}";
             projection += $", ROW_NUMBER() OVER (PARTITION BY {partitionColumn}{windowOrder}) AS {QuoteIdent("__teaql_partition_rank")}";
         }
 
-        var sql = $"SELECT {projection} FROM {QuoteIdent(entity.TableName)}";
+        var sql = $"SELECT {projection} FROM {QuoteIdent(entity.TableNameValue)}";
         var whereParts = new List<string>();
 
-        if (query.Filter != null)
+        if (query.FilterCondition != null)
         {
-            whereParts.Add(CompileExpr(entity, query.Filter, paramsList));
+            whereParts.Add(CompileExpr(entity, query.FilterCondition, paramsList));
         }
 
-        if (!string.IsNullOrEmpty(query.SearchWithText))
+        if (!string.IsNullOrEmpty(query.SearchText))
         {
             var orParts = new List<string>();
-            var likeValue = $"%{query.SearchWithText}%";
+            var likeValue = $"%{query.SearchText}%";
             foreach (var property in entity.Properties)
             {
                 if (property.DataType == DataType.Text || property.DataType == DataType.LargeText)
                 {
                     paramsList.Add(new Value.TextValue(likeValue));
-                    orParts.Add($"{QuoteIdent(property.ColumnName)} LIKE {Placeholder(paramsList.Count)}");
+                    orParts.Add($"{QuoteIdent(property.ColumnNameString)} LIKE {Placeholder(paramsList.Count)}");
                 }
             }
             if (orParts.Count > 0)
@@ -184,9 +189,9 @@ public abstract class SqlDialect
             }
         }
 
-        if (query.RawSqlSearchCriteria != null && query.RawSqlSearchCriteria.Count > 0)
+        if (query.RawSqlSearchCriteriaItems != null && query.RawSqlSearchCriteriaItems.Count > 0)
         {
-            whereParts.AddRange(query.RawSqlSearchCriteria);
+            whereParts.AddRange(query.RawSqlSearchCriteriaItems);
         }
 
         if (whereParts.Count > 0)
@@ -205,21 +210,21 @@ public abstract class SqlDialect
             return $"SELECT * FROM ({sql}) AS {QuoteIdent("__teaql_partitioned")} WHERE {string.Join(" AND ", predicates)} ORDER BY {rank}";
         }
 
-        if (query.GroupBy != null && query.GroupBy.Count > 0)
+        if (query.GroupByItems != null && query.GroupByItems.Count > 0)
         {
-            var groupBy = string.Join(", ", query.GroupBy.Select(field => ColumnSql(entity, field)));
+            var groupBy = string.Join(", ", query.GroupByItems.Select(field => ColumnSql(entity, field)));
             sql += $" GROUP BY {groupBy}";
         }
 
-        if (query.Having != null)
+        if (query.HavingCondition != null)
         {
-            var havingSql = CompileExpr(entity, query.Having, paramsList);
+            var havingSql = CompileExpr(entity, query.HavingCondition, paramsList);
             sql += $" HAVING {havingSql}";
         }
 
-        if (query.OrderBy != null && query.OrderBy.Count > 0)
+        if (query.OrderByItems != null && query.OrderByItems.Count > 0)
         {
-            var orderBy = string.Join(", ", query.OrderBy.Select(order => OrderBySql(entity, order, paramsList)));
+            var orderBy = string.Join(", ", query.OrderByItems.Select(order => OrderBySql(entity, order, paramsList)));
             sql += $" ORDER BY {orderBy}";
         }
 
@@ -248,7 +253,7 @@ public abstract class SqlDialect
         {
             if (command.Values.TryGetValue(property.Name, out var value))
             {
-                columns.Add(QuoteIdent(property.ColumnName));
+                columns.Add(QuoteIdent(property.ColumnNameString));
                 if (value is Value.NullValue)
                 {
                     value = new Value.TypedNullValue(property.DataType);
@@ -261,7 +266,7 @@ public abstract class SqlDialect
         if (columns.Count == 0)
             throw SqlCompileException.EmptyMutation("insert");
 
-        var sql = $"INSERT INTO {QuoteIdent(entity.TableName)} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", placeholders)})";
+        var sql = $"INSERT INTO {QuoteIdent(entity.TableNameValue)} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", placeholders)})";
         return new CompiledQuery(sql, paramsList, null);
     }
 
@@ -284,7 +289,7 @@ public abstract class SqlDialect
         if (columns.Count == 0)
             throw SqlCompileException.EmptyMutation("batch_insert");
 
-        var columnNames = columns.Select(p => QuoteIdent(p.ColumnName)).ToList();
+        var columnNames = columns.Select(p => QuoteIdent(p.ColumnNameString)).ToList();
         var paramsList = new List<Value>();
         var valuesClauses = new List<string>();
 
@@ -307,7 +312,7 @@ public abstract class SqlDialect
             valuesClauses.Add($"({string.Join(", ", rowPlaceholders)})");
         }
 
-        var sql = $"INSERT INTO {QuoteIdent(entity.TableName)} ({string.Join(", ", columnNames)}) VALUES {string.Join(", ", valuesClauses)}";
+        var sql = $"INSERT INTO {QuoteIdent(entity.TableNameValue)} ({string.Join(", ", columnNames)}) VALUES {string.Join(", ", valuesClauses)}";
         return new CompiledQuery(sql, paramsList, null);
     }
 
@@ -322,7 +327,7 @@ public abstract class SqlDialect
         foreach (var property in entity.Properties)
         {
             if (property.IsId) continue;
-            if (property.IsVersion && command.ExpectedVersion.HasValue) continue;
+            if (property.IsVersion && command.ExpectedVersionValue.HasValue) continue;
 
             if (command.Values.TryGetValue(property.Name, out var value))
             {
@@ -331,33 +336,33 @@ public abstract class SqlDialect
                     value = new Value.TypedNullValue(property.DataType);
                 }
                 paramsList.Add(value);
-                assignments.Add($"{QuoteIdent(property.ColumnName)} = {Placeholder(paramsList.Count)}");
+                assignments.Add($"{QuoteIdent(property.ColumnNameString)} = {Placeholder(paramsList.Count)}");
             }
         }
 
-        if (command.ExpectedVersion.HasValue)
+        if (command.ExpectedVersionValue.HasValue)
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
-            paramsList.Add(new Value.I64Value(command.ExpectedVersion.Value + 1));
-            assignments.Add($"{QuoteIdent(versionProperty.ColumnName)} = {Placeholder(paramsList.Count)}");
+            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value + 1));
+            assignments.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
 
         if (assignments.Count == 0)
             throw SqlCompileException.EmptyMutation("update");
 
         paramsList.Add(command.Id);
-        var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnName)} = {Placeholder(paramsList.Count)}" };
+        var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}" };
 
-        if (command.ExpectedVersion.HasValue)
+        if (command.ExpectedVersionValue.HasValue)
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
-            paramsList.Add(new Value.I64Value(command.ExpectedVersion.Value));
-            predicates.Add($"{QuoteIdent(versionProperty.ColumnName)} = {Placeholder(paramsList.Count)}");
+            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
+            predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
 
-        var sql = $"UPDATE {QuoteIdent(entity.TableName)} SET {string.Join(", ", assignments)} WHERE {string.Join(" AND ", predicates)}";
+        var sql = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {string.Join(", ", assignments)} WHERE {string.Join(" AND ", predicates)}";
         return new CompiledQuery(sql, paramsList, null);
     }
 
@@ -377,7 +382,7 @@ public abstract class SqlDialect
             var property = entity.Properties.FirstOrDefault(p => p.Name == fieldName)
                 ?? throw SqlCompileException.UnknownField(fieldName);
 
-            var caseParts = new List<string> { $"CASE {QuoteIdent(idProperty.ColumnName)}" };
+            var caseParts = new List<string> { $"CASE {QuoteIdent(idProperty.ColumnNameString)}" };
 
             for (int i = 0; i < command.BatchValues.Count; i++)
             {
@@ -396,15 +401,15 @@ public abstract class SqlDialect
                 caseParts.Add($"WHEN {idPh} THEN {valPh}");
             }
 
-            caseParts.Add($"ELSE {QuoteIdent(property.ColumnName)} END");
-            setClauses.Add($"{QuoteIdent(property.ColumnName)} = {string.Join(" ", caseParts)}");
+            caseParts.Add($"ELSE {QuoteIdent(property.ColumnNameString)} END");
+            setClauses.Add($"{QuoteIdent(property.ColumnNameString)} = {string.Join(" ", caseParts)}");
         }
 
         bool hasVersions = false;
         var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion);
         if (versionProperty != null)
         {
-            var caseParts = new List<string> { $"CASE {QuoteIdent(idProperty.ColumnName)}" };
+            var caseParts = new List<string> { $"CASE {QuoteIdent(idProperty.ColumnNameString)}" };
 
             for (int i = 0; i < command.BatchExpectedVersions.Count; i++)
             {
@@ -426,8 +431,8 @@ public abstract class SqlDialect
 
             if (hasVersions)
             {
-                caseParts.Add($"ELSE {QuoteIdent(versionProperty.ColumnName)} END");
-                setClauses.Add($"{QuoteIdent(versionProperty.ColumnName)} = {string.Join(" ", caseParts)}");
+                caseParts.Add($"ELSE {QuoteIdent(versionProperty.ColumnNameString)} END");
+                setClauses.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {string.Join(" ", caseParts)}");
             }
         }
 
@@ -441,11 +446,11 @@ public abstract class SqlDialect
             inPlaceholders.Add(Placeholder(paramsList.Count));
         }
 
-        var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnName)} IN ({string.Join(", ", inPlaceholders)})" };
+        var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} IN ({string.Join(", ", inPlaceholders)})" };
 
         if (hasVersions && versionProperty != null)
         {
-            var caseParts = new List<string> { $"CASE {QuoteIdent(idProperty.ColumnName)}" };
+            var caseParts = new List<string> { $"CASE {QuoteIdent(idProperty.ColumnNameString)}" };
 
             for (int i = 0; i < command.BatchExpectedVersions.Count; i++)
             {
@@ -463,12 +468,12 @@ public abstract class SqlDialect
                     caseParts.Add($"WHEN {idPh} THEN {valPh}");
                 }
             }
-            caseParts.Add($"ELSE {QuoteIdent(versionProperty.ColumnName)} END");
+            caseParts.Add($"ELSE {QuoteIdent(versionProperty.ColumnNameString)} END");
 
-            predicates.Add($"{QuoteIdent(versionProperty.ColumnName)} = {string.Join(" ", caseParts)}");
+            predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {string.Join(" ", caseParts)}");
         }
 
-        var sql = $"UPDATE {QuoteIdent(entity.TableName)} SET {string.Join(", ", setClauses)} WHERE {string.Join(" AND ", predicates)}";
+        var sql = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {string.Join(", ", setClauses)} WHERE {string.Join(" AND ", predicates)}";
         return new CompiledQuery(sql, paramsList, null);
     }
 
@@ -483,40 +488,40 @@ public abstract class SqlDialect
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
 
-            paramsList.Add(new Value.I64Value(command.ExpectedVersion.HasValue ? -(command.ExpectedVersion.Value + 1) : -1));
+            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.HasValue ? -(command.ExpectedVersionValue.Value + 1) : -1));
             paramsList.Add(command.Id);
 
-            var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnName)} = {Placeholder(paramsList.Count)}" };
+            var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}" };
 
-            if (command.ExpectedVersion.HasValue)
+            if (command.ExpectedVersionValue.HasValue)
             {
-                paramsList.Add(new Value.I64Value(command.ExpectedVersion.Value));
-                predicates.Add($"{QuoteIdent(versionProperty.ColumnName)} = {Placeholder(paramsList.Count)}");
+                paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
+                predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
             }
 
-            var sqlSoft = $"UPDATE {QuoteIdent(entity.TableName)} SET {QuoteIdent(versionProperty.ColumnName)} = {Placeholder(1)} WHERE {string.Join(" AND ", predicates)}";
+            var sqlSoft = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(1)} WHERE {string.Join(" AND ", predicates)}";
             return new CompiledQuery(sqlSoft, paramsList, null);
         }
 
         paramsList.Add(command.Id);
-        var preds = new List<string> { $"{QuoteIdent(idProperty.ColumnName)} = {Placeholder(paramsList.Count)}" };
+        var preds = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}" };
 
-        if (command.ExpectedVersion.HasValue)
+        if (command.ExpectedVersionValue.HasValue)
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
-            paramsList.Add(new Value.I64Value(command.ExpectedVersion.Value));
-            preds.Add($"{QuoteIdent(versionProperty.ColumnName)} = {Placeholder(paramsList.Count)}");
+            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
+            preds.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
 
-        var sqlHard = $"DELETE FROM {QuoteIdent(entity.TableName)} WHERE {string.Join(" AND ", preds)}";
+        var sqlHard = $"DELETE FROM {QuoteIdent(entity.TableNameValue)} WHERE {string.Join(" AND ", preds)}";
         return new CompiledQuery(sqlHard, paramsList, null);
     }
 
     public virtual CompiledQuery CompileRecover(EntityDescriptor entity, RecoverCommand command)
     {
-        if (command.ExpectedVersion >= 0)
-            throw SqlCompileException.InvalidRecoverVersion(command.ExpectedVersion);
+        if (command.ExpectedVersionValue >= 0)
+            throw SqlCompileException.InvalidRecoverVersion(command.ExpectedVersionValue);
 
         var idProperty = entity.Properties.FirstOrDefault(p => p.IsId)
             ?? throw SqlCompileException.MissingIdProperty(entity.Name);
@@ -525,13 +530,13 @@ public abstract class SqlDialect
 
         var paramsList = new List<Value>
         {
-            new Value.I64Value(-command.ExpectedVersion + 1),
+            new Value.I64Value(-command.ExpectedVersionValue + 1),
             command.Id,
-            new Value.I64Value(command.ExpectedVersion)
+            new Value.I64Value(command.ExpectedVersionValue)
         };
 
-        var sql = $"UPDATE {QuoteIdent(entity.TableName)} SET {QuoteIdent(versionProperty.ColumnName)} = {Placeholder(1)} " +
-                  $"WHERE {QuoteIdent(idProperty.ColumnName)} = {Placeholder(2)} AND {QuoteIdent(versionProperty.ColumnName)} = {Placeholder(3)}";
+        var sql = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(1)} " +
+                  $"WHERE {QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(2)} AND {QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(3)}";
         
         return new CompiledQuery(sql, paramsList, null);
     }
@@ -540,7 +545,7 @@ public abstract class SqlDialect
     {
         var property = entity.Properties.FirstOrDefault(p => p.Name == field)
             ?? throw SqlCompileException.UnknownField(field);
-        return QuoteIdent(property.ColumnName);
+        return QuoteIdent(property.ColumnNameString);
     }
 
     public virtual string OrderBySql(EntityDescriptor entity, OrderBy orderBy, List<Value> paramsList)
@@ -596,7 +601,7 @@ public abstract class SqlDialect
     {
         var parts = new List<string>();
         
-        var groupsAndProj = (query.GroupBy ?? Enumerable.Empty<string>())
+        var groupsAndProj = (query.GroupByItems ?? Enumerable.Empty<string>())
             .Concat(query.Projection ?? Enumerable.Empty<string>());
             
         foreach (var field in groupsAndProj)
@@ -623,9 +628,9 @@ public abstract class SqlDialect
             if (!parts.Contains(aliased)) parts.Add(aliased);
         }
 
-        if (query.Aggregates != null)
+        if (query.AggregateItems != null)
         {
-            foreach (var aggregate in query.Aggregates)
+            foreach (var aggregate in query.AggregateItems)
             {
                 var field = ResolveAggregateField(entity, aggregate);
                 var call = AggregateCallSql(aggregate.Function, field);
@@ -669,14 +674,14 @@ public abstract class SqlDialect
             case Expr.ColumnExpr col:
                 return ColumnSql(entity, col.Name);
             case Expr.ValueExpr val:
-                paramsList.Add(val.Value);
+                paramsList.Add(val.NodeValue);
                 return Placeholder(paramsList.Count);
             case Expr.FunctionExpr func:
                 return CompileFunction(entity, func.Fn, func.Args, paramsList);
             case Expr.BinaryExpr bin:
                 return CompileBinaryExpr(entity, bin, paramsList);
             case Expr.SubQueryExpr sub:
-                return CompileSubQuery(entity, sub.Left, sub.Op, sub.Entity, sub.Query, paramsList);
+                return CompileSubquery(entity, sub.Left, sub.Op, sub.Entity, sub.Query, paramsList);
             case Expr.BetweenExpr bet:
                 return CompileBetween(entity, bet, paramsList);
             case Expr.IsNullExpr isn:
@@ -769,7 +774,7 @@ public abstract class SqlDialect
         return CompileExpr(entity, args[0], paramsList);
     }
 
-    public virtual string CompileSubQuery(EntityDescriptor entity, Expr left, BinaryOp op, EntityDescriptor subEntity, SelectQuery query, List<Value> paramsList)
+    public virtual string CompileSubquery(EntityDescriptor entity, Expr left, BinaryOp op, EntityDescriptor subEntity, SelectQuery query, List<Value> paramsList)
     {
         var lhs = CompileExpr(entity, left, paramsList);
         var operatorSql = op switch
@@ -798,7 +803,7 @@ public abstract class SqlDialect
             _ => throw new InvalidOperationException("Unreachable")
         };
 
-        if (right is Expr.ValueExpr valExpr && valExpr.Value is Value.ListValue listVal)
+        if (right is Expr.ValueExpr valExpr && valExpr.NodeValue is Value.ListValue listVal)
         {
             if (listVal.Values.Count == 0)
             {
@@ -821,7 +826,7 @@ public abstract class SqlDialect
 
     public virtual string CompileProjection(EntityDescriptor entity, SelectQuery query, List<Value> paramsList)
     {
-        if (query.Aggregates == null || query.Aggregates.Count == 0)
+        if (query.AggregateItems == null || query.AggregateItems.Count == 0)
         {
             return SelectProjection(entity, query, paramsList);
         }
@@ -830,17 +835,17 @@ public abstract class SqlDialect
 
     public virtual string ResolveOrderField(EntityDescriptor entity, OrderBy orderBy, List<Value> paramsList)
     {
-        if (orderBy.Expr != null)
+        if (orderBy.ExprValue != null)
         {
-            return CompileExpr(entity, orderBy.Expr, paramsList);
+            return CompileExpr(entity, orderBy.ExprValue, paramsList);
         }
         return ColumnSql(entity, orderBy.Field);
     }
 
     public virtual string ColumnWithAlias(PropertyDescriptor property)
     {
-        var column = QuoteIdent(property.ColumnName);
-        if (property.ColumnName == property.Name)
+        var column = QuoteIdent(property.ColumnNameString);
+        if (property.ColumnNameString == property.Name)
             return column;
         return $"{column} AS {QuoteIdent(property.Name)}";
     }

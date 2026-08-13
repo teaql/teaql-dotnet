@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\TeaQL.DataService\TeaQL.DataService.csproj" />
     <ProjectReference Include="..\TeaQL.Core\TeaQL.Core.csproj" />
+    <ProjectReference Include="..\TeaQL.Runtime\TeaQL.Runtime.csproj" />
   </ItemGroup>
 
   <ItemGroup>

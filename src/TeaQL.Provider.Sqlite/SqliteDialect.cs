@@ -40,6 +40,6 @@ public class SqliteDialect : SqlDialect
     {
         var def = ColumnDefinitionSql(property);
         var defWithoutNotNull = def.Replace(" NOT NULL", "");
-        return $"ALTER TABLE {QuoteIdent(entity.TableName)} ADD COLUMN {defWithoutNotNull}";
+        return $"ALTER TABLE {QuoteIdent(entity.TableNameValue)} ADD COLUMN {defWithoutNotNull}";
     }
 }

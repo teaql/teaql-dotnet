@@ -119,6 +119,7 @@ public record UnsafeRawSqlSegment
     public string Sql { get; }
     private UnsafeRawSqlSegment(string sql) => Sql = sql;
     public static UnsafeRawSqlSegment Trusted(string sql) => new(sql);
+    public string IntoSql() => Sql;
 }
 
 public record RawDynamicProperty(string PropertyName, string RawSqlSegment)
@@ -157,9 +158,9 @@ public static class RequestHelpers
         var currentQuery = query;
         foreach (var selection in relationSelections)
         {
-            var relations = new List<RelationLoad>(currentQuery.Relations);
+            var relations = new List<RelationLoad>(currentQuery.RelationLoads);
             relations.Add(new RelationLoad(selection.Name, selection.IntoQuery()));
-            currentQuery = currentQuery with { Relations = relations };
+            currentQuery = currentQuery with { RelationLoads = relations };
         }
         return currentQuery;
     }
@@ -169,12 +170,12 @@ public static class RequestHelpers
         var q = query;
         if (options.Comment != null)
         {
-            q = q with { Comment = options.Comment };
+            q = q with { CommentText = options.Comment };
         }
         q = q with
         {
-            RawSql = options.RawSql,
-            RawSqlSearchCriteria = options.RawSqlSearchCriteria.ToList(),
+            RawSqlText = options.RawSql,
+            RawSqlSearchCriteriaItems = options.RawSqlSearchCriteria.ToList(),
             DynamicProperties = options.DynamicProperties.Select(p => new RawSqlProjection(p.PropertyName, p.RawSqlSegment)).ToList(),
             RawProjections = options.RawProjections.Select(p => new RawSqlProjection(p.PropertyName, p.RawSqlSegment)).ToList(),
             ObjectGroupBys = options.ObjectGroupBys.Select(g => new ObjectGroupBy(g.PropertyName, g.StorageField, g.Query.IntoQuery())).ToList(),
@@ -195,18 +196,18 @@ public static class RequestHelpers
 
     public static void MergeOuterFilterIntoFacetAggregates(QuerySelection selection, SelectQuery outerQuery)
     {
-        if (outerQuery.Filter == null) return;
+        if (outerQuery.FilterCondition == null) return;
 
         for (int i = 0; i < selection.QueryOptions.RelationAggregates.Count; i++)
         {
             var aggregate = selection.QueryOptions.RelationAggregates[i];
             if (aggregate.Query.Query.Entity == outerQuery.Entity)
             {
-                var newFilter = aggregate.Query.Query.Filter == null
-                    ? outerQuery.Filter
-                    : new Expr.AndExpr(new List<Expr> { aggregate.Query.Query.Filter, outerQuery.Filter });
+                var newFilter = aggregate.Query.Query.FilterCondition == null
+                    ? outerQuery.FilterCondition
+                    : new Expr.AndExpr(new List<Expr> { aggregate.Query.Query.FilterCondition, outerQuery.FilterCondition });
                 
-                var newQuery = aggregate.Query.Query with { Filter = newFilter };
+                var newQuery = aggregate.Query.Query with { FilterCondition = newFilter };
                 aggregate.Query.Query = newQuery;
             }
         }

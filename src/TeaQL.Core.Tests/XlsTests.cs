@@ -31,8 +31,8 @@ public class XlsTests
     [Fact]
     public void TestXlsBlockBuildContext()
     {
-        var ctx = XlsBlockBuildContext.FromPage("page1");
-        Assert.Equal("page1", ctx.Page);
+        var ctx = XlsBlockBuildContext.Page("page1");
+        Assert.Equal("page1", ctx.PageName);
         Assert.Equal(0, ctx.X);
         Assert.Equal(0, ctx.Y);
 
@@ -51,14 +51,14 @@ public class XlsTests
         var workbook = new XlsWorkbook();
         var page = new XlsPage("Sheet1");
         
-        var block = new XlsBlock("Sheet1", 0, 0, JsonValue.Create("header"));
+        var block = new XlsBlock { Page = "Sheet1", Top = 0, Left = 0, Bottom = 10, Right = 10 };
         page.PushBlock(block);
         
         workbook.PushPage(page);
         
         Assert.NotNull(workbook.Page("Sheet1"));
         Assert.NotNull(workbook.Page("Sheet1")?.BlockAt(0, 0));
-        Assert.Null(workbook.Page("Sheet1")?.BlockAt(1, 1));
+        Assert.Null(workbook.Page("Sheet1")?.BlockAt(11, 11));
         
         var json = workbook.ToJsonValue();
         Assert.NotNull(json);
