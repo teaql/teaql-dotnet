@@ -18,3 +18,6 @@ Expect `WEB-2026-001`, `2026-08-12`, and decimal `129.95`. The first run reports
 ## Customize it
 
 Change the generated filter or ordering in `Program.cs`, then rebuild with shared Roslyn compilation disabled as shown above. Read request signatures rather than guessing. Keep custom policy and audit sinks in `dotnet-app-console`; regenerate `dotnet-lib-core`. The shared model is generation provenance, not a runtime dependency.
+### Materialized-list hard limit
+
+`ExecuteForListAsync` protects the service by applying a default hard limit of 10,000 rows. A requested page size above that ceiling fails explicitly. Trusted application code can call `HardLimit(...)` to override the outer-query ceiling. **Caution:** most applications should not override it; do so only for a reviewed, exceptional requirement. This setting does not describe streaming execution.

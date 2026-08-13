@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace TeaQL.Core;
 
@@ -64,6 +65,9 @@ public record StreamConfig(int ChunkSize = 1000);
 
 public record SelectQuery
 {
+    public const ulong DefaultHardLimit = 10_000;
+    [JsonIgnore]
+    public ulong HardLimitValue { get; set; } = DefaultHardLimit;
     public string Entity { get; set; } = "";
     public List<string> Projection { get; set; } = new();
     public List<NamedExpr> ExprProjection { get; set; } = new();
@@ -267,6 +271,29 @@ public record SelectQuery
         Slice = Slice ?? new Slice(null, 0);
         Slice = Slice with { Limit = limit };
         return this;
+    }
+
+    /// Override the outer materialized-list ceiling. Most callers should keep 10,000.
+    public SelectQuery HardLimit(ulong hardLimit)
+    {
+        if (hardLimit == 0) throw new ArgumentOutOfRangeException(nameof(hardLimit));
+        HardLimitValue = hardLimit;
+        return this;
+    }
+
+    public SelectQuery PrepareForList()
+    {
+        ApplyListLimit(HardLimitValue);
+        return this;
+    }
+
+    private void ApplyListLimit(ulong ceiling)
+    {
+        if (Slice?.Limit is ulong requested && requested > ceiling)
+            throw new InvalidOperationException($"QUERY_HARD_LIMIT_EXCEEDED: requested limit {requested} exceeds hard limit {ceiling}");
+        Slice = Slice == null ? new Slice(ceiling, 0) : Slice with { Limit = Slice.Limit ?? ceiling };
+        foreach (var relation in Relations) relation.Query?.ApplyListLimit(DefaultHardLimit);
+        foreach (var child in ChildEnhancements) child.ApplyListLimit(DefaultHardLimit);
     }
 
     public SelectQuery Offset(ulong offset)
