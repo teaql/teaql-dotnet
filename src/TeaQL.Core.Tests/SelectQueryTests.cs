@@ -6,6 +6,15 @@ namespace TeaQL.Core.Tests;
 public class SelectQueryTests
 {
     [Fact]
+    public void MaterializedListHardLimitIsLocalAndEnforced()
+    {
+        Assert.Equal((ulong)10_000, new SelectQuery("Order").PrepareForList().Slice!.Limit);
+        Assert.Throws<System.InvalidOperationException>(() => new SelectQuery("Order").Limit(10_001).PrepareForList());
+        new SelectQuery("Order").Limit(10_001).HardLimit(20_000).PrepareForList();
+        Assert.DoesNotContain("HardLimit", System.Text.Json.JsonSerializer.Serialize(new SelectQuery("Order").HardLimit(20_000)));
+    }
+
+    [Fact]
     public void TestSelectQueryBuilder()
     {
         var query = new SelectQuery("users")

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Runtime.CompilerServices;
 using Npgsql;
 using NpgsqlTypes;
 using TeaQL.Core;
@@ -11,7 +13,7 @@ using TeaQL.Sql;
 
 namespace TeaQL.Provider.PostgreSql;
 
-public class PostgreSqlTransport : ISqlTransport
+public class PostgreSqlTransport : IStreamingSqlTransport
 {
     private readonly NpgsqlDataSource _dataSource;
 
@@ -44,6 +46,28 @@ public class PostgreSqlTransport : ISqlTransport
         }
         
         return records;
+    }
+
+    public async IAsyncEnumerable<Record> StreamSqlAsync(
+        CompiledQuery query,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = query.Sql;
+        SetParameters(cmd, query.Params);
+        await using var reader = await cmd.ExecuteReaderAsync(
+            System.Data.CommandBehavior.SequentialAccess,
+            cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var record = new Record();
+            for (var i = 0; i < reader.FieldCount; i++)
+                record[reader.GetName(i)] = reader.IsDBNull(i)
+                    ? new Value.NullValue()
+                    : MapToValue(reader.GetValue(i));
+            yield return record;
+        }
     }
 
     public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)

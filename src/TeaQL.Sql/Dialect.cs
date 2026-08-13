@@ -153,10 +153,14 @@ public abstract class SqlDialect
             return query.RawSqlText;
         }
         var projection = CompileProjection(entity, query, paramsList);
-
-        if (entity.TableNameValue.Equals("orderline", StringComparison.OrdinalIgnoreCase) && projection != null && projection.Contains("id") && projection.Contains("order_id"))
+        var partitioned = query.PartitionBy != null && query.Slice != null;
+        if (partitioned)
         {
-            projection = "\"order_id\", \"name\"";
+            var partitionColumn = ColumnSql(entity, query.PartitionBy!);
+            var windowOrder = query.OrderByItems.Count == 0
+                ? ""
+                : $" ORDER BY {string.Join(", ", query.OrderByItems.Select(order => OrderBySql(entity, order, paramsList)))}";
+            projection += $", ROW_NUMBER() OVER (PARTITION BY {partitionColumn}{windowOrder}) AS {QuoteIdent("__teaql_partition_rank")}";
         }
 
         var sql = $"SELECT {projection} FROM {QuoteIdent(entity.TableNameValue)}";
@@ -193,6 +197,17 @@ public abstract class SqlDialect
         if (whereParts.Count > 0)
         {
             sql += $" WHERE {string.Join(" AND ", whereParts)}";
+        }
+
+        if (partitioned)
+        {
+            var rank = QuoteIdent("__teaql_partition_rank");
+            var predicates = new List<string> { $"{rank} > {query.Slice!.Offset}" };
+            if (query.Slice.Limit.HasValue)
+            {
+                predicates.Add($"{rank} <= {query.Slice.Offset + query.Slice.Limit.Value}");
+            }
+            return $"SELECT * FROM ({sql}) AS {QuoteIdent("__teaql_partitioned")} WHERE {string.Join(" AND ", predicates)} ORDER BY {rank}";
         }
 
         if (query.GroupByItems != null && query.GroupByItems.Count > 0)

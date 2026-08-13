@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace TeaQL.Core;
 
@@ -56,7 +57,7 @@ public record ObjectGroupBy(string PropertyName, string StorageField, SelectQuer
 
 public record AggregationCacheOptions(bool EnabledValue, ulong CacheExpiredMillis, bool PropagateValue, ulong PropagateCacheExpiredMillis)
 {
-    public static AggregationCacheOptions Enabled(ulong cacheExpiredMillis) => 
+    public static AggregationCacheOptions Enabled(ulong cacheExpiredMillis) =>
         new(true, cacheExpiredMillis, false, 0);
 
     public AggregationCacheOptions Propagate(ulong cacheExpiredMillis) =>
@@ -67,6 +68,9 @@ public record StreamConfig(int ChunkSize = 1000);
 
 public record SelectQuery
 {
+    public const ulong DefaultHardLimit = 10_000;
+    [JsonIgnore]
+    public ulong HardLimitValue { get; set; } = DefaultHardLimit;
     public string Entity { get; set; } = "";
     public List<string> Projection { get; set; } = new();
     public List<NamedExpr> ExprProjection { get; set; } = new();
@@ -75,6 +79,7 @@ public record SelectQuery
     public Expr? HavingCondition { get; set; }
     public List<OrderBy> OrderByItems { get; set; } = new();
     public Slice? Slice { get; set; }
+    public string? PartitionBy { get; set; }
     public List<Aggregate> AggregateItems { get; set; } = new();
     public List<string> GroupByItems { get; set; } = new();
     public List<RelationLoad> RelationLoads { get; set; } = new();
@@ -271,6 +276,29 @@ public record SelectQuery
         return this;
     }
 
+    /// Override the outer materialized-list ceiling. Most callers should keep 10,000.
+    public SelectQuery HardLimit(ulong hardLimit)
+    {
+        if (hardLimit == 0) throw new ArgumentOutOfRangeException(nameof(hardLimit));
+        HardLimitValue = hardLimit;
+        return this;
+    }
+
+    public SelectQuery PrepareForList()
+    {
+        ApplyListLimit(HardLimitValue);
+        return this;
+    }
+
+    private void ApplyListLimit(ulong ceiling)
+    {
+        if (Slice?.Limit is ulong requested && requested > ceiling)
+            throw new InvalidOperationException($"QUERY_HARD_LIMIT_EXCEEDED: requested limit {requested} exceeds hard limit {ceiling}");
+        Slice = Slice == null ? new Slice(ceiling, 0) : Slice with { Limit = Slice.Limit ?? ceiling };
+        foreach (var relation in RelationLoads) relation.Query?.ApplyListLimit(DefaultHardLimit);
+        foreach (var child in ChildEnhancements) child.ApplyListLimit(DefaultHardLimit);
+    }
+
     public SelectQuery Offset(ulong offset)
     {
         Slice = Slice ?? new Slice(null, 0);
@@ -279,6 +307,12 @@ public record SelectQuery
     }
 
     public SelectQuery Page(ulong offset, ulong limit) => Offset(offset).Limit(limit);
+
+    public SelectQuery PartitionByField(string field)
+    {
+        PartitionBy = field;
+        return this;
+    }
 
     public SelectQuery Stream(int chunkSize)
     {

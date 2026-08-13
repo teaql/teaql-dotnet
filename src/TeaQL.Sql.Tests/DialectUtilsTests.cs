@@ -103,6 +103,24 @@ namespace TeaQL.Sql.Tests
         }
 
         [Fact]
+        public void CompileSelect_AppliesNestedLimitPerPartition()
+        {
+            var entity = EntityDescriptor.New("OrderLine").TableName("orderline")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("order_id", DataType.I64))
+                .Property(PropertyDescriptor.New("name", DataType.Text));
+            var query = new SelectQuery("OrderLine")
+                .Project("id").Project("order_id").Project("name")
+                .AndFilter(Expr.InList("order_id", new Value[] { new Value.I64Value(11), new Value.I64Value(12) }))
+                .OrderDesc("id").Offset(1).Limit(3).PartitionByField("order_id");
+
+            var compiled = _dialect.CompileSelect(entity, query);
+
+            Assert.Equal("SELECT * FROM (SELECT \"id\", \"order_id\", \"name\", ROW_NUMBER() OVER (PARTITION BY \"order_id\" ORDER BY \"id\" DESC) AS \"__teaql_partition_rank\" FROM \"orderline\" WHERE (\"order_id\" IN ($1, $2))) AS \"__teaql_partitioned\" WHERE \"__teaql_partition_rank\" > 1 AND \"__teaql_partition_rank\" <= 4 ORDER BY \"__teaql_partition_rank\"", compiled.Sql);
+            Assert.Equal(2, compiled.Params.Count);
+        }
+
+        [Fact]
         public void CompileInsert_ReturnsExpected()
         {
             var entity = new EntityDescriptor { TableNameValue = "users" };

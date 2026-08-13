@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Runtime.CompilerServices;
 using MySqlConnector;
 using TeaQL.Core;
 using TeaQL.Sql;
 
 namespace TeaQL.Provider.MySql;
 
-public class MySqlTransport : ISqlTransport, IDisposable
+public class MySqlTransport : IStreamingSqlTransport, IDisposable
 {
     private readonly MySqlConnection _connection;
     private readonly bool _ownsConnection;
@@ -62,6 +64,29 @@ public class MySqlTransport : ISqlTransport, IDisposable
         }
 
         return results;
+    }
+
+    public async IAsyncEnumerable<Record> StreamSqlAsync(
+        CompiledQuery query,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await EnsureConnectionOpenAsync();
+        using var cmd = _connection.CreateCommand();
+        cmd.CommandText = query.Sql;
+        foreach (var param in query.Params)
+        {
+            var p = cmd.CreateParameter();
+            p.Value = ConvertValue(param);
+            cmd.Parameters.Add(p);
+        }
+        using var reader = await cmd.ExecuteReaderAsync(System.Data.CommandBehavior.SequentialAccess, cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var record = new Record();
+            for (var i = 0; i < reader.FieldCount; i++)
+                record[reader.GetName(i)] = ConvertFromDbValue(reader.GetValue(i));
+            yield return record;
+        }
     }
 
     public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
