@@ -2,11 +2,14 @@ using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using TeaQL.Core;
+using TeaQL.DataService;
 
 namespace TeaQL.Runtime;
 
 public class UserContext
 {
+    private readonly IContinuousPageCursorStore _continuousPageCursorStore = new InMemoryContinuousPageCursorStore();
+    private readonly ContinuousPageRuntimeContext _continuousPageRuntime;
     public IMetadataStore? Metadata { get; set; }
     public IEntityRegistry? EntityRegistry { get; set; }
     
@@ -27,6 +30,7 @@ public class UserContext
         var user = Environment.UserName;
         UserIdentifier = $"{user}@pid-{pid}.tid-{threadId}";
         TraceId = $"req-{pid}-{threadId}-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+        _continuousPageRuntime = new ContinuousPageRuntimeContext(_continuousPageCursorStore, UserIdentifier);
     }
 
     public UserContext WithMetadata(IMetadataStore metadata)
@@ -45,6 +49,21 @@ public class UserContext
     {
         module.ApplyTo(this);
         return this;
+    }
+
+    public ContinuousPageRuntimeContext ContinuousPageRuntime()
+    {
+        _continuousPageRuntime.Owner = UserIdentifier ?? "";
+        return _continuousPageRuntime;
+    }
+
+    public string ContinuousPagePlan => _continuousPageRuntime.Plan;
+    public string? ContinuousPageCursorId => _continuousPageRuntime.CursorId;
+
+    public QueryRequest PrepareQueryRequest(QueryRequest request)
+    {
+        request.ContinuousPageRuntime = ContinuousPageRuntime();
+        return request;
     }
 
     public EntityDescriptor? GetEntity(string name)

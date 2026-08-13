@@ -6,6 +6,16 @@ namespace TeaQL.Core.Tests;
 public class SelectQueryTests
 {
     [Fact]
+    public void ContinuousPageFetchIsExplicitLocalAndValidated()
+    {
+        var query = new SelectQuery("Order").OptimizeForContinuousPageFetchWith("recent-orders", 30);
+        Assert.Equal("recent-orders", query.ContinuousPageFetch!.Namespace);
+        Assert.DoesNotContain("ContinuousPageFetch", System.Text.Json.JsonSerializer.Serialize(query));
+        Assert.Throws<ArgumentException>(() => new SelectQuery("Order").OptimizeForContinuousPageFetchWith(" ", 30));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new SelectQuery("Order").OptimizeForContinuousPageFetchWith("orders", 0));
+    }
+
+    [Fact]
     public void MaterializedListHardLimitIsLocalAndEnforced()
     {
         Assert.Equal((ulong)10_000, new SelectQuery("Order").PrepareForList().Slice!.Limit);

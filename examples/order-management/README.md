@@ -35,3 +35,28 @@ await foreach (var order in request.Comment("export orders").Purpose("reviewed e
 ```
 
 The chunk size is the provider fetch bound. **Caution:** normally keep the default 1,000. Streaming relation or aggregate enhancement is rejected; use a root query or `ExecuteForListAsync`. Ordinary federation requires a dedicated streaming protocol.
+
+### Optional continuous browsing optimization
+
+For a browse-only screen ordered by the unique `id`, trusted application code can opt in:
+
+```csharp
+var orders = await Q.CustomerOrders()
+    .OrderByIdDescending()
+    .Offset(page * pageSize)
+    .Limit(pageSize)
+    .OptimizeForContinuousPageFetchWith("recent-orders", 60)
+    .Purpose("browse recent orders")
+    .Comment("order browser")
+    .ExecuteForListAsync(ctx);
+```
+
+The runtime remembers a bounded, expiring cursor in `UserContext`. A matching next page
+transparently uses an `id` seek instead of a deep offset; a cache miss, unsupported query
+shape, or unavailable store retains correct offset behavior. The selected plan and cursor
+ID remain observable for diagnosis.
+
+**Caution:** this is an explicitly approximate optimization for continuous browsing, not
+business logic, reconciliation, export, or a stable snapshot. Browse screens normally do
+not need an exact count. The option is local runtime metadata excluded from JSON, so the
+federation protocol cannot enable or modify it.

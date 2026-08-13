@@ -65,12 +65,15 @@ public record AggregationCacheOptions(bool EnabledValue, ulong CacheExpiredMilli
 }
 
 public record StreamConfig(int ChunkSize = 1000);
+public record ContinuousPageFetchOptions(string Namespace, int TtlSeconds);
 
 public record SelectQuery
 {
     public const ulong DefaultHardLimit = 10_000;
     [JsonIgnore]
     public ulong HardLimitValue { get; set; } = DefaultHardLimit;
+    [JsonIgnore]
+    public ContinuousPageFetchOptions? ContinuousPageFetch { get; set; }
     public string Entity { get; set; } = "";
     public List<string> Projection { get; set; } = new();
     public List<NamedExpr> ExprProjection { get; set; } = new();
@@ -307,6 +310,17 @@ public record SelectQuery
     }
 
     public SelectQuery Page(ulong offset, ulong limit) => Offset(offset).Limit(limit);
+
+    public SelectQuery OptimizeForContinuousPageFetch() =>
+        OptimizeForContinuousPageFetchWith("default", 600);
+
+    public SelectQuery OptimizeForContinuousPageFetchWith(string @namespace, int ttlSeconds)
+    {
+        if (string.IsNullOrWhiteSpace(@namespace)) throw new ArgumentException("namespace must not be empty", nameof(@namespace));
+        if (ttlSeconds <= 0) throw new ArgumentOutOfRangeException(nameof(ttlSeconds));
+        ContinuousPageFetch = new ContinuousPageFetchOptions(@namespace, ttlSeconds);
+        return this;
+    }
 
     public SelectQuery PartitionByField(string field)
     {

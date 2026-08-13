@@ -14,11 +14,22 @@ namespace TeaQL.DataService.Tests
         {
             var query = new SelectQuery();
             var trace = new List<TraceNode> { new TraceNode("test", null, "comment") };
-            var req = new QueryRequest { Query = query, TraceChain = trace, Comment = "comment" };
+            var req = new QueryRequest { Query = query, TraceChain = trace, Comment = "comment", Purpose = "trusted purpose",
+                ContinuousPageRuntime = new ContinuousPageRuntimeContext(new EmptyCursorStore(), "owner") };
 
             Assert.Same(query, req.Query);
             Assert.Same(trace, req.TraceChain);
             Assert.Equal("comment", req.Comment);
+            var json = System.Text.Json.JsonSerializer.Serialize(req);
+            Assert.DoesNotContain("Purpose", json);
+            Assert.DoesNotContain("ContinuousPageRuntime", json);
+        }
+
+        private sealed class EmptyCursorStore : IContinuousPageCursorStore
+        {
+            public System.Threading.Tasks.Task<ContinuousPageCursor?> GetAsync(string key, ulong offset) => System.Threading.Tasks.Task.FromResult<ContinuousPageCursor?>(null);
+            public System.Threading.Tasks.Task PutAsync(ContinuousPageCursor cursor) => System.Threading.Tasks.Task.CompletedTask;
+            public System.Threading.Tasks.Task InvalidateAsync(string key) => System.Threading.Tasks.Task.CompletedTask;
         }
 
         [Fact]

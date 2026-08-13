@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
 using TeaQL.Core;
+using System.Text.Json.Serialization;
 
 namespace TeaQL.DataService;
 
@@ -24,6 +25,37 @@ public class QueryRequest
     public SelectQuery Query { get; set; } = new();
     public List<TraceNode> TraceChain { get; set; } = new();
     public string? Comment { get; set; }
+    [JsonIgnore]
+    public string? Purpose { get; set; }
+    [JsonIgnore]
+    public ContinuousPageRuntimeContext? ContinuousPageRuntime { get; set; }
+}
+
+public record ContinuousPageCursor(
+    string CursorId,
+    string QueryKey,
+    string Entity,
+    SortDirection Direction,
+    Value Boundary,
+    ulong PageSize,
+    ulong NextOffset,
+    DateTimeOffset ExpiresAt);
+
+public interface IContinuousPageCursorStore
+{
+    Task<ContinuousPageCursor?> GetAsync(string queryKey, ulong targetOffset);
+    Task PutAsync(ContinuousPageCursor cursor);
+    Task InvalidateAsync(string queryKey);
+}
+
+public sealed class ContinuousPageRuntimeContext
+{
+    public ContinuousPageRuntimeContext(IContinuousPageCursorStore store, string owner) { Store = store; Owner = owner; }
+    public IContinuousPageCursorStore Store { get; }
+    public string Owner { get; set; }
+    public string Plan { get; set; } = "DISABLED";
+    public string? CursorId { get; set; }
+    public void Observe(string plan, string? cursorId = null) { Plan = plan; CursorId = cursorId; }
 }
 
 public class QueryResult
