@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using TeaQL.Core;
 using TeaQL.DataService;
 
@@ -20,6 +22,17 @@ public interface IEntityRegistry
 public interface ITeaqlRuntime
 {
     UserContext UserContext { get; }
+}
+
+public interface IRequestPolicy
+{
+    SelectQuery Apply(SelectQuery query);
+}
+
+public interface IAppAuditEventSink
+{
+    Task RecordAsync(IReadOnlyDictionary<string, object?> safeEvent,
+        CancellationToken cancellationToken = default);
 }
 
 public interface IRemoteCacheProvider

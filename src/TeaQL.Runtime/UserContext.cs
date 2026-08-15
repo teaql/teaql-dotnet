@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TeaQL.Core;
+using TeaQL.DataService;
 
 namespace TeaQL.Runtime;
 
@@ -39,6 +43,41 @@ public class UserContext
     {
         EntityRegistry = registry;
         return this;
+    }
+
+    public UserContext WithRequestPolicy(IRequestPolicy policy)
+    {
+        InsertResource(policy);
+        return this;
+    }
+
+    public UserContext WithAppAuditEventSink(IAppAuditEventSink sink)
+    {
+        InsertResource(sink);
+        return this;
+    }
+
+    public UserContext WithTrustedTenant(string tenant)
+    {
+        if (string.IsNullOrWhiteSpace(tenant))
+            throw new ArgumentException("A trusted tenant is required", nameof(tenant));
+        InsertNamedResource("trustedTenant", tenant);
+        return this;
+    }
+
+    public SelectQuery ApplyRequestPolicy(SelectQuery query) =>
+        RequireResource<IRequestPolicy>().Apply(query);
+
+    public Task PublishAppAuditEventAsync(IReadOnlyDictionary<string, object?> safeEvent,
+        CancellationToken cancellationToken = default) =>
+        RequireResource<IAppAuditEventSink>().RecordAsync(safeEvent, cancellationToken);
+
+    public async Task EnsureSchemaAsync()
+    {
+        var provider = RequireResource<ISchemaExecutor>();
+        var metadata = Metadata ?? throw new InvalidOperationException("Missing metadata");
+        foreach (var entity in metadata.GetAllEntities())
+            await provider.EnsureSchemaAsync(new SchemaRequest { EntityName = entity.Name });
     }
 
     public UserContext WithModule(RuntimeModule module)
