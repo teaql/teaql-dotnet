@@ -132,6 +132,11 @@ public class ExecutionMetadata
     public List<TraceNode> TraceChain { get; set; } = new();
     public string? Comment { get; set; }
     public string? BackendRequestId { get; set; }
+    /// <summary>Provider-native request text with placeholders, never interpolated bind values.</summary>
+    public string? ParameterizedQuery { get; set; }
+    /// <summary>Structured bind values for trusted runtime diagnostics.</summary>
+    public IReadOnlyList<Value> Parameters { get; set; } = Array.Empty<Value>();
+    public int ParameterCount => Parameters.Count;
     public string? DebugQuery { get; set; }
 }
 

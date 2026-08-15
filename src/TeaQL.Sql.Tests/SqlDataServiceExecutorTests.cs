@@ -45,7 +45,8 @@ namespace TeaQL.Sql.Tests
             var ed = new EntityDescriptor { Name = "TestEntity", TableNameValue = "test" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
-            var compiled = new CompiledQuery("SELECT 1", new List<Value>(), null);
+            var compiled = new CompiledQuery(
+                "SELECT $1", new List<Value> { new Value.TextValue("secret-customer-value") }, null);
             _mockDialect.Setup(d => d.CompileSelect(ed, req.Query)).Returns(compiled);
 
             var rows = new List<Record> { new Record() };
@@ -56,6 +57,10 @@ namespace TeaQL.Sql.Tests
             Assert.Single(result.Rows);
             Assert.Equal(DataServiceOperation.Query, result.Metadata.Operation);
             Assert.Equal(1, result.Metadata.ResultCount);
+            Assert.Equal("SELECT $1", result.Metadata.ParameterizedQuery);
+            Assert.DoesNotContain("secret-customer-value", result.Metadata.ParameterizedQuery);
+            Assert.Single(result.Metadata.Parameters);
+            Assert.Equal(1, result.Metadata.ParameterCount);
         }
 
         [Fact]
@@ -84,6 +89,8 @@ namespace TeaQL.Sql.Tests
 
             Assert.Equal(1ul, result.AffectedRows);
             Assert.Equal(DataServiceOperation.Insert, result.Metadata.Operation);
+            Assert.Equal("INSERT ...", result.Metadata.ParameterizedQuery);
+            Assert.Empty(result.Metadata.Parameters);
         }
 
         [Fact]

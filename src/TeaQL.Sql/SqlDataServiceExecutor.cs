@@ -79,6 +79,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             TraceChain = request.TraceChain ?? new List<TraceNode>(),
             Comment = request.Comment,
             BackendRequestId = null,
+            ParameterizedQuery = compiled.Sql,
+            Parameters = compiled.Params.ToList(),
             DebugQuery = compiled.DebugSql(Dialect.Kind)
         };
 
@@ -90,11 +92,19 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         if (request is BatchMutationRequest batchReq)
         {
             ulong totalAffected = 0;
+            var parameterizedQueries = new List<string>();
+            var parameters = new List<Value>();
+            var debugQueries = new List<string>();
             var batchStart = DateTimeOffset.UtcNow;
             foreach (var req in batchReq.Requests)
             {
                 var res = await MutateAsync(req);
                 totalAffected += res.AffectedRows;
+                if (!string.IsNullOrWhiteSpace(res.Metadata.ParameterizedQuery))
+                    parameterizedQueries.Add(res.Metadata.ParameterizedQuery);
+                parameters.AddRange(res.Metadata.Parameters);
+                if (!string.IsNullOrWhiteSpace(res.Metadata.DebugQuery))
+                    debugQueries.Add(res.Metadata.DebugQuery);
             }
             var batchEnd = DateTimeOffset.UtcNow;
 
@@ -113,7 +123,10 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
                     TraceChain = new List<TraceNode>(),
                     Comment = null,
                     BackendRequestId = null,
-                    DebugQuery = null
+                    ParameterizedQuery = parameterizedQueries.Count == 0
+                        ? null : string.Join("; ", parameterizedQueries),
+                    Parameters = parameters,
+                    DebugQuery = debugQueries.Count == 0 ? null : string.Join("; ", debugQueries)
                 }
             };
         }
@@ -179,6 +192,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             TraceChain = request.TraceChain?.ToList() ?? new List<TraceNode>(),
             Comment = request.Comment,
             BackendRequestId = null,
+            ParameterizedQuery = compiled.Sql,
+            Parameters = compiled.Params.ToList(),
             DebugQuery = compiled.DebugSql(Dialect.Kind)
         };
 
@@ -402,6 +417,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
             TraceChain = request.TraceChain ?? new List<TraceNode>(),
             Comment = request.Comment,
             BackendRequestId = null,
+            ParameterizedQuery = compiled.Sql,
+            Parameters = compiled.Params.ToList(),
             DebugQuery = compiled.DebugSql(Dialect.Kind)
         };
 
@@ -413,11 +430,19 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
         if (request is BatchMutationRequest batchReq)
         {
             ulong totalAffected = 0;
+            var parameterizedQueries = new List<string>();
+            var parameters = new List<Value>();
+            var debugQueries = new List<string>();
             var batchStart = DateTimeOffset.UtcNow;
             foreach (var req in batchReq.Requests)
             {
                 var res = await MutateAsync(req);
                 totalAffected += res.AffectedRows;
+                if (!string.IsNullOrWhiteSpace(res.Metadata.ParameterizedQuery))
+                    parameterizedQueries.Add(res.Metadata.ParameterizedQuery);
+                parameters.AddRange(res.Metadata.Parameters);
+                if (!string.IsNullOrWhiteSpace(res.Metadata.DebugQuery))
+                    debugQueries.Add(res.Metadata.DebugQuery);
             }
             var batchEnd = DateTimeOffset.UtcNow;
 
@@ -436,7 +461,10 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
                     TraceChain = new List<TraceNode>(),
                     Comment = null,
                     BackendRequestId = null,
-                    DebugQuery = null
+                    ParameterizedQuery = parameterizedQueries.Count == 0
+                        ? null : string.Join("; ", parameterizedQueries),
+                    Parameters = parameters,
+                    DebugQuery = debugQueries.Count == 0 ? null : string.Join("; ", debugQueries)
                 }
             };
         }
@@ -502,6 +530,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
             TraceChain = request.TraceChain?.ToList() ?? new List<TraceNode>(),
             Comment = request.Comment,
             BackendRequestId = null,
+            ParameterizedQuery = compiled.Sql,
+            Parameters = compiled.Params.ToList(),
             DebugQuery = compiled.DebugSql(Dialect.Kind)
         };
 
