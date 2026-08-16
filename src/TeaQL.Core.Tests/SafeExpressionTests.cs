@@ -63,6 +63,14 @@ public class SafeExpressionTests
     }
 
     [Fact]
+    public void SafeExpression_OrIfNull_ReturnsValueOrFallback()
+    {
+        Assert.Equal(7, SafeExpression.Value(7).OrIfNull(9));
+        var missing = new SafeExpression<object, int>(new object(), _ => (false, 0));
+        Assert.Equal(9, missing.OrIfNull(9));
+    }
+
+    [Fact]
     public void SafeExpression_CallbacksOnlyRunForTheirMatchingBranch()
     {
         var present = SafeExpression.Value("teaql");

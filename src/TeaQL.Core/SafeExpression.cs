@@ -78,7 +78,7 @@ public class SafeExpression<R, T>
         );
     }
 
-    public T OrElse(T defaultValue)
+    public T OrIfNull(T defaultValue)
     {
         var val = Eval();
         return val.HasValue ? val.Value : defaultValue;
