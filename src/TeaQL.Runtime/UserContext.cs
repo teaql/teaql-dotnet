@@ -11,12 +11,19 @@ namespace TeaQL.Runtime;
 
 public class UserContext
 {
+    private sealed record LocalCacheEntry(object Value, DateTimeOffset? ExpiresAt);
+    private static readonly ConcurrentDictionary<string, LocalCacheEntry> LocalCache = new();
+    private sealed record LocalLockEntry(UserContext Owner, DateTimeOffset? ExpiresAt);
+    private static readonly object LocalLockGate = new();
+    private static readonly Dictionary<string, LocalLockEntry> LocalLocks = new();
     public IMetadataStore? Metadata { get; set; }
     public IEntityRegistry? EntityRegistry { get; set; }
     
     private readonly ConcurrentDictionary<Type, object> _typedResources = new();
     private readonly ConcurrentDictionary<string, object> _namedResources = new();
     private readonly ConcurrentDictionary<string, Value> _locals = new();
+    private readonly ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
+    private readonly ConcurrentBag<object> _managedEntities = new();
     
     public string TraceId { get; set; }
     public string? UserIdentifier { get; set; }
@@ -84,6 +91,36 @@ public class UserContext
     {
         module.ApplyTo(this);
         return this;
+    }
+
+    public UserContext RegisterEntityInitializer(string entityName, Action<UserContext, object> initializer)
+    {
+        if (string.IsNullOrWhiteSpace(entityName)) throw new ArgumentException("Entity name is required", nameof(entityName));
+        ArgumentNullException.ThrowIfNull(initializer);
+        var initializers = _entityInitializers.GetOrAdd(entityName, _ => new List<Action<UserContext, object>>());
+        lock (initializers) initializers.Add(initializer);
+        return this;
+    }
+
+    /// <summary>Applies trusted local defaults while preserving the concrete generated type.</summary>
+    public T InitializeEntity<T>(string entityName, T entity) where T : class
+    {
+        if (string.IsNullOrWhiteSpace(entityName)) throw new ArgumentException("Entity name is required", nameof(entityName));
+        ArgumentNullException.ThrowIfNull(entity);
+        ApplyEntityInitializers("*", entity);
+        ApplyEntityInitializers(entityName, entity);
+        _managedEntities.Add(entity);
+        return entity;
+    }
+
+    public IReadOnlyCollection<object> ManagedEntities => _managedEntities.ToArray();
+
+    private void ApplyEntityInitializers(string entityName, object entity)
+    {
+        if (!_entityInitializers.TryGetValue(entityName, out var initializers)) return;
+        Action<UserContext, object>[] snapshot;
+        lock (initializers) snapshot = initializers.ToArray();
+        foreach (var initializer in snapshot) initializer(this, entity);
     }
 
     public EntityDescriptor? GetEntity(string name)
@@ -156,9 +193,26 @@ public class UserContext
     // ==========================================
     // Local Cache
     // ==========================================
-    public void PutToLocalCache(string key, object value, int? timeToLiveInSeconds = null) { }
-    public T? GetFromLocalCache<T>(string key) { return default; }
-    public void RemoveFromLocalCache(string key) { }
+    public void PutToLocalCache(string key, object value, int? timeToLiveInSeconds = null)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(value);
+        var expiresAt = timeToLiveInSeconds > 0
+            ? DateTimeOffset.UtcNow.AddSeconds(timeToLiveInSeconds.Value)
+            : (DateTimeOffset?)null;
+        LocalCache[key] = new LocalCacheEntry(value, expiresAt);
+    }
+    public T? GetFromLocalCache<T>(string key)
+    {
+        if (!LocalCache.TryGetValue(key, out var entry)) return default;
+        if (entry.ExpiresAt is not null && DateTimeOffset.UtcNow >= entry.ExpiresAt)
+        {
+            LocalCache.TryRemove(new KeyValuePair<string, LocalCacheEntry>(key, entry));
+            return default;
+        }
+        return entry.Value is T value ? value : default;
+    }
+    public void RemoveFromLocalCache(string key) { LocalCache.TryRemove(key, out _); }
 
     // ==========================================
     // Remote Cache
@@ -180,8 +234,40 @@ public class UserContext
     // ==========================================
     // Local Lock
     // ==========================================
-    public bool TryLocalLock(string key, long timeoutMillis, long expireMillis) { return true; }
-    public void UnlockLocal(string key) { }
+    public bool TryLocalLock(string key, long timeoutMillis, long expireMillis)
+    {
+        var deadline = DateTimeOffset.UtcNow.AddMilliseconds(Math.Max(timeoutMillis, 0));
+        lock (LocalLockGate)
+        {
+            while (true)
+            {
+                var now = DateTimeOffset.UtcNow;
+                if (!LocalLocks.TryGetValue(key, out var current)
+                    || current.ExpiresAt is not null && now >= current.ExpiresAt
+                    || ReferenceEquals(current.Owner, this))
+                {
+                    var expiresAt = expireMillis > 0 ? now.AddMilliseconds(expireMillis) : (DateTimeOffset?)null;
+                    LocalLocks[key] = new LocalLockEntry(this, expiresAt);
+                    return true;
+                }
+                var remaining = deadline - now;
+                if (timeoutMillis <= 0 || remaining <= TimeSpan.Zero) return false;
+                var leaseRemaining = current.ExpiresAt is null ? remaining : current.ExpiresAt.Value - now;
+                Monitor.Wait(LocalLockGate, leaseRemaining < remaining ? leaseRemaining : remaining);
+            }
+        }
+    }
+    public void UnlockLocal(string key)
+    {
+        lock (LocalLockGate)
+        {
+            if (LocalLocks.TryGetValue(key, out var current) && ReferenceEquals(current.Owner, this))
+            {
+                LocalLocks.Remove(key);
+                Monitor.PulseAll(LocalLockGate);
+            }
+        }
+    }
 
     // ==========================================
     // Remote Lock
