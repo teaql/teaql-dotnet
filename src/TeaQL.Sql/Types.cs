@@ -191,14 +191,16 @@ public class CompiledQuery
         return output.ToString();
     }
 
-    private static string SqlBoolLiteral(bool value) => value ? "TRUE" : "FALSE";
+    private static string SqlBoolLiteral(bool value, DatabaseKind kind) => kind == DatabaseKind.SqlServer
+        ? (value ? "1" : "0")
+        : (value ? "TRUE" : "FALSE");
 
     private static string SqlLiteral(Value value, DatabaseKind kind)
     {
         return value switch
         {
             Value.NullValue => "NULL",
-            Value.BoolValue b => SqlBoolLiteral(b.Value),
+            Value.BoolValue b => SqlBoolLiteral(b.Value, kind),
             Value.I64Value i => i.Value.ToString(),
             Value.U64Value u => u.Value.ToString(),
             Value.F64Value f => f.Value.ToString(System.Globalization.CultureInfo.InvariantCulture),

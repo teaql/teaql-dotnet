@@ -55,6 +55,18 @@ namespace TeaQL.Sql.Tests
         }
 
         [Fact]
+        public void DebugSql_SqlServer_UsesExecutableLiterals()
+        {
+            var query = new CompiledQuery(
+                "SELECT * FROM school WHERE name = @p1 AND active = @p2",
+                new List<Value> { new Value.TextValue("O'Brien"), new Value.BoolValue(true) });
+
+            Assert.Equal(
+                "SELECT * FROM school WHERE name = 'O''Brien' AND active = 1",
+                query.DebugSql(DatabaseKind.SqlServer));
+        }
+
+        [Fact]
         public void SqlCompileException_Constructors_Work()
         {
             Assert.NotNull(SqlCompileException.UnknownEntity("e"));
@@ -106,6 +118,22 @@ namespace TeaQL.Sql.Tests
             Assert.Contains("'{}'", debug);
             Assert.Contains("'2023-01-01'", debug);
             Assert.Contains("1000", debug);
+        }
+
+        [Fact]
+        public void DebugSql_RendersCopyPasteStatementWithSharedSemantics()
+        {
+            var query = new CompiledQuery(
+                "SELECT * FROM school WHERE name = $1 AND active = $2 AND phone IS $3 AND repeated = $1 AND note = '$2'",
+                new List<Value> {
+                    new Value.TextValue("O'Brien School"),
+                    new Value.BoolValue(true),
+                    new Value.NullValue()
+                });
+
+            Assert.Equal(
+                "SELECT * FROM school WHERE name = 'O''Brien School' AND active = TRUE AND phone IS NULL AND repeated = 'O''Brien School' AND note = '$2'",
+                query.DebugSql(DatabaseKind.PostgreSql));
         }
     }
 }
