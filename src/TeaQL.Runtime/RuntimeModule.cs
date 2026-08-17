@@ -15,6 +15,15 @@ public class RuntimeModule
         return this;
     }
 
+    public RuntimeModule And(RuntimeModule other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        var combined = new RuntimeModule();
+        foreach (var descriptor in Metadata.GetAllEntities()) combined.Entity(descriptor);
+        foreach (var descriptor in other.Metadata.GetAllEntities()) combined.Entity(descriptor);
+        return combined;
+    }
+
     public void ApplyTo(UserContext ctx)
     {
         ctx.Metadata = Metadata;

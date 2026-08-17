@@ -55,6 +55,17 @@ namespace TeaQL.Runtime.Tests
         }
 
         [Fact]
+        public void RuntimeModule_IsComposableAndInstallDoesNotEnsureSchema()
+        {
+            var first = new RuntimeModule().Entity(new EntityDescriptor { Name = "first" });
+            var second = new RuntimeModule().Entity(new EntityDescriptor { Name = "second" });
+            var ctx = new UserContext().Install(first.And(second));
+
+            Assert.NotNull(ctx.GetEntity("first"));
+            Assert.NotNull(ctx.GetEntity("second"));
+        }
+
+        [Fact]
         public void Constructor_InitializesTraceIdAndUserIdentifier()
         {
             var ctx = new UserContext();

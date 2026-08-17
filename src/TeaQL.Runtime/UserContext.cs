@@ -93,6 +93,9 @@ public class UserContext
         return this;
     }
 
+    /// <summary>Installs a passive runtime manifest. Schema changes remain explicit.</summary>
+    public UserContext Install(RuntimeModule module) => WithModule(module);
+
     public UserContext RegisterEntityInitializer(string entityName, Action<UserContext, object> initializer)
     {
         if (string.IsNullOrWhiteSpace(entityName)) throw new ArgumentException("Entity name is required", nameof(entityName));
