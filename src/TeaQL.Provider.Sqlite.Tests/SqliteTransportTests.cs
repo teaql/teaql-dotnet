@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using TeaQL.Provider.Sqlite;
 using TeaQL.Core;
 using TeaQL.Sql;
+using TeaQL.DataService;
 using Record = TeaQL.Core.Record;
 
 namespace TeaQL.Provider.Sqlite.Tests
@@ -102,6 +103,35 @@ namespace TeaQL.Provider.Sqlite.Tests
                 new List<Value> { new Value.ListValue(new List<Value>()) }); // ListValue is unsupported
                 
             await Assert.ThrowsAsync<NotSupportedException>(() => _transport.ExecuteSqlAsync(insert));
+        }
+
+        [Fact]
+        public async Task MutationReturnsAuthoritativeDatabaseDefaultsInItsTransaction()
+        {
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "CREATE TABLE widget (id INTEGER PRIMARY KEY, name TEXT DEFAULT 'database-default', version INTEGER DEFAULT 1)",
+                new List<Value>()));
+            var descriptor = EntityDescriptor.New("Widget").TableName("widget")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("name", DataType.Text))
+                .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+            var executor = new SqlDataServiceExecutor(
+                new SqliteDialect(), _transport, new SingleSchemaProvider(descriptor));
+            var command = new InsertCommand("Widget").Value("id", new Value.I64Value(7));
+
+            var result = await executor.MutateAsync(new InsertMutationRequest(command));
+
+            Assert.NotNull(result.PersistedRecord);
+            Assert.Equal(7, ((Value.I64Value)result.PersistedRecord!["id"]).Value);
+            Assert.Equal("database-default", ((Value.TextValue)result.PersistedRecord["name"]).Value);
+            Assert.Equal(1, ((Value.I64Value)result.PersistedRecord["version"]).Value);
+        }
+
+        private sealed class SingleSchemaProvider : ISchemaProvider
+        {
+            private readonly EntityDescriptor _descriptor;
+            public SingleSchemaProvider(EntityDescriptor descriptor) => _descriptor = descriptor;
+            public EntityDescriptor? GetEntity(string name) => name == _descriptor.Name ? _descriptor : null;
         }
     }
 }

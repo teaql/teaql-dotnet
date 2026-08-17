@@ -9,7 +9,7 @@ using TeaQL.Sql;
 
 namespace TeaQL.Provider.Sqlite;
 
-public class SqliteTransport : IStreamingSqlTransport
+public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport
 {
     private readonly SqliteConnection _connection;
 
@@ -88,6 +88,67 @@ public class SqliteTransport : IStreamingSqlTransport
 
         var rows = await cmd.ExecuteNonQueryAsync();
         return (ulong)(rows > 0 ? rows : 0);
+    }
+
+    public async Task<ISqlTransaction> BeginSqlAsync()
+    {
+        var transaction = await _connection.BeginTransactionAsync();
+        return new Transaction(_connection, (SqliteTransaction)transaction, this);
+    }
+
+    private sealed class Transaction : ISqlTransaction
+    {
+        private readonly SqliteConnection _connection;
+        private readonly SqliteTransaction _transaction;
+        private readonly SqliteTransport _owner;
+
+        public Transaction(SqliteConnection connection, SqliteTransaction transaction, SqliteTransport owner)
+        {
+            _connection = connection;
+            _transaction = transaction;
+            _owner = owner;
+        }
+
+        public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
+        {
+            var records = new List<Record>();
+            using var command = CreateCommand(query);
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var record = new Record();
+                for (var index = 0; index < reader.FieldCount; index++)
+                    record[reader.GetName(index)] = _owner.ReadValue(reader, index);
+                records.Add(record);
+            }
+            return records;
+        }
+
+        public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
+        {
+            using var command = CreateCommand(query);
+            var rows = await command.ExecuteNonQueryAsync();
+            return (ulong)(rows > 0 ? rows : 0);
+        }
+
+        private SqliteCommand CreateCommand(CompiledQuery query)
+        {
+            var command = _connection.CreateCommand();
+            command.Transaction = _transaction;
+            command.CommandText = query.Sql;
+            for (var index = 0; index < query.Params.Count; index++)
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = $"@p{index}";
+                _owner.BindValue(parameter, query.Params[index]);
+                command.Parameters.Add(parameter);
+            }
+            return command;
+        }
+
+        public Task CommitSqlAsync() => _transaction.CommitAsync();
+        public Task RollbackSqlAsync() => _transaction.RollbackAsync();
+        public void Dispose() => _transaction.Dispose();
     }
 
     private void BindValue(SqliteParameter p, Value value)

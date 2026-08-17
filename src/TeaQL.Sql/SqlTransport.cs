@@ -27,3 +27,6 @@ public interface ISqlTransactionTransport : ISqlTransport
 {
     Task<ISqlTransaction> BeginSqlAsync();
 }
+
+/// Providers implementing this marker run each public mutation and authoritative refresh atomically.
+public interface IAutomaticMutationTransactionTransport : ISqlTransactionTransport { }

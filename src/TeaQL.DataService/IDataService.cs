@@ -107,6 +107,7 @@ public class MutationResult
 {
     public ulong AffectedRows { get; set; }
     public Record GeneratedValues { get; set; } = new();
+    public Record? PersistedRecord { get; set; }
     public ExecutionMetadata Metadata { get; set; } = new();
 }
 

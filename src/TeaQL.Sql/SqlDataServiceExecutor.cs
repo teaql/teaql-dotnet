@@ -89,6 +89,23 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
+        if (Transport is IAutomaticMutationTransactionTransport transactionTransport)
+        {
+            using var transportTransaction = await transactionTransport.BeginSqlAsync();
+            var transaction = new SqlDataServiceTransaction(Dialect, transportTransaction, SchemaProvider);
+            try
+            {
+                var result = await transaction.MutateAsync(request);
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         if (request is BatchMutationRequest batchReq)
         {
             ulong totalAffected = 0;
@@ -535,10 +552,30 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
             DebugQuery = compiled.DebugSql(Dialect.Kind)
         };
 
+        Record? persistedRecord = null;
+        var physicallyDeleted = request is DeleteMutationRequest deleted && !deleted.Command.SoftDelete;
+        Value? entityId = request switch
+        {
+            InsertMutationRequest insert when entityDesc.IdProperty() is { } idProperty
+                && insert.Command.Values.TryGetValue(idProperty.Name, out var insertedId) => insertedId,
+            UpdateMutationRequest update => update.Command.Id,
+            DeleteMutationRequest delete => delete.Command.Id,
+            RecoverMutationRequest recover => recover.Command.Id,
+            _ => null
+        };
+        if (affectedRows > 0 && !physicallyDeleted && entityId != null && entityDesc.IdProperty() is { } id)
+        {
+            var refresh = new SelectQuery(entityName).Filter(Expr.Eq(id.Name, entityId));
+            var rows = await Transport.FetchAllSqlAsync(Dialect.CompileSelect(entityDesc, refresh));
+            persistedRecord = rows.SingleOrDefault()
+                ?? throw new SqlExecutorException($"Authoritative persisted row not found for {entityName}");
+        }
+
         return new MutationResult
         {
             AffectedRows = affectedRows,
             GeneratedValues = new Record(),
+            PersistedRecord = persistedRecord,
             Metadata = metadata
         };
     }
