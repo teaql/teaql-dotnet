@@ -13,45 +13,45 @@ namespace TeaQL.Runtime.Tests
         [Fact]
         public void RequireEntity_ThrowsIfMissing()
         {
-            var ctx = new UserContext();
-            Assert.Throws<InvalidOperationException>(() => ctx.RequireEntity("missing"));
+            var context = new UserContext();
+            Assert.Throws<InvalidOperationException>(() => context.RequireEntity("missing"));
             
             var store = new InMemoryMetadataStore();
             store.WithEntity(new EntityDescriptor { Name = "found" });
-            ctx.WithMetadata(store);
+            context.WithMetadata(store);
             
-            Assert.NotNull(ctx.RequireEntity("found"));
+            Assert.NotNull(context.RequireEntity("found"));
         }
 
         [Fact]
         public void RequireResource_ThrowsIfMissing()
         {
-            var ctx = new UserContext();
-            Assert.Throws<InvalidOperationException>(() => ctx.RequireResource<string>());
+            var context = new UserContext();
+            Assert.Throws<InvalidOperationException>(() => context.RequireResource<string>());
             
-            ctx.InsertResource("hello");
-            Assert.Equal("hello", ctx.RequireResource<string>());
+            context.InsertResource("hello");
+            Assert.Equal("hello", context.RequireResource<string>());
         }
 
         [Fact]
         public void RequireNamedResource_ThrowsIfMissing()
         {
-            var ctx = new UserContext();
-            Assert.Throws<InvalidOperationException>(() => ctx.RequireNamedResource<string>("missing"));
+            var context = new UserContext();
+            Assert.Throws<InvalidOperationException>(() => context.RequireNamedResource<string>("missing"));
             
-            ctx.InsertNamedResource("found", "value");
-            Assert.Equal("value", ctx.RequireNamedResource<string>("found"));
+            context.InsertNamedResource("found", "value");
+            Assert.Equal("value", context.RequireNamedResource<string>("found"));
         }
 
         [Fact]
         public void WithModule_AppliesModule()
         {
-            var ctx = new UserContext();
+            var context = new UserContext();
             var module = new RuntimeModule();
             module.Entity(new EntityDescriptor { Name = "test" });
-            ctx.WithModule(module);
+            context.WithModule(module);
             
-            Assert.NotNull(ctx.GetEntity("test"));
+            Assert.NotNull(context.GetEntity("test"));
         }
 
         [Fact]
@@ -59,19 +59,19 @@ namespace TeaQL.Runtime.Tests
         {
             var first = new RuntimeModule().Entity(new EntityDescriptor { Name = "first" });
             var second = new RuntimeModule().Entity(new EntityDescriptor { Name = "second" });
-            var ctx = new UserContext().Install(first.And(second));
+            var context = new UserContext().Install(first.And(second));
 
-            Assert.NotNull(ctx.GetEntity("first"));
-            Assert.NotNull(ctx.GetEntity("second"));
+            Assert.NotNull(context.GetEntity("first"));
+            Assert.NotNull(context.GetEntity("second"));
         }
 
         [Fact]
         public void Constructor_InitializesTraceIdAndUserIdentifier()
         {
-            var ctx = new UserContext();
-            Assert.NotNull(ctx.TraceId);
-            Assert.NotNull(ctx.UserIdentifier);
-            Assert.Equal("UTC", ctx.Timezone);
+            var context = new UserContext();
+            Assert.NotNull(context.TraceId);
+            Assert.NotNull(context.UserIdentifier);
+            Assert.Equal("UTC", context.Timezone);
         }
     }
 }

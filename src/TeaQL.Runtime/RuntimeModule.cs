@@ -24,16 +24,16 @@ public class RuntimeModule
         return combined;
     }
 
-    public void ApplyTo(UserContext ctx)
+    public void ApplyTo(UserContext context)
     {
-        ctx.Metadata = Metadata;
-        ctx.EntityRegistry = EntityRegistry;
+        context.Metadata = Metadata;
+        context.EntityRegistry = EntityRegistry;
     }
 
     public UserContext IntoContext()
     {
-        var ctx = new UserContext();
-        ApplyTo(ctx);
-        return ctx;
+        var context = new UserContext();
+        ApplyTo(context);
+        return context;
     }
 }

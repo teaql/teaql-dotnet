@@ -31,12 +31,12 @@ public class XlsTests
     [Fact]
     public void TestXlsBlockBuildContext()
     {
-        var ctx = XlsBlockBuildContext.Page("page1");
-        Assert.Equal("page1", ctx.PageName);
-        Assert.Equal(0, ctx.X);
-        Assert.Equal(0, ctx.Y);
+        var context = XlsBlockBuildContext.Page("page1");
+        Assert.Equal("page1", context.PageName);
+        Assert.Equal(0, context.X);
+        Assert.Equal(0, context.Y);
 
-        var ctx2 = ctx.Next();
+        var ctx2 = context.Next();
         Assert.Equal(1, ctx2.X);
         Assert.Equal(0, ctx2.Y);
 

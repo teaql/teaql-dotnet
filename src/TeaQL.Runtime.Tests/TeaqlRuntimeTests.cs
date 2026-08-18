@@ -11,68 +11,68 @@ namespace TeaQL.Runtime.Tests
         [Fact]
         public void UserContext_Initialization_SetsDefaultValues()
         {
-            var ctx = new UserContext();
-            Assert.NotNull(ctx.TraceId);
-            Assert.NotNull(ctx.UserIdentifier);
-            Assert.Equal("UTC", ctx.Timezone);
+            var context = new UserContext();
+            Assert.NotNull(context.TraceId);
+            Assert.NotNull(context.UserIdentifier);
+            Assert.Equal("UTC", context.Timezone);
         }
 
         [Fact]
         public void WithMetadata_SetsMetadata()
         {
-            var ctx = new UserContext();
+            var context = new UserContext();
             var meta = new InMemoryMetadataStore();
-            ctx.WithMetadata(meta);
-            Assert.Same(meta, ctx.Metadata);
+            context.WithMetadata(meta);
+            Assert.Same(meta, context.Metadata);
         }
 
         [Fact]
         public void GetEntity_ReturnsEntity_FromMetadata()
         {
-            var ctx = new UserContext();
+            var context = new UserContext();
             var meta = new InMemoryMetadataStore();
             var ed = new EntityDescriptor { Name = "test" };
             meta.Register(ed);
-            ctx.WithMetadata(meta);
+            context.WithMetadata(meta);
 
-            var result = ctx.GetEntity("test");
+            var result = context.GetEntity("test");
             Assert.Same(ed, result);
-            Assert.Null(ctx.GetEntity("missing"));
-            Assert.Same(ed, ctx.RequireEntity("test"));
-            Assert.Throws<InvalidOperationException>(() => ctx.RequireEntity("missing"));
+            Assert.Null(context.GetEntity("missing"));
+            Assert.Same(ed, context.RequireEntity("test"));
+            Assert.Throws<InvalidOperationException>(() => context.RequireEntity("missing"));
         }
 
         [Fact]
         public void Resources_Typed_SetAndGet()
         {
-            var ctx = new UserContext();
+            var context = new UserContext();
             var res = new object();
-            ctx.InsertResource(res);
-            Assert.Same(res, ctx.GetResource<object>());
-            Assert.Same(res, ctx.RequireResource<object>());
+            context.InsertResource(res);
+            Assert.Same(res, context.GetResource<object>());
+            Assert.Same(res, context.RequireResource<object>());
         }
 
         [Fact]
         public void Resources_Named_SetAndGet()
         {
-            var ctx = new UserContext();
+            var context = new UserContext();
             var res = new object();
-            ctx.InsertNamedResource("name", res);
-            Assert.Same(res, ctx.GetNamedResource<object>("name"));
-            Assert.Same(res, ctx.RequireNamedResource<object>("name"));
-            Assert.Null(ctx.GetNamedResource<object>("missing"));
-            Assert.Throws<InvalidOperationException>(() => ctx.RequireNamedResource<object>("missing"));
+            context.InsertNamedResource("name", res);
+            Assert.Same(res, context.GetNamedResource<object>("name"));
+            Assert.Same(res, context.RequireNamedResource<object>("name"));
+            Assert.Null(context.GetNamedResource<object>("missing"));
+            Assert.Throws<InvalidOperationException>(() => context.RequireNamedResource<object>("missing"));
         }
 
         [Fact]
         public void Locals_SetGetRemove()
         {
-            var ctx = new UserContext();
+            var context = new UserContext();
             var val = new Value.I64Value(42);
-            ctx.PutLocal("key", val);
-            Assert.Same(val, ctx.GetLocal("key"));
-            Assert.Same(val, ctx.RemoveLocal("key"));
-            Assert.Null(ctx.GetLocal("key"));
+            context.PutLocal("key", val);
+            Assert.Same(val, context.GetLocal("key"));
+            Assert.Same(val, context.RemoveLocal("key"));
+            Assert.Null(context.GetLocal("key"));
         }
 
         [Fact]
@@ -81,8 +81,8 @@ namespace TeaQL.Runtime.Tests
             var mockProvider = new Moq.Mock<IServiceProvider>();
             mockProvider.Setup(p => p.GetService(typeof(string))).Returns("hello");
             
-            var ctx = new UserContext { ServiceProvider = mockProvider.Object };
-            Assert.Equal("hello", ctx.GetResource<string>());
+            var context = new UserContext { ServiceProvider = mockProvider.Object };
+            Assert.Equal("hello", context.GetResource<string>());
         }
     }
 

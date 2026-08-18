@@ -125,7 +125,7 @@ namespace Generated.Models
             return entity;
         }
 
-        public async Task<object> SaveAsync(UserContext ctx)
+        public async Task<object> SaveAsync(UserContext context)
         {
             if (string.IsNullOrEmpty(_comment))
             {
@@ -135,7 +135,7 @@ namespace Generated.Models
             var creating = !this.Id.HasValue;
             var cmd = creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
             var req = new MutationRequest { Command = cmd, Comment = _comment };
-            var result = await ctx.DataService.MutateAsync(ctx, req);
+            var result = await context.DataService.MutateAsync(context, req);
             if (result is MutationResult mutationResult)
             {
                 if (creating) Id = mutationResult.Id;
@@ -145,7 +145,7 @@ namespace Generated.Models
             {
                 child.UpdateCustomerOrderId(Id);
                 child.AuditAs(_comment);
-                await child.SaveAsync(ctx);
+                await child.SaveAsync(context);
             }
             return result;
         }

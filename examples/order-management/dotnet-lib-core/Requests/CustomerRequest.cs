@@ -367,15 +367,15 @@ namespace Generated.Requests
                     return this;
                 }
 
-        private async Task<QueryResult> ExecuteForListInternalAsync(UserContext ctx)
+        private async Task<QueryResult> ExecuteForListInternalAsync(UserContext context)
         {
             if (string.IsNullOrEmpty(_purpose) || string.IsNullOrEmpty(_comment))
             {
                 throw new Exception("Security audit failure: Comment() and Purpose() must be called before ExecuteForListAsync()");
             }
-            var service = ctx.RequireDataService();
+            var service = context.RequireDataService();
             var req = new QueryRequest(_query);
-            return await service.QueryAsync(ctx, req);
+            return await service.QueryAsync(context, req);
         }
 
     }
@@ -393,16 +393,16 @@ namespace Generated.Requests
             _limitOne = limitOne;
         }
 
-        public Generated.Models.Customer NewEntity(UserContext ctx)
+        public Generated.Models.Customer NewEntity(UserContext context)
             => new Generated.Models.Customer();
 
-        public Task<QueryResult> ExecuteForListAsync(UserContext ctx)
-            => _executeForList(ctx);
+        public Task<QueryResult> ExecuteForListAsync(UserContext context)
+            => _executeForList(context);
 
-        public async Task<Record> ExecuteForOneAsync(UserContext ctx)
+        public async Task<Record> ExecuteForOneAsync(UserContext context)
         {
             _limitOne();
-            var res = await ExecuteForListAsync(ctx);
+            var res = await ExecuteForListAsync(context);
             if (res.Rows != null && res.Rows.Count > 0)
             {
                 return res.Rows[0];
@@ -411,9 +411,9 @@ namespace Generated.Requests
         }
 
         public async Task<List<Generated.Models.Customer>> ExecuteEntitiesForListAsync(
-            UserContext ctx)
+            UserContext context)
         {
-            var result = await ExecuteForListAsync(ctx);
+            var result = await ExecuteForListAsync(context);
             var entities = new List<Generated.Models.Customer>();
             foreach (var row in result.Rows)
                 entities.Add(Generated.Models.Customer.FromRecord(row));
@@ -421,10 +421,10 @@ namespace Generated.Requests
         }
 
         public async Task<Generated.Models.Customer> ExecuteEntityForOneAsync(
-            UserContext ctx)
+            UserContext context)
         {
             _limitOne();
-            var entities = await ExecuteEntitiesForListAsync(ctx);
+            var entities = await ExecuteEntitiesForListAsync(context);
             return entities.Count > 0 ? entities[0] : null;
         }
     }

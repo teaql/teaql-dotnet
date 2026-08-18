@@ -91,17 +91,17 @@ namespace TeaQL.Core
     public class RawAuditEvent { public string Kind { get; set; } public string Entity { get; set; } public long Id { get; set; } public string Reason { get; set; } public IReadOnlyList<AuditFieldChange> Changes { get; set; } }
     public class SafeAuditField { public string Field { get; set; } public string Value { get; set; } public bool Masked { get; set; } public bool Truncated { get; set; } }
     public class SafeAuditEvent { public string Kind { get; set; } public string Entity { get; set; } public long Id { get; set; } public string Reason { get; set; } public IReadOnlyList<SafeAuditField> Fields { get; set; } }
-    public interface IRawAuditEventSink { Task OnEventAsync(UserContext ctx, RawAuditEvent auditEvent); }
-    public interface IAppAuditEventSink { Task OnSafeEventAsync(UserContext ctx, SafeAuditEvent auditEvent); }
+    public interface IRawAuditEventSink { Task OnEventAsync(UserContext context, RawAuditEvent auditEvent); }
+    public interface IAppAuditEventSink { Task OnSafeEventAsync(UserContext context, SafeAuditEvent auditEvent); }
     public class InMemoryRawAuditEventSink : IRawAuditEventSink
     {
         public List<RawAuditEvent> Events { get; } = new();
-        public Task OnEventAsync(UserContext ctx, RawAuditEvent auditEvent) { Events.Add(auditEvent); return Task.CompletedTask; }
+        public Task OnEventAsync(UserContext context, RawAuditEvent auditEvent) { Events.Add(auditEvent); return Task.CompletedTask; }
     }
     public class InMemoryAppAuditEventSink : IAppAuditEventSink
     {
         public List<SafeAuditEvent> Events { get; } = new();
-        public Task OnSafeEventAsync(UserContext ctx, SafeAuditEvent auditEvent) { Events.Add(auditEvent); return Task.CompletedTask; }
+        public Task OnSafeEventAsync(UserContext context, SafeAuditEvent auditEvent) { Events.Add(auditEvent); return Task.CompletedTask; }
     }
     public class UserContext
     {
@@ -160,8 +160,8 @@ namespace TeaQL.Core
     }
     public interface IDataService
     {
-        Task<QueryResult> QueryAsync(UserContext ctx, QueryRequest req);
-        Task<object> MutateAsync(UserContext ctx, MutationRequest req);
+        Task<QueryResult> QueryAsync(UserContext context, QueryRequest req);
+        Task<object> MutateAsync(UserContext context, MutationRequest req);
     }
 
     public class JsonFileDataService : IDataService
@@ -184,7 +184,7 @@ namespace TeaQL.Core
                 : new StoreState();
         }
 
-        public async Task<object> MutateAsync(UserContext ctx, MutationRequest req)
+        public async Task<object> MutateAsync(UserContext context, MutationRequest req)
         {
             if (string.IsNullOrWhiteSpace(req.Comment))
                 throw new InvalidOperationException("Security audit failure: mutation audit reason is required");
@@ -196,7 +196,7 @@ namespace TeaQL.Core
                     : req.Command is DeleteCommand delete ? Delete(delete)
                     : throw new InvalidOperationException("Unsupported mutation command");
             }
-            await ctx.EmitMutationAuditAsync(req.Command, result, req.Comment);
+            await context.EmitMutationAuditAsync(req.Command, result, req.Comment);
             return result;
         }
 
@@ -232,7 +232,7 @@ namespace TeaQL.Core
             return new MutationResult { Success = true, Id = id, Deleted = true };
         }
 
-        public Task<QueryResult> QueryAsync(UserContext ctx, QueryRequest req)
+        public Task<QueryResult> QueryAsync(UserContext context, QueryRequest req)
         {
             lock (_gate)
             {
@@ -285,7 +285,7 @@ namespace TeaQL.Core
 
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-        public async Task<object> MutateAsync(UserContext ctx, MutationRequest req)
+        public async Task<object> MutateAsync(UserContext context, MutationRequest req)
         {
             if (string.IsNullOrWhiteSpace(req.Comment))
                 throw new InvalidOperationException("Security audit failure: mutation audit reason is required");
@@ -293,7 +293,7 @@ namespace TeaQL.Core
                 : req.Command is UpdateCommand update ? await UpdateAsync(update)
                 : req.Command is DeleteCommand delete ? await DeleteAsync(delete)
                 : throw new InvalidOperationException("Unsupported mutation command");
-            await ctx.EmitMutationAuditAsync(req.Command, result, req.Comment);
+            await context.EmitMutationAuditAsync(req.Command, result, req.Comment);
             return result;
         }
 
@@ -365,7 +365,7 @@ namespace TeaQL.Core
             return new MutationResult { Success = true, Id = id, Deleted = true };
         }
 
-        public async Task<QueryResult> QueryAsync(UserContext ctx, QueryRequest req)
+        public async Task<QueryResult> QueryAsync(UserContext context, QueryRequest req)
         {
             var query = req.Query;
             var where = new List<string>();
@@ -439,7 +439,7 @@ namespace TeaQL.Core
             sql.CommandText = string.IsNullOrEmpty(query.PartitionBy)
                 ? ApplyPagination(statement, query, query.Orders.Count != 0)
                 : statement;
-            ctx.SqlTrace.Add(sql.CommandText);
+            context.SqlTrace.Add(sql.CommandText);
 
             var result = new QueryResult();
             await using (var reader = await sql.ExecuteReaderAsync())
@@ -456,11 +456,11 @@ namespace TeaQL.Core
                     result.Rows.Add(record);
                 }
             }
-            await EnhanceRelationsAsync(ctx, query, result.Rows);
+            await EnhanceRelationsAsync(context, query, result.Rows);
             return result;
         }
 
-        private async Task EnhanceRelationsAsync(UserContext ctx, SelectQuery query, List<Record> parents)
+        private async Task EnhanceRelationsAsync(UserContext context, SelectQuery query, List<Record> parents)
         {
             if (parents.Count == 0 || query.Relations.Count == 0) return;
             foreach (var load in query.Relations)
@@ -472,7 +472,7 @@ namespace TeaQL.Core
                 var child = CloneQuery(load.Query, load.TargetEntity);
                 child.Filters.Add(new FilterExpression { Operator = "in", Field = load.ForeignKey, Expected = parentIds });
                 if (child.LimitValue.HasValue) child.PartitionBy = load.ForeignKey;
-                var children = (await QueryAsync(ctx, new QueryRequest(child))).Rows;
+                var children = (await QueryAsync(context, new QueryRequest(child))).Rows;
                 foreach (var row in children) row.Remove("__teaql_partition_rank");
                 var buckets = children
                     .Where(row => row.ContainsKey(load.ForeignKey))

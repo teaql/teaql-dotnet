@@ -8,9 +8,9 @@ namespace TeaQL.Runtime.Tests
         [Fact]
         public void Constructor_SetsContext()
         {
-            var ctx = new UserContext();
-            var runtime = new TeaqlRuntime(ctx);
-            Assert.Same(ctx, runtime.UserContext);
+            var context = new UserContext();
+            var runtime = new TeaqlRuntime(context);
+            Assert.Same(context, runtime.UserContext);
         }
     }
 }
