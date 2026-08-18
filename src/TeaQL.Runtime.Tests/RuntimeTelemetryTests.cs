@@ -102,6 +102,29 @@ public class RuntimeTelemetryTests
         Assert.Equal(query.SpanId, provider.ParentSpanId);
     }
 
+    [Fact]
+    public async Task RuntimeDataServiceCarriesObserverIntoActualRelationLoad()
+    {
+        var spans = new List<Activity>();
+        using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+            .AddSource("io.teaql.runtime").AddInMemoryExporter(spans).Build();
+        using var telemetry = new OpenTelemetryRuntimeTelemetry();
+        var context = new UserContext()
+            .WithDataService(new StubDataService(observeRelation: true))
+            .WithRuntimeTelemetry(telemetry);
+        var queryRequest = new QueryRequest { Query = new SelectQuery("School") };
+        queryRequest.Query.Relation("students");
+
+        await context.RequireResource<IDataService>().QueryAsync(queryRequest);
+        tracerProvider.ForceFlush();
+
+        var provider = spans.Single(span => span.OperationName == "teaql.provider");
+        var relation = spans.Single(span => span.OperationName == "teaql.relation_load");
+        Assert.Equal(provider.SpanId, relation.ParentSpanId);
+        Assert.Contains(relation.Tags, tag =>
+            tag.Key == "teaql.relation.name" && Equals(tag.Value, "students"));
+    }
+
     private sealed class RecordingTelemetry(List<string> events) : IRuntimeTelemetry
     {
         public RuntimeOperation? Operation { get; private set; }
@@ -122,13 +145,17 @@ public class RuntimeTelemetryTests
         public IRuntimeTelemetryScope Start(RuntimeOperation operation) => throw new InvalidOperationException();
     }
 
-    private sealed class StubDataService : IDataService
+    private sealed class StubDataService(bool observeRelation = false) : IDataService
     {
         public DataServiceCapabilities Capabilities { get; } = new() { Query = true, Mutation = true };
-        public Task<QueryResult> QueryAsync(QueryRequest request) => Task.FromResult(new QueryResult
+        public async Task<QueryResult> QueryAsync(QueryRequest request)
         {
-            Rows = new List<TeaQL.Core.Record> { new() }
-        });
+            if (observeRelation && request.Query.RelationLoads.Count > 0)
+                await request.RelationLoadObserver!.ObserveAsync(
+                    request.Query.Entity, request.Query.RelationLoads[0].Name,
+                    () => Task.CompletedTask);
+            return new QueryResult { Rows = new List<TeaQL.Core.Record> { new() } };
+        }
         public Task<MutationResult> MutateAsync(MutationRequest request) =>
             Task.FromResult(new MutationResult { AffectedRows = 1 });
     }

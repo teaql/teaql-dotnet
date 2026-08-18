@@ -22,8 +22,10 @@ public sealed class RuntimeDataService : IDataService
 
     public DataServiceCapabilities Capabilities => _provider.Capabilities;
 
-    public Task<QueryResult> QueryAsync(QueryRequest request) =>
-        _context.RuntimeTelemetry.ObserveAsync(
+    public Task<QueryResult> QueryAsync(QueryRequest request)
+    {
+        request.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry);
+        return _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("query", $"{request.Query.Entity}.list",
                 new Dictionary<string, object> { ["teaql.entity.type"] = request.Query.Entity }),
             () => ObserveProviderQueryAsync(request),
@@ -31,13 +33,18 @@ public sealed class RuntimeDataService : IDataService
             {
                 ["teaql.result.cardinality"] = result.Rows.Count
             });
+    }
 
     public Task<MutationResult> MutateAsync(MutationRequest request)
     {
         var entity = EntityName(request);
         return _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("mutation", $"{entity}.mutate",
-                new Dictionary<string, object> { ["teaql.entity.type"] = entity }),
+                new Dictionary<string, object>
+                {
+                    ["teaql.entity.type"] = entity,
+                    ["teaql.mutation.kind"] = MutationKind(request)
+                }),
             () => ObserveProviderMutationAsync(request),
             result => new Dictionary<string, object>
             {
@@ -47,7 +54,12 @@ public sealed class RuntimeDataService : IDataService
 
     private Task<QueryResult> ObserveProviderQueryAsync(QueryRequest request) =>
         _context.RuntimeTelemetry.ObserveAsync(
-            RuntimeOperation.Create("provider", "data-service.query"),
+            RuntimeOperation.Create("provider", "data-service.query",
+                new Dictionary<string, object>
+                {
+                    ["teaql.provider.kind"] = _provider.GetType().Name,
+                    ["teaql.provider.operation"] = "query"
+                }),
             () => _provider.QueryAsync(request),
             result => new Dictionary<string, object>
             {
@@ -56,7 +68,12 @@ public sealed class RuntimeDataService : IDataService
 
     private Task<MutationResult> ObserveProviderMutationAsync(MutationRequest request) =>
         _context.RuntimeTelemetry.ObserveAsync(
-            RuntimeOperation.Create("provider", "data-service.mutate"),
+            RuntimeOperation.Create("provider", "data-service.mutate",
+                new Dictionary<string, object>
+                {
+                    ["teaql.provider.kind"] = _provider.GetType().Name,
+                    ["teaql.provider.operation"] = MutationKind(request)
+                }),
             () => _provider.MutateAsync(request),
             result => new Dictionary<string, object>
             {
@@ -72,4 +89,31 @@ public sealed class RuntimeDataService : IDataService
         BatchMutationRequest => "batch",
         _ => "unknown"
     };
+
+    private static string MutationKind(MutationRequest request) => request switch
+    {
+        InsertMutationRequest => "create",
+        UpdateMutationRequest => "update",
+        DeleteMutationRequest => "delete",
+        RecoverMutationRequest => "recover",
+        BatchMutationRequest => "batch",
+        _ => "unknown"
+    };
+
+    private sealed class RuntimeRelationLoadObserver(IRuntimeTelemetry telemetry)
+        : IRelationLoadObserver
+    {
+        public async Task ObserveAsync(string entity, string relation, Func<Task> body)
+        {
+            await telemetry.ObserveAsync(
+                RuntimeOperation.Create("relation_load", $"{entity}.{relation}",
+                    new Dictionary<string, object>
+                    {
+                        ["teaql.entity.type"] = entity,
+                        ["teaql.relation.name"] = relation
+                    }),
+                async () => { await body().ConfigureAwait(false); return true; })
+                .ConfigureAwait(false);
+        }
+    }
 }

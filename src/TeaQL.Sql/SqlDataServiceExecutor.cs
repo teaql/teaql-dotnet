@@ -317,17 +317,25 @@ internal static class RelationQueryLoader
             {
                 childQuery.PartitionByField(relation.ForeignKeyValue);
             }
-            var childResult = await queryAsync(new QueryRequest
+            async Task LoadAndAttach()
             {
-                Query = childQuery,
-                TraceChain = request.TraceChain,
-                Comment = request.Comment
-            });
-            foreach (var child in childResult.Rows)
-            {
-                child.Remove("__teaql_partition_rank");
+                var childResult = await queryAsync(new QueryRequest
+                {
+                    Query = childQuery,
+                    TraceChain = request.TraceChain,
+                    Comment = request.Comment,
+                    RelationLoadObserver = request.RelationLoadObserver
+                });
+                foreach (var child in childResult.Rows)
+                {
+                    child.Remove("__teaql_partition_rank");
+                }
+                Attach(parents, childResult.Rows, load.Name, relation);
             }
-            Attach(parents, childResult.Rows, load.Name, relation);
+            if (request.RelationLoadObserver is { } observer)
+                await observer.ObserveAsync(request.Query.Entity, load.Name, LoadAndAttach);
+            else
+                await LoadAndAttach();
         }
     }
 

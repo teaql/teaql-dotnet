@@ -24,6 +24,13 @@ public class QueryRequest
     public SelectQuery Query { get; set; } = new();
     public List<TraceNode> TraceChain { get; set; } = new();
     public string? Comment { get; set; }
+    /// <summary>Runtime-only observer; providers must not serialize it.</summary>
+    public IRelationLoadObserver? RelationLoadObserver { get; set; }
+}
+
+public interface IRelationLoadObserver
+{
+    Task ObserveAsync(string entity, string relation, Func<Task> body);
 }
 
 public class QueryResult

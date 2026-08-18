@@ -89,8 +89,23 @@ public class UserContext
         RequireResource<IRequestPolicy>().Apply(query);
 
     public Task PublishAppAuditEventAsync(IReadOnlyDictionary<string, object?> safeEvent,
+        CancellationToken cancellationToken = default) => PublishAppAuditEventAsync(
+            safeEvent.TryGetValue("entityType", out var entity) ? entity?.ToString() ?? "unknown" : "unknown",
+            safeEvent.TryGetValue("mutationKind", out var kind) ? kind?.ToString() ?? "unknown" : "unknown",
+            safeEvent.TryGetValue("changedFieldCount", out var count) && count is IConvertible convertible
+                ? convertible.ToInt32(System.Globalization.CultureInfo.InvariantCulture) : 0,
+            safeEvent, cancellationToken);
+
+    public Task PublishAppAuditEventAsync(string entityType, string mutationKind,
+        int changedFieldCount, IReadOnlyDictionary<string, object?> safeEvent,
         CancellationToken cancellationToken = default) => RuntimeTelemetry.ObserveAsync(
-            RuntimeOperation.Create("audit", "app-audit.record"),
+            RuntimeOperation.Create("audit", $"{entityType}.audit",
+                new Dictionary<string, object>
+                {
+                    ["teaql.entity.type"] = entityType,
+                    ["teaql.mutation.kind"] = mutationKind,
+                    ["teaql.audit.changed_field_count"] = changedFieldCount
+                }),
             async () =>
             {
                 await RequireResource<IAppAuditEventSink>()
@@ -251,23 +266,56 @@ public class UserContext
             { ["teaql.cache.result"] = result is null ? "miss" : "hit" });
         return result;
     }
-    public void RemoveFromLocalCache(string key) { LocalCache.TryRemove(key, out _); }
+    public void RemoveFromLocalCache(string key)
+    {
+        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.remove",
+            new Dictionary<string, object> { ["teaql.cache.operation"] = "remove" }));
+        try
+        {
+            LocalCache.TryRemove(key, out _);
+            scope.Success(new Dictionary<string, object> { ["teaql.cache.result"] = "removed" });
+        }
+        catch (Exception error) { scope.Failure(error); throw; }
+    }
 
     // ==========================================
     // Remote Cache
     // ==========================================
     public void PutToRemoteCache(string key, object value, int? timeToLiveInSeconds = null)
     {
-        GetResource<IRemoteCacheProvider>()?.Put(key, value, timeToLiveInSeconds);
+        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.put",
+            new Dictionary<string, object> { ["teaql.cache.operation"] = "put" }));
+        try
+        {
+            GetResource<IRemoteCacheProvider>()?.Put(key, value, timeToLiveInSeconds);
+            scope.Success(new Dictionary<string, object> { ["teaql.cache.result"] = "stored" });
+        }
+        catch (Exception error) { scope.Failure(error); throw; }
     }
     public T? GetFromRemoteCache<T>(string key)
     {
-        var provider = GetResource<IRemoteCacheProvider>();
-        return provider != null ? provider.Get<T>(key) : default;
+        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.get",
+            new Dictionary<string, object> { ["teaql.cache.operation"] = "get" }));
+        try
+        {
+            var provider = GetResource<IRemoteCacheProvider>();
+            var result = provider != null ? provider.Get<T>(key) : default;
+            scope.Success(new Dictionary<string, object>
+                { ["teaql.cache.result"] = result is null ? "miss" : "hit" });
+            return result;
+        }
+        catch (Exception error) { scope.Failure(error); throw; }
     }
     public void RemoveFromRemoteCache(string key)
     {
-        GetResource<IRemoteCacheProvider>()?.Remove(key);
+        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.remove",
+            new Dictionary<string, object> { ["teaql.cache.operation"] = "remove" }));
+        try
+        {
+            GetResource<IRemoteCacheProvider>()?.Remove(key);
+            scope.Success(new Dictionary<string, object> { ["teaql.cache.result"] = "removed" });
+        }
+        catch (Exception error) { scope.Failure(error); throw; }
     }
 
     // ==========================================

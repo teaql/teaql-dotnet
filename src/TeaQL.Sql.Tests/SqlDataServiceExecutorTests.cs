@@ -73,6 +73,38 @@ namespace TeaQL.Sql.Tests
         }
 
         [Fact]
+        public async Task QueryAsync_ObservesActualRelationFetchAndAttach()
+        {
+            var school = new EntityDescriptor { Name = "School", TableNameValue = "school" }
+                .Relation(RelationDescriptor.New("students", "Student")
+                    .ForeignKey("schoolId").Many());
+            var student = new EntityDescriptor { Name = "Student", TableNameValue = "student" };
+            _mockSchemaProvider.Setup(s => s.GetEntity("School")).Returns(school);
+            _mockSchemaProvider.Setup(s => s.GetEntity("Student")).Returns(student);
+            var parentSql = new CompiledQuery("SELECT school", new List<Value>());
+            var childSql = new CompiledQuery("SELECT student", new List<Value>());
+            _mockDialect.Setup(d => d.CompileSelect(school, It.IsAny<SelectQuery>()))
+                .Returns(parentSql);
+            _mockDialect.Setup(d => d.CompileSelect(student, It.IsAny<SelectQuery>()))
+                .Returns(childSql);
+            _mockTransport.SetupSequence(t => t.FetchAllSqlAsync(It.IsAny<CompiledQuery>()))
+                .ReturnsAsync(new List<Record> { new() { ["id"] = new Value.I64Value(1) } })
+                .ReturnsAsync(new List<Record>
+                    { new() { ["id"] = new Value.I64Value(2), ["schoolId"] = new Value.I64Value(1) } });
+            var observer = new RecordingRelationObserver();
+            var query = new SelectQuery("School").Relation("students");
+
+            var result = await _executor.QueryAsync(new QueryRequest
+                { Query = query, RelationLoadObserver = observer });
+
+            Assert.Equal("School", observer.Entity);
+            Assert.Equal("students", observer.Relation);
+            Assert.Equal(1, observer.Invocations);
+            var related = Assert.IsType<Value.ListValue>(result.Rows[0]["students"]);
+            Assert.Single(related.Values);
+        }
+
+        [Fact]
         public async Task MutateAsync_Insert_CallsTransport()
         {
             var cmd = new InsertCommand { Entity = "TestEntity" };
@@ -122,6 +154,20 @@ namespace TeaQL.Sql.Tests
             {
                 await Task.Yield();
                 yield return row;
+            }
+        }
+
+        private sealed class RecordingRelationObserver : IRelationLoadObserver
+        {
+            public string? Entity { get; private set; }
+            public string? Relation { get; private set; }
+            public int Invocations { get; private set; }
+            public async Task ObserveAsync(string entity, string relation, Func<Task> body)
+            {
+                Entity = entity;
+                Relation = relation;
+                Invocations++;
+                await body();
             }
         }
 
