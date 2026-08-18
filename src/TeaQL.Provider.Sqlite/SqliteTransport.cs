@@ -183,7 +183,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
                 p.Value = d.Value.ToString("yyyy-MM-dd");
                 break;
             case Value.TimestampValue t:
-                p.Value = t.Milliseconds.ToString();
+                p.Value = t.Milliseconds;
                 break;
             default:
                 throw new System.NotSupportedException($"Unsupported value type: {value.GetType()}");

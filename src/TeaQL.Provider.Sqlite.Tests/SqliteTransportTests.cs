@@ -90,6 +90,33 @@ namespace TeaQL.Provider.Sqlite.Tests
             var record = results[0];
             Assert.IsType<Value.NullValue>(record["v"]);
         }
+
+        [Fact]
+        public async Task TemporalDebugSql_IsExecutableAndMatchesPreparedStorage()
+        {
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "CREATE TABLE temporal_fixture (id INTEGER PRIMARY KEY, d DATE, t TIMESTAMP)",
+                new List<Value>()));
+            var prepared = new CompiledQuery(
+                "INSERT INTO temporal_fixture VALUES (@p0, @p1, @p2) /* ignored @p9 */",
+                new List<Value> {
+                    new Value.I64Value(1),
+                    new Value.DateValue(new DateTime(2024, 2, 29)),
+                    new Value.TimestampValue(1787110200123)
+                });
+            await _transport.ExecuteSqlAsync(prepared);
+            var literal = new CompiledQuery(
+                prepared.DebugSql(DatabaseKind.Sqlite).Replace("VALUES (1,", "VALUES (2,"),
+                new List<Value>());
+            await _transport.ExecuteSqlAsync(literal);
+
+            var rows = await _transport.FetchAllSqlAsync(new CompiledQuery(
+                "SELECT d, t, typeof(t) AS storage_type FROM temporal_fixture ORDER BY id",
+                new List<Value>()));
+            Assert.Equal(rows[0]["d"], rows[1]["d"]);
+            Assert.Equal(rows[0]["t"], rows[1]["t"]);
+            Assert.Equal("integer", ((Value.TextValue)rows[0]["storage_type"]).Value);
+        }
         
         [Fact]
         public async Task UnsupportedType_Throws()

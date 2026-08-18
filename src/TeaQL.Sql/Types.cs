@@ -39,12 +39,13 @@ public class CompiledQuery
 
     public string DebugSql(DatabaseKind kind)
     {
+        var sql = SqlWithComment();
         return kind switch
         {
-            DatabaseKind.PostgreSql => ReplacePostgresPlaceholders(Sql, Params),
-            DatabaseKind.Sqlite => ReplacePositionalPlaceholders(Sql, Params, DatabaseKind.Sqlite),
-            DatabaseKind.MySql => ReplacePositionalPlaceholders(Sql, Params, DatabaseKind.MySql),
-            DatabaseKind.SqlServer => ReplaceSqlServerPlaceholders(Sql, Params),
+            DatabaseKind.PostgreSql => ReplacePostgresPlaceholders(sql, Params),
+            DatabaseKind.Sqlite => ReplacePositionalPlaceholders(sql, Params, DatabaseKind.Sqlite),
+            DatabaseKind.MySql => ReplacePositionalPlaceholders(sql, Params, DatabaseKind.MySql),
+            DatabaseKind.SqlServer => ReplaceSqlServerPlaceholders(sql, Params),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }
@@ -153,27 +154,84 @@ public class CompiledQuery
     private static string ReplacePositionalPlaceholders(string sql, List<Value> parameters, DatabaseKind kind)
     {
         var output = new System.Text.StringBuilder(sql.Length);
-        bool inString = false;
+        var state = SqlScanState.Sql;
         int paramIndex = 0;
 
         for (int i = 0; i < sql.Length; i++)
         {
             char ch = sql[i];
-            if (ch == '\'')
+            if (state == SqlScanState.Sql && ch == '\'')
             {
                 output.Append('\'');
-                if (inString && i + 1 < sql.Length && sql[i + 1] == '\'')
+                state = SqlScanState.SingleQuote;
+                continue;
+            }
+            if (state == SqlScanState.Sql && ch == '"')
+            {
+                output.Append(ch);
+                state = SqlScanState.DoubleQuote;
+                continue;
+            }
+            if (state == SqlScanState.Sql && ch == '-' && i + 1 < sql.Length && sql[i + 1] == '-')
+            {
+                output.Append("--");
+                i++;
+                state = SqlScanState.LineComment;
+                continue;
+            }
+            if (state == SqlScanState.Sql && ch == '/' && i + 1 < sql.Length && sql[i + 1] == '*')
+            {
+                output.Append("/*");
+                i++;
+                state = SqlScanState.BlockComment;
+                continue;
+            }
+            if (state == SqlScanState.SingleQuote)
+            {
+                output.Append(ch);
+                if (ch == '\'' && i + 1 < sql.Length && sql[i + 1] == '\'')
                 {
                     output.Append('\'');
                     i++;
                 }
-                else
+                else if (ch == '\'')
                 {
-                    inString = !inString;
+                    state = SqlScanState.Sql;
                 }
                 continue;
             }
-            if (!inString && ch == '?')
+            if (state == SqlScanState.DoubleQuote)
+            {
+                output.Append(ch);
+                if (ch == '"' && i + 1 < sql.Length && sql[i + 1] == '"')
+                {
+                    output.Append('"');
+                    i++;
+                }
+                else if (ch == '"')
+                {
+                    state = SqlScanState.Sql;
+                }
+                continue;
+            }
+            if (state == SqlScanState.LineComment)
+            {
+                output.Append(ch);
+                if (ch == '\r' || ch == '\n') state = SqlScanState.Sql;
+                continue;
+            }
+            if (state == SqlScanState.BlockComment)
+            {
+                output.Append(ch);
+                if (ch == '*' && i + 1 < sql.Length && sql[i + 1] == '/')
+                {
+                    output.Append('/');
+                    i++;
+                    state = SqlScanState.Sql;
+                }
+                continue;
+            }
+            if (ch == '?')
             {
                 if (paramIndex < parameters.Count)
                 {
@@ -186,10 +244,24 @@ public class CompiledQuery
                 }
                 continue;
             }
+            if (ch == '@' && i + 2 < sql.Length && sql[i + 1] == 'p'
+                && char.IsDigit(sql[i + 2]))
+            {
+                var end = i + 2;
+                while (end < sql.Length && char.IsDigit(sql[end])) end++;
+                var parameterIndex = int.Parse(sql[(i + 2)..end]);
+                output.Append(parameterIndex < parameters.Count
+                    ? SqlLiteral(parameters[parameterIndex], kind)
+                    : sql[i..end]);
+                i = end - 1;
+                continue;
+            }
             output.Append(ch);
         }
         return output.ToString();
     }
+
+    private enum SqlScanState { Sql, SingleQuote, DoubleQuote, LineComment, BlockComment }
 
     private static string SqlBoolLiteral(bool value, DatabaseKind kind) => kind == DatabaseKind.SqlServer
         ? (value ? "1" : "0")

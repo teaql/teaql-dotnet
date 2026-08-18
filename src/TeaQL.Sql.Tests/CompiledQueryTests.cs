@@ -135,5 +135,21 @@ namespace TeaQL.Sql.Tests
                 "SELECT * FROM school WHERE name = 'O''Brien School' AND active = TRUE AND phone IS NULL AND repeated = 'O''Brien School' AND note = '$2'",
                 query.DebugSql(DatabaseKind.PostgreSql));
         }
+
+        [Fact]
+        public void DebugSql_SqlitePreservesCommentsAndTemporalStorageLiterals()
+        {
+            var query = new CompiledQuery(
+                "-- line ? $1\nSELECT '?', \"identifier?\", ?, ? /* block ? */",
+                new List<Value> {
+                    new Value.DateValue(new DateTime(2024, 2, 29)),
+                    new Value.TimestampValue(1787110200123)
+                },
+                "teaql purpose=temporal.verify ? $1");
+
+            Assert.Equal(
+                "/* teaql purpose=temporal.verify ? $1 */ -- line ? $1\nSELECT '?', \"identifier?\", '2024-02-29', 1787110200123 /* block ? */",
+                query.DebugSql(DatabaseKind.Sqlite));
+        }
     }
 }
