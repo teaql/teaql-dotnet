@@ -52,14 +52,21 @@ namespace TeaQL.TfpEndpoint
         }
 
         public Task<Dictionary<string, object>> HandleQueryAsync(string payloadJson) =>
-            _telemetry.ObserveAsync(
+            HandleQueryAsync(payloadJson, new Dictionary<string, string>());
+
+        public async Task<Dictionary<string, object>> HandleQueryAsync(
+            string payloadJson, IReadOnlyDictionary<string, string> carrier)
+        {
+            using var propagation = _telemetry.ActivateSafely(carrier);
+            return await _telemetry.ObserveAsync(
                 RuntimeOperation.Create("tfp", "server.query",
                     new Dictionary<string, object> { ["teaql.tfp.role"] = "server" }),
                 () => HandleQueryCoreAsync(payloadJson),
                 result => new Dictionary<string, object>
                 {
                     ["teaql.result.cardinality"] = ((List<Dictionary<string, object?>>)result["data"]).Count
-                });
+                }).ConfigureAwait(false);
+        }
 
         private async Task<Dictionary<string, object>> HandleQueryCoreAsync(string payloadJson)
         {
@@ -129,10 +136,17 @@ namespace TeaQL.TfpEndpoint
         }
 
         public Task<Dictionary<string, object>> HandleMutationAsync(string payloadJson) =>
-            _telemetry.ObserveAsync(
+            HandleMutationAsync(payloadJson, new Dictionary<string, string>());
+
+        public async Task<Dictionary<string, object>> HandleMutationAsync(
+            string payloadJson, IReadOnlyDictionary<string, string> carrier)
+        {
+            using var propagation = _telemetry.ActivateSafely(carrier);
+            return await _telemetry.ObserveAsync(
                 RuntimeOperation.Create("tfp", "server.mutation",
                     new Dictionary<string, object> { ["teaql.tfp.role"] = "server" }),
-                () => HandleMutationCoreAsync(payloadJson));
+                () => HandleMutationCoreAsync(payloadJson)).ConfigureAwait(false);
+        }
 
         private async Task<Dictionary<string, object>> HandleMutationCoreAsync(string payloadJson)
         {

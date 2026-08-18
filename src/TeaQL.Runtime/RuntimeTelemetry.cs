@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 
 namespace TeaQL.Runtime;
@@ -47,8 +48,16 @@ public interface IRuntimeTelemetryScope
 public interface IRuntimeTelemetry
 {
     IRuntimeTelemetryScope Start(RuntimeOperation operation);
+    IDisposable ExtractAndActivate(IReadOnlyDictionary<string, string> carrier) => NoopDisposable.Instance;
     Task FlushAsync() => Task.CompletedTask;
     Task ShutdownAsync() => Task.CompletedTask;
+}
+
+public sealed class NoopDisposable : IDisposable
+{
+    public static readonly NoopDisposable Instance = new();
+    private NoopDisposable() { }
+    public void Dispose() { }
 }
 
 public sealed class NoopRuntimeTelemetry : IRuntimeTelemetry
@@ -66,6 +75,17 @@ public sealed class NoopRuntimeTelemetry : IRuntimeTelemetry
 
 public static class RuntimeTelemetryExtensions
 {
+    public static IDisposable ActivateSafely(this IRuntimeTelemetry? telemetry,
+        IReadOnlyDictionary<string, string>? carrier)
+    {
+        try
+        {
+            return new FailOpenDisposable((telemetry ?? NoopRuntimeTelemetry.Instance)
+                .ExtractAndActivate(carrier ?? new Dictionary<string, string>()));
+        }
+        catch { return NoopDisposable.Instance; }
+    }
+
     public static IRuntimeTelemetryScope StartSafely(
         this IRuntimeTelemetry? telemetry, RuntimeOperation operation)
     {
@@ -105,6 +125,16 @@ public static class RuntimeTelemetryExtensions
             try { action(scope); } catch { }
         }
     }
+
+    private sealed class FailOpenDisposable(IDisposable? @delegate) : IDisposable
+    {
+        private IDisposable? _delegate = @delegate;
+        public void Dispose()
+        {
+            var current = Interlocked.Exchange(ref _delegate, null);
+            try { current?.Dispose(); } catch { }
+        }
+    }
 }
 
 public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposable
@@ -114,6 +144,7 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
     private readonly Histogram<double> _duration;
     private readonly Counter<long> _operations;
     private readonly ILogger? _logger;
+    private readonly AsyncLocal<ActivityContext?> _remoteParent = new();
 
     public OpenTelemetryRuntimeTelemetry(
         string instrumentationScope = "io.teaql.runtime", ILogger? logger = null)
@@ -129,10 +160,42 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
 
     public IRuntimeTelemetryScope Start(RuntimeOperation operation)
     {
-        var activity = _activities.StartActivity($"teaql.{operation.Family}", ActivityKind.Internal);
+        var activity = Activity.Current is null && _remoteParent.Value is { } remoteParent
+            ? _activities.StartActivity($"teaql.{operation.Family}", ActivityKind.Internal, remoteParent)
+            : _activities.StartActivity($"teaql.{operation.Family}", ActivityKind.Internal);
         if (activity is not null)
             foreach (var pair in operation.Attributes) activity.SetTag(pair.Key, pair.Value);
         return new OpenTelemetryScope(activity, operation, _duration, _operations, _logger);
+    }
+
+    public IDisposable ExtractAndActivate(IReadOnlyDictionary<string, string> carrier)
+    {
+        var previous = _remoteParent.Value;
+        string? traceparent = null;
+        string? tracestate = null;
+        foreach (var pair in carrier)
+        {
+            if (pair.Key.Equals("traceparent", StringComparison.OrdinalIgnoreCase))
+                traceparent = pair.Value;
+            else if (pair.Key.Equals("tracestate", StringComparison.OrdinalIgnoreCase))
+                tracestate = pair.Value;
+        }
+        if (traceparent is not null
+            && ActivityContext.TryParse(traceparent, tracestate, true, out var extracted))
+            _remoteParent.Value = extracted;
+        return new RestoreRemoteParent(_remoteParent, previous);
+    }
+
+    private sealed class RestoreRemoteParent(
+        AsyncLocal<ActivityContext?> slot, ActivityContext? previous) : IDisposable
+    {
+        private bool _disposed;
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+            slot.Value = previous;
+        }
     }
 
     public void Dispose()

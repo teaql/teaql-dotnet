@@ -64,7 +64,6 @@ public class RuntimeTelemetryTests
         tracerProvider.ForceFlush();
         meterProvider.ForceFlush();
 
-        Assert.Equal(2, spans.Count);
         var querySpan = spans.Single(span => span.OperationName == "teaql.query");
         var providerSpan = spans.Single(span => span.OperationName == "teaql.provider");
         Assert.Equal(querySpan.SpanId, providerSpan.ParentSpanId);

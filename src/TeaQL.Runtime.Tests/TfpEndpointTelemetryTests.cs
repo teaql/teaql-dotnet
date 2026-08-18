@@ -2,6 +2,9 @@ using TeaQL.Core;
 using TeaQL.DataService;
 using TeaQL.TfpEndpoint;
 using Xunit;
+using System.Diagnostics;
+using OpenTelemetry;
+using OpenTelemetry.Trace;
 
 namespace TeaQL.Runtime.Tests;
 
@@ -40,6 +43,29 @@ public class TfpEndpointTelemetryTests
             handler.HandleQueryAsync("{\"entity\":\"Probe\"}"));
         Assert.Same(original, thrown);
         Assert.Same(original, telemetry.Events[^1].Error);
+    }
+
+    [Fact]
+    public async Task ExtractsCaseInsensitiveW3cCarrierAsDirectServerParent()
+    {
+        var spans = new List<Activity>();
+        using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+            .AddSource("io.teaql.runtime").AddInMemoryExporter(spans).Build();
+        using var telemetry = new OpenTelemetryRuntimeTelemetry();
+        var handler = new TfpEndpointHandler(new StubDataService(), telemetry);
+        const string traceId = "0af7651916cd43dd8448eb211c80319c";
+        const string parentSpanId = "b7ad6b7169203331";
+
+        await handler.HandleQueryAsync("{\"entity\":\"Probe\"}",
+            new Dictionary<string, string>
+            {
+                ["TraceParent"] = $"00-{traceId}-{parentSpanId}-01"
+            });
+        tracerProvider.ForceFlush();
+
+        var server = Assert.Single(spans.Where(span => span.OperationName == "teaql.tfp"));
+        Assert.Equal(ActivityTraceId.CreateFromString(traceId), server.TraceId);
+        Assert.Equal(ActivitySpanId.CreateFromString(parentSpanId), server.ParentSpanId);
     }
 
     private sealed class StubDataService : IDataService
