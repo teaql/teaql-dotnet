@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace TeaQL.Runtime;
 
@@ -112,8 +113,10 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
     private readonly Meter _meter;
     private readonly Histogram<double> _duration;
     private readonly Counter<long> _operations;
+    private readonly ILogger? _logger;
 
-    public OpenTelemetryRuntimeTelemetry(string instrumentationScope = "io.teaql.runtime")
+    public OpenTelemetryRuntimeTelemetry(
+        string instrumentationScope = "io.teaql.runtime", ILogger? logger = null)
     {
         _activities = new ActivitySource(instrumentationScope);
         _meter = new Meter(instrumentationScope);
@@ -121,6 +124,7 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
             "teaql.runtime.operation.duration", "ms", "TeaQL runtime operation duration");
         _operations = _meter.CreateCounter<long>(
             "teaql.runtime.operation.count", "{operation}", "Completed TeaQL runtime operations");
+        _logger = logger;
     }
 
     public IRuntimeTelemetryScope Start(RuntimeOperation operation)
@@ -128,7 +132,7 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
         var activity = _activities.StartActivity($"teaql.{operation.Family}", ActivityKind.Internal);
         if (activity is not null)
             foreach (var pair in operation.Attributes) activity.SetTag(pair.Key, pair.Value);
-        return new OpenTelemetryScope(activity, operation, _duration, _operations);
+        return new OpenTelemetryScope(activity, operation, _duration, _operations, _logger);
     }
 
     public void Dispose()
@@ -143,15 +147,17 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
         private readonly RuntimeOperation _operation;
         private readonly Histogram<double> _duration;
         private readonly Counter<long> _operations;
+        private readonly ILogger? _logger;
         private readonly long _startedAt = Stopwatch.GetTimestamp();
 
         public OpenTelemetryScope(Activity? activity, RuntimeOperation operation,
-            Histogram<double> duration, Counter<long> operations)
+            Histogram<double> duration, Counter<long> operations, ILogger? logger)
         {
             _activity = activity;
             _operation = operation;
             _duration = duration;
             _operations = operations;
+            _logger = logger;
         }
 
         public void Success(IReadOnlyDictionary<string, object>? attributes = null)
@@ -179,8 +185,12 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
                 { "teaql.operation.family", _operation.Family },
                 { "teaql.operation.outcome", outcome }
             };
-            _duration.Record(Stopwatch.GetElapsedTime(_startedAt).TotalMilliseconds, tags);
+            var durationMs = Stopwatch.GetElapsedTime(_startedAt).TotalMilliseconds;
+            _duration.Record(durationMs, tags);
             _operations.Add(1, tags);
+            _logger?.LogInformation(
+                "TeaQL runtime operation completed: {teaql.operation.family} {teaql.operation.name} {teaql.operation.outcome} {teaql.operation.duration_ms}",
+                _operation.Family, _operation.Name, outcome, durationMs);
             activity?.Stop();
         }
     }

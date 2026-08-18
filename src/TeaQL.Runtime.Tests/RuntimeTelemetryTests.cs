@@ -5,7 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Trace;
+using Microsoft.Extensions.Logging;
 using TeaQL.Core;
 using TeaQL.DataService;
 using Xunit;
@@ -41,6 +43,7 @@ public class RuntimeTelemetryTests
     {
         var spans = new List<Activity>();
         var metrics = new List<Metric>();
+        var logs = new List<LogRecord>();
         using var tracerProvider = Sdk.CreateTracerProviderBuilder()
             .AddSource("io.teaql.runtime")
             .AddInMemoryExporter(spans)
@@ -49,7 +52,10 @@ public class RuntimeTelemetryTests
             .AddMeter("io.teaql.runtime")
             .AddInMemoryExporter(metrics)
             .Build();
-        using var telemetry = new OpenTelemetryRuntimeTelemetry();
+        using var loggerFactory = LoggerFactory.Create(builder => builder.AddOpenTelemetry(
+            options => options.AddInMemoryExporter(logs)));
+        using var telemetry = new OpenTelemetryRuntimeTelemetry(
+            logger: loggerFactory.CreateLogger("TeaQL.Runtime"));
         var query = telemetry.StartSafely(RuntimeOperation.Create("query", "School.list",
             new Dictionary<string, object> { ["teaql.entity.type"] = "School" }));
         var provider = telemetry.StartSafely(RuntimeOperation.Create("provider", "sqlite.query"));
@@ -64,6 +70,13 @@ public class RuntimeTelemetryTests
         Assert.Equal(querySpan.SpanId, providerSpan.ParentSpanId);
         Assert.Contains(metrics, metric => metric.Name == "teaql.runtime.operation.duration");
         Assert.Contains(metrics, metric => metric.Name == "teaql.runtime.operation.count");
+        Assert.Equal(2, logs.Count);
+        var queryLog = logs.Single(log => log.Attributes?.Any(attribute =>
+            attribute.Key == "teaql.operation.family" && Equals(attribute.Value, "query")) == true);
+        Assert.Equal(querySpan.TraceId, queryLog.TraceId);
+        Assert.Equal(querySpan.SpanId, queryLog.SpanId);
+        Assert.DoesNotContain(queryLog.Attributes ?? [], attribute =>
+            attribute.Key == "teaql.entity.id");
     }
 
     [Fact]
