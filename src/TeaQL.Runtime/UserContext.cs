@@ -30,6 +30,7 @@ public class UserContext
     public string? Timezone { get; set; } = "UTC";
     
     public IServiceProvider? ServiceProvider { get; set; }
+    public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = NoopRuntimeTelemetry.Instance;
 
     public UserContext()
     {
@@ -43,6 +44,12 @@ public class UserContext
     public UserContext WithMetadata(IMetadataStore metadata)
     {
         Metadata = metadata;
+        return this;
+    }
+
+    public UserContext WithRuntimeTelemetry(IRuntimeTelemetry telemetry)
+    {
+        RuntimeTelemetry = telemetry ?? NoopRuntimeTelemetry.Instance;
         return this;
     }
 
