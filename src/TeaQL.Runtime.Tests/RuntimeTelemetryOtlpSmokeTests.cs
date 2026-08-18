@@ -19,6 +19,7 @@ public class RuntimeTelemetryOtlpSmokeTests
 
         var endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
             ?? "http://localhost:4318");
+        var expectExportFailure = Environment.GetEnvironmentVariable("TEAQL_EXPECT_EXPORT_FAILURE") == "1";
         var runId = serviceName[(serviceName.LastIndexOf('-') + 1)..];
         var resource = ResourceBuilder.CreateDefault()
             .AddService(serviceName, serviceInstanceId: runId)
@@ -35,11 +36,13 @@ public class RuntimeTelemetryOtlpSmokeTests
             {
                 options.Endpoint = new Uri(endpoint, "/v1/traces");
                 options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                options.TimeoutMilliseconds = 1_000;
                 options.ExportProcessorType = ExportProcessorType.Batch;
                 options.BatchExportProcessorOptions = new BatchExportProcessorOptions<Activity>
                 {
                     MaxQueueSize = 64,
-                    MaxExportBatchSize = 16
+                    MaxExportBatchSize = 16,
+                    ExporterTimeoutMilliseconds = 2_000
                 };
             }).Build();
         using var meterProvider = Sdk.CreateMeterProviderBuilder()
@@ -49,6 +52,7 @@ public class RuntimeTelemetryOtlpSmokeTests
             {
                 options.Endpoint = new Uri(endpoint, "/v1/metrics");
                 options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                options.TimeoutMilliseconds = 1_000;
                 options.ExportProcessorType = ExportProcessorType.Simple;
             }).Build();
         using var loggerFactory = LoggerFactory.Create(builder => builder.AddOpenTelemetry(options =>
@@ -58,11 +62,13 @@ public class RuntimeTelemetryOtlpSmokeTests
             {
                 exporter.Endpoint = new Uri(endpoint, "/v1/logs");
                 exporter.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                exporter.TimeoutMilliseconds = 1_000;
                 exporter.ExportProcessorType = ExportProcessorType.Batch;
                 exporter.BatchExportProcessorOptions = new BatchExportProcessorOptions<Activity>
                 {
                     MaxQueueSize = 64,
-                    MaxExportBatchSize = 16
+                    MaxExportBatchSize = 16,
+                    ExporterTimeoutMilliseconds = 2_000
                 };
             });
         }));
@@ -87,8 +93,12 @@ public class RuntimeTelemetryOtlpSmokeTests
             ["teaql.audit.changed_field_count"] = 1
         });
 
-        Assert.True(tracerProvider.ForceFlush());
-        Assert.True(meterProvider.ForceFlush());
+        var traceFlushed = tracerProvider.ForceFlush(5_000);
+        var metricFlushed = meterProvider.ForceFlush(5_000);
+        if (expectExportFailure)
+            Assert.False(traceFlushed && metricFlushed);
+        else
+            Assert.True(traceFlushed && metricFlushed);
         loggerFactory.Dispose();
     }
 
