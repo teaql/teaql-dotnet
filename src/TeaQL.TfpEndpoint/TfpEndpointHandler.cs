@@ -5,16 +5,19 @@ using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using TeaQL.Core;
 using TeaQL.DataService;
+using TeaQL.Runtime;
 
 namespace TeaQL.TfpEndpoint
 {
     public class TfpEndpointHandler
     {
         private readonly IDataService _dataService;
+        private readonly IRuntimeTelemetry _telemetry;
 
-        public TfpEndpointHandler(IDataService dataService)
+        public TfpEndpointHandler(IDataService dataService, IRuntimeTelemetry? telemetry = null)
         {
             _dataService = dataService;
+            _telemetry = telemetry ?? NoopRuntimeTelemetry.Instance;
         }
 
         private Value MapToValue(object? obj)
@@ -48,7 +51,17 @@ namespace TeaQL.TfpEndpoint
             };
         }
 
-        public async Task<Dictionary<string, object>> HandleQueryAsync(string payloadJson)
+        public Task<Dictionary<string, object>> HandleQueryAsync(string payloadJson) =>
+            _telemetry.ObserveAsync(
+                RuntimeOperation.Create("tfp", "server.query",
+                    new Dictionary<string, object> { ["teaql.tfp.role"] = "server" }),
+                () => HandleQueryCoreAsync(payloadJson),
+                result => new Dictionary<string, object>
+                {
+                    ["teaql.result.cardinality"] = ((List<Dictionary<string, object?>>)result["data"]).Count
+                });
+
+        private async Task<Dictionary<string, object>> HandleQueryCoreAsync(string payloadJson)
         {
             var tfpQuery = JsonSerializer.Deserialize<TfpSelectQuery>(payloadJson);
             if (tfpQuery == null)
@@ -115,7 +128,13 @@ namespace TeaQL.TfpEndpoint
             };
         }
 
-        public async Task<Dictionary<string, object>> HandleMutationAsync(string payloadJson)
+        public Task<Dictionary<string, object>> HandleMutationAsync(string payloadJson) =>
+            _telemetry.ObserveAsync(
+                RuntimeOperation.Create("tfp", "server.mutation",
+                    new Dictionary<string, object> { ["teaql.tfp.role"] = "server" }),
+                () => HandleMutationCoreAsync(payloadJson));
+
+        private async Task<Dictionary<string, object>> HandleMutationCoreAsync(string payloadJson)
         {
             var tfpMut = JsonSerializer.Deserialize<TfpMutationQuery>(payloadJson);
             if (tfpMut == null)

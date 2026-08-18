@@ -28,6 +28,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.17.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
     <ProjectReference Include="..\TeaQL.Runtime\TeaQL.Runtime.csproj" />
+    <ProjectReference Include="..\TeaQL.TfpEndpoint\TeaQL.TfpEndpoint.csproj" />
   </ItemGroup>
 
 </Project>
