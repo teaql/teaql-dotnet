@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using TeaQL.Core;
+using TeaQL.DataService;
 using Xunit;
 
 namespace TeaQL.Runtime.Tests;
@@ -64,6 +66,29 @@ public class RuntimeTelemetryTests
         Assert.Contains(metrics, metric => metric.Name == "teaql.runtime.operation.count");
     }
 
+    [Fact]
+    public async Task RuntimeDataServiceProducesQueryAndNestedProviderSpans()
+    {
+        var spans = new List<Activity>();
+        using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+            .AddSource("io.teaql.runtime")
+            .AddInMemoryExporter(spans)
+            .Build();
+        using var telemetry = new OpenTelemetryRuntimeTelemetry();
+        var context = new UserContext()
+            .WithDataService(new StubDataService())
+            .WithRuntimeTelemetry(telemetry);
+
+        var result = await context.RequireResource<IDataService>().QueryAsync(
+            new QueryRequest { Query = new SelectQuery("School") });
+        tracerProvider.ForceFlush();
+
+        Assert.Single(result.Rows);
+        var query = spans.Single(span => span.OperationName == "teaql.query");
+        var provider = spans.Single(span => span.OperationName == "teaql.provider");
+        Assert.Equal(query.SpanId, provider.ParentSpanId);
+    }
+
     private sealed class RecordingTelemetry(List<string> events) : IRuntimeTelemetry
     {
         public RuntimeOperation? Operation { get; private set; }
@@ -82,5 +107,16 @@ public class RuntimeTelemetryTests
     private sealed class BrokenTelemetry : IRuntimeTelemetry
     {
         public IRuntimeTelemetryScope Start(RuntimeOperation operation) => throw new InvalidOperationException();
+    }
+
+    private sealed class StubDataService : IDataService
+    {
+        public DataServiceCapabilities Capabilities { get; } = new() { Query = true, Mutation = true };
+        public Task<QueryResult> QueryAsync(QueryRequest request) => Task.FromResult(new QueryResult
+        {
+            Rows = new List<TeaQL.Core.Record> { new() }
+        });
+        public Task<MutationResult> MutateAsync(MutationRequest request) =>
+            Task.FromResult(new MutationResult { AffectedRows = 1 });
     }
 }

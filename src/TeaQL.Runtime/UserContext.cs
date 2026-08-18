@@ -53,6 +53,12 @@ public class UserContext
         return this;
     }
 
+    public UserContext WithDataService(IDataService provider)
+    {
+        InsertResource<IDataService>(new RuntimeDataService(provider, this));
+        return this;
+    }
+
     public UserContext WithEntityRegistry(IEntityRegistry registry)
     {
         EntityRegistry = registry;
@@ -83,8 +89,14 @@ public class UserContext
         RequireResource<IRequestPolicy>().Apply(query);
 
     public Task PublishAppAuditEventAsync(IReadOnlyDictionary<string, object?> safeEvent,
-        CancellationToken cancellationToken = default) =>
-        RequireResource<IAppAuditEventSink>().RecordAsync(safeEvent, cancellationToken);
+        CancellationToken cancellationToken = default) => RuntimeTelemetry.ObserveAsync(
+            RuntimeOperation.Create("audit", "app-audit.record"),
+            async () =>
+            {
+                await RequireResource<IAppAuditEventSink>()
+                    .RecordAsync(safeEvent, cancellationToken).ConfigureAwait(false);
+                return true;
+            });
 
     public async Task EnsureSchemaAsync()
     {
@@ -205,22 +217,39 @@ public class UserContext
     // ==========================================
     public void PutToLocalCache(string key, object value, int? timeToLiveInSeconds = null)
     {
+        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.put",
+            new Dictionary<string, object> { ["teaql.cache.operation"] = "put" }));
+        try
+        {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
         var expiresAt = timeToLiveInSeconds > 0
             ? DateTimeOffset.UtcNow.AddSeconds(timeToLiveInSeconds.Value)
             : (DateTimeOffset?)null;
         LocalCache[key] = new LocalCacheEntry(value, expiresAt);
+            scope.Success(new Dictionary<string, object> { ["teaql.cache.result"] = "stored" });
+        }
+        catch (Exception error) { scope.Failure(error); throw; }
     }
     public T? GetFromLocalCache<T>(string key)
     {
-        if (!LocalCache.TryGetValue(key, out var entry)) return default;
+        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.get",
+            new Dictionary<string, object> { ["teaql.cache.operation"] = "get" }));
+        if (!LocalCache.TryGetValue(key, out var entry))
+        {
+            scope.Success(new Dictionary<string, object> { ["teaql.cache.result"] = "miss" });
+            return default;
+        }
         if (entry.ExpiresAt is not null && DateTimeOffset.UtcNow >= entry.ExpiresAt)
         {
             LocalCache.TryRemove(new KeyValuePair<string, LocalCacheEntry>(key, entry));
+            scope.Success(new Dictionary<string, object> { ["teaql.cache.result"] = "miss" });
             return default;
         }
-        return entry.Value is T value ? value : default;
+        var result = entry.Value is T value ? value : default;
+        scope.Success(new Dictionary<string, object>
+            { ["teaql.cache.result"] = result is null ? "miss" : "hit" });
+        return result;
     }
     public void RemoveFromLocalCache(string key) { LocalCache.TryRemove(key, out _); }
 
