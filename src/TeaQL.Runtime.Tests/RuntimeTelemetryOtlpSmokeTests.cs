@@ -58,16 +58,36 @@ public class RuntimeTelemetryOtlpSmokeTests
         using var telemetry = new OpenTelemetryRuntimeTelemetry(
             logger: loggerFactory.CreateLogger("TeaQL.Runtime"));
 
-        var scope = telemetry.StartSafely(RuntimeOperation.Create("query", "ConformanceProbe.list",
-            new Dictionary<string, object>
-            {
-                ["teaql.entity.type"] = "ConformanceProbe",
-                ["teaql.entity.id"] = "must-not-export"
-            }));
-        scope.Success(new Dictionary<string, object> { ["teaql.result.cardinality"] = 1 });
+        Complete(telemetry, "query", "ConformanceProbe.list",
+            new() { ["teaql.entity.type"] = "ConformanceProbe" });
+        Complete(telemetry, "mutation", "ConformanceProbe.update",
+            new() { ["teaql.entity.type"] = "ConformanceProbe", ["teaql.mutation.kind"] = "update" });
+        Complete(telemetry, "relation_load", "ConformanceProbe.children",
+            new() { ["teaql.entity.type"] = "ConformanceProbe", ["teaql.relation.name"] = "children" });
+        Complete(telemetry, "provider", "sqlite.query",
+            new() { ["teaql.provider.kind"] = "sqlite", ["teaql.provider.operation"] = "query" });
+        Complete(telemetry, "cache", "local.get",
+            new() { ["teaql.cache.operation"] = "get" });
+        Complete(telemetry, "tfp", "server.query",
+            new() { ["teaql.tfp.role"] = "server" });
+        Complete(telemetry, "audit", "ConformanceProbe.audit", new()
+        {
+            ["teaql.entity.type"] = "ConformanceProbe", ["teaql.mutation.kind"] = "update",
+            ["teaql.audit.changed_field_count"] = 1
+        });
 
         Assert.True(tracerProvider.ForceFlush());
         Assert.True(meterProvider.ForceFlush());
         loggerFactory.Dispose();
+    }
+
+    private static void Complete(OpenTelemetryRuntimeTelemetry telemetry, string family,
+        string name, Dictionary<string, object> attributes)
+    {
+        attributes["teaql.entity.id"] = "must-not-export";
+        var scope = telemetry.StartSafely(RuntimeOperation.Create(family, name, attributes));
+        var completion = new Dictionary<string, object> { ["teaql.result.cardinality"] = 1 };
+        if (family == "cache") completion["teaql.cache.result"] = "hit";
+        scope.Success(completion);
     }
 }
