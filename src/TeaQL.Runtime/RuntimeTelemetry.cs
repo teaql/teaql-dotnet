@@ -144,10 +144,13 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
     private readonly Histogram<double> _duration;
     private readonly Counter<long> _operations;
     private readonly ILogger? _logger;
+    private readonly Func<Task> _flush;
+    private readonly Func<Task> _shutdown;
     private readonly AsyncLocal<ActivityContext?> _remoteParent = new();
 
     public OpenTelemetryRuntimeTelemetry(
-        string instrumentationScope = "io.teaql.runtime", ILogger? logger = null)
+        string instrumentationScope = "io.teaql.runtime", ILogger? logger = null,
+        Func<Task>? flush = null, Func<Task>? shutdown = null)
     {
         _activities = new ActivitySource(instrumentationScope);
         _meter = new Meter(instrumentationScope);
@@ -156,7 +159,13 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
         _operations = _meter.CreateCounter<long>(
             "teaql.runtime.operation.count", "{operation}", "Completed TeaQL runtime operations");
         _logger = logger;
+        _flush = flush ?? (() => Task.CompletedTask);
+        _shutdown = shutdown ?? (() => Task.CompletedTask);
     }
+
+    public Task FlushAsync() => _flush();
+
+    public Task ShutdownAsync() => _shutdown();
 
     public IRuntimeTelemetryScope Start(RuntimeOperation operation)
     {

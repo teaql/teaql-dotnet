@@ -39,6 +39,20 @@ public class RuntimeTelemetryTests
     }
 
     [Fact]
+    public async Task DelegatesExplicitApplicationOwnedLifecycle()
+    {
+        var calls = new List<string>();
+        using var telemetry = new OpenTelemetryRuntimeTelemetry(
+            flush: () => { calls.Add("flush"); return Task.CompletedTask; },
+            shutdown: () => { calls.Add("shutdown"); return Task.CompletedTask; });
+
+        await telemetry.FlushAsync();
+        await telemetry.ShutdownAsync();
+
+        Assert.Equal(new[] { "flush", "shutdown" }, calls);
+    }
+
+    [Fact]
     public void OfficialSdkExportsNestedSpansAndMetrics()
     {
         var spans = new List<Activity>();
