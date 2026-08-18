@@ -22,7 +22,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
     {
         var records = new List<Record>();
         using var cmd = _connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         for (int i = 0; i < query.Params.Count; i++)
         {
@@ -53,7 +53,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var cmd = _connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         for (var i = 0; i < query.Params.Count; i++)
         {
             var p = cmd.CreateParameter();
@@ -76,7 +76,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
     public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
     {
         using var cmd = _connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         for (int i = 0; i < query.Params.Count; i++)
         {
@@ -135,7 +135,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         {
             var command = _connection.CreateCommand();
             command.Transaction = _transaction;
-            command.CommandText = query.Sql;
+            command.CommandText = query.SqlWithComment();
             for (var index = 0; index < query.Params.Count; index++)
             {
                 var parameter = command.CreateParameter();

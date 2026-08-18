@@ -26,7 +26,7 @@ public class PostgreSqlTransport : IStreamingSqlTransport
     {
         await using var connection = await _dataSource.OpenConnectionAsync();
         await using var cmd = connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         SetParameters(cmd, query.Params);
 
@@ -54,7 +54,7 @@ public class PostgreSqlTransport : IStreamingSqlTransport
     {
         await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
         await using var cmd = connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         SetParameters(cmd, query.Params);
         await using var reader = await cmd.ExecuteReaderAsync(
             System.Data.CommandBehavior.SequentialAccess,
@@ -74,7 +74,7 @@ public class PostgreSqlTransport : IStreamingSqlTransport
     {
         await using var connection = await _dataSource.OpenConnectionAsync();
         await using var cmd = connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         SetParameters(cmd, query.Params);
         

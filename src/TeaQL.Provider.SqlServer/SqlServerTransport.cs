@@ -24,7 +24,7 @@ public class SqlServerTransport : ISqlTransport
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var cmd = connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         SetParameters(cmd, query.Params);
 
@@ -51,7 +51,7 @@ public class SqlServerTransport : ISqlTransport
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var cmd = connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         SetParameters(cmd, query.Params);
         

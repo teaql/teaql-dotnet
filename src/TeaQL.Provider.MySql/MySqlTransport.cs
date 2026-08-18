@@ -17,7 +17,11 @@ public class MySqlTransport : IStreamingSqlTransport, IDisposable
 
     public MySqlTransport(string connectionString)
     {
-        _connection = new MySqlConnection(connectionString);
+        var builder = new MySqlConnectionStringBuilder(connectionString)
+        {
+            DateTimeKind = MySqlDateTimeKind.Utc
+        };
+        _connection = new MySqlConnection(builder.ConnectionString);
         _ownsConnection = true;
     }
 
@@ -39,7 +43,7 @@ public class MySqlTransport : IStreamingSqlTransport, IDisposable
     {
         await EnsureConnectionOpenAsync();
         using var cmd = _connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         foreach (var param in query.Params)
         {
@@ -72,7 +76,7 @@ public class MySqlTransport : IStreamingSqlTransport, IDisposable
     {
         await EnsureConnectionOpenAsync();
         using var cmd = _connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         foreach (var param in query.Params)
         {
             var p = cmd.CreateParameter();
@@ -93,7 +97,7 @@ public class MySqlTransport : IStreamingSqlTransport, IDisposable
     {
         await EnsureConnectionOpenAsync();
         using var cmd = _connection.CreateCommand();
-        cmd.CommandText = query.Sql;
+        cmd.CommandText = query.SqlWithComment();
         
         foreach (var param in query.Params)
         {
@@ -147,7 +151,8 @@ public class MySqlTransport : IStreamingSqlTransport, IDisposable
             double d => new Value.F64Value(d),
             decimal dec => new Value.DecimalValue(dec),
             string s => new Value.TextValue(s),
-            DateTime dt => new Value.TimestampValue(new DateTimeOffset(dt).ToUnixTimeMilliseconds()),
+            DateTime dt => new Value.TimestampValue(
+                new DateTimeOffset(DateTime.SpecifyKind(dt, DateTimeKind.Utc)).ToUnixTimeMilliseconds()),
             DateTimeOffset dto => new Value.TimestampValue(dto.ToUnixTimeMilliseconds()),
             byte[] bytes => new Value.TextValue(Convert.ToBase64String(bytes)),
             _ => new Value.TextValue(dbValue.ToString()!)

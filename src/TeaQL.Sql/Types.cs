@@ -42,7 +42,7 @@ public class CompiledQuery
         var sql = SqlWithComment();
         return kind switch
         {
-            DatabaseKind.PostgreSql => ReplacePostgresPlaceholders(sql, Params),
+            DatabaseKind.PostgreSql => ReplacePositionalPlaceholders(sql, Params, DatabaseKind.PostgreSql),
             DatabaseKind.Sqlite => ReplacePositionalPlaceholders(sql, Params, DatabaseKind.Sqlite),
             DatabaseKind.MySql => ReplacePositionalPlaceholders(sql, Params, DatabaseKind.MySql),
             DatabaseKind.SqlServer => ReplaceSqlServerPlaceholders(sql, Params),
@@ -256,6 +256,18 @@ public class CompiledQuery
                 i = end - 1;
                 continue;
             }
+            if (kind == DatabaseKind.PostgreSql && ch == '$' && i + 1 < sql.Length
+                && char.IsDigit(sql[i + 1]))
+            {
+                var end = i + 1;
+                while (end < sql.Length && char.IsDigit(sql[end])) end++;
+                var parameterIndex = int.Parse(sql[(i + 1)..end]) - 1;
+                output.Append(parameterIndex >= 0 && parameterIndex < parameters.Count
+                    ? SqlLiteral(parameters[parameterIndex], kind)
+                    : sql[i..end]);
+                i = end - 1;
+                continue;
+            }
             output.Append(ch);
         }
         return output.ToString();
@@ -279,8 +291,8 @@ public class CompiledQuery
             Value.DecimalValue d => d.Value.ToString(System.Globalization.CultureInfo.InvariantCulture),
             Value.TextValue t => QuotedSqlString(t.Value),
             Value.JsonValue j => QuotedSqlString(j.Value?.ToJsonString() ?? "null"),
-            Value.DateValue d => QuotedSqlString(d.Value.ToString("yyyy-MM-dd")),
-            Value.TimestampValue t => t.Milliseconds.ToString(),
+            Value.DateValue d => DateLiteral(d.Value, kind),
+            Value.TimestampValue t => TimestampLiteral(t.Milliseconds, kind),
             Value.ObjectValue o => QuotedSqlString(System.Text.Json.JsonSerializer.Serialize(o.Value)),
             Value.ListValue l => FormatList(l.Values, kind),
             Value.TypedNullValue => "NULL",
@@ -297,6 +309,31 @@ public class CompiledQuery
     private static string QuotedSqlString(string value)
     {
         return $"'{value.Replace("'", "''")}'";
+    }
+
+    private static string DateLiteral(DateTime value, DatabaseKind kind)
+    {
+        var literal = QuotedSqlString(value.ToString("yyyy-MM-dd"));
+        return kind switch
+        {
+            DatabaseKind.PostgreSql => $"DATE {literal}",
+            DatabaseKind.MySql or DatabaseKind.SqlServer => $"CAST({literal} AS DATE)",
+            _ => literal
+        };
+    }
+
+    private static string TimestampLiteral(long milliseconds, DatabaseKind kind)
+    {
+        if (kind == DatabaseKind.Sqlite) return milliseconds.ToString();
+        var instant = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
+        var text = instant.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        return kind switch
+        {
+            DatabaseKind.PostgreSql => $"TIMESTAMPTZ '{text}Z'",
+            DatabaseKind.MySql => $"CAST('{text}' AS DATETIME(3))",
+            DatabaseKind.SqlServer => $"CAST('{text}+00:00' AS DATETIMEOFFSET(3))",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
     }
 }
 

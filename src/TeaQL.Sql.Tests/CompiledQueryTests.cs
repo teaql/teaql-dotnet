@@ -151,5 +151,22 @@ namespace TeaQL.Sql.Tests
                 "/* teaql purpose=temporal.verify ? $1 */ -- line ? $1\nSELECT '?', \"identifier?\", '2024-02-29', 1787110200123 /* block ? */",
                 query.DebugSql(DatabaseKind.Sqlite));
         }
+
+        [Fact]
+        public void DebugSql_PostgresAndMySqlUseTypedTemporalLiterals()
+        {
+            var values = new List<Value> {
+                new Value.DateValue(new DateTime(2024, 2, 29)),
+                new Value.TimestampValue(-315521754322)
+            };
+            Assert.Equal(
+                "-- ignored $1\nSELECT DATE '2024-02-29', TIMESTAMPTZ '1960-01-02 03:04:05.678Z' /* ignored $2 */",
+                new CompiledQuery("-- ignored $1\nSELECT $1, $2 /* ignored $2 */", values)
+                    .DebugSql(DatabaseKind.PostgreSql));
+            Assert.Equal(
+                "SELECT CAST('2024-02-29' AS DATE), CAST('1960-01-02 03:04:05.678' AS DATETIME(3)) /* ignored ? */",
+                new CompiledQuery("SELECT ?, ? /* ignored ? */", values)
+                    .DebugSql(DatabaseKind.MySql));
+        }
     }
 }
