@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -34,7 +35,12 @@ public class RuntimeTelemetryOtlpSmokeTests
             {
                 options.Endpoint = new Uri(endpoint, "/v1/traces");
                 options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-                options.ExportProcessorType = ExportProcessorType.Simple;
+                options.ExportProcessorType = ExportProcessorType.Batch;
+                options.BatchExportProcessorOptions = new BatchExportProcessorOptions<Activity>
+                {
+                    MaxQueueSize = 64,
+                    MaxExportBatchSize = 16
+                };
             }).Build();
         using var meterProvider = Sdk.CreateMeterProviderBuilder()
             .SetResourceBuilder(resource)
@@ -52,7 +58,12 @@ public class RuntimeTelemetryOtlpSmokeTests
             {
                 exporter.Endpoint = new Uri(endpoint, "/v1/logs");
                 exporter.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-                exporter.ExportProcessorType = ExportProcessorType.Simple;
+                exporter.ExportProcessorType = ExportProcessorType.Batch;
+                exporter.BatchExportProcessorOptions = new BatchExportProcessorOptions<Activity>
+                {
+                    MaxQueueSize = 64,
+                    MaxExportBatchSize = 16
+                };
             });
         }));
         using var telemetry = new OpenTelemetryRuntimeTelemetry(
