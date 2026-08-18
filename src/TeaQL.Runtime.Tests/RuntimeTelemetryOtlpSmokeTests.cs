@@ -110,5 +110,8 @@ public class RuntimeTelemetryOtlpSmokeTests
         var completion = new Dictionary<string, object> { ["teaql.result.cardinality"] = 1 };
         if (family == "cache") completion["teaql.cache.result"] = "hit";
         scope.Success(completion);
+        var failedScope = telemetry.StartSafely(RuntimeOperation.Create(
+            family, $"{name}.failure", attributes));
+        failedScope.Failure(new InvalidOperationException("ConformanceProbeError"));
     }
 }
