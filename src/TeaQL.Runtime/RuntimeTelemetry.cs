@@ -9,6 +9,26 @@ using Microsoft.Extensions.Logging;
 
 namespace TeaQL.Runtime;
 
+public static class RuntimeErrorClassifier
+{
+    public static string Category(Exception error) => Category(error.GetType().Name);
+
+    public static string Category(string errorType)
+    {
+        var type = errorType.ToLowerInvariant();
+        if (Contains(type, "timeout", "deadline")) return "timeout";
+        if (Contains(type, "authentication", "authorization", "unauthorized", "forbidden", "permission")) return "authorization";
+        if (Contains(type, "validation", "invalidargument", "valueerror", "parse", "format")) return "validation";
+        if (Contains(type, "conflict", "optimistic", "version", "duplicate", "alreadyexists")) return "conflict";
+        if (Contains(type, "transport", "network", "connection", "socket", "http", "ioexception")) return "transport";
+        if (Contains(type, "provider", "sql", "database", "jdbc")) return "provider";
+        return "internal";
+    }
+
+    private static bool Contains(string value, params string[] candidates) =>
+        candidates.Any(value.Contains);
+}
+
 public sealed record RuntimeOperation(
     string Family,
     string Name,
@@ -244,12 +264,14 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
 
         public void Failure(Exception error)
         {
+            var category = RuntimeErrorClassifier.Category(error);
             _activity?.SetTag("teaql.error.type", error.GetType().Name);
+            _activity?.SetTag("teaql.error.category", category);
             _activity?.SetStatus(ActivityStatusCode.Error);
-            Finish("failure");
+            Finish("failure", category);
         }
 
-        private void Finish(string outcome)
+        private void Finish(string outcome, string? errorCategory = null)
         {
             var activity = System.Threading.Interlocked.Exchange(ref _activity, null);
             var tags = new TagList
@@ -261,8 +283,8 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
             _duration.Record(durationMs, tags);
             _operations.Add(1, tags);
             _logger?.LogInformation(
-                "TeaQL runtime operation completed: {teaql.operation.family} {teaql.operation.name} {teaql.operation.outcome} {teaql.operation.duration_ms}",
-                _operation.Family, _operation.Name, outcome, durationMs);
+                "TeaQL runtime operation completed: {teaql.operation.family} {teaql.operation.name} {teaql.operation.outcome} {teaql.operation.duration_ms} {teaql.error.category}",
+                _operation.Family, _operation.Name, outcome, durationMs, errorCategory);
             activity?.Stop();
         }
     }

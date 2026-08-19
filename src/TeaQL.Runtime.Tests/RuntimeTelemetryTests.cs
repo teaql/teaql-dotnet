@@ -17,6 +17,14 @@ namespace TeaQL.Runtime.Tests;
 public class RuntimeTelemetryTests
 {
     [Fact]
+    public void ClassifiesNativeErrorTypesWithoutInspectingMessages()
+    {
+        Assert.Equal("timeout", RuntimeErrorClassifier.Category("DatabaseTimeoutException"));
+        Assert.Equal("authorization", RuntimeErrorClassifier.Category("PermissionException"));
+        Assert.Equal("internal", RuntimeErrorClassifier.Category("UnknownTeaQLError"));
+    }
+
+    [Fact]
     public async Task LifecycleIsSafeBalancedAndFailOpen()
     {
         var events = new List<string>();
