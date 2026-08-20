@@ -31,6 +31,13 @@ public class UserContext
     
     public IServiceProvider? ServiceProvider { get; set; }
     public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = NoopRuntimeTelemetry.Instance;
+    public TeaQLLocale Locale { get; private set; } = TeaQLLocale.English;
+    public I18nCatalog I18nCatalog { get; private set; } = I18nCatalog.Builtin;
+
+    public UserContext SetLocaleCode(string code) { var locale = TeaQLLocales.Parse(code); Locale = locale; return this; }
+    public UserContext SetLanguageCode(string code) => SetLocaleCode(code);
+    public UserContext InstallI18nCatalog(I18nCatalog catalog) { I18nCatalog = catalog ?? throw new ArgumentNullException(nameof(catalog)); return this; }
+    public IReadOnlyList<CheckResult> TranslateCheckResults(IReadOnlyList<CheckResult> results) { foreach(var result in results) I18nCatalog.Translate(result, Locale); return results; }
 
     public UserContext()
     {
