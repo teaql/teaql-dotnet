@@ -17,9 +17,9 @@ public class TfpEndpointTelemetryTests
         var dataService = new StubDataService();
         var handler = new TfpEndpointHandler(dataService, telemetry);
 
-        var query = await handler.HandleQueryAsync("{\"entity\":\"Probe\",\"limitValue\":10}");
-        await handler.HandleMutationAsync(
-            "{\"entity\":\"Probe\",\"action\":\"Create\",\"payload\":{}}");
+        var query = await handler.HandleQueryAsync(Trusted(), QueryPayload());
+        await handler.HandleMutationAsync(Trusted(),
+            "{\"entity\":\"Probe\",\"action\":\"Create\",\"payload\":{},\"comment\":\"create probe\"}");
 
         Assert.Empty((List<Dictionary<string, object?>>)query["data"]);
         Assert.Collection(telemetry.Events,
@@ -40,7 +40,7 @@ public class TfpEndpointTelemetryTests
         var original = new InvalidOperationException("provider failed");
         dataService.Error = original;
         var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            handler.HandleQueryAsync("{\"entity\":\"Probe\"}"));
+            handler.HandleQueryAsync(Trusted(), QueryPayload()));
         Assert.Same(original, thrown);
         Assert.Same(original, telemetry.Events[^1].Error);
     }
@@ -56,7 +56,7 @@ public class TfpEndpointTelemetryTests
         const string traceId = "0af7651916cd43dd8448eb211c80319c";
         const string parentSpanId = "b7ad6b7169203331";
 
-        await handler.HandleQueryAsync("{\"entity\":\"Probe\"}",
+        await handler.HandleQueryAsync(Trusted(), QueryPayload(),
             new Dictionary<string, string>
             {
                 ["TraceParent"] = $"00-{traceId}-{parentSpanId}-01"
@@ -67,6 +67,47 @@ public class TfpEndpointTelemetryTests
         Assert.Equal(ActivityTraceId.CreateFromString(traceId), server.TraceId);
         Assert.Equal(ActivitySpanId.CreateFromString(parentSpanId), server.ParentSpanId);
     }
+
+    [Fact]
+    public async Task FailsClosedForMissingPolicyForbiddenFilterAndMutation()
+    {
+        var handler = new TfpEndpointHandler(new StubDataService());
+        var unauthorized = await Assert.ThrowsAsync<TfpEndpointException>(() =>
+            handler.HandleQueryAsync(QueryPayload()));
+        Assert.Equal("TFP_UNAUTHORIZED", unauthorized.Code);
+
+        var forbidden = await Assert.ThrowsAsync<TfpEndpointException>(() =>
+            handler.HandleQueryAsync(Trusted(),
+                "{\"entity\":\"Probe\",\"filterCondition\":{\"secret\":{\"$eq\":1}},\"commentText\":\"x\",\"purposeText\":\"x\"}"));
+        Assert.Equal("TFP_FORBIDDEN_FIELD", forbidden.Code);
+
+        var audit = await Assert.ThrowsAsync<TfpEndpointException>(() =>
+            handler.HandleMutationAsync(Trusted(),
+                "{\"entity\":\"Probe\",\"action\":\"Create\",\"payload\":{},\"comment\":\" \"}"));
+        Assert.Equal("TFP_AUDIT_REASON_REQUIRED", audit.Code);
+    }
+
+    private static string QueryPayload() =>
+        "{\"entity\":\"Probe\",\"limitValue\":10,\"commentText\":\"test query\",\"purposeText\":\"test\"}";
+
+    private static TrustedFederalContext Trusted() => new()
+    {
+        TenantField = "tenant_id",
+        TenantId = new Value.I64Value(7),
+        AuthenticatedUser = "tester",
+        ApprovedPurpose = "tests",
+        AllowedEntities = new HashSet<string> { "Probe" },
+        ReadableFields = new Dictionary<string, IReadOnlyDictionary<string, string>> {
+            ["Probe"] = new Dictionary<string, string> { ["id"] = "id" }
+        },
+        WritableFields = new Dictionary<string, IReadOnlyDictionary<string, string>> {
+            ["Probe"] = new Dictionary<string, string>()
+        },
+        AllowedActions = new Dictionary<string, ISet<string>> {
+            ["Probe"] = new HashSet<string> { "Create" }
+        },
+        MaxPageSize = 100
+    };
 
     private sealed class StubDataService : IDataService
     {
