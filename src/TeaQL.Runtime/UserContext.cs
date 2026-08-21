@@ -18,6 +18,7 @@ public class UserContext
     private static readonly object LocalLockGate = new();
     private static readonly Dictionary<string, LocalLockEntry> LocalLocks = new();
     public IMetadataStore? Metadata { get; set; }
+    public EntityRoot EntityRoot { get; } = new();
     public IEntityRegistry? EntityRegistry { get; set; }
     
     private readonly ConcurrentDictionary<Type, object> _typedResources = new();
