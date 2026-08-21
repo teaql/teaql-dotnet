@@ -34,6 +34,36 @@ public sealed class EntityRoot
         _changes.ToDictionary(item => item.Key,
             item => (IReadOnlyDictionary<string, Value>)new Dictionary<string, Value>(item.Value));
 
+    public IReadOnlyDictionary<string, Value> Change(EntityKey key) =>
+        _changes.TryGetValue(key, out var values)
+            ? new Dictionary<string, Value>(values)
+            : new Dictionary<string, Value>();
+
+    public void MergeFrom(EntityRoot other)
+    {
+        if (ReferenceEquals(this, other)) return;
+        foreach (var (key, values) in other.Changes())
+            foreach (var (field, value) in values) Set(key, field, value);
+        foreach (var key in other._newKeys.Keys) MarkAsNew(key);
+        foreach (var key in other._deletedKeys.Keys) MarkAsDeleted(key);
+        foreach (var (key, version) in other._originalVersions) SetOriginalVersion(key, version);
+    }
+
+    public void Rekey(EntityKey oldKey, EntityKey newKey)
+    {
+        if (oldKey == newKey) return;
+        if (_changes.TryRemove(oldKey, out var values))
+            foreach (var (field, value) in values) Set(newKey, field, value);
+        if (_originalVersions.TryRemove(oldKey, out var version)) _originalVersions[newKey] = version;
+        if (_newKeys.TryRemove(oldKey, out _)) _newKeys[newKey] = 0;
+        if (_deletedKeys.TryRemove(oldKey, out _)) _deletedKeys[newKey] = 0;
+    }
+
+    public void ClearEntity(EntityKey key)
+    {
+        _changes.TryRemove(key, out _); _newKeys.TryRemove(key, out _); _deletedKeys.TryRemove(key, out _);
+    }
+
     public void SetOriginalVersion(EntityKey key, long version) => _originalVersions[key] = version;
     public long? OriginalVersion(EntityKey key) => _originalVersions.TryGetValue(key, out var value) ? value : null;
     public void MarkAsNew(EntityKey key) => _newKeys[key] = 0;

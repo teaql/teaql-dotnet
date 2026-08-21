@@ -28,4 +28,16 @@ public class EntityRootTests
         Assert.False(root.IsNew(line));
         Assert.False(root.IsDeleted(line));
     }
+
+    [Fact]
+    public void MergesRekeysAndClearsOneEntity()
+    {
+        var child = new EntityRoot();
+        var temporary = new EntityKey("OrderLine", new Value.I64Value(-1));
+        var persisted = new EntityKey("OrderLine", new Value.I64Value(42));
+        child.MarkAsNew(temporary); child.Set(temporary, "quantity", new Value.I64Value(2));
+        var root = new EntityRoot(); root.MergeFrom(child); root.Rekey(temporary, persisted);
+        Assert.True(root.IsNew(persisted)); Assert.True(root.Change(persisted).ContainsKey("quantity"));
+        root.ClearEntity(persisted); Assert.False(root.IsNew(persisted)); Assert.Empty(root.Change(persisted));
+    }
 }
