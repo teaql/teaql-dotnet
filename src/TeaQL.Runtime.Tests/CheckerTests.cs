@@ -7,6 +7,15 @@ namespace TeaQL.Runtime.Tests;
 public class CheckerTests
 {
     [Fact]
+    public void ActiveRootIsTypedAndFailsClosed()
+    {
+        var context = new UserContext().WithActiveRoot("Tenant", 42);
+        Assert.Equal(new ContextEntityRef("Tenant", 42), context.RequireActiveRoot("Tenant"));
+        Assert.Throws<ContextRootException>(() => context.RequireActiveRoot("Organization"));
+        Assert.Throws<ContextRootException>(() => new UserContext().RequireActiveRoot("Tenant"));
+    }
+
+    [Fact]
     public async Task CheckerFailureIsStructuredSaveScopedAndPrecedesProvider()
     {
         var provider = new CountingDataService();

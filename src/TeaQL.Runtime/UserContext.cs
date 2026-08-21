@@ -11,6 +11,7 @@ namespace TeaQL.Runtime;
 
 public class UserContext
 {
+    private const string ActiveRootResource = "teaql.activeRoot";
     private sealed record LocalCacheEntry(object Value, DateTimeOffset? ExpiresAt);
     private static readonly ConcurrentDictionary<string, LocalCacheEntry> LocalCache = new();
     private sealed record LocalLockEntry(UserContext Owner, DateTimeOffset? ExpiresAt);
@@ -91,6 +92,23 @@ public class UserContext
             throw new ArgumentException("A trusted tenant is required", nameof(tenant));
         InsertNamedResource("trustedTenant", tenant);
         return this;
+    }
+
+    public UserContext WithActiveRoot(string entityType, long id)
+    {
+        if (string.IsNullOrWhiteSpace(entityType)) throw new ArgumentException("Active root entity type is required", nameof(entityType));
+        if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id), "Active root id must be positive");
+        InsertNamedResource(ActiveRootResource, new ContextEntityRef(entityType, id));
+        return this;
+    }
+
+    public ContextEntityRef RequireActiveRoot(string expectedEntityType)
+    {
+        if (!_namedResources.TryGetValue(ActiveRootResource, out var value) || value is not ContextEntityRef root)
+            throw new ContextRootException(expectedEntityType, null, "Active root is missing from UserContext");
+        if (!string.Equals(root.EntityType, expectedEntityType, StringComparison.Ordinal))
+            throw new ContextRootException(expectedEntityType, root, $"Active root type is {root.EntityType}, expected {expectedEntityType}");
+        return root;
     }
 
     public SelectQuery ApplyRequestPolicy(SelectQuery query) =>
