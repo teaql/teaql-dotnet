@@ -24,6 +24,7 @@ public class UserContext
     private readonly ConcurrentDictionary<string, Value> _locals = new();
     private readonly ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
     private readonly ConcurrentBag<object> _managedEntities = new();
+    private readonly ConcurrentDictionary<string, IEntityChecker> _checkers = new();
     
     public string TraceId { get; set; }
     public string? UserIdentifier { get; set; }
@@ -136,6 +137,32 @@ public class UserContext
 
     /// <summary>Installs a passive runtime manifest. Schema changes remain explicit.</summary>
     public UserContext Install(RuntimeModule module) => WithModule(module);
+
+    internal void InstallCheckers(IReadOnlyDictionary<string, IEntityChecker> checkers)
+    {
+        foreach (var checker in checkers) _checkers[checker.Key] = checker.Value;
+    }
+
+    internal void CheckAndFix(MutationRequest request)
+    {
+        if (request is BatchMutationRequest batch)
+        {
+            foreach (var item in batch.Requests) CheckAndFix(item);
+            return;
+        }
+        var entity = request switch
+        {
+            InsertMutationRequest insert => insert.Command.Entity,
+            UpdateMutationRequest update => update.Command.Entity,
+            DeleteMutationRequest delete => delete.Command.Entity,
+            RecoverMutationRequest recover => recover.Command.Entity,
+            _ => ""
+        };
+        if (!_checkers.TryGetValue(entity, out var checker)) return;
+        var violations = checker.CheckAndFix(this, request, DateTimeOffset.UtcNow).ToList();
+        TranslateCheckResults(violations);
+        if (violations.Count != 0) throw new CheckException(violations);
+    }
 
     public UserContext RegisterEntityInitializer(string entityName, Action<UserContext, object> initializer)
     {

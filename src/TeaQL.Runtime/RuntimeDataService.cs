@@ -37,6 +37,7 @@ public sealed class RuntimeDataService : IDataService
 
     public Task<MutationResult> MutateAsync(MutationRequest request)
     {
+        _context.CheckAndFix(request);
         var entity = EntityName(request);
         return _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("mutation", $"{entity}.mutate",

@@ -21,6 +21,12 @@ public sealed class CheckResult
     public object? InputValue {get;init;} public object? SystemValue {get;init;} public string? Message {get;set;}
 }
 
+public sealed class CheckException(IReadOnlyList<CheckResult> violations)
+    : Exception("Check failed: " + string.Join("; ", violations.Select(x => x.Message ?? $"{x.RuleId}:{x.Location}")))
+{
+    public IReadOnlyList<CheckResult> Violations { get; } = violations;
+}
+
 public sealed class I18nCatalog
 {
     private sealed record LocaleData(Dictionary<string,string> Messages, Dictionary<string,string> Vocabulary);
