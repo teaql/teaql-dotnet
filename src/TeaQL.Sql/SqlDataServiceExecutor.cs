@@ -15,7 +15,7 @@ public class SqlExecutorException : Exception
     public SqlExecutorException(string message, Exception innerException) : base(message, innerException) { }
 }
 
-public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStreamQueryExecutor
+public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStreamQueryExecutor, IIdGeneratorExecutor
 {
     public SqlDialect Dialect { get; }
     public ISqlTransport Transport { get; }
@@ -34,7 +34,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         Mutation = true,
         Transaction = Transport is ISqlTransactionTransport,
         Schema = false,
-        IdGeneration = false,
+        IdGeneration = true,
         BatchMutation = true,
         Returning = false
     };
@@ -160,6 +160,14 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         var entityDesc = SchemaProvider.GetEntity(entityName)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {entityName}");
 
+        if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
+        {
+            if (!allocationInsert.Command.Values.TryGetValue(allocationId.Name, out var explicitId))
+                allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(await NextIdAsync(entityName));
+            else
+                await EnsureIdFloorAsync(entityName, OptimisticIdSpace.Floor(explicitId, entityName));
+        }
+
         CompiledQuery compiled;
         try
         {
@@ -241,6 +249,12 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
         return new SqlDataServiceTransaction(Dialect, tx, SchemaProvider);
     }
+
+    public Task<ulong> NextIdAsync(string entity) =>
+        OptimisticIdSpace.NextIdAsync(Transport, Dialect, entity);
+
+    public Task EnsureIdFloorAsync(string entity, ulong floor) =>
+        OptimisticIdSpace.EnsureFloorAsync(Transport, Dialect, entity, floor);
 
     public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -378,7 +392,7 @@ internal static class RelationQueryLoader
     }
 }
 
-public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
+public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IIdGeneratorExecutor
 {
     public SqlDialect Dialect { get; }
     public ISqlTransaction Transport { get; }
@@ -397,7 +411,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
         Mutation = true,
         Transaction = false,
         Schema = false,
-        IdGeneration = false,
+        IdGeneration = true,
         BatchMutation = true,
         Returning = false
     };
@@ -506,6 +520,14 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
         var entityDesc = SchemaProvider.GetEntity(entityName)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {entityName}");
 
+        if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
+        {
+            if (!allocationInsert.Command.Values.TryGetValue(allocationId.Name, out var explicitId))
+                allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(await NextIdAsync(entityName));
+            else
+                await EnsureIdFloorAsync(entityName, OptimisticIdSpace.Floor(explicitId, entityName));
+        }
+
         CompiledQuery compiled;
         try
         {
@@ -599,6 +621,12 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
     }
+
+    public Task<ulong> NextIdAsync(string entity) =>
+        OptimisticIdSpace.NextIdAsync(Transport, Dialect, entity);
+
+    public Task EnsureIdFloorAsync(string entity, ulong floor) =>
+        OptimisticIdSpace.EnsureFloorAsync(Transport, Dialect, entity, floor);
 
     public async Task RollbackAsync()
     {

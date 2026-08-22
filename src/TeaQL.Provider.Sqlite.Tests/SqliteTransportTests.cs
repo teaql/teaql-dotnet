@@ -29,6 +29,43 @@ namespace TeaQL.Provider.Sqlite.Tests
         }
 
         [Fact]
+        public async Task OptimisticIdSpaceIsSharedAcrossExecutors()
+        {
+            var path = Path.Combine(Path.GetTempPath(), $"teaql-id-space-{Guid.NewGuid():N}.db");
+            try
+            {
+                await using var firstConnection = new SqliteConnection($"Data Source={path};Default Timeout=5");
+                await using var secondConnection = new SqliteConnection($"Data Source={path};Default Timeout=5");
+                await firstConnection.OpenAsync();
+                await secondConnection.OpenAsync();
+                var first = new SqlDataServiceExecutor(
+                    new SqliteDialect(), new SqliteTransport(firstConnection), new EmptySchemaProvider());
+                var second = new SqlDataServiceExecutor(
+                    new SqliteDialect(), new SqliteTransport(secondConnection), new EmptySchemaProvider());
+
+                Assert.Equal(1ul, await first.NextIdAsync("Order"));
+                Assert.Equal(2ul, await second.NextIdAsync("Order"));
+                Assert.Equal(1ul, await first.NextIdAsync("Customer"));
+                await first.EnsureIdFloorAsync("SeededType", 1001);
+                Assert.Equal(1002ul, await second.NextIdAsync("SeededType"));
+                var tasks = Enumerable.Range(0, 20)
+                    .Select(index => (index % 2 == 0 ? first : second).NextIdAsync("Order"));
+                var ids = (await Task.WhenAll(tasks)).OrderBy(value => value).ToArray();
+                Assert.Equal(Enumerable.Range(3, 20).Select(value => (ulong)value), ids);
+                Assert.Equal(20, ids.Distinct().Count());
+            }
+            finally
+            {
+                if (File.Exists(path)) File.Delete(path);
+            }
+        }
+
+        private sealed class EmptySchemaProvider : ISchemaProvider
+        {
+            public EntityDescriptor? GetEntity(string name) => null;
+        }
+
+        [Fact]
         public async Task ExecuteSqlAsync_ReturnsAffectedRows()
         {
             var create = new CompiledQuery("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)", new List<Value>());

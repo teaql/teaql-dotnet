@@ -196,4 +196,5 @@ public interface ISchemaExecutor : IDataService
 public interface IIdGeneratorExecutor : IDataService
 {
     Task<ulong> NextIdAsync(string entity);
+    Task EnsureIdFloorAsync(string entity, ulong floor);
 }
