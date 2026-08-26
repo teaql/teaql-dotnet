@@ -301,7 +301,9 @@ namespace TeaQL.Core
         public Task EnsureSchemaAsync()
         {
             if (_runtimeModule == null) throw new InvalidOperationException("Install a RuntimeModule before EnsureSchemaAsync().");
-            return RequireDataService().EnsureSchemaAsync(_runtimeModule);
+            if (RequireDataService() is not ISchemaExecutor schema)
+                throw new NotSupportedException("The configured DataService does not support schema reconciliation.");
+            return schema.EnsureSchemaAsync(_runtimeModule);
         }
         private IReadOnlyDictionary<string, IEntityChecker> _checkers = new Dictionary<string, IEntityChecker>();
         public void CheckAndFix(MutationRequest request) {
@@ -409,9 +411,12 @@ namespace TeaQL.Core
     }
     public interface IDataService
     {
-        Task EnsureSchemaAsync(RuntimeModule module);
         Task<QueryResult> QueryAsync(UserContext context, QueryRequest req);
         Task<object> MutateAsync(UserContext context, MutationRequest req);
+    }
+    internal interface ISchemaExecutor
+    {
+        Task EnsureSchemaAsync(RuntimeModule module);
     }
 
     public sealed class StreamChunk
@@ -432,7 +437,7 @@ namespace TeaQL.Core
             CancellationToken cancellationToken = default);
     }
 
-    public class JsonFileDataService : IDataService
+    public class JsonFileDataService : IDataService, ISchemaExecutor
     {
         private readonly string _path;
         private readonly object _gate = new object();
@@ -452,7 +457,7 @@ namespace TeaQL.Core
                 : new StoreState();
         }
 
-        public Task EnsureSchemaAsync(RuntimeModule module) => throw new NotSupportedException(
+        Task ISchemaExecutor.EnsureSchemaAsync(RuntimeModule module) => throw new NotSupportedException(
             "EnsureSchemaAsync is only supported by a schema-aware database provider; JsonFileDataService has no database schema.");
 
         public async Task<object> MutateAsync(UserContext context, MutationRequest req)
@@ -604,7 +609,7 @@ namespace TeaQL.Core
         private void Persist() { var directory = Path.GetDirectoryName(Path.GetFullPath(_path)); if (directory != null) Directory.CreateDirectory(directory); var temporary = _path + ".tmp"; File.WriteAllText(temporary, JsonSerializer.Serialize(_state)); File.Move(temporary, _path, true); }
     }
 
-    public abstract class AdoNetSqlDataService : IDataService, IAsyncDisposable
+    public abstract class AdoNetSqlDataService : IDataService, ISchemaExecutor, IAsyncDisposable
     {
         protected abstract DbConnection CreateConnection();
         protected abstract string QuoteSafeIdentifier(string identifier);
@@ -618,7 +623,7 @@ namespace TeaQL.Core
 
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-        public async Task EnsureSchemaAsync(RuntimeModule module)
+        async Task ISchemaExecutor.EnsureSchemaAsync(RuntimeModule module)
         {
             foreach (var entity in module.Entities)
             {
