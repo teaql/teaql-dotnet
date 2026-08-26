@@ -35,7 +35,7 @@ namespace TeaQL.Sql.Tests
             Assert.True(caps.Query);
             Assert.True(caps.Mutation);
             Assert.True(caps.Transaction);
-            Assert.False(caps.Schema);
+            Assert.True(caps.Schema);
         }
 
         [Fact]

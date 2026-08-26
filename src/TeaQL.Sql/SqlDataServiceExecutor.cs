@@ -15,7 +15,7 @@ public class SqlExecutorException : Exception
     public SqlExecutorException(string message, Exception innerException) : base(message, innerException) { }
 }
 
-public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStreamQueryExecutor, IIdGeneratorExecutor
+public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStreamQueryExecutor, IIdGeneratorExecutor, ISchemaExecutor
 {
     public SqlDialect Dialect { get; }
     public ISqlTransport Transport { get; }
@@ -33,11 +33,24 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         Query = true,
         Mutation = true,
         Transaction = Transport is ISqlTransactionTransport,
-        Schema = false,
+        Schema = true,
         IdGeneration = true,
         BatchMutation = true,
         Returning = false
     };
+
+    public async Task<SchemaResult> EnsureSchemaAsync(SchemaRequest request)
+    {
+        var entity = SchemaProvider.GetEntity(request.EntityName)
+            ?? throw new SqlExecutorException($"SQL schema error: unknown entity {request.EntityName}");
+        foreach (var statement in Dialect.SchemaSetupSqls())
+            await Transport.ExecuteSqlAsync(new CompiledQuery(statement, new List<Value>()));
+        await Transport.ExecuteSqlAsync(new CompiledQuery(
+            Dialect.CompileCreateTable(entity), new List<Value>()));
+        foreach (var statement in Dialect.SchemaIndexesSqls(entity))
+            await Transport.ExecuteSqlAsync(new CompiledQuery(statement, new List<Value>()));
+        return new SchemaResult { Changed = true };
+    }
 
     public async Task<QueryResult> QueryAsync(QueryRequest request)
     {

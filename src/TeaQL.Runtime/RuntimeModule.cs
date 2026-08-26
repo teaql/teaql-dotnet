@@ -9,6 +9,11 @@ public class RuntimeModule
     public InMemoryMetadataStore Metadata { get; } = new();
     public InMemoryEntityRegistry EntityRegistry { get; } = new();
     internal Dictionary<string, IEntityChecker> Checkers { get; } = new();
+    internal List<BootstrapEntity> RootEntities { get; } = new();
+    internal List<BootstrapEntity> ConstantEntities { get; } = new();
+
+    public RuntimeModule RootEntity(BootstrapEntity entity) { RootEntities.Add(entity); return this; }
+    public RuntimeModule ConstantEntity(BootstrapEntity entity) { ConstantEntities.Add(entity); return this; }
 
     public RuntimeModule Checker(string entity, IEntityChecker checker)
     {
@@ -31,6 +36,10 @@ public class RuntimeModule
         foreach (var descriptor in other.Metadata.GetAllEntities()) combined.Entity(descriptor);
         foreach (var checker in Checkers) combined.Checker(checker.Key, checker.Value);
         foreach (var checker in other.Checkers) combined.Checker(checker.Key, checker.Value);
+        combined.RootEntities.AddRange(RootEntities);
+        combined.RootEntities.AddRange(other.RootEntities);
+        combined.ConstantEntities.AddRange(ConstantEntities);
+        combined.ConstantEntities.AddRange(other.ConstantEntities);
         return combined;
     }
 
@@ -39,6 +48,7 @@ public class RuntimeModule
         context.Metadata = Metadata;
         context.EntityRegistry = EntityRegistry;
         context.InstallCheckers(Checkers);
+        context.InstallBootstrapEntities(RootEntities, ConstantEntities);
     }
 
     public UserContext IntoContext()
@@ -48,6 +58,8 @@ public class RuntimeModule
         return context;
     }
 }
+
+public sealed record BootstrapEntity(string Entity, long Id, Record Values);
 
 public interface IEntityChecker
 {

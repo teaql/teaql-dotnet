@@ -146,6 +146,57 @@ public class UserContext
         var metadata = Metadata ?? throw new InvalidOperationException("Missing metadata");
         foreach (var entity in metadata.GetAllEntities())
             await provider.EnsureSchemaAsync(new SchemaRequest { EntityName = entity.Name });
+        await EnsureBootstrapEntitiesAsync(provider);
+    }
+
+    private IReadOnlyList<BootstrapEntity> _rootEntities = Array.Empty<BootstrapEntity>();
+    private IReadOnlyList<BootstrapEntity> _constantEntities = Array.Empty<BootstrapEntity>();
+
+    internal void InstallBootstrapEntities(
+        IReadOnlyList<BootstrapEntity> roots, IReadOnlyList<BootstrapEntity> constants)
+    {
+        _rootEntities = roots.ToArray();
+        _constantEntities = constants.ToArray();
+    }
+
+    private async Task EnsureBootstrapEntitiesAsync(ISchemaExecutor provider)
+    {
+        foreach (var seed in _rootEntities.Select(value => (value, false))
+                     .Concat(_constantEntities.Select(value => (value, true))))
+        {
+            var query = new SelectQuery(seed.value.Entity)
+                .Filter(Expr.Eq("id", new Value.I64Value(seed.value.Id)))
+                .Limit(1);
+            var rows = (await provider.QueryAsync(new QueryRequest { Query = query })).Rows;
+            if (rows.Count == 0)
+            {
+                var values = new Record(seed.value.Values)
+                {
+                    ["id"] = new Value.I64Value(seed.value.Id),
+                    ["version"] = new Value.I64Value(1)
+                };
+                await provider.MutateAsync(new InsertMutationRequest(
+                    new InsertCommand(seed.value.Entity) { Values = values }));
+            }
+            else if (seed.Item2)
+            {
+                var changed = new Record();
+                foreach (var pair in seed.value.Values)
+                    if (pair.Key != "id" && (!rows[0].TryGetValue(pair.Key, out var current)
+                        || !Equals(current, pair.Value))) changed[pair.Key] = pair.Value;
+                if (changed.Count > 0)
+                {
+                    var version = rows[0]["version"].TryI64()
+                        ?? throw new InvalidOperationException("Bootstrap row has no numeric version");
+                    await provider.MutateAsync(new UpdateMutationRequest(
+                        new UpdateCommand(seed.value.Entity, new Value.I64Value(seed.value.Id))
+                        { Values = changed }.ExpectedVersion(version)));
+                }
+            }
+            if (provider is not IIdGeneratorExecutor ids)
+                throw new NotSupportedException("Schema provider does not support ID floor synchronization");
+            await ids.EnsureIdFloorAsync(seed.value.Entity, checked((ulong)seed.value.Id));
+        }
     }
 
     public UserContext WithModule(RuntimeModule module)
