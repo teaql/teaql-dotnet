@@ -84,7 +84,8 @@ namespace TeaQL.Provider.Sqlite.Tests
             var executor = new SqlDataServiceExecutor(
                 new SqliteDialect(), _transport, new ModuleSchemaProvider(module));
             var context = module.IntoContext();
-            context.InsertResource<ISchemaExecutor>(executor);
+            context.WithDataService(executor);
+            Assert.Null(typeof(SqlDataServiceExecutor).GetMethod("EnsureSchemaAsync"));
 
             await context.EnsureSchemaAsync();
             await executor.MutateAsync(new UpdateMutationRequest(

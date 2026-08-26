@@ -66,6 +66,8 @@ public class UserContext
     public UserContext WithDataService(IDataService provider)
     {
         InsertResource<IDataService>(new RuntimeDataService(provider, this));
+        if (provider is ISchemaExecutor schemaExecutor)
+            InsertResource<ISchemaExecutor>(schemaExecutor);
         return this;
     }
 

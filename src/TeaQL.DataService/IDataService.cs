@@ -178,17 +178,17 @@ public interface ITransactionExecutor : IDataService
     Task<ITransaction> BeginTransactionAsync();
 }
 
-public class SchemaRequest
+internal class SchemaRequest
 {
     public string EntityName { get; set; } = string.Empty;
 }
 
-public class SchemaResult
+internal class SchemaResult
 {
     public bool Changed { get; set; }
 }
 
-public interface ISchemaExecutor : IDataService
+internal interface ISchemaExecutor : IDataService
 {
     Task<SchemaResult> EnsureSchemaAsync(SchemaRequest request);
 }

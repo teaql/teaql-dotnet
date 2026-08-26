@@ -39,7 +39,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         Returning = false
     };
 
-    public async Task<SchemaResult> EnsureSchemaAsync(SchemaRequest request)
+    async Task<SchemaResult> ISchemaExecutor.EnsureSchemaAsync(SchemaRequest request)
     {
         var entity = SchemaProvider.GetEntity(request.EntityName)
             ?? throw new SqlExecutorException($"SQL schema error: unknown entity {request.EntityName}");
