@@ -29,7 +29,10 @@ public class CheckerTests
         for (var attempt = 0; attempt < 2; attempt++)
         {
             var error = await Assert.ThrowsAsync<CheckException>(() => service.MutateAsync(request));
-            Assert.Equal("name", Assert.Single(error.Violations).Location);
+            var violation = Assert.Single(error.Violations);
+            Assert.Equal("name", violation.ModelPath);
+            Assert.Equal("Name", violation.NativePath);
+            Assert.Equal("/name", violation.InstancePath);
         }
         Assert.Equal(2, checker.Calls);
         Assert.Equal(0, provider.MutationCalls);
@@ -44,7 +47,7 @@ public class CheckerTests
             Calls++;
             var insert = Assert.IsType<InsertMutationRequest>(mutation);
             return insert.Command.Values.ContainsKey("name")
-                ? [] : [new CheckResult { RuleId = "required", Location = "name" }];
+                ? [] : [new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") }];
         }
     }
 

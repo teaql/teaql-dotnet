@@ -17,7 +17,10 @@ public static class TeaQLLocales
 
 public sealed class CheckResult
 {
-    public required string RuleId {get;init;} public required string Location {get;init;}
+    public required string RuleId {get;init;} public required ObjectLocation Location {get;init;}
+    public string ModelPath => Location.ModelPath;
+    public string NativePath => Location.NativePath;
+    public string InstancePath => Location.InstancePath;
     public object? InputValue {get;init;} public object? SystemValue {get;init;} public string? Message {get;set;}
 }
 
@@ -37,5 +40,5 @@ public sealed class I18nCatalog
     public static I18nCatalog FromJson(Stream stream,I18nCatalog? fallback=null){using var doc=JsonDocument.Parse(stream);if(doc.RootElement.GetProperty("schema").GetString()!="teaql.i18n/v1")throw new ArgumentException("Unsupported i18n schema");var locales=new Dictionary<string,LocaleData>();foreach(var locale in doc.RootElement.GetProperty("locales").EnumerateObject()){var code=TeaQLLocales.Parse(locale.Name).Code();var messages=locale.Value.GetProperty("messages").EnumerateObject().ToDictionary(x=>x.Name,x=>x.Value.GetString()!);var vocabulary=locale.Value.GetProperty("vocabulary").EnumerateObject().ToDictionary(x=>x.Name,x=>x.Value.GetString()!);locales[code]=new(messages,vocabulary);}return new(locales,fallback);}
     private string? Find(string code,string key)=>_locales.TryGetValue(code,out var locale)&&locale.Messages.TryGetValue(key,out var value)?value:null;
     public string Message(TeaQLLocale locale,string key)=>Find(locale.Code(),key)??_fallback?.Find(locale.Code(),key)??Find("en",key)??_fallback?.Find("en",key)??key;
-    public CheckResult Translate(CheckResult result,TeaQLLocale locale){var keys=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase){{"required","checker.required"},{"min","checker.min"},{"max","checker.max"},{"min_str_len","checker.minLength"},{"min_length","checker.minLength"},{"max_str_len","checker.maxLength"},{"max_length","checker.maxLength"}};var key=keys.TryGetValue(result.RuleId,out var found)?found:$"checker.{result.RuleId.ToLowerInvariant()}";var input=result.InputValue?.ToString()??"null";result.Message=Message(locale,key).Replace("{location}",result.Location).Replace("{system}",result.SystemValue?.ToString()??"null").Replace("{input}",input).Replace("{input_len}",input.Length.ToString());return result;}
+    public CheckResult Translate(CheckResult result,TeaQLLocale locale){var keys=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase){{"required","checker.required"},{"min","checker.min"},{"max","checker.max"},{"min_str_len","checker.minLength"},{"min_length","checker.minLength"},{"max_str_len","checker.maxLength"},{"max_length","checker.maxLength"}};var key=keys.TryGetValue(result.RuleId,out var found)?found:$"checker.{result.RuleId.ToLowerInvariant()}";var input=result.InputValue?.ToString()??"null";result.Message=Message(locale,key).Replace("{location}",result.NativePath).Replace("{system}",result.SystemValue?.ToString()??"null").Replace("{input}",input).Replace("{input_len}",input.Length.ToString());return result;}
 }
