@@ -63,7 +63,8 @@ try
         ("date range", Q.Schools().WithEstablishedDateBetween(new DateTime(1995, 1, 1), new DateTime(1995, 12, 31)), 1),
         ("known", Q.Schools().WithAddressIsKnown(), 1),
         ("unknown", Q.Schools().WithAddressIsUnknown(), 0),
-        ("boolean", Q.Schools().WhichAreActive(), 1),
+        ("boolean true", Q.Schools().WhichAreActive(), 1),
+        ("boolean false", Q.Schools().WhichAreNotActive(), 0),
         ("constant relation", Q.Schools().WithSchoolTypeIsPrimary(), 1),
     };
     foreach (var (label, request, expected) in queryCases)
