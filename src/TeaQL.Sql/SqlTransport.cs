@@ -12,6 +12,11 @@ public interface ISqlTransport
     Task<ulong> ExecuteSqlAsync(CompiledQuery query);
 }
 
+public interface ISchemaConnectionInitializer
+{
+    Task EnsureSchemaFunctionsAsync();
+}
+
 public interface IStreamingSqlTransport : ISqlTransport
 {
     IAsyncEnumerable<Record> StreamSqlAsync(CompiledQuery query, CancellationToken cancellationToken = default);

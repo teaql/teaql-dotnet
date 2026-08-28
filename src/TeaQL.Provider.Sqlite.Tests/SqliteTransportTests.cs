@@ -88,6 +88,16 @@ namespace TeaQL.Provider.Sqlite.Tests
             Assert.Null(typeof(SqlDataServiceExecutor).GetMethod("EnsureSchemaAsync"));
 
             await context.EnsureSchemaAsync();
+            await context.EnsureSchemaAsync();
+            using (var soundex = _connection.CreateCommand())
+            {
+                soundex.CommandText = "SELECT soundex('Robert'), soundex('Robert') = soundex('Rupert'), soundex(NULL)";
+                using var reader = await soundex.ExecuteReaderAsync();
+                Assert.True(await reader.ReadAsync());
+                Assert.Equal("R163", reader.GetString(0));
+                Assert.Equal(1L, reader.GetInt64(1));
+                Assert.Equal("?000", reader.GetString(2));
+            }
             await executor.MutateAsync(new UpdateMutationRequest(
                 new UpdateCommand("Platform", new Value.I64Value(1))
                     .Value("name", new Value.TextValue("Customer Name"))));

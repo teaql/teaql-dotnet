@@ -41,6 +41,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
     async Task<SchemaResult> ISchemaExecutor.EnsureSchemaAsync(SchemaRequest request)
     {
+        if (Transport is ISchemaConnectionInitializer initializer)
+            await initializer.EnsureSchemaFunctionsAsync();
         var entity = SchemaProvider.GetEntity(request.EntityName)
             ?? throw new SqlExecutorException($"SQL schema error: unknown entity {request.EntityName}");
         foreach (var statement in Dialect.SchemaSetupSqls())

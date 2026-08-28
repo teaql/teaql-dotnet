@@ -9,13 +9,43 @@ using TeaQL.Sql;
 
 namespace TeaQL.Provider.Sqlite;
 
-public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport
+public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport, ISchemaConnectionInitializer
 {
     private readonly SqliteConnection _connection;
 
     public SqliteTransport(SqliteConnection connection)
     {
         _connection = connection;
+    }
+
+    public Task EnsureSchemaFunctionsAsync()
+    {
+        _connection.CreateFunction<string?, string>("soundex", Soundex, isDeterministic: true);
+        return Task.CompletedTask;
+    }
+
+    private static string Soundex(string? value)
+    {
+        if (value is null) return "?000";
+        var letters = value.ToUpperInvariant().Where(c => c is >= 'A' and <= 'Z').ToArray();
+        if (letters.Length == 0) return "?000";
+        static char Code(char c) => c switch
+        {
+            'B' or 'F' or 'P' or 'V' => '1',
+            'C' or 'G' or 'J' or 'K' or 'Q' or 'S' or 'X' or 'Z' => '2',
+            'D' or 'T' => '3', 'L' => '4', 'M' or 'N' => '5', 'R' => '6', _ => '0'
+        };
+        var result = new List<char> { letters[0] };
+        var previous = Code(letters[0]);
+        foreach (var letter in letters.Skip(1))
+        {
+            var current = Code(letter);
+            if (current != '0' && current != previous) result.Add(current);
+            if (result.Count == 4) break;
+            previous = current;
+        }
+        while (result.Count < 4) result.Add('0');
+        return new string(result.ToArray());
     }
 
     public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
