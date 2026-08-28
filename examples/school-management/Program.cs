@@ -74,6 +74,15 @@ try
             .ExecuteForListAsync(context);
         Require(result.Count == expected, $"{label}: expected {expected}, got {result.Count}");
     }
+    var related = await Q.Schools().WithNameIs("Riverside Primary School")
+        .SelectPlatformWith(Q.PlatformsWithMinimalFields().SelectName())
+        .SelectSchoolTypeWith(Q.SchoolTypesWithMinimalFields().SelectCode())
+        .Comment("Query parity: typed forward relations")
+        .Purpose("Execute the shared School Query conformance case")
+        .ExecuteForOneAsync(context);
+    Require(related?.PlatformEntity?.Name == "Campus Learning Platform"
+            && related.SchoolTypeEntity?.Code == "PRIMARY",
+        "Typed forward relation query did not hydrate Platform and SchoolType");
     var projected = await Q.Schools().SelectName().OrderByIdDescending()
         .Comment("Query parity: projection and ordering")
         .Purpose("Execute the shared School Query conformance case")
