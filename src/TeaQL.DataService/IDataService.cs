@@ -37,6 +37,7 @@ public class QueryResult
 {
     public List<Record> Rows { get; set; } = new();
     public ExecutionMetadata Metadata { get; set; } = new();
+    public Dictionary<string, SmartList<Record>> Facets { get; set; } = new();
 }
 
 public abstract class MutationRequest
