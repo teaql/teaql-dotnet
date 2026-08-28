@@ -137,9 +137,27 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithIdIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("id", val));
+                    return this;
+                }
+
                 public PlatformRequest WithIdIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("id", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithIdNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("id", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithIdGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("id", val));
                     return this;
                 }
 
@@ -149,9 +167,33 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithIdLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("id", val));
+                    return this;
+                }
+
                 public PlatformRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", val));
+                    return this;
+                }
+
+                public PlatformRequest WithIdBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("id", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithIdIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("id"));
+                    return this;
+                }
+
+                public PlatformRequest WithIdIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("id"));
                     return this;
                 }
 
@@ -166,10 +208,92 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", val));
                     return this;
                 }
+                public PlatformRequest WithNameIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("name", val));
+                    return this;
+                }
 
                 public PlatformRequest WithNameIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("name", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithNameNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("name", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithNameGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("name", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithNameIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("name"));
+                    return this;
+                }
+
+                public PlatformRequest WithNameIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("name"));
+                    return this;
+                }
+                public PlatformRequest WithNameNotContaining(string val)
+                {
+                    _query.AndFilter(Expr.NotContain("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.BeginWith("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameNotStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.EndWith("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameNotEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotEndWith("name", val));
                     return this;
                 }
 
@@ -184,10 +308,92 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("base_url", val));
                     return this;
                 }
+                public PlatformRequest WithBaseUrlIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("base_url", val));
+                    return this;
+                }
 
                 public PlatformRequest WithBaseUrlIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("base_url", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("base_url", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("base_url", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("base_url"));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("base_url"));
+                    return this;
+                }
+                public PlatformRequest WithBaseUrlNotContaining(string val)
+                {
+                    _query.AndFilter(Expr.NotContain("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.BeginWith("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlNotStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotBeginWith("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.EndWith("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlNotEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotEndWith("base_url", val));
                     return this;
                 }
 
@@ -197,9 +403,27 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithCreateTimeIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("create_time", val));
+                    return this;
+                }
+
                 public PlatformRequest WithCreateTimeIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("create_time", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithCreateTimeNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("create_time", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithCreateTimeGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("create_time", val));
                     return this;
                 }
 
@@ -209,9 +433,33 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithCreateTimeLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("create_time", val));
+                    return this;
+                }
+
                 public PlatformRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("create_time", val));
+                    return this;
+                }
+
+                public PlatformRequest WithCreateTimeBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("create_time", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithCreateTimeIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("create_time"));
+                    return this;
+                }
+
+                public PlatformRequest WithCreateTimeIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("create_time"));
                     return this;
                 }
 
@@ -221,9 +469,27 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithUpdateTimeIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("update_time", val));
+                    return this;
+                }
+
                 public PlatformRequest WithUpdateTimeIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("update_time", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithUpdateTimeNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("update_time", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithUpdateTimeGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("update_time", val));
                     return this;
                 }
 
@@ -233,9 +499,33 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithUpdateTimeLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("update_time", val));
+                    return this;
+                }
+
                 public PlatformRequest WithUpdateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("update_time", val));
+                    return this;
+                }
+
+                public PlatformRequest WithUpdateTimeBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("update_time", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithUpdateTimeIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("update_time"));
+                    return this;
+                }
+
+                public PlatformRequest WithUpdateTimeIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("update_time"));
                     return this;
                 }
 
@@ -245,9 +535,27 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithVersionIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("version", val));
+                    return this;
+                }
+
                 public PlatformRequest WithVersionIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("version", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("version", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("version", val));
                     return this;
                 }
 
@@ -257,9 +565,33 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithVersionLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("version", val));
+                    return this;
+                }
+
                 public PlatformRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("version", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("version"));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("version"));
                     return this;
                 }
 

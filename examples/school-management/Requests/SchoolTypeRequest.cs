@@ -154,9 +154,27 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public SchoolTypeRequest WithIdIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("id", val));
+                    return this;
+                }
+
                 public SchoolTypeRequest WithIdIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("id", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithIdNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("id", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithIdGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("id", val));
                     return this;
                 }
 
@@ -166,9 +184,33 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public SchoolTypeRequest WithIdLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("id", val));
+                    return this;
+                }
+
                 public SchoolTypeRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithIdBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("id", lower, upper));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithIdIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("id"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithIdIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("id"));
                     return this;
                 }
 
@@ -183,10 +225,92 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", val));
                     return this;
                 }
+                public SchoolTypeRequest WithNameIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("name", val));
+                    return this;
+                }
 
                 public SchoolTypeRequest WithNameIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("name", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("name", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("name", lower, upper));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("name"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("name"));
+                    return this;
+                }
+                public SchoolTypeRequest WithNameNotContaining(string val)
+                {
+                    _query.AndFilter(Expr.NotContain("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.BeginWith("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameNotStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.EndWith("name", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithNameNotEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotEndWith("name", val));
                     return this;
                 }
 
@@ -201,10 +325,92 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("code", val));
                     return this;
                 }
+                public SchoolTypeRequest WithCodeIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("code", val));
+                    return this;
+                }
 
                 public SchoolTypeRequest WithCodeIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("code", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("code", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("code", lower, upper));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("code"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("code"));
+                    return this;
+                }
+                public SchoolTypeRequest WithCodeNotContaining(string val)
+                {
+                    _query.AndFilter(Expr.NotContain("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.BeginWith("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeNotStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotBeginWith("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.EndWith("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeNotEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotEndWith("code", val));
                     return this;
                 }
 
@@ -214,9 +420,27 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public SchoolTypeRequest WithDisplayOrderIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("display_order", val));
+                    return this;
+                }
+
                 public SchoolTypeRequest WithDisplayOrderIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("display_order", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithDisplayOrderNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("display_order", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithDisplayOrderGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("display_order", val));
                     return this;
                 }
 
@@ -226,9 +450,33 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public SchoolTypeRequest WithDisplayOrderLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("display_order", val));
+                    return this;
+                }
+
                 public SchoolTypeRequest WithDisplayOrderLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("display_order", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithDisplayOrderBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("display_order", lower, upper));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithDisplayOrderIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("display_order"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithDisplayOrderIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("display_order"));
                     return this;
                 }
 
@@ -238,9 +486,27 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public SchoolTypeRequest WithVersionIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("version", val));
+                    return this;
+                }
+
                 public SchoolTypeRequest WithVersionIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("version", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithVersionNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("version", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithVersionGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("version", val));
                     return this;
                 }
 
@@ -250,9 +516,33 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public SchoolTypeRequest WithVersionLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("version", val));
+                    return this;
+                }
+
                 public SchoolTypeRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithVersionBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("version", lower, upper));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithVersionIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("version"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithVersionIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("version"));
                     return this;
                 }
 

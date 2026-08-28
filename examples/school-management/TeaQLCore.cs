@@ -28,7 +28,37 @@ namespace TeaQL.Core
             new RuntimeModule(Entities.Concat(other.Entities), Checkers.Concat(other.Checkers).ToDictionary(x => x.Key, x => x.Value), SchemaSamples.Concat(other.SchemaSamples).ToDictionary(x => x.Key, x => x.Value), RootEntities.Concat(other.RootEntities), ConstantEntities.Concat(other.ConstantEntities));
     }
     public sealed record BootstrapEntity(string Entity, long Id, Record Values);
-    public record CheckResult(string RuleId, string Location);
+    public abstract record ObjectLocationSegment
+    {
+        private ObjectLocationSegment() { }
+        public sealed record PropertySegment(string Name) : ObjectLocationSegment;
+        public sealed record IndexSegment(int Value) : ObjectLocationSegment;
+    }
+    public sealed class ObjectLocation
+    {
+        private readonly IReadOnlyList<ObjectLocationSegment> _segments;
+        private ObjectLocation(IReadOnlyList<ObjectLocationSegment> segments) { _segments = segments; }
+        public static ObjectLocation Root() => new ObjectLocation(Array.Empty<ObjectLocationSegment>());
+        public static ObjectLocation Property(string name) => Root().PropertyAt(name);
+        public ObjectLocation PropertyAt(string name) => new ObjectLocation(_segments.Concat(new[] { new ObjectLocationSegment.PropertySegment(name) }).ToArray());
+        public ObjectLocation Index(int index) { if (index.CompareTo(0) == -1) throw new ArgumentOutOfRangeException(nameof(index)); return new ObjectLocation(_segments.Concat(new[] { new ObjectLocationSegment.IndexSegment(index) }).ToArray()); }
+        public string ModelPath => Render(name => name);
+        public string NativePath => Render(PascalCase);
+        public string InstancePath => string.Concat(_segments.Select(segment => segment is ObjectLocationSegment.PropertySegment property ? "/" + EscapePointer(LowerCamel(property.Name)) : "/" + ((ObjectLocationSegment.IndexSegment)segment).Value));
+        public override string ToString() => NativePath;
+        public static implicit operator ObjectLocation(string property) => Property(property);
+        private string Render(Func<string, string> propertyName) { var result = ""; foreach (var segment in _segments) { if (segment is ObjectLocationSegment.IndexSegment index) result += $"[{index.Value}]"; else { var property = (ObjectLocationSegment.PropertySegment)segment; result += (result.Length == 0 ? "" : ".") + propertyName(property.Name); } } return result; }
+        private static string PascalCase(string name) => string.Concat(name.Split('_').Select(Capitalize));
+        private static string LowerCamel(string name) { var parts = name.Split('_'); return parts[0] + string.Concat(parts.Skip(1).Select(Capitalize)); }
+        private static string Capitalize(string value) => value.Length == 0 ? "" : char.ToUpperInvariant(value[0]) + value.Substring(1);
+        private static string EscapePointer(string value) => value.Replace("~", "~0").Replace("/", "~1");
+    }
+    public record CheckResult(string RuleId, ObjectLocation Location)
+    {
+        public string ModelPath => Location.ModelPath;
+        public string NativePath => Location.NativePath;
+        public string InstancePath => Location.InstancePath;
+    }
     public sealed class CheckException(IReadOnlyList<CheckResult> violations) : Exception("Check failed") { public IReadOnlyList<CheckResult> Violations { get; } = violations; }
     public sealed record ContextEntityRef(string EntityType, long Id);
     public sealed class ContextRootException(string message) : InvalidOperationException(message) { }
@@ -92,10 +122,22 @@ namespace TeaQL.Core
     public class Expr
     {
         public static object Eq(string field, object value) { return new FilterExpression { Operator = "eq", Field = field, Expected = value }; }
+        public static object Ne(string field, object value) { return new FilterExpression { Operator = "ne", Field = field, Expected = value }; }
         public static object Contain(string field, object value) { return new FilterExpression { Operator = "contain", Field = field, Expected = value }; }
+        public static object NotContain(string field, object value) { return new FilterExpression { Operator = "not_contain", Field = field, Expected = value }; }
+        public static object BeginWith(string field, object value) { return new FilterExpression { Operator = "begin_with", Field = field, Expected = value }; }
+        public static object NotBeginWith(string field, object value) { return new FilterExpression { Operator = "not_begin_with", Field = field, Expected = value }; }
+        public static object EndWith(string field, object value) { return new FilterExpression { Operator = "end_with", Field = field, Expected = value }; }
+        public static object NotEndWith(string field, object value) { return new FilterExpression { Operator = "not_end_with", Field = field, Expected = value }; }
         public static object In(string field, object value) { return new FilterExpression { Operator = "in", Field = field, Expected = value }; }
+        public static object NotIn(string field, object value) { return new FilterExpression { Operator = "not_in", Field = field, Expected = value }; }
+        public static object Gt(string field, object value) { return new FilterExpression { Operator = "gt", Field = field, Expected = value }; }
         public static object Gte(string field, object value) { return new FilterExpression { Operator = "gte", Field = field, Expected = value }; }
+        public static object Lt(string field, object value) { return new FilterExpression { Operator = "lt", Field = field, Expected = value }; }
         public static object Lte(string field, object value) { return new FilterExpression { Operator = "lte", Field = field, Expected = value }; }
+        public static object Between(string field, object lower, object upper) { return new FilterExpression { Operator = "between", Field = field, Expected = new object[] { lower, upper } }; }
+        public static object IsNull(string field) { return new FilterExpression { Operator = "is_null", Field = field }; }
+        public static object IsNotNull(string field) { return new FilterExpression { Operator = "is_not_null", Field = field }; }
     }
 
     public class SelectQuery
@@ -414,6 +456,8 @@ namespace TeaQL.Core
         Task<QueryResult> QueryAsync(UserContext context, QueryRequest req);
         Task<object> MutateAsync(UserContext context, MutationRequest req);
     }
+    // Provider SPI. Deliberately internal: application code must use
+    // UserContext.EnsureSchemaAsync() so the execution context always participates.
     internal interface ISchemaExecutor
     {
         Task EnsureSchemaAsync(RuntimeModule module);
@@ -592,12 +636,33 @@ namespace TeaQL.Core
 
         private bool Matches(Dictionary<string, JsonElement> row, FilterExpression filter)
         {
-            if (!row.TryGetValue(filter.Field, out var actual)) return false;
+            var present = row.TryGetValue(filter.Field, out var actual) && actual.ValueKind != JsonValueKind.Null;
+            if (filter.Operator == "is_null") return !present;
+            if (filter.Operator == "is_not_null") return present;
+            if (!present) return false;
             var expected = filter.Expected is Value value ? value.Raw : filter.Expected;
             if (filter.Operator == "contain") return actual.ToString().Contains(expected?.ToString() ?? "", StringComparison.Ordinal);
+            if (filter.Operator == "not_contain") return !actual.ToString().Contains(expected?.ToString() ?? "", StringComparison.Ordinal);
+            if (filter.Operator == "begin_with") return actual.ToString().StartsWith(expected?.ToString() ?? "", StringComparison.Ordinal);
+            if (filter.Operator == "not_begin_with") return !actual.ToString().StartsWith(expected?.ToString() ?? "", StringComparison.Ordinal);
+            if (filter.Operator == "end_with") return actual.ToString().EndsWith(expected?.ToString() ?? "", StringComparison.Ordinal);
+            if (filter.Operator == "not_end_with") return !actual.ToString().EndsWith(expected?.ToString() ?? "", StringComparison.Ordinal);
             if (filter.Operator == "gt") return Convert.ToDecimal(actual.ToString()) > Convert.ToDecimal(expected);
+            if (filter.Operator == "gte") return Convert.ToDecimal(actual.ToString()) >= Convert.ToDecimal(expected);
             if (filter.Operator == "lt") return Convert.ToDecimal(actual.ToString()) < Convert.ToDecimal(expected);
-            return actual.ToString() == expected?.ToString();
+            if (filter.Operator == "lte") return Convert.ToDecimal(actual.ToString()) <= Convert.ToDecimal(expected);
+            if (filter.Operator == "in" || filter.Operator == "not_in")
+            {
+                var found = ((IEnumerable<object>)filter.Expected).Any(item => actual.ToString() == (item is Value v ? v.Raw : item)?.ToString());
+                return filter.Operator == "in" ? found : !found;
+            }
+            if (filter.Operator == "between")
+            {
+                var bounds = ((IEnumerable<object>)filter.Expected).ToArray();
+                var number = Convert.ToDecimal(actual.ToString());
+                return number >= Convert.ToDecimal(bounds[0]) && number <= Convert.ToDecimal(bounds[1]);
+            }
+            return filter.Operator == "ne" ? actual.ToString() != expected?.ToString() : actual.ToString() == expected?.ToString();
         }
 
         private static string SortValue(Dictionary<string, JsonElement> row, string field) => row.TryGetValue(field, out var value) ? value.ToString() : "";
@@ -614,6 +679,8 @@ namespace TeaQL.Core
         protected abstract DbConnection CreateConnection();
         protected abstract string QuoteSafeIdentifier(string identifier);
         protected abstract string ContainsSql(string column, string parameter);
+        protected abstract string StartsWithSql(string column, string parameter);
+        protected abstract string EndsWithSql(string column, string parameter);
         protected abstract string ApplyPagination(string statement, SelectQuery query, bool hasOrder);
         protected abstract string CreateTableSql(string table);
         protected abstract string ColumnExistsSql(string table, string column);
@@ -781,7 +848,11 @@ namespace TeaQL.Core
             await using var sql = connection.CreateCommand();
             foreach (var filter in query.Filters)
             {
-                if (filter.Operator == "in")
+                if (filter.Operator == "is_null" || filter.Operator == "is_not_null")
+                {
+                    where.Add($"{Quote(filter.Field)} IS {(filter.Operator == "is_null" ? "" : "NOT ")}NULL");
+                }
+                else if (filter.Operator == "in" || filter.Operator == "not_in")
                 {
                     var placeholders = new List<string>();
                     foreach (var expected in (IEnumerable<object>)filter.Expected)
@@ -790,7 +861,18 @@ namespace TeaQL.Core
                         placeholders.Add("@" + parameter);
                         AddParameter(sql, parameter, expected ?? DBNull.Value);
                     }
-                    where.Add(placeholders.Count == 0 ? "1 = 0" : $"{Quote(filter.Field)} IN ({string.Join(", ", placeholders)})");
+                    where.Add(placeholders.Count == 0
+                        ? (filter.Operator == "in" ? "1 = 0" : "1 = 1")
+                        : $"{Quote(filter.Field)} {(filter.Operator == "in" ? "IN" : "NOT IN")} ({string.Join(", ", placeholders)})");
+                }
+                else if (filter.Operator == "between")
+                {
+                    var bounds = ((IEnumerable<object>)filter.Expected).ToArray();
+                    var lower = "p" + sql.Parameters.Count;
+                    AddParameter(sql, lower, bounds[0] ?? DBNull.Value);
+                    var upper = "p" + sql.Parameters.Count;
+                    AddParameter(sql, upper, bounds[1] ?? DBNull.Value);
+                    where.Add($"{Quote(filter.Field)} BETWEEN @{lower} AND @{upper}");
                 }
                 else
                 {
@@ -798,6 +880,12 @@ namespace TeaQL.Core
                     where.Add(filter.Operator switch
                     {
                         "contain" => ContainsSql(Quote(filter.Field), parameter),
+                        "not_contain" => $"NOT ({ContainsSql(Quote(filter.Field), parameter)})",
+                        "begin_with" => StartsWithSql(Quote(filter.Field), parameter),
+                        "not_begin_with" => $"NOT ({StartsWithSql(Quote(filter.Field), parameter)})",
+                        "end_with" => EndsWithSql(Quote(filter.Field), parameter),
+                        "not_end_with" => $"NOT ({EndsWithSql(Quote(filter.Field), parameter)})",
+                        "ne" => $"{Quote(filter.Field)} <> @{parameter}",
                         "gte" => $"{Quote(filter.Field)} >= @{parameter}",
                         "lte" => $"{Quote(filter.Field)} <= @{parameter}",
                         "gt" => $"{Quote(filter.Field)} > @{parameter}",
@@ -1151,6 +1239,8 @@ namespace TeaQL.Core
         protected override DbConnection CreateConnection() => new SqliteConnection(_connectionString);
         protected override string QuoteSafeIdentifier(string identifier) => $"\"{identifier}\"";
         protected override string ContainsSql(string column, string parameter) => $"CAST({column} AS TEXT) LIKE '%' || @{parameter} || '%'";
+        protected override string StartsWithSql(string column, string parameter) => $"CAST({column} AS TEXT) LIKE @{parameter} || '%'";
+        protected override string EndsWithSql(string column, string parameter) => $"CAST({column} AS TEXT) LIKE '%' || @{parameter}";
         protected override string ApplyPagination(string statement, SelectQuery query, bool hasOrder)
         {
             if (query.LimitValue.HasValue) statement += " LIMIT " + query.LimitValue.Value;
