@@ -55,6 +55,7 @@ public static class DialectUtils
 
 public abstract class SqlDialect
 {
+    public virtual string RelationTopNPolicy => "window";
     public abstract DatabaseKind Kind { get; }
     public abstract string QuoteIdent(string ident);
     public abstract string Placeholder(int index);
@@ -105,7 +106,13 @@ public abstract class SqlDialect
 
         foreach (var p in entity.Properties)
         {
-            if (p.Name.EndsWith("Id") || p.Name.EndsWith("Time") || p.Name.EndsWith("_time") ||
+            if (p.Name.EndsWith("Id") || p.Name.EndsWith("_id"))
+            {
+                var idxName = $"IDX_{tableNameUpper}_{p.ColumnNameString.ToUpperInvariant()}_ID_DESC";
+                var idCol = entity.Properties.FirstOrDefault(candidate => candidate.IsId)?.ColumnNameString ?? "id";
+                sqls.Add($"CREATE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(p.ColumnNameString)}, {QuoteIdent(idCol)} DESC)");
+            }
+            else if (p.Name.EndsWith("Time") || p.Name.EndsWith("_time") ||
                 p.Name == "create_time" || p.Name == "update_time")
             {
                 var idxName = $"IDX_{tableNameUpper}_{p.ColumnNameString.ToUpperInvariant()}";

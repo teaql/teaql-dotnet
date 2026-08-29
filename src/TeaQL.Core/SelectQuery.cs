@@ -98,6 +98,8 @@ public record SelectQuery
     public StreamConfig? StreamConfig { get; set; }
     [JsonIgnore]
     public IdSetPaginationOptions? IdSetPagination { get; set; }
+    [JsonIgnore]
+    public ulong? TopNProbeThreshold { get; set; }
 
     public SelectQuery() { }
 
@@ -326,6 +328,12 @@ public record SelectQuery
         return this;
     }
 
+    public SelectQuery TopNProbeParentThreshold(ulong threshold)
+    {
+        TopNProbeThreshold = threshold;
+        return this;
+    }
+
     public SelectQuery CloneForExecution()
     {
         return new SelectQuery(Entity)
@@ -353,7 +361,8 @@ public record SelectQuery
             ObjectGroupBys = new List<ObjectGroupBy>(ObjectGroupBys),
             ChildEnhancements = new List<SelectQuery>(ChildEnhancements),
             StreamConfig = StreamConfig,
-            IdSetPagination = IdSetPagination
+            IdSetPagination = IdSetPagination,
+            TopNProbeThreshold = TopNProbeThreshold
         };
     }
 

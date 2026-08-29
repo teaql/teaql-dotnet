@@ -7,6 +7,7 @@ namespace TeaQL.Provider.Sqlite;
 public class SqliteDialect : SqlDialect
 {
     public override DatabaseKind Kind => DatabaseKind.Sqlite;
+    public override string RelationTopNPolicy => "always_probe";
 
     public override string QuoteIdent(string ident)
     {

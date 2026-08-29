@@ -174,6 +174,7 @@ public class RuntimeTelemetryTests
             if (observeRelation && request.Query.RelationLoads.Count > 0)
                 await request.RelationLoadObserver!.ObserveAsync(
                     request.Query.Entity, request.Query.RelationLoads[0].Name,
+                    new Dictionary<string, object>(),
                     () => Task.CompletedTask);
             return new QueryResult { Rows = new List<TeaQL.Core.Record> { new() } };
         }

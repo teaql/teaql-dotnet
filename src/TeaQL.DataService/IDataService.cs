@@ -30,7 +30,8 @@ public class QueryRequest
 
 public interface IRelationLoadObserver
 {
-    Task ObserveAsync(string entity, string relation, Func<Task> body);
+    Task ObserveAsync(string entity, string relation,
+        IReadOnlyDictionary<string, object> attributes, Func<Task> body);
 }
 
 public class QueryResult

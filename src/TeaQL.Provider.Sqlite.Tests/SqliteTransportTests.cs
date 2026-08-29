@@ -200,6 +200,84 @@ namespace TeaQL.Provider.Sqlite.Tests
         }
 
         [Fact]
+        public async Task TopNRelationPlansAreEquivalentStableAndObservable()
+        {
+            var order = EntityDescriptor.New("Order").TableName("orders")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+                .Relation(RelationDescriptor.New("lines", "OrderLine").LocalKey("id").ForeignKey("orderId").Many());
+            var line = EntityDescriptor.New("OrderLine").TableName("orderline")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("orderId", DataType.I64).ColumnName("order_id"))
+                .Property(PropertyDescriptor.New("name", DataType.Text))
+                .Property(PropertyDescriptor.New("state", DataType.Text))
+                .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+            var module = new RuntimeModule().Entity(order).Entity(line);
+            var recording = new RecordingTransport(_transport);
+            var executor = new SqlDataServiceExecutor(new SqliteDialect(), recording, new ModuleSchemaProvider(module));
+            var context = module.IntoContext().WithDataService(executor);
+            await context.EnsureSchemaAsync();
+            await context.EnsureSchemaAsync();
+            await _transport.ExecuteSqlAsync(new CompiledQuery("INSERT INTO orders VALUES (11,1),(12,1),(13,1)", []));
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "INSERT INTO orderline VALUES " +
+                "(1101,11,'same','visible',1),(1102,11,'same','visible',1),(1103,11,'same','visible',1),(1104,11,'same','visible',1)," +
+                "(1201,12,'same','visible',1),(1202,12,'same','visible',1),(1203,12,'same','visible',1),(1204,12,'same','visible',1)," +
+                "(9999,11,'same','hidden',1)", []));
+
+            SelectQuery Query(ulong? threshold = null)
+            {
+                var child = new SelectQuery("OrderLine").Project("id").Project("name")
+                    .Filter(Expr.Eq("state", new Value.TextValue("visible")))
+                    .AndFilter(Expr.Gt("version", new Value.I64Value(0))).OrderDesc("name").Limit(3);
+                if (threshold is not null) child.TopNProbeParentThreshold(threshold.Value);
+                return new SelectQuery("Order").OrderAsc("id").RelationQuery("lines", child);
+            }
+            static string Ids(List<Record> rows) => string.Join(";", rows.Select(row =>
+                $"{row["id"].TryI64()}:{string.Join(',', ((Value.ListValue)row["lines"]).Values
+                    .Cast<Value.ObjectValue>().Select(child => child.Value["id"].TryI64()))}"));
+
+            var observer = new RecordingTopNObserver();
+            recording.Queries.Clear();
+            var probes = await executor.QueryAsync(new QueryRequest { Query = Query(), RelationLoadObserver = observer });
+            Assert.Equal([3, 3, 0], probes.Rows.Select(row => ((Value.ListValue)row["lines"]).Values.Count).ToArray());
+            Assert.Equal(4, recording.Queries.Count);
+            Assert.DoesNotContain(recording.Queries, sql => sql.Contains("COUNT(", StringComparison.OrdinalIgnoreCase));
+            Assert.All(recording.Queries.Skip(1), sql =>
+            {
+                Assert.Contains("state", sql);
+                Assert.Contains("version", sql);
+                Assert.Contains("id ASC", sql);
+            });
+
+            recording.Queries.Clear();
+            var window = await executor.QueryAsync(new QueryRequest { Query = Query(0), RelationLoadObserver = observer });
+            Assert.Equal(2, recording.Queries.Count);
+            Assert.Contains("ROW_NUMBER() OVER", recording.Queries[1]);
+            Assert.Contains("state", recording.Queries[1]);
+            Assert.Contains("version", recording.Queries[1]);
+            Assert.DoesNotContain("COUNT(", recording.Queries[1], StringComparison.OrdinalIgnoreCase);
+            Assert.Equal(Ids(probes.Rows), Ids(window.Rows));
+            Assert.Equal("window", observer.Attributes!["teaql.relation.selected_plan"]);
+            Assert.Equal(3, observer.Attributes["teaql.relation.parent_count"]);
+
+            foreach (var (threshold, expected) in new[] { (3ul, 4), (2ul, 2) })
+            {
+                recording.Queries.Clear();
+                var first = await executor.QueryAsync(new QueryRequest { Query = Query(threshold) });
+                var sql = recording.Queries.ToArray();
+                recording.Queries.Clear();
+                var second = await executor.QueryAsync(new QueryRequest { Query = Query(threshold) });
+                Assert.Equal(expected, recording.Queries.Count);
+                Assert.Equal(sql, recording.Queries);
+                Assert.Equal(Ids(first.Rows), Ids(second.Rows));
+            }
+            using var indexCommand = _connection.CreateCommand();
+            indexCommand.CommandText = "SELECT count(*) FROM pragma_index_list('orderline') WHERE name='IDX_ORDERLINE_ORDER_ID_ID_DESC'";
+            Assert.Equal(1L, (long)(await indexCommand.ExecuteScalarAsync())!);
+        }
+
+        [Fact]
         public async Task CompleteScalarFixtureIncludingNullableBooleanExecutes()
         {
             var record = EntityDescriptor.New("QueryRecord").TableName("query_record_scalar")
@@ -380,6 +458,28 @@ namespace TeaQL.Provider.Sqlite.Tests
             private readonly EntityDescriptor _descriptor;
             public SingleSchemaProvider(EntityDescriptor descriptor) => _descriptor = descriptor;
             public EntityDescriptor? GetEntity(string name) => name == _descriptor.Name ? _descriptor : null;
+        }
+
+        private sealed class RecordingTransport(ISqlTransport inner) : ISqlTransport
+        {
+            public List<string> Queries { get; } = new();
+            public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+            public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
+            {
+                Queries.Add(query.Sql);
+                return await inner.FetchAllSqlAsync(query);
+            }
+        }
+
+        private sealed class RecordingTopNObserver : IRelationLoadObserver
+        {
+            public IReadOnlyDictionary<string, object>? Attributes { get; private set; }
+            public async Task ObserveAsync(string entity, string relation,
+                IReadOnlyDictionary<string, object> attributes, Func<Task> body)
+            {
+                Attributes = attributes;
+                await body();
+            }
         }
     }
 }

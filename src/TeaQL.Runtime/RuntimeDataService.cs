@@ -233,15 +233,17 @@ public sealed class RuntimeDataService : IDataService
     private sealed class RuntimeRelationLoadObserver(IRuntimeTelemetry telemetry)
         : IRelationLoadObserver
     {
-        public async Task ObserveAsync(string entity, string relation, Func<Task> body)
+        public async Task ObserveAsync(string entity, string relation,
+            IReadOnlyDictionary<string, object> attributes, Func<Task> body)
         {
+            var operationAttributes = new Dictionary<string, object>(attributes)
+            {
+                ["teaql.entity.type"] = entity,
+                ["teaql.relation.name"] = relation
+            };
             await telemetry.ObserveAsync(
                 RuntimeOperation.Create("relation_load", $"{entity}.{relation}",
-                    new Dictionary<string, object>
-                    {
-                        ["teaql.entity.type"] = entity,
-                        ["teaql.relation.name"] = relation
-                    }),
+                    operationAttributes),
                 async () => { await body().ConfigureAwait(false); return true; })
                 .ConfigureAwait(false);
         }

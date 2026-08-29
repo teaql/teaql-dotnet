@@ -198,7 +198,8 @@ namespace TeaQL.Sql.Tests
             public string? Entity { get; private set; }
             public string? Relation { get; private set; }
             public int Invocations { get; private set; }
-            public async Task ObserveAsync(string entity, string relation, Func<Task> body)
+            public async Task ObserveAsync(string entity, string relation,
+                IReadOnlyDictionary<string, object> attributes, Func<Task> body)
             {
                 Entity = entity;
                 Relation = relation;

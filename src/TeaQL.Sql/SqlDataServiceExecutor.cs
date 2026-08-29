@@ -80,7 +80,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         {
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
-        await RelationQueryLoader.EnhanceAsync(SchemaProvider, QueryAsync, rows, request);
+        await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request);
         var end = DateTimeOffset.UtcNow;
 
         var metadata = new ExecutionMetadata
@@ -311,6 +311,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 internal static class RelationQueryLoader
 {
     public static async Task EnhanceAsync(
+        SqlDialect dialect,
         ISchemaProvider schemaProvider,
         Func<QueryRequest, Task<QueryResult>> queryAsync,
         List<Record> parents,
@@ -341,28 +342,59 @@ internal static class RelationQueryLoader
             {
                 childQuery.Projection.Add(relation.ForeignKeyValue);
             }
-            childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
-            if (childQuery.Slice != null)
+            var limited = childQuery.Slice?.Limit is > 0;
+            if (limited && !childQuery.OrderByItems.Any(order => order.Field == "id"))
+                childQuery.OrderAsc("id");
+            var threshold = childQuery.TopNProbeThreshold;
+            var useProbes = limited &&
+                ((dialect.RelationTopNPolicy == "always_probe" && threshold is null) ||
+                 (threshold is > 0 && (ulong)parentIds.Count <= threshold));
+            var selectedPlan = useProbes ? "bounded_probes" : limited ? "window" : "batch";
+            var probeCount = useProbes ? parentIds.Count : 0;
+            if (!useProbes)
             {
-                childQuery.PartitionByField(relation.ForeignKeyValue);
+                childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
+                if (limited) childQuery.PartitionByField(relation.ForeignKeyValue);
             }
             async Task LoadAndAttach()
             {
-                var childResult = await queryAsync(new QueryRequest
+                var childRows = new List<Record>();
+                var queries = useProbes
+                    ? parentIds.Select(parentId =>
+                    {
+                        var probe = Clone(childQuery);
+                        probe.PartitionBy = null;
+                        probe.AndFilter(Expr.Eq(relation.ForeignKeyValue, parentId));
+                        return probe;
+                    })
+                    : new[] { childQuery };
+                foreach (var executionQuery in queries)
                 {
-                    Query = childQuery,
-                    TraceChain = request.TraceChain,
-                    Comment = request.Comment,
-                    RelationLoadObserver = request.RelationLoadObserver
-                });
-                foreach (var child in childResult.Rows)
+                    var childResult = await queryAsync(new QueryRequest
+                    {
+                        Query = executionQuery,
+                        TraceChain = request.TraceChain,
+                        Comment = request.Comment,
+                        RelationLoadObserver = request.RelationLoadObserver
+                    });
+                    childRows.AddRange(childResult.Rows);
+                }
+                foreach (var child in childRows)
                 {
                     child.Remove("__teaql_partition_rank");
                 }
-                Attach(parents, childResult.Rows, load.Name, relation);
+                Attach(parents, childRows, load.Name, relation);
             }
             if (request.RelationLoadObserver is { } observer)
-                await observer.ObserveAsync(request.Query.Entity, load.Name, LoadAndAttach);
+                await observer.ObserveAsync(request.Query.Entity, load.Name,
+                    new Dictionary<string, object>
+                    {
+                        ["teaql.relation.parent_count"] = parentIds.Count,
+                        ["teaql.relation.per_parent_limit"] = childQuery.Slice?.Limit ?? 0,
+                        ["teaql.relation.configured_probe_threshold"] = threshold is null ? -1L : (long)threshold,
+                        ["teaql.relation.selected_plan"] = selectedPlan,
+                        ["teaql.relation.probe_count"] = probeCount
+                    }, LoadAndAttach);
             else
                 await LoadAndAttach();
         }
@@ -558,7 +590,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         {
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
-        await RelationQueryLoader.EnhanceAsync(SchemaProvider, QueryAsync, rows, request);
+        await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request);
         var end = DateTimeOffset.UtcNow;
 
         var metadata = new ExecutionMetadata
