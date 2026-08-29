@@ -11,6 +11,7 @@ namespace TeaQL.Runtime;
 
 public class UserContext
 {
+    private static readonly IIdSetStore DefaultIdSetStore = new InMemoryIdSetStore();
     private const string ActiveRootResource = "teaql.activeRoot";
     private sealed record LocalCacheEntry(object Value, DateTimeOffset? ExpiresAt);
     private static readonly ConcurrentDictionary<string, LocalCacheEntry> LocalCache = new();
@@ -35,6 +36,10 @@ public class UserContext
     public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = NoopRuntimeTelemetry.Instance;
     public TeaQLLocale Locale { get; private set; } = TeaQLLocale.English;
     public I18nCatalog I18nCatalog { get; private set; } = I18nCatalog.Builtin;
+    public IIdSetStore IdSetStore { get; private set; } = DefaultIdSetStore;
+    public string IdSetPlan { get; private set; } = "ID_SET_DISABLED";
+    public ulong IdSetCount { get; private set; }
+    public string IdSetCountAccuracy { get; private set; } = "UNKNOWN";
 
     public UserContext SetLocaleCode(string code) { var locale = TeaQLLocales.Parse(code); Locale = locale; return this; }
     public UserContext SetLanguageCode(string code) => SetLocaleCode(code);
@@ -68,6 +73,27 @@ public class UserContext
         if (provider is ISchemaExecutor schemaExecutor)
             InsertResource<ISchemaExecutor>(schemaExecutor);
         return this;
+    }
+
+    public UserContext WithIdSetStore(IIdSetStore store)
+    {
+        IdSetStore = store ?? throw new ArgumentNullException(nameof(store));
+        return this;
+    }
+
+    internal void ObserveIdSet(string plan, string accuracy = "UNKNOWN", ulong count = 0)
+    {
+        IdSetPlan = plan;
+        IdSetCountAccuracy = accuracy;
+        IdSetCount = count;
+    }
+
+    internal string IdSetSecurityScope()
+    {
+        _namedResources.TryGetValue("trustedTenant", out var tenant);
+        _namedResources.TryGetValue(ActiveRootResource, out var root);
+        _typedResources.TryGetValue(typeof(IRequestPolicy), out var policy);
+        return $"{UserIdentifier}|{tenant}|{root}|{policy?.GetType().FullName}:{System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(policy ?? this)}";
     }
 
     public UserContext WithEntityRegistry(IEntityRegistry registry)

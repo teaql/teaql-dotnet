@@ -66,6 +66,8 @@ public record AggregationCacheOptions(bool EnabledValue, ulong CacheExpiredMilli
 
 public record StreamConfig(int ChunkSize = 1000);
 
+public sealed record IdSetPaginationOptions(string Namespace, int TtlSeconds, ulong MaxIds);
+
 public record SelectQuery
 {
     public const ulong DefaultHardLimit = 10_000;
@@ -94,6 +96,8 @@ public record SelectQuery
     public List<ObjectGroupBy> ObjectGroupBys { get; set; } = new();
     public List<SelectQuery> ChildEnhancements { get; set; } = new();
     public StreamConfig? StreamConfig { get; set; }
+    [JsonIgnore]
+    public IdSetPaginationOptions? IdSetPagination { get; set; }
 
     public SelectQuery() { }
 
@@ -308,6 +312,50 @@ public record SelectQuery
     }
 
     public SelectQuery Page(ulong offset, ulong limit) => Offset(offset).Limit(limit);
+
+    public SelectQuery OptimizePaginationWithIdSet() =>
+        OptimizePaginationWithIdSet("default", 600, 3_000_000);
+
+    public SelectQuery OptimizePaginationWithIdSet(string namespaceName, int ttlSeconds, ulong maxIds)
+    {
+        if (string.IsNullOrWhiteSpace(namespaceName))
+            throw new ArgumentException("ID set pagination namespace must not be empty", nameof(namespaceName));
+        if (ttlSeconds <= 0) throw new ArgumentOutOfRangeException(nameof(ttlSeconds));
+        if (maxIds == 0) throw new ArgumentOutOfRangeException(nameof(maxIds));
+        IdSetPagination = new IdSetPaginationOptions(namespaceName, ttlSeconds, maxIds);
+        return this;
+    }
+
+    public SelectQuery CloneForExecution()
+    {
+        return new SelectQuery(Entity)
+        {
+            HardLimitValue = HardLimitValue,
+            Projection = new List<string>(Projection),
+            ExprProjection = new List<NamedExpr>(ExprProjection),
+            SearchText = SearchText,
+            FilterCondition = FilterCondition,
+            HavingCondition = HavingCondition,
+            OrderByItems = new List<OrderBy>(OrderByItems),
+            Slice = Slice,
+            PartitionBy = PartitionBy,
+            AggregateItems = new List<Aggregate>(AggregateItems),
+            GroupByItems = new List<string>(GroupByItems),
+            RelationLoads = new List<RelationLoad>(RelationLoads),
+            RelationAggregates = new List<RelationAggregate>(RelationAggregates),
+            AggregationCache = AggregationCache,
+            CommentText = CommentText,
+            TraceChain = new List<TraceNode>(TraceChain),
+            RawSqlText = RawSqlText,
+            RawSqlSearchCriteriaItems = new List<string>(RawSqlSearchCriteriaItems),
+            DynamicProperties = new List<RawSqlProjection>(DynamicProperties),
+            RawProjections = new List<RawSqlProjection>(RawProjections),
+            ObjectGroupBys = new List<ObjectGroupBy>(ObjectGroupBys),
+            ChildEnhancements = new List<SelectQuery>(ChildEnhancements),
+            StreamConfig = StreamConfig,
+            IdSetPagination = IdSetPagination
+        };
+    }
 
     public SelectQuery PartitionByField(string field)
     {
