@@ -83,6 +83,7 @@ public record SelectQuery
     public List<Aggregate> AggregateItems { get; set; } = new();
     public List<string> GroupByItems { get; set; } = new();
     public List<RelationLoad> RelationLoads { get; set; } = new();
+    public List<RelationAggregate> RelationAggregates { get; set; } = new();
     public AggregationCacheOptions? AggregationCache { get; set; }
     public string? CommentText { get; set; }
     public List<TraceNode> TraceChain { get; set; } = new();

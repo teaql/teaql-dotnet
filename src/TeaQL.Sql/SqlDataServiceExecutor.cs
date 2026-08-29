@@ -316,7 +316,7 @@ internal static class RelationQueryLoader
         List<Record> parents,
         QueryRequest request)
     {
-        if (parents.Count == 0 || request.Query.RelationLoads.Count == 0)
+        if (parents.Count == 0)
         {
             return;
         }
@@ -366,6 +366,106 @@ internal static class RelationQueryLoader
             else
                 await LoadAndAttach();
         }
+        await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor);
+    }
+
+    private static async Task EnhanceAggregatesAsync(
+        ISchemaProvider schemaProvider,
+        Func<QueryRequest, Task<QueryResult>> queryAsync,
+        List<Record> parents,
+        QueryRequest request,
+        EntityDescriptor parentDescriptor)
+    {
+        foreach (var aggregate in request.Query.RelationAggregates)
+        {
+            var relation = parentDescriptor.RelationByName(aggregate.RelationName)
+                ?? throw new SqlExecutorException($"SQL compile error: missing relation {request.Query.Entity}.{aggregate.RelationName}");
+            var parentIds = parents
+                .Where(parent => parent.ContainsKey(relation.LocalKeyValue))
+                .Select(parent => parent[relation.LocalKeyValue])
+                .ToList();
+            if (parentIds.Count == 0)
+            {
+                AttachEmptyAggregate(parents, aggregate, aggregate.Query);
+                continue;
+            }
+            var childQuery = Clone(aggregate.Query);
+            childQuery.Entity = relation.TargetEntity;
+            childQuery.Projection.Clear();
+            childQuery.ExprProjection.Clear();
+            childQuery.OrderByItems.Clear();
+            childQuery.Slice = null;
+            childQuery.RelationLoads.Clear();
+            childQuery.RelationAggregates.Clear();
+            if (childQuery.AggregateItems.Count == 0)
+                childQuery.AggregateItems.Add(Aggregate.Count(aggregate.Alias));
+            if (!childQuery.GroupByItems.Contains(relation.ForeignKeyValue))
+                childQuery.GroupByItems.Add(relation.ForeignKeyValue);
+            childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
+            var result = await queryAsync(new QueryRequest
+            {
+                Query = childQuery,
+                TraceChain = request.TraceChain,
+                Comment = request.Comment,
+                RelationLoadObserver = request.RelationLoadObserver
+            });
+            var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity);
+            var foreignProperty = childDescriptor?.PropertyByName(relation.ForeignKeyValue);
+            if (foreignProperty != null && foreignProperty.ColumnNameString != relation.ForeignKeyValue)
+            {
+                foreach (var row in result.Rows)
+                    if (row.TryGetValue(foreignProperty.ColumnNameString, out var value))
+                        row[relation.ForeignKeyValue] = value;
+            }
+            AttachAggregate(parents, result.Rows, relation, aggregate, childQuery);
+        }
+    }
+
+    private static Value EmptyAggregateValue(SelectQuery query) =>
+        query.AggregateItems.Count == 0 || query.AggregateItems[0].Function == AggregateFunction.Count
+            ? new Value.I64Value(0)
+            : new Value.NullValue();
+
+    private static void AttachEmptyAggregate(List<Record> parents, RelationAggregate aggregate, SelectQuery query)
+    {
+        foreach (var parent in parents)
+            parent[aggregate.Alias] = aggregate.SingleResult
+                ? EmptyAggregateValue(query)
+                : new Value.ObjectValue(new Record());
+    }
+
+    private static void AttachAggregate(
+        List<Record> parents,
+        List<Record> rows,
+        RelationDescriptor relation,
+        RelationAggregate aggregate,
+        SelectQuery query)
+    {
+        var buckets = rows
+            .Where(row => row.ContainsKey(relation.ForeignKeyValue))
+            .ToDictionary(row => row[relation.ForeignKeyValue], row => row);
+        foreach (var parent in parents)
+        {
+            if (!parent.TryGetValue(relation.LocalKeyValue, out var localKey) || !buckets.TryGetValue(localKey, out var row))
+            {
+                parent[aggregate.Alias] = aggregate.SingleResult
+                    ? EmptyAggregateValue(query)
+                    : new Value.ObjectValue(new Record());
+                continue;
+            }
+            if (aggregate.SingleResult)
+            {
+                var innerAlias = query.AggregateItems.Count > 0 ? query.AggregateItems[0].Alias : aggregate.Alias;
+                parent[aggregate.Alias] = row.TryGetValue(innerAlias, out var value) ? value : new Value.NullValue();
+            }
+            else
+            {
+                var values = new Record();
+                foreach (var pair in row)
+                    if (pair.Key != relation.ForeignKeyValue) values[pair.Key] = pair.Value;
+                parent[aggregate.Alias] = new Value.ObjectValue(values);
+            }
+        }
     }
 
     private static SelectQuery Clone(SelectQuery query) => query with
@@ -376,6 +476,7 @@ internal static class RelationQueryLoader
         AggregateItems = new List<Aggregate>(query.AggregateItems),
         GroupByItems = new List<string>(query.GroupByItems),
         RelationLoads = new List<RelationLoad>(query.RelationLoads),
+        RelationAggregates = new List<RelationAggregate>(query.RelationAggregates),
         TraceChain = new List<TraceNode>(query.TraceChain),
         RawSqlSearchCriteriaItems = new List<string>(query.RawSqlSearchCriteriaItems),
         DynamicProperties = new List<RawSqlProjection>(query.DynamicProperties),

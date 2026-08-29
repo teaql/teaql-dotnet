@@ -179,6 +179,7 @@ public static class RequestHelpers
             DynamicProperties = options.DynamicProperties.Select(p => new RawSqlProjection(p.PropertyName, p.RawSqlSegment)).ToList(),
             RawProjections = options.RawProjections.Select(p => new RawSqlProjection(p.PropertyName, p.RawSqlSegment)).ToList(),
             ObjectGroupBys = options.ObjectGroupBys.Select(g => new ObjectGroupBy(g.PropertyName, g.StorageField, g.Query.IntoQuery())).ToList(),
+            RelationAggregates = RuntimeRelationAggregates(options),
             ChildEnhancements = childEnhancements.Select(c => c.IntoQuery()).ToList()
         };
         return q;

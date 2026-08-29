@@ -105,6 +105,42 @@ namespace TeaQL.Sql.Tests
         }
 
         [Fact]
+        public async Task QueryAsync_AttachesBatchedRelationAggregateAliases()
+        {
+            var school = new EntityDescriptor { Name = "School", TableNameValue = "school" }
+                .Relation(RelationDescriptor.New("students", "Student").ForeignKey("schoolId").Many());
+            var student = new EntityDescriptor { Name = "Student", TableNameValue = "student" }
+                .Property(PropertyDescriptor.New("schoolId", DataType.I64).ColumnName("school_id"))
+                .Property(PropertyDescriptor.New("score", DataType.I64));
+            _mockSchemaProvider.Setup(s => s.GetEntity("School")).Returns(school);
+            _mockSchemaProvider.Setup(s => s.GetEntity("Student")).Returns(student);
+            _mockDialect.Setup(d => d.CompileSelect(It.IsAny<EntityDescriptor>(), It.IsAny<SelectQuery>()))
+                .Returns(new CompiledQuery("SELECT", new List<Value>()));
+            _mockTransport.SetupSequence(t => t.FetchAllSqlAsync(It.IsAny<CompiledQuery>()))
+                .ReturnsAsync(new List<Record>
+                {
+                    new() { ["id"] = new Value.I64Value(1) },
+                    new() { ["id"] = new Value.I64Value(2) }
+                })
+                .ReturnsAsync(new List<Record>
+                    { new() { ["school_id"] = new Value.I64Value(1), ["recordCount"] = new Value.I64Value(2) } })
+                .ReturnsAsync(new List<Record>
+                    { new() { ["school_id"] = new Value.I64Value(1), ["scoreTotal"] = new Value.I64Value(42) } });
+            var countQuery = new SelectQuery("Student").Aggregate(Aggregate.Count("recordCount"));
+            var sumQuery = new SelectQuery("Student").Aggregate(Aggregate.Sum("score", "scoreTotal"));
+            var query = new SelectQuery("School");
+            query.RelationAggregates.Add(new RelationAggregate("students", "recordCount", countQuery, true));
+            query.RelationAggregates.Add(new RelationAggregate("students", "scoreTotal", sumQuery, true));
+
+            var result = await _executor.QueryAsync(new QueryRequest { Query = query });
+
+            Assert.Equal(2, result.Rows[0]["recordCount"].TryI64());
+            Assert.Equal(42, result.Rows[0]["scoreTotal"].TryI64());
+            Assert.Equal(0, result.Rows[1]["recordCount"].TryI64());
+            Assert.IsType<Value.NullValue>(result.Rows[1]["scoreTotal"]);
+        }
+
+        [Fact]
         public async Task MutateAsync_Insert_CallsTransport()
         {
             var cmd = new InsertCommand { Entity = "TestEntity" };
