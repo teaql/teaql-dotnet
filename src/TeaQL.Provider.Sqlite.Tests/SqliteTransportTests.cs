@@ -139,6 +139,128 @@ namespace TeaQL.Provider.Sqlite.Tests
         }
 
         [Fact]
+        public async Task RelationSubqueriesExecutePositiveAndNegativePredicates()
+        {
+            var group = EntityDescriptor.New("QueryGroup").TableName("query_group_data")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("name", DataType.Text))
+                .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+            var record = EntityDescriptor.New("QueryRecord").TableName("query_record_data")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("queryGroup", DataType.I64).ColumnName("query_group"))
+                .Property(PropertyDescriptor.New("name", DataType.Text))
+                .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+            var module = new RuntimeModule().Entity(group).Entity(record);
+            var executor = new SqlDataServiceExecutor(
+                new SqliteDialect(), _transport, new ModuleSchemaProvider(module));
+            var context = module.IntoContext().WithDataService(executor);
+            await context.EnsureSchemaAsync();
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "INSERT INTO query_group_data(id,name,version) VALUES (1,'Core',1),(2,'Other',1),(3,'Empty',1)", []));
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "INSERT INTO query_record_data(id,query_group,name,version) VALUES " +
+                "(11,1,'included',1),(12,2,'excluded',1),(13,NULL,'orphan',1)", []));
+            var child = new SelectQuery("QueryGroup")
+            {
+                FilterCondition = Expr.Eq("name", new Value.TextValue("Core"))
+            };
+            var included = new SelectQuery("QueryRecord")
+            {
+                FilterCondition = Expr.InSubquery("queryGroup", group, child, "id")
+            };
+            var excluded = new SelectQuery("QueryRecord")
+            {
+                FilterCondition = Expr.NotInSubquery("queryGroup", group, child, "id")
+            };
+
+            Assert.Equal("included", (await executor.QueryAsync(
+                new QueryRequest { Query = included })).Rows.Single()["name"].TryText());
+            Assert.Equal("excluded", (await executor.QueryAsync(
+                new QueryRequest { Query = excluded })).Rows.Single()["name"].TryText());
+
+            async Task<long[]> Ids(string entityName, Expr filter) =>
+                (await executor.QueryAsync(new QueryRequest
+                {
+                    Query = new SelectQuery(entityName)
+                        .Filter(filter).OrderAsc("id")
+                })).Rows.Select(row => row["id"].TryI64()!.Value).ToArray();
+
+            Assert.Equal([11L, 12L], await Ids("QueryRecord", Expr.IsNotNull("queryGroup")));
+            Assert.Equal([13L], await Ids("QueryRecord", Expr.IsNull("queryGroup")));
+            Assert.Equal([11L], await Ids("QueryRecord",
+                Expr.InSubquery("queryGroup", group, child, "id")));
+            Assert.Equal([12L], await Ids("QueryRecord",
+                Expr.NotInSubquery("queryGroup", group, child, "id")));
+
+            var allRecords = new SelectQuery("QueryRecord");
+            Assert.Equal([1L, 2L], await Ids("QueryGroup",
+                Expr.InSubquery("id", record, allRecords, "queryGroup")));
+            Assert.Equal([3L], await Ids("QueryGroup",
+                Expr.NotInSubquery("id", record, allRecords, "queryGroup")));
+        }
+
+        [Fact]
+        public async Task CompleteScalarFixtureIncludingNullableBooleanExecutes()
+        {
+            var record = EntityDescriptor.New("QueryRecord").TableName("query_record_scalar")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("requiredText", DataType.Text).ColumnName("required_text"))
+                .Property(PropertyDescriptor.New("optionalText", DataType.Text).ColumnName("optional_text"))
+                .Property(PropertyDescriptor.New("requiredInteger", DataType.I64).ColumnName("required_integer"))
+                .Property(PropertyDescriptor.New("optionalLong", DataType.I64).ColumnName("optional_long"))
+                .Property(PropertyDescriptor.New("requiredDecimal", DataType.Decimal).ColumnName("required_decimal"))
+                .Property(PropertyDescriptor.New("requiredFloat", DataType.F64).ColumnName("required_float"))
+                .Property(PropertyDescriptor.New("requiredDouble", DataType.F64).ColumnName("required_double"))
+                .Property(PropertyDescriptor.New("requiredDate", DataType.Date).ColumnName("required_date"))
+                .Property(PropertyDescriptor.New("requiredTime", DataType.I64).ColumnName("required_time"))
+                .Property(PropertyDescriptor.New("requiredTimestamp", DataType.Timestamp).ColumnName("required_timestamp"))
+                .Property(PropertyDescriptor.New("active", DataType.Bool))
+                .Property(PropertyDescriptor.New("reviewed", DataType.Bool))
+                .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+            var module = new RuntimeModule().Entity(record);
+            var executor = new SqlDataServiceExecutor(
+                new SqliteDialect(), _transport, new ModuleSchemaProvider(module));
+            var context = module.IntoContext().WithDataService(executor);
+            await context.EnsureSchemaAsync();
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "INSERT INTO query_record_scalar VALUES " +
+                "(1,'Alpha','optional',42,42000000000,42.125,42.5,42.75,'2026-08-29',34200000,1777632600000,1,0,1)," +
+                "(2,'Beta',NULL,7,NULL,7.500,7.5,7.75,'2026-08-30',36000000,1777720400000,0,NULL,1)," +
+                "(3,'Gamma','tail',99,99000000000,99.875,99.5,99.75,'2026-08-31',37800000,1777808200000,1,1,1)", []));
+
+            async Task<long[]> Ids(Expr expression)
+            {
+                var query = new SelectQuery("QueryRecord")
+                {
+                    Projection = ["id"],
+                    FilterCondition = expression,
+                    OrderByItems = [OrderBy.Asc("id")]
+                };
+                return (await executor.QueryAsync(new QueryRequest { Query = query })).Rows
+                    .Select(row => row["id"].TryI64() ?? -1).ToArray();
+            }
+            Assert.Equal([1], await Ids(Expr.Eq("requiredText", new Value.TextValue("Alpha"))));
+            Assert.Equal([2, 3], await Ids(Expr.Ne("requiredText", new Value.TextValue("Alpha"))));
+            Assert.Equal([1, 3], await Ids(Expr.InList("requiredText",
+                [new Value.TextValue("Alpha"), new Value.TextValue("Gamma")])));
+            Assert.Equal([2], await Ids(Expr.Contain("requiredText", "et")));
+            Assert.Equal([1, 3], await Ids(Expr.Between("requiredInteger", new Value.I64Value(40), new Value.I64Value(100))));
+            Assert.Equal([3], await Ids(Expr.Gt("requiredDecimal", new Value.DecimalValue(50m))));
+            Assert.Equal([2], await Ids(Expr.Lte("requiredFloat", new Value.F64Value(7.5))));
+            Assert.Equal([3], await Ids(Expr.Gte("requiredDouble", new Value.F64Value(99.75))));
+            Assert.Equal([2, 3], await Ids(Expr.Between("requiredDate",
+                new Value.DateValue(new DateTime(2026, 8, 30)), new Value.DateValue(new DateTime(2026, 8, 31)))));
+            Assert.Equal([3], await Ids(Expr.Gt("requiredTime", new Value.I64Value(36_000_000))));
+            Assert.Equal([1, 2], await Ids(Expr.Lt("requiredTimestamp", new Value.TimestampValue(1_777_750_000_000))));
+            Assert.Equal([2], await Ids(Expr.IsNull("optionalText")));
+            Assert.Equal([1, 3], await Ids(Expr.IsNotNull("optionalLong")));
+            Assert.Equal([2], await Ids(Expr.Eq("active", new Value.BoolValue(false))));
+            Assert.Equal([3], await Ids(Expr.Eq("reviewed", new Value.BoolValue(true))));
+            Assert.Equal([1], await Ids(Expr.Eq("reviewed", new Value.BoolValue(false))));
+            Assert.Equal([2], await Ids(Expr.IsNull("reviewed")));
+        }
+
+        [Fact]
         public async Task FetchAllSqlAsync_ReadsVariousTypes()
         {
             var create = new CompiledQuery("CREATE TABLE types (id INTEGER, b BOOLEAN, f REAL, s TEXT, d DATE, t TIMESTAMP, dec NUMERIC, j JSON)", new List<Value>());

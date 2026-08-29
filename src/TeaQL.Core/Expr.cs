@@ -100,8 +100,20 @@ public abstract record Expr
 
     public static Expr Subquery(Expr left, BinaryOp op, EntityDescriptor entity, SelectQuery query, string field)
     {
-        query.Projection = new List<string> { field };
-        return new SubQueryExpr(left, op, entity, query);
+        var filter = query.FilterCondition;
+        if (op is BinaryOp.NotIn or BinaryOp.NotInLarge)
+        {
+            var nonNullProjection = IsNotNull(field);
+            filter = filter == null ? nonNullProjection : filter.And(nonNullProjection);
+        }
+        // Do not mutate a child request which may also be reused by a positive
+        // relation predicate.
+        var projected = query with
+        {
+            Projection = new List<string> { field },
+            FilterCondition = filter
+        };
+        return new SubQueryExpr(left, op, entity, projected);
     }
 
     public static Expr Between(string column, Value lower, Value upper) => 

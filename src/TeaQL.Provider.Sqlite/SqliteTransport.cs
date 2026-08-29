@@ -201,7 +201,9 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
                 p.Value = f.Value;
                 break;
             case Value.DecimalValue d:
-                p.Value = $"__teaql_decimal__:{d.Value}";
+                // Let SQLite NUMERIC affinity interpret the decimal text. A
+                // tagged sentinel is text and breaks ordered SQL predicates.
+                p.Value = d.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 break;
             case Value.TextValue t:
                 p.Value = t.Value;
@@ -235,10 +237,14 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             long v = reader.GetInt64(i);
             if (typeName == "BOOLEAN" || typeName == "BOOL") return new Value.BoolValue(v != 0);
             if (typeName == "TIMESTAMP" || typeName == "DATETIME") return new Value.TimestampValue(v);
+            if (typeName == "NUMERIC" || typeName == "DECIMAL") return new Value.DecimalValue(v);
             return new Value.I64Value(v);
         }
         else if (fieldType == typeof(double))
         {
+            if (typeName == "NUMERIC" || typeName == "DECIMAL")
+                return new Value.DecimalValue(Convert.ToDecimal(
+                    reader.GetDouble(i), System.Globalization.CultureInfo.InvariantCulture));
             return new Value.F64Value(reader.GetDouble(i));
         }
         else if (fieldType == typeof(string))
