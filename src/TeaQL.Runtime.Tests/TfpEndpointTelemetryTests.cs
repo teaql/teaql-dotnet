@@ -87,6 +87,18 @@ public class TfpEndpointTelemetryTests
         Assert.Equal("TFP_AUDIT_REASON_REQUIRED", audit.Code);
     }
 
+    [Fact]
+    public async Task IDSET_015_FederationPayloadCannotInjectRetentionControls()
+    {
+        var handler = new TfpEndpointHandler(new StubDataService());
+        var error = await Assert.ThrowsAsync<TfpEndpointException>(() => handler.HandleQueryAsync(
+            Trusted(),
+            "{\"entity\":\"Probe\",\"limitValue\":10,\"commentText\":\"x\",\"purposeText\":\"x\",\"idSetPagination\":{\"namespace\":\"attacker\",\"ttlSeconds\":999999,\"maxIds\":999999999}}"));
+        Assert.Equal("TFP_INVALID_REQUEST", error.Code);
+        Assert.Contains("Unknown TFP field", error.Message);
+        Assert.Contains("idSetPagination", error.Message);
+    }
+
     private static string QueryPayload() =>
         "{\"entity\":\"Probe\",\"limitValue\":10,\"commentText\":\"test query\",\"purposeText\":\"test\"}";
 

@@ -93,7 +93,10 @@ public class UserContext
         _namedResources.TryGetValue("trustedTenant", out var tenant);
         _namedResources.TryGetValue(ActiveRootResource, out var root);
         _typedResources.TryGetValue(typeof(IRequestPolicy), out var policy);
-        return $"{UserIdentifier}|{tenant}|{root}|{policy?.GetType().FullName}:{System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(policy ?? this)}";
+        var policyIdentity = policy == null
+            ? "none"
+            : $"{policy.GetType().FullName}:{System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(policy)}";
+        return $"{UserIdentifier}|{tenant}|{root}|{policyIdentity}";
     }
 
     public UserContext WithEntityRegistry(IEntityRegistry registry)
