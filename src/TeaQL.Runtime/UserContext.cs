@@ -27,6 +27,26 @@ public class UserContext
     private readonly ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
     private readonly ConcurrentBag<object> _managedEntities = new();
     private readonly ConcurrentDictionary<string, IEntityChecker> _checkers = new();
+    private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
+    private sealed class GraphSaveSession { }
+    private readonly AsyncLocal<GraphSaveSession?> _ambientGraphSave = new();
+    private GraphSaveSession? _activeGraphSave;
+    private List<Action> _graphCommitActions = new();
+    private List<Action> _graphRollbackActions = new();
+    private DateTimeOffset? _graphFixTime;
+    private List<FixEvidence> _currentFixEvidence = new();
+    private IReadOnlyList<FixEvidence> _lastFixEvidence = Array.Empty<FixEvidence>();
+    public IReadOnlyList<FixEvidence> LastFixEvidence => _lastFixEvidence;
+
+    public void RecordFixEvidence(FixEvidence evidence)
+    {
+        var normalized = (evidence.SourceLabel ?? "").ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(evidence.EntityType) || string.IsNullOrWhiteSpace(evidence.ModelPath)
+            || string.IsNullOrWhiteSpace(evidence.SourceLabel) || normalized.Contains("authorization")
+            || normalized.Contains("cookie") || normalized.Contains("token="))
+            throw new ArgumentException("Fix evidence must contain only safe framework provenance labels");
+        _currentFixEvidence.Add(evidence);
+    }
     
     public string TraceId { get; set; }
     public string? UserIdentifier { get; set; }
@@ -70,9 +90,77 @@ public class UserContext
     public UserContext WithDataService(IDataService provider)
     {
         InsertResource<IDataService>(new RuntimeDataService(provider, this));
+        if (provider is ITransactionExecutor transactionExecutor)
+            InsertResource<ITransactionExecutor>(transactionExecutor);
         if (provider is ISchemaExecutor schemaExecutor)
             InsertResource<ISchemaExecutor>(schemaExecutor);
         return this;
+    }
+
+    public async Task<T> ExecuteGraphSaveAsync<T>(Func<Task<T>> work)
+    {
+        if (_ambientGraphSave.Value != null && ReferenceEquals(_ambientGraphSave.Value, _activeGraphSave))
+            return await work().ConfigureAwait(false);
+        await _graphSaveGate.WaitAsync().ConfigureAwait(false);
+        var original = RequireResource<IDataService>();
+        ITransaction? transaction = null;
+        var session = new GraphSaveSession();
+        try
+        {
+            transaction = await RequireResource<ITransactionExecutor>()
+                .BeginTransactionAsync().ConfigureAwait(false);
+            _activeGraphSave = session;
+            _ambientGraphSave.Value = session;
+            _graphFixTime = DateTimeOffset.UtcNow;
+            _currentFixEvidence = new List<FixEvidence>();
+            _graphCommitActions = new List<Action>();
+            _graphRollbackActions = new List<Action>();
+            InsertResource<IDataService>(new RuntimeDataService(transaction, this));
+            T result;
+            try
+            {
+                result = await work().ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                try { await transaction.RollbackAsync().ConfigureAwait(false); }
+                finally
+                {
+                    for (var index = _graphRollbackActions.Count - 1; index >= 0; index--)
+                        _graphRollbackActions[index]();
+                }
+                throw;
+            }
+            foreach (var action in _graphCommitActions) action();
+            return result;
+        }
+        finally
+        {
+            _lastFixEvidence = _currentFixEvidence.AsReadOnly();
+            InsertResource<IDataService>(original);
+            _ambientGraphSave.Value = null;
+            _activeGraphSave = null;
+            _graphFixTime = null;
+            _graphCommitActions = new List<Action>();
+            _graphRollbackActions = new List<Action>();
+            transaction?.Dispose();
+            _graphSaveGate.Release();
+        }
+    }
+
+    public void AfterGraphCommit(Action action)
+    {
+        if (_ambientGraphSave.Value == null || !ReferenceEquals(_ambientGraphSave.Value, _activeGraphSave))
+            throw new InvalidOperationException("No graph save is active");
+        _graphCommitActions.Add(action);
+    }
+
+    public void AfterGraphRollback(Action action)
+    {
+        if (_ambientGraphSave.Value == null || !ReferenceEquals(_ambientGraphSave.Value, _activeGraphSave))
+            throw new InvalidOperationException("No graph save is active");
+        _graphRollbackActions.Add(action);
     }
 
     public UserContext WithIdSetStore(IIdSetStore store)
@@ -259,10 +347,13 @@ public class UserContext
             _ => ""
         };
         if (!_checkers.TryGetValue(entity, out var checker)) return;
-        var violations = checker.CheckAndFix(this, request, DateTimeOffset.UtcNow).ToList();
+        var violations = checker.CheckAndFix(this, request, _graphFixTime ?? DateTimeOffset.UtcNow).ToList();
         TranslateCheckResults(violations);
         if (violations.Count != 0) throw new CheckException(violations);
     }
+
+    /// <summary>Generated graph infrastructure validates/fixes every node before its first provider mutation.</summary>
+    public void PreflightMutation(MutationRequest request) => CheckAndFix(request);
 
     public UserContext RegisterEntityInitializer(string entityName, Action<UserContext, object> initializer)
     {

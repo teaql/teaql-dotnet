@@ -36,6 +36,12 @@ public sealed record ObjectLocation
         return Append(new ObjectLocationSegment.Index(index));
     }
 
+    public ObjectLocation PrefixedBy(ObjectLocation prefix)
+    {
+        ArgumentNullException.ThrowIfNull(prefix);
+        return new(prefix._segments.Concat(_segments).ToArray());
+    }
+
     public string ModelPath => Render(static name => name);
 
     public string NativePath => Render(ToPascalCase);
