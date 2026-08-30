@@ -57,7 +57,7 @@ namespace Generated.Models
             return this;
         }
 
-        public Platform MarkAsDeleted()
+        public Platform MarkForDeletion()
         {
             _markedForDeletion = true;
             _entityRoot.MarkAsDeleted(TeaqlEntityKey());

@@ -62,7 +62,7 @@ namespace Generated.Models
             return this;
         }
 
-        public WorkItem MarkAsDeleted()
+        public WorkItem MarkForDeletion()
         {
             _markedForDeletion = true;
             _entityRoot.MarkAsDeleted(TeaqlEntityKey());

@@ -62,7 +62,7 @@ namespace Generated.Models
             return this;
         }
 
-        public School MarkAsDeleted()
+        public School MarkForDeletion()
         {
             _markedForDeletion = true;
             _entityRoot.MarkAsDeleted(TeaqlEntityKey());

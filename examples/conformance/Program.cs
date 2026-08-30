@@ -67,7 +67,7 @@ var updated = await queried.UpdateTitle("Verified .NET runtime")
 Require(updated.Version == oldVersion + 1, "Update did not increment version");
 Console.WriteLine($"PASS Update (version {oldVersion} -> {updated.Version})");
 
-await updated.MarkAsDeleted().AuditAs("Delete conformance work item").SaveAsync(context);
+await updated.MarkForDeletion().AuditAs("Delete conformance work item").SaveAsync(context);
 var remaining = await Q.WorkItems().WithIdIs(created.Id.Value)
     .Comment("Verify soft-deleted work item is excluded")
     .Purpose("Verify delete semantics")
