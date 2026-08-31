@@ -35,6 +35,12 @@ public interface IAppAuditEventSink
         CancellationToken cancellationToken = default);
 }
 
+/// <summary>Explicit value-bearing SQL diagnostic destination; never configured by default.</summary>
+public interface IDiagnosticSqlLogSink
+{
+    void Write(ExecutionMetadata metadata);
+}
+
 public interface IRemoteCacheProvider
 {
     void Put(string key, object value, int? timeToLiveInSeconds = null);

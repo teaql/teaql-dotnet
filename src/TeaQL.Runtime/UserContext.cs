@@ -54,6 +54,7 @@ public class UserContext
     
     public IServiceProvider? ServiceProvider { get; set; }
     public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = NoopRuntimeTelemetry.Instance;
+    public IDiagnosticSqlLogSink? DiagnosticSqlLogSink { get; private set; }
     public TeaQLLocale Locale { get; private set; } = TeaQLLocale.English;
     public I18nCatalog I18nCatalog { get; private set; } = I18nCatalog.Builtin;
     public IIdSetStore IdSetStore { get; private set; } = DefaultIdSetStore;
@@ -85,6 +86,17 @@ public class UserContext
     {
         RuntimeTelemetry = telemetry ?? NoopRuntimeTelemetry.Instance;
         return this;
+    }
+
+    public UserContext WithDiagnosticSqlLogSink(IDiagnosticSqlLogSink? sink)
+    {
+        DiagnosticSqlLogSink = sink;
+        return this;
+    }
+
+    internal void RecordExecutionMetadata(ExecutionMetadata? metadata)
+    {
+        if (metadata != null) DiagnosticSqlLogSink?.Write(metadata);
     }
 
     public UserContext WithDataService(IDataService provider)

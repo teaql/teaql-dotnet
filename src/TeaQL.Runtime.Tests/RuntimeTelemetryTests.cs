@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -124,6 +125,27 @@ public class RuntimeTelemetryTests
     }
 
     [Fact]
+    public async Task DiagnosticSqlLogIsExplicitAndUsesDebugQuery()
+    {
+        var output = new StringWriter();
+        var context = new UserContext().WithDataService(new StubDataService());
+        await context.RequireResource<IDataService>().QueryAsync(
+            new QueryRequest { Query = new SelectQuery("School") });
+        Assert.Equal("", output.ToString());
+
+        context.WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(output));
+        await context.RequireResource<IDataService>().QueryAsync(
+            new QueryRequest { Query = new SelectQuery("School") });
+        Assert.Contains("SELECT * FROM school_data WHERE name = 'O''Brien 学校'", output.ToString());
+
+        var before = output.ToString();
+        context.WithDiagnosticSqlLogSink(null);
+        await context.RequireResource<IDataService>().QueryAsync(
+            new QueryRequest { Query = new SelectQuery("School") });
+        Assert.Equal(before, output.ToString());
+    }
+
+    [Fact]
     public async Task RuntimeDataServiceCarriesObserverIntoActualRelationLoad()
     {
         var spans = new List<Activity>();
@@ -176,7 +198,17 @@ public class RuntimeTelemetryTests
                     request.Query.Entity, request.Query.RelationLoads[0].Name,
                     new Dictionary<string, object>(),
                     () => Task.CompletedTask);
-            return new QueryResult { Rows = new List<TeaQL.Core.Record> { new() } };
+            return new QueryResult {
+                Rows = new List<TeaQL.Core.Record> { new() },
+                Metadata = new ExecutionMetadata {
+                    Operation = DataServiceOperation.Query,
+                    StartedAt = DateTimeOffset.UnixEpoch,
+                    EndedAt = DateTimeOffset.UnixEpoch.AddMilliseconds(1),
+                    ResultCount = 1,
+                    ParameterizedQuery = "SELECT * FROM school_data WHERE name = ?",
+                    DebugQuery = "SELECT * FROM school_data WHERE name = 'O''Brien 学校'"
+                }
+            };
         }
         public Task<MutationResult> MutateAsync(MutationRequest request) =>
             Task.FromResult(new MutationResult { AffectedRows = 1 });

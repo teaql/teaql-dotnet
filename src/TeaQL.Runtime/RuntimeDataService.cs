@@ -182,8 +182,9 @@ public sealed class RuntimeDataService : IDataService
             });
     }
 
-    private Task<QueryResult> ObserveProviderQueryAsync(QueryRequest request) =>
-        _context.RuntimeTelemetry.ObserveAsync(
+    private async Task<QueryResult> ObserveProviderQueryAsync(QueryRequest request)
+    {
+        var result = await _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("provider", "data-service.query",
                 new Dictionary<string, object>
                 {
@@ -194,10 +195,14 @@ public sealed class RuntimeDataService : IDataService
             result => new Dictionary<string, object>
             {
                 ["teaql.result.cardinality"] = result.Rows.Count
-            });
+            }).ConfigureAwait(false);
+        _context.RecordExecutionMetadata(result.Metadata);
+        return result;
+    }
 
-    private Task<MutationResult> ObserveProviderMutationAsync(MutationRequest request) =>
-        _context.RuntimeTelemetry.ObserveAsync(
+    private async Task<MutationResult> ObserveProviderMutationAsync(MutationRequest request)
+    {
+        var result = await _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("provider", "data-service.mutate",
                 new Dictionary<string, object>
                 {
@@ -208,7 +213,10 @@ public sealed class RuntimeDataService : IDataService
             result => new Dictionary<string, object>
             {
                 ["teaql.result.cardinality"] = result.AffectedRows
-            });
+            }).ConfigureAwait(false);
+        _context.RecordExecutionMetadata(result.Metadata);
+        return result;
+    }
 
     private static string EntityName(MutationRequest request) => request switch
     {
