@@ -26,7 +26,8 @@ try
 }
 catch (CheckException error)
 {
-    Require(error.Violations.Any(item => item.RuleId == "required" && item.Location.Contains("title")),
+    Require(error.Violations.Any(item => item.RuleId == "required"
+        && item.Location.ToString().Contains("title", StringComparison.OrdinalIgnoreCase)),
         "Checker did not identify title");
 }
 Require(context.SqlTrace.Count == sqlBeforeInvalid, "Checker must run before mutation SQL");
@@ -46,6 +47,15 @@ var queried = await Q.WorkItems().WithIdIs(created.Id.Value)
     .ExecuteForOneAsync(context);
 Require(queried is not null && queried.Title == "Verify .NET runtime", "Q API result mismatch");
 Console.WriteLine("PASS Q API (typed SmartList<WorkItem>)");
+
+var related = await Q.WorkItems().WithIdIs(created.Id.Value)
+    .SelectPlatformWith(Q.PlatformsWithMinimalFields().SelectName())
+    .Comment("what: load work item with platform")
+    .Purpose("why: prove generated relation trace inheritance")
+    .ExecuteForOneAsync(context);
+Require(related?.PlatformEntity?.Name == "Runtime Example",
+    "Forward Platform relation was not loaded");
+Console.WriteLine("PASS relation query (typed Platform and inherited trace intent)");
 
 Require(E.WorkItem(queried).Title().Eval() == "Verify .NET runtime", "E loaded scalar mismatch");
 Require(E.WorkItem(queried).Description().OrIfNull("N/A") == "N/A", "E null fallback mismatch");

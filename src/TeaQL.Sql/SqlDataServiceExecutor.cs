@@ -85,14 +85,15 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
         var metadata = new ExecutionMetadata
         {
-            Backend = "sql",
+            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
             Operation = DataServiceOperation.Query,
             StartedAt = start,
             EndedAt = end,
             AffectedRows = null,
             ResultCount = rows.Count,
-            TraceChain = request.TraceChain ?? new List<TraceNode>(),
+            TraceChain = SqlDataServiceTransaction.QueryTracePath(request, Dialect.Kind.ToString()),
             Comment = request.Comment,
+            Purpose = request.Purpose,
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
@@ -146,7 +147,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
                 GeneratedValues = new Record(),
                 Metadata = new ExecutionMetadata
                 {
-                    Backend = "sql",
+                    Backend = Dialect.Kind.ToString().ToLowerInvariant(),
                     Operation = DataServiceOperation.Batch,
                     StartedAt = batchStart,
                     EndedAt = batchEnd,
@@ -223,14 +224,15 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
         var metadata = new ExecutionMetadata
         {
-            Backend = "sql",
+            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
             Operation = operation,
             StartedAt = start,
             EndedAt = end,
             AffectedRows = affectedRows,
             ResultCount = null,
-            TraceChain = request.TraceChain?.ToList() ?? new List<TraceNode>(),
+            TraceChain = SqlDataServiceTransaction.MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
             Comment = request.Comment,
+            AuditReason = request.Comment,
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
@@ -373,8 +375,14 @@ internal static class RelationQueryLoader
                     var childResult = await queryAsync(new QueryRequest
                     {
                         Query = executionQuery,
-                        TraceChain = request.TraceChain,
+                        TraceChain = request.TraceChain.Concat(new[] {
+                            new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
+                                Level = request.TraceChain.Count, Kind = "relation",
+                                Name = $"{request.Query.Entity}.{load.Name}"
+                            }
+                        }).ToList(),
                         Comment = request.Comment,
+                        Purpose = request.Purpose,
                         RelationLoadObserver = request.RelationLoadObserver
                     });
                     childRows.AddRange(childResult.Rows);
@@ -437,8 +445,14 @@ internal static class RelationQueryLoader
             var result = await queryAsync(new QueryRequest
             {
                 Query = childQuery,
-                TraceChain = request.TraceChain,
+                TraceChain = request.TraceChain.Concat(new[] {
+                    new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
+                        Level = request.TraceChain.Count, Kind = "relation",
+                        Name = $"{request.Query.Entity}.{aggregate.RelationName}"
+                    }
+                }).ToList(),
                 Comment = request.Comment,
+                Purpose = request.Purpose,
                 RelationLoadObserver = request.RelationLoadObserver
             });
             var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity);
@@ -595,14 +609,15 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
         var metadata = new ExecutionMetadata
         {
-            Backend = "sql",
+            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
             Operation = DataServiceOperation.Query,
             StartedAt = start,
             EndedAt = end,
             AffectedRows = null,
             ResultCount = rows.Count,
-            TraceChain = request.TraceChain ?? new List<TraceNode>(),
+            TraceChain = QueryTracePath(request, Dialect.Kind.ToString()),
             Comment = request.Comment,
+            Purpose = request.Purpose,
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
@@ -639,7 +654,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
                 GeneratedValues = new Record(),
                 Metadata = new ExecutionMetadata
                 {
-                    Backend = "sql",
+                    Backend = Dialect.Kind.ToString().ToLowerInvariant(),
                     Operation = DataServiceOperation.Batch,
                     StartedAt = batchStart,
                     EndedAt = batchEnd,
@@ -716,14 +731,15 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
         var metadata = new ExecutionMetadata
         {
-            Backend = "sql",
+            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
             Operation = operation,
             StartedAt = start,
             EndedAt = end,
             AffectedRows = affectedRows,
             ResultCount = null,
-            TraceChain = request.TraceChain?.ToList() ?? new List<TraceNode>(),
+            TraceChain = MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
             Comment = request.Comment,
+            AuditReason = request.Comment,
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
@@ -786,6 +802,31 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         {
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
+    }
+
+    internal static List<TraceNode> QueryTracePath(QueryRequest request, string provider)
+    {
+        var result = new List<TraceNode> {
+            new(request.Query.Entity, null, request.Comment ?? "") { Level = 0, Kind = "operation", Name = "query" },
+            new(request.Query.Entity, null, request.Comment ?? "") { Level = 1, Kind = "request", Name = request.Query.Entity }
+        };
+        result.AddRange(request.TraceChain);
+        result.Add(new TraceNode(request.Query.Entity, null, "") { Level = result.Count, Kind = "provider", Name = provider.ToLowerInvariant() });
+        result.Add(new TraceNode(request.Query.Entity, null, "") { Level = result.Count, Kind = "sql", Name = "select" });
+        return result;
+    }
+
+    internal static List<TraceNode> MutationTracePath(
+        MutationRequest request, string entityName, DataServiceOperation operation, string provider)
+    {
+        var result = new List<TraceNode> {
+            new(entityName, null, request.Comment ?? "") { Level = 0, Kind = "operation", Name = "mutation" },
+            new(entityName, null, request.Comment ?? "") { Level = 1, Kind = "entity", Name = entityName }
+        };
+        result.AddRange(request.TraceChain);
+        result.Add(new TraceNode(entityName, null, "") { Level = result.Count, Kind = "provider", Name = provider.ToLowerInvariant() });
+        result.Add(new TraceNode(entityName, null, "") { Level = result.Count, Kind = "sql", Name = operation.ToString().ToLowerInvariant() });
+        return result;
     }
 
     public void Dispose()

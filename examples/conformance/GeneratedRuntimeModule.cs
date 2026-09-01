@@ -11,8 +11,8 @@ internal sealed class PlatformChecker : IEntityChecker
         var creating = request.Command is InsertCommand;
         var updating = request.Command is UpdateCommand;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult("required", "name"));
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", "name"));
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("name")));
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("name")));
 
 
         return results;
@@ -28,13 +28,13 @@ internal sealed class WorkItemChecker : IEntityChecker
         var creating = request.Command is InsertCommand;
         var updating = request.Command is UpdateCommand;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("title")) || (values.TryGetValue("title", out var checkTitle) && checkTitle is Value.NullValue)) results.Add(new CheckResult("required", "title"));
-        if (values.TryGetValue("title", out var minLenTitle) && minLenTitle.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult("min_length", "title"));
-        if (values.TryGetValue("title", out var maxLenTitle) && maxLenTitle.Raw?.ToString()?.Length > 80) results.Add(new CheckResult("max_length", "title"));
+        if ((creating && !values.ContainsKey("title")) || (values.TryGetValue("title", out var checkTitle) && checkTitle is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("title")));
+        if (values.TryGetValue("title", out var minLenTitle) && minLenTitle.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult("min_length", ObjectLocation.Property("title")));
+        if (values.TryGetValue("title", out var maxLenTitle) && maxLenTitle.Raw?.ToString()?.Length > 80) results.Add(new CheckResult("max_length", ObjectLocation.Property("title")));
 
-        if (values.TryGetValue("description", out var maxLenDescription) && maxLenDescription.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", "description"));
+        if (values.TryGetValue("description", out var maxLenDescription) && maxLenDescription.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("description")));
 
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult("required", "platform"));
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("platform")));
 
 
         return results;
@@ -50,23 +50,35 @@ public static class GeneratedRuntimeModule
        "WorkItem"
     }, new Dictionary<string, IEntityChecker>
     {
-        ["Platform"] = new PlatformChecker(),
-        ["WorkItem"] = new WorkItemChecker()
+       ["Platform"] = new PlatformChecker(),
+       ["WorkItem"] = new WorkItemChecker()
     }, new Dictionary<string, Record>
     {
-        ["Platform"] = new Record
-        {
+       ["Platform"] = new Record {
             ["id"] = new Value.I64Value(0),
             ["name"] = new Value.TextValue(""),
             ["version"] = new Value.I64Value(0)
         },
-        ["WorkItem"] = new Record
-        {
+       ["WorkItem"] = new Record {
             ["id"] = new Value.I64Value(0),
             ["title"] = new Value.TextValue(""),
             ["description"] = new Value.TextValue(""),
             ["platform"] = new Value.I64Value(0),
             ["version"] = new Value.I64Value(0)
         }
-    });
+    }, new Dictionary<string, IReadOnlyDictionary<string, bool>>
+    {
+       ["Platform"] = new Dictionary<string, bool> {
+           ["id"] = true,
+           ["name"] = true,
+           ["version"] = true
+        },
+       ["WorkItem"] = new Dictionary<string, bool> {
+           ["id"] = true,
+           ["title"] = true,
+           ["description"] = false,
+           ["platform"] = true,
+           ["version"] = true
+        }
+    }, new[] { new BootstrapEntity("Platform", 1, new Record { ["name"] = new Value.TextValue("Runtime Example") }) }, Array.Empty<BootstrapEntity>());
 }

@@ -41,7 +41,16 @@ namespace TeaQL.Sql.Tests
         [Fact]
         public async Task QueryAsync_CallsTransport_AndReturnsResult()
         {
-            var req = new QueryRequest { Query = new SelectQuery { Entity = "TestEntity" } };
+            var req = new QueryRequest {
+                Query = new SelectQuery { Entity = "TestEntity" },
+                Comment = "what: load governed records",
+                Purpose = "why: verify trace inheritance",
+                TraceChain = new List<TraceNode> {
+                    new("Organization", null, "organization") { Level = 2, Kind = "relation", Name = "TestEntity.organization" },
+                    new("Region", null, "region") { Level = 3, Kind = "relation", Name = "Organization.region" },
+                    new("Country", null, "country") { Level = 4, Kind = "relation", Name = "Region.country" }
+                }
+            };
             var ed = new EntityDescriptor { Name = "TestEntity", TableNameValue = "test" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
@@ -61,6 +70,10 @@ namespace TeaQL.Sql.Tests
             Assert.DoesNotContain("secret-customer-value", result.Metadata.ParameterizedQuery);
             Assert.Single(result.Metadata.Parameters);
             Assert.Equal(1, result.Metadata.ParameterCount);
+            Assert.Equal(req.Comment, result.Metadata.Comment);
+            Assert.Equal(req.Purpose, result.Metadata.Purpose);
+            Assert.Equal(new[] { "operation", "request", "relation", "relation", "relation", "provider", "sql" },
+                result.Metadata.TraceChain.Select(node => node.Kind));
         }
 
         [Fact]
@@ -144,6 +157,7 @@ namespace TeaQL.Sql.Tests
         public async Task MutateAsync_Insert_CallsTransport()
         {
             var cmd = new InsertCommand { Entity = "TestEntity" };
+            cmd.TraceChain.Add(new TraceNode("TestEntity", null, "create fixture") { Kind = "auditReason", Name = "TestEntity" });
             var req = new InsertMutationRequest(cmd);
             var ed = new EntityDescriptor { Name = "TestEntity", TableNameValue = "test" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
@@ -159,6 +173,7 @@ namespace TeaQL.Sql.Tests
             Assert.Equal(DataServiceOperation.Insert, result.Metadata.Operation);
             Assert.Equal("INSERT ...", result.Metadata.ParameterizedQuery);
             Assert.Empty(result.Metadata.Parameters);
+            Assert.Equal("create fixture", result.Metadata.AuditReason);
         }
 
         [Fact]

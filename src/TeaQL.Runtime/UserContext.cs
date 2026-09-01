@@ -54,7 +54,9 @@ public class UserContext
     
     public IServiceProvider? ServiceProvider { get; set; }
     public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = NoopRuntimeTelemetry.Instance;
-    public IDiagnosticSqlLogSink? DiagnosticSqlLogSink { get; private set; }
+    public IDiagnosticSqlLogSink? DiagnosticSqlLogSink { get; private set; } = new TextDiagnosticSqlLogSink();
+    public bool QuerySqlLogEnabled { get; private set; } = true;
+    public bool MutationSqlLogEnabled { get; private set; } = true;
     public TeaQLLocale Locale { get; private set; } = TeaQLLocale.English;
     public I18nCatalog I18nCatalog { get; private set; } = I18nCatalog.Builtin;
     public IIdSetStore IdSetStore { get; private set; } = DefaultIdSetStore;
@@ -94,9 +96,17 @@ public class UserContext
         return this;
     }
 
+    public UserContext EnableQuerySqlLog(bool enabled = true) { QuerySqlLogEnabled = enabled; return this; }
+    public UserContext EnableMutationSqlLog(bool enabled = true) { MutationSqlLogEnabled = enabled; return this; }
+    public UserContext DisableQuerySqlLog() => EnableQuerySqlLog(false);
+    public UserContext DisableMutationSqlLog() => EnableMutationSqlLog(false);
+
     internal void RecordExecutionMetadata(ExecutionMetadata? metadata)
     {
-        if (metadata != null) DiagnosticSqlLogSink?.Write(metadata);
+        if (metadata == null) return;
+        var query = metadata.Operation == DataServiceOperation.Query;
+        if ((query && !QuerySqlLogEnabled) || (!query && !MutationSqlLogEnabled)) return;
+        DiagnosticSqlLogSink?.Write(metadata);
     }
 
     public UserContext WithDataService(IDataService provider)

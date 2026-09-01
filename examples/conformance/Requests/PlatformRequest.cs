@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,6 +72,24 @@ namespace Generated.Requests
             return this;
         }
 
+        public PlatformRequest OptimizePaginationWithIdSet()
+        {
+            _query.OptimizePaginationWithIdSet();
+            return this;
+        }
+
+        public PlatformRequest OptimizePaginationWithIdSet(string namespaceName, int ttlSeconds, int maxIds)
+        {
+            _query.OptimizePaginationWithIdSet(namespaceName, ttlSeconds, maxIds);
+            return this;
+        }
+
+        public PlatformRequest TopNProbeParentThreshold(int threshold)
+        {
+            _query.TopNProbeParentThreshold(threshold);
+            return this;
+        }
+
         public PlatformRequest Limit(int n)
         {
             _query.Limit(n);
@@ -91,126 +110,298 @@ namespace Generated.Requests
             return this;
         }
 
-        public PlatformRequest SelectId()
-        {
-            _query.Project("id");
-            return this;
-        }
+                public PlatformRequest SelectId()
+                {
+                    _query.Project("id");
+                    return this;
+                }
 
-        public PlatformRequest SelectName()
-        {
-            _query.Project("name");
-            return this;
-        }
+                public PlatformRequest SelectName()
+                {
+                    _query.Project("name");
+                    return this;
+                }
 
-        public PlatformRequest SelectVersion()
-        {
-            _query.Project("version");
-            return this;
-        }
+                public PlatformRequest SelectVersion()
+                {
+                    _query.Project("version");
+                    return this;
+                }
 
 
-        public PlatformRequest WithIdIs(object val)
-        {
-            _query.AndFilter(Expr.Eq("id", val));
-            return this;
-        }
+                public PlatformRequest WithIdIs(object val)
+                {
+                    _query.AndFilter(Expr.Eq("id", val));
+                    return this;
+                }
 
-        public PlatformRequest WithIdIn(params object[] vals)
-        {
-            _query.AndFilter(Expr.In("id", vals));
-            return this;
-        }
+                public PlatformRequest WithIdIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("id", val));
+                    return this;
+                }
 
-        public PlatformRequest WithIdGreaterThanOrEqualTo(object val)
-        {
-            _query.AndFilter(Expr.Gte("id", val));
-            return this;
-        }
+                public PlatformRequest WithIdIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.In("id", vals));
+                    return this;
+                }
 
-        public PlatformRequest WithIdLessThanOrEqualTo(object val)
-        {
-            _query.AndFilter(Expr.Lte("id", val));
-            return this;
-        }
+                public PlatformRequest WithIdNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("id", vals));
+                    return this;
+                }
 
-        public PlatformRequest WithNameContaining(string val)
-        {
-            _query.AndFilter(Expr.Contain("name", val));
-            return this;
-        }
+                public PlatformRequest WithIdGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("id", val));
+                    return this;
+                }
 
-        public PlatformRequest WithNameIs(string val)
-        {
-            _query.AndFilter(Expr.Eq("name", val));
-            return this;
-        }
+                public PlatformRequest WithIdGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte("id", val));
+                    return this;
+                }
 
-        public PlatformRequest WithNameIn(params object[] vals)
-        {
-            _query.AndFilter(Expr.In("name", vals));
-            return this;
-        }
+                public PlatformRequest WithIdLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("id", val));
+                    return this;
+                }
 
-        public PlatformRequest WithVersionIs(object val)
-        {
-            _query.AndFilter(Expr.Eq("version", val));
-            return this;
-        }
+                public PlatformRequest WithIdLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte("id", val));
+                    return this;
+                }
 
-        public PlatformRequest WithVersionIn(params object[] vals)
-        {
-            _query.AndFilter(Expr.In("version", vals));
-            return this;
-        }
+                public PlatformRequest WithIdBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("id", lower, upper));
+                    return this;
+                }
 
-        public PlatformRequest WithVersionGreaterThanOrEqualTo(object val)
-        {
-            _query.AndFilter(Expr.Gte("version", val));
-            return this;
-        }
+                public PlatformRequest WithIdIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("id"));
+                    return this;
+                }
 
-        public PlatformRequest WithVersionLessThanOrEqualTo(object val)
-        {
-            _query.AndFilter(Expr.Lte("version", val));
-            return this;
-        }
+                public PlatformRequest WithIdIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("id"));
+                    return this;
+                }
 
-        public PlatformRequest OrderByIdAscending()
-        {
-            _query.OrderBy("id", "asc");
-            return this;
-        }
+                public PlatformRequest WithNameContaining(string val)
+                {
+                    _query.AndFilter(Expr.Contain("name", val));
+                    return this;
+                }
 
-        public PlatformRequest OrderByIdDescending()
-        {
-            _query.OrderBy("id", "desc");
-            return this;
-        }
+                public PlatformRequest WithNameIs(string val)
+                {
+                    _query.AndFilter(Expr.Eq("name", val));
+                    return this;
+                }
+                public PlatformRequest WithNameIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("name", val));
+                    return this;
+                }
 
-        public PlatformRequest OrderByNameAscending()
-        {
-            _query.OrderBy("name", "asc");
-            return this;
-        }
+                public PlatformRequest WithNameIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.In("name", vals));
+                    return this;
+                }
 
-        public PlatformRequest OrderByNameDescending()
-        {
-            _query.OrderBy("name", "desc");
-            return this;
-        }
+                public PlatformRequest WithNameNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("name", vals));
+                    return this;
+                }
 
-        public PlatformRequest OrderByVersionAscending()
-        {
-            _query.OrderBy("version", "asc");
-            return this;
-        }
+                public PlatformRequest WithNameGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("name", val));
+                    return this;
+                }
 
-        public PlatformRequest OrderByVersionDescending()
-        {
-            _query.OrderBy("version", "desc");
-            return this;
-        }
+                public PlatformRequest WithNameGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("name", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithNameIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("name"));
+                    return this;
+                }
+
+                public PlatformRequest WithNameIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("name"));
+                    return this;
+                }
+                public PlatformRequest WithNameNotContaining(string val)
+                {
+                    _query.AndFilter(Expr.NotContain("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.BeginWith("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameNotStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.EndWith("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameNotEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithNameSoundingLike(string val)
+                {
+                    _query.AndFilter(Expr.SoundLike("name", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionIs(object val)
+                {
+                    _query.AndFilter(Expr.Eq("version", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne("version", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.In("version", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn("version", vals));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt("version", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte("version", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt("version", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte("version", val));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between("version", lower, upper));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("version"));
+                    return this;
+                }
+
+                public PlatformRequest WithVersionIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("version"));
+                    return this;
+                }
+
+                public PlatformRequest OrderByIdAscending()
+                {
+                    _query.OrderBy("id", "asc");
+                    return this;
+                }
+
+                public PlatformRequest OrderByIdDescending()
+                {
+                    _query.OrderBy("id", "desc");
+                    return this;
+                }
+
+                public PlatformRequest OrderByNameAscending()
+                {
+                    _query.OrderBy("name", "asc");
+                    return this;
+                }
+
+                public PlatformRequest OrderByNameDescending()
+                {
+                    _query.OrderBy("name", "desc");
+                    return this;
+                }
+
+                public PlatformRequest OrderByVersionAscending()
+                {
+                    _query.OrderBy("version", "asc");
+                    return this;
+                }
+
+                public PlatformRequest OrderByVersionDescending()
+                {
+                    _query.OrderBy("version", "desc");
+                    return this;
+                }
 
 
         public PlatformRequest Count()
@@ -225,56 +416,124 @@ namespace Generated.Requests
             return this;
         }
 
-        public PlatformRequest GroupById()
-        {
-            _query.GroupBy("id");
-            return this;
-        }
+                public PlatformRequest GroupById()
+                {
+                    _query.GroupBy("id");
+                    return this;
+                }
 
-        public PlatformRequest GroupByIdAs(string retName)
-        {
-            _query.GroupBy("id");
-            return this;
-        }
-        public PlatformRequest GroupByName()
-        {
-            _query.GroupBy("name");
-            return this;
-        }
+                public PlatformRequest GroupByIdAs(string retName)
+                {
+                    _query.GroupBy("id"); 
+                    return this;
+                }
+                public PlatformRequest GroupByName()
+                {
+                    _query.GroupBy("name");
+                    return this;
+                }
 
-        public PlatformRequest GroupByNameAs(string retName)
-        {
-            _query.GroupBy("name");
-            return this;
-        }
-        public PlatformRequest GroupByVersion()
-        {
-            _query.GroupBy("version");
-            return this;
-        }
+                public PlatformRequest GroupByNameAs(string retName)
+                {
+                    _query.GroupBy("name"); 
+                    return this;
+                }
+                public PlatformRequest GroupByVersion()
+                {
+                    _query.GroupBy("version");
+                    return this;
+                }
 
-        public PlatformRequest GroupByVersionAs(string retName)
-        {
-            _query.GroupBy("version");
-            return this;
-        }
-        public PlatformRequest SelectWorkItemList()
-        {
-            return SelectWorkItemListWith(new WorkItemRequest());
-        }
+                public PlatformRequest GroupByVersionAs(string retName)
+                {
+                    _query.GroupBy("version"); 
+                    return this;
+                }
+                public PlatformRequest SelectWorkItemList()
+                {
+                    return SelectWorkItemListWith(new WorkItemRequest());
+                }
 
-        public PlatformRequest SelectWorkItemListWith(WorkItemRequest child)
-        {
-            _query.RelationQuery("WorkItemList", "WorkItem", "platform", true, child.GetQuery());
-            return this;
-        }
+                public PlatformRequest SelectWorkItemListWith(WorkItemRequest child)
+                {
+                    _query.RelationQuery("WorkItemList", "WorkItem", "platform", true, child.GetQuery());
+                    return this;
+                }
+                public PlatformRequest HaveWorkItems()
+                    => WithWorkItemListMatching(new WorkItemRequest());
+
+                public PlatformRequest HaveNoWorkItems()
+                    => WithoutWorkItemListMatching(new WorkItemRequest());
+
+                public PlatformRequest WithWorkItemListMatching(WorkItemRequest child)
+                {
+                    _query.AndFilter(Expr.InSubquery("id", EntityDescriptor.New("WorkItem"), child.GetQuery(), "platform"));
+                    return this;
+                }
+
+                public PlatformRequest WithoutWorkItemListMatching(WorkItemRequest child)
+                {
+                    _query.AndFilter(Expr.NotInSubquery("id", EntityDescriptor.New("WorkItem"), child.GetQuery(), "platform"));
+                    return this;
+                }
+                public PlatformRequest CountWorkItems()
+                    => CountWorkItemsAs("countWorkItems");
+
+                public PlatformRequest CountWorkItemsAs(string alias)
+                    => CountWorkItemsWith(alias, new WorkItemRequest());
+
+                public PlatformRequest CountWorkItemsWith(string alias, WorkItemRequest child)
+                {
+                    child.GetQuery().Aggregate("Count", "id", alias);
+                    _query.RelationAggregate("WorkItemList", "WorkItem", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+
+
 
         private async Task<QueryResult> ExecuteForListInternalAsync(UserContext context)
         {
             EnsureIntent();
             var service = context.RequireDataService();
             var req = new QueryRequest(_query);
-            return await service.QueryAsync(context, req);
+            var result = await service.QueryAsync(context, req);
+            foreach (var facet in _query.Facets)
+            {
+                var membership = _query.Copy();
+                membership.Facets.Clear();
+                membership.Relations.Clear();
+                membership.Orders.Clear();
+                membership.Aggregates.Clear();
+                membership.GroupFields.Clear();
+                membership.Projections.Clear();
+                membership.Project(facet.RelationName);
+                var membershipRows = (await service.QueryAsync(context, new QueryRequest(membership))).Rows;
+                var counts = membershipRows
+                    .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
+                    .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw))
+                    .ToDictionary(group => group.Key, group => group.Count());
+
+                var nested = facet.Query.Copy();
+                nested.Facets.Clear();
+                var countAliases = nested.Aggregates
+                    .Where(aggregate => string.Equals(aggregate.Function, "Count", StringComparison.OrdinalIgnoreCase))
+                    .Select(aggregate => aggregate.Alias).ToArray();
+                nested.Aggregates.Clear();
+                nested.GroupFields.Clear();
+                var facetRows = (await service.QueryAsync(context, new QueryRequest(nested))).Rows;
+                var decorated = new SmartList<Record>();
+                foreach (var row in facetRows)
+                {
+                    var key = row.TryGetValue("id", out var id) ? Convert.ToString(id.Raw) : null;
+                    var count = key != null && counts.TryGetValue(key, out var value) ? value : 0;
+                    if (!facet.IncludeAllFacets && count == 0) continue;
+                    foreach (var alias in countAliases.Length == 0 ? new[] { "count" } : countAliases)
+                        row[alias] = new Value.I64Value(count);
+                    decorated.Add(row);
+                }
+                result.Facets[facet.Name] = decorated;
+            }
+            return result;
         }
 
         private async Task<PlatformPage> ExecuteForPageInternalAsync(
@@ -284,19 +543,27 @@ namespace Generated.Requests
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
             if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireDataService();
-            var countQuery = new SelectQuery("Platform");
-            foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
-            countQuery.Aggregate("Count", "id", "count");
-            var countResult = await service.QueryAsync(context, new QueryRequest(countQuery));
-            var totalCount = countResult.Rows.Count == 0
-                ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
-
             _query.Offset(offset);
             _query.Limit(limit);
             var result = await service.QueryAsync(context, new QueryRequest(_query));
+            long totalCount;
+            if (_query.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
+            {
+                totalCount = context.IdSetCount;
+            }
+            else
+            {
+                var countQuery = new SelectQuery("Platform");
+                foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
+                countQuery.Aggregate("Count", "id", "count");
+                var countResult = await service.QueryAsync(context, new QueryRequest(countQuery));
+                totalCount = countResult.Rows.Count == 0
+                    ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
+            }
             var rows = new SmartList<Generated.Models.Platform>();
+            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                rows.Add(Generated.Models.Platform.FromRecord(row));
+                rows.Add(Generated.Models.Platform.FromRecord(row, queryRoot));
             return new PlatformPage(rows, totalCount);
         }
 
@@ -312,8 +579,9 @@ namespace Generated.Requests
             await foreach (var chunk in streaming.QueryStreamAsync(
                 context, new QueryRequest(_query), chunkSize, cancellationToken).WithCancellation(cancellationToken))
             {
+                var queryRoot = new EntityRoot();
                 foreach (var row in chunk.Rows)
-                    yield return Generated.Models.Platform.FromRecord(row);
+                    yield return Generated.Models.Platform.FromRecord(row, queryRoot);
             }
         }
 
@@ -369,8 +637,10 @@ namespace Generated.Requests
         {
             var result = await ExecuteForRowsAsync(context);
             var entities = new SmartList<Generated.Models.Platform>();
+            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                entities.Add(Generated.Models.Platform.FromRecord(row));
+                entities.Add(Generated.Models.Platform.FromRecord(row, queryRoot));
+            entities.Facets = result.Facets;
             return entities;
         }
 

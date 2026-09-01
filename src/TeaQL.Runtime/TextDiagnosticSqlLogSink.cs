@@ -25,7 +25,9 @@ public sealed class TextDiagnosticSqlLogSink : IDiagnosticSqlLogSink
         lock (_gate)
         {
             _writer.WriteLine($"[TeaQL SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us] {summary}");
-            _writer.WriteLine(metadata.DebugQuery);
+            _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)}");
+            _writer.WriteLine($"Parameterized SQL: {metadata.ParameterizedQuery} params=[{string.Join(", ", metadata.Parameters)}]");
+            _writer.WriteLine($"Debug SQL: {metadata.DebugQuery}");
         }
     }
 }

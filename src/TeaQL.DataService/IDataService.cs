@@ -24,6 +24,7 @@ public class QueryRequest
     public SelectQuery Query { get; set; } = new();
     public List<TraceNode> TraceChain { get; set; } = new();
     public string? Comment { get; set; }
+    public string? Purpose { get; set; }
     /// <summary>Runtime-only observer; providers must not serialize it.</summary>
     public IRelationLoadObserver? RelationLoadObserver { get; set; }
 }
@@ -141,6 +142,8 @@ public class ExecutionMetadata
     public int? ResultCount { get; set; }
     public List<TraceNode> TraceChain { get; set; } = new();
     public string? Comment { get; set; }
+    public string? Purpose { get; set; }
+    public string? AuditReason { get; set; }
     public string? BackendRequestId { get; set; }
     /// <summary>Provider-native request text with placeholders, never interpolated bind values.</summary>
     public string? ParameterizedQuery { get; set; }

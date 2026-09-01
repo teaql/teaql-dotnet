@@ -35,7 +35,7 @@ public interface IAppAuditEventSink
         CancellationToken cancellationToken = default);
 }
 
-/// <summary>Explicit value-bearing SQL diagnostic destination; never configured by default.</summary>
+/// <summary>Value-bearing SQL diagnostic destination; a text sink is configured by default.</summary>
 public interface IDiagnosticSqlLogSink
 {
     void Write(ExecutionMetadata metadata);

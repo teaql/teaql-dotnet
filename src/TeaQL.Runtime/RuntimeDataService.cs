@@ -141,6 +141,7 @@ public sealed class RuntimeDataService : IDataService
         Query = query,
         TraceChain = new List<TraceNode>(source.TraceChain),
         Comment = source.Comment,
+        Purpose = source.Purpose,
         RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry)
     };
 

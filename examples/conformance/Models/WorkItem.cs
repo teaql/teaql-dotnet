@@ -12,26 +12,20 @@ namespace Generated.Models
         private EntityRoot _entityRoot = new EntityRoot();
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private EntityKey TeaqlEntityKey() => new EntityKey("WorkItem", Id ?? _ledgerId);
-        internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; } }
-        private static Value TeaqlValue(object value) => value switch
-        {
-            null => new Value.NullValue(),
-            string v => new Value.TextValue(v),
-            bool v => new Value.BoolValue(v),
-            double v => new Value.F64Value(v),
-            decimal v => new Value.DecimalValue(v),
-            DateTime v => new Value.DateTimeValue(v),
-            int v => new Value.I64Value(v),
-            long v => new Value.I64Value(v),
-            _ => new Value.ObjectValue(value)
+        internal EntityRoot TeaqlMutationLedger => _entityRoot;
+        internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; }  }
+        private static Value TeaqlValue(object value) => value switch {
+            null => new Value.NullValue(), string v => new Value.TextValue(v), bool v => new Value.BoolValue(v),
+            double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.DateTimeValue(v), TimeSpan v => new Value.TimeValue(v),
+            int v => new Value.I64Value(v), long v => new Value.I64Value(v), _ => new Value.ObjectValue(value)
         };
         public WorkItem() { _entityRoot.MarkAsNew(TeaqlEntityKey()); }
-        public long? Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public long? Platform { get; set; }
-        public long? Version { get; set; }
-        public Platform PlatformEntity { get; set; }
+                public long? Id { get; set; }
+                public string Title { get; set; }
+                public string Description { get; set; }
+                public long? Platform { get; set; }
+                public long? Version { get; set; }
+                public Platform PlatformEntity { get; set; }
 
         private string _comment;
         private bool _markedForDeletion;
@@ -77,73 +71,143 @@ namespace Generated.Models
         public static WorkItem FromRecord(Record record)
         {
             var entity = new WorkItem().MarkLoadedOnly();
-            if (record.TryGetValue("id", out var idValue))
-            {
-                entity.MarkLoaded("Id");
-                if (idValue.Raw != null)
-                    entity.Id = Convert.ToInt64(idValue.Raw);
-            }
-            if (record.TryGetValue("title", out var titleValue))
-            {
-                entity.MarkLoaded("Title");
-                if (titleValue.Raw != null)
-                    entity.Title = Convert.ToString(titleValue.Raw);
-            }
-            if (record.TryGetValue("description", out var descriptionValue))
-            {
-                entity.MarkLoaded("Description");
-                if (descriptionValue.Raw != null)
-                    entity.Description = Convert.ToString(descriptionValue.Raw);
-            }
-            if (record.TryGetValue("Platform", out var platformValue)
-                || record.TryGetValue("platform", out platformValue))
-            {
-                entity.MarkLoaded("Platform");
-                if (platformValue.Raw is IEnumerable<Record> platformRows)
-                {
-                    foreach (var row in platformRows)
+                    if (record.TryGetValue("id", out var idValue))
                     {
-                        entity.PlatformEntity = global::Generated.Models.Platform.FromRecord(row);
-                        entity.Platform = entity.PlatformEntity.Id;
-                        entity.MarkLoaded("PlatformEntity");
-                        break;
+                        entity.MarkLoaded("Id");
+                        if (idValue.Raw != null)
+                            entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                }
-                else if (platformValue.Raw != null)
-                    entity.Platform = Convert.ToInt64(platformValue.Raw);
-            }
-            if (record.TryGetValue("version", out var versionValue))
-            {
-                entity.MarkLoaded("Version");
-                if (versionValue.Raw != null)
-                    entity.Version = Convert.ToInt64(versionValue.Raw);
-            }
+                    if (record.TryGetValue("title", out var titleValue))
+                    {
+                        entity.MarkLoaded("Title");
+                        if (titleValue.Raw != null)
+                            entity.Title = Convert.ToString(titleValue.Raw);
+                    }
+                    if (record.TryGetValue("description", out var descriptionValue))
+                    {
+                        entity.MarkLoaded("Description");
+                        if (descriptionValue.Raw != null)
+                            entity.Description = Convert.ToString(descriptionValue.Raw);
+                    }
+                    if (record.TryGetValue("Platform", out var platformValue)
+                        || record.TryGetValue("platform", out platformValue))
+                    {
+                        entity.MarkLoaded("Platform");
+                        if (platformValue.Raw is IEnumerable<Record> platformRows)
+                        {
+                            foreach (var row in platformRows)
+                            {
+                                entity.PlatformEntity = global::Generated.Models.Platform.FromRecord(row);
+                                entity.Platform = entity.PlatformEntity.Id;
+                                entity.MarkLoaded("PlatformEntity");
+                                break;
+                            }
+                        }
+                        else if (platformValue.Raw != null)
+                            entity.Platform = Convert.ToInt64(platformValue.Raw);
+                    }
+                    if (record.TryGetValue("version", out var versionValue))
+                    {
+                        entity.MarkLoaded("Version");
+                        if (versionValue.Raw != null)
+                            entity.Version = Convert.ToInt64(versionValue.Raw);
+                    }
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
             return entity;
         }
 
+        internal static WorkItem FromRecord(Record record, EntityRoot root)
+        {
+            var entity = FromRecord(record);
+            entity.AttachRoot(root);
+            return entity;
+        }
+
         public async Task<WorkItem> SaveAsync(UserContext context)
         {
+            return await context.ExecuteGraphSaveAsync(async () =>
+            {
+                TeaqlPreflightGraph(context);
+                return await TeaqlSaveWithinGraphAsync(context);
+            });
+        }
+
+        internal void TeaqlPreflightGraph(UserContext context)
+        {
+            if (string.IsNullOrWhiteSpace(_comment))
+                throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
+            var creating = !Id.HasValue;
+            if (!creating && !_markedForDeletion)
+            {
+                if (!IsLoaded("Id"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("id"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Title"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("title"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Description"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("description"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Platform"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("platform"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Version"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("version"), Message: "Mutation requires a fully loaded entity") });
+            }
+            var command = _markedForDeletion ? (object)ToDeleteCommand()
+                : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
+            if (!creating && !_markedForDeletion)
+            {
+                ((UpdateCommand)command).Values = _entityRoot.Change(TeaqlEntityKey());
+                if (Version.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(Version.Value);
+            }
+            context.CheckAndFix(new MutationRequest { Command = command, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot });
+        }
+
+        internal async Task<WorkItem> TeaqlSaveWithinGraphAsync(UserContext context)
+        {
+            var teaqlOriginalKey = TeaqlEntityKey();
+            var teaqlOriginalLedgerId = _ledgerId;
+            var teaqlOriginalMarkedForDeletion = _markedForDeletion;
+            var teaqlOriginalFullyLoaded = _fullyLoaded;
+            var teaqlOriginalLoadedFields = new HashSet<string>(_loadedFields, StringComparer.OrdinalIgnoreCase);
+            var teaqlOriginalId = this.Id;
+            var teaqlOriginalTitle = this.Title;
+            var teaqlOriginalDescription = this.Description;
+            var teaqlOriginalPlatform = this.Platform;
+            var teaqlOriginalVersion = this.Version;
+            context.AfterGraphRollback(() =>
+            {
+                var currentKey = TeaqlEntityKey();
+                this.Id = teaqlOriginalId;
+                this.Title = teaqlOriginalTitle;
+                this.Description = teaqlOriginalDescription;
+                this.Platform = teaqlOriginalPlatform;
+                this.Version = teaqlOriginalVersion;
+                _ledgerId = teaqlOriginalLedgerId;
+                _markedForDeletion = teaqlOriginalMarkedForDeletion;
+                _fullyLoaded = teaqlOriginalFullyLoaded;
+                _loadedFields = teaqlOriginalLoadedFields;
+                _entityRoot.Rekey(currentKey, teaqlOriginalKey);
+            });
+            context.AfterGraphCommit(() =>
+            {
+                _entityRoot.ClearEntity(TeaqlEntityKey());
+                if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
+            });
             if (string.IsNullOrWhiteSpace(_comment))
             {
                 throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
             }
-            AttachRoot(context.EntityRoot);
-
             var creating = !this.Id.HasValue;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
             var cmd = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand()
                 : (object)ToUpdateCommand();
-            if (!creating && !_markedForDeletion)
-            {
+            if (!creating && !_markedForDeletion) {
                 ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
                 if (Version.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(Version.Value);
             }
-            var req = new MutationRequest { Command = cmd, Comment = _comment, LedgerKey = TeaqlEntityKey() };
+            var req = new MutationRequest { Command = cmd, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot };
             var result = await context.DataService.MutateAsync(context, req);
             if (result is not MutationResult mutationResult || mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for WorkItem");
@@ -156,23 +220,21 @@ namespace Generated.Models
             this.Version = saved.Version;
             _ledgerId = Id ?? _ledgerId;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
-            _entityRoot.ClearEntity(TeaqlEntityKey());
-            if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
             return saved;
         }
 
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-            if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
 
-            if (Title != null) record["title"] = new Value.TextValue(Title);
+                    if (Title != null) record["title"] = new Value.TextValue(Title);
 
-            if (Description != null) record["description"] = new Value.TextValue(Description);
+                    if (Description != null) record["description"] = new Value.TextValue(Description);
 
-            if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
 
-            if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "WorkItem", Values = record };
         }
@@ -180,19 +242,18 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-            if (Title != null) record["title"] = new Value.TextValue(Title);
+                    if (Title != null) record["title"] = new Value.TextValue(Title);
 
-            if (Description != null) record["description"] = new Value.TextValue(Description);
+                    if (Description != null) record["description"] = new Value.TextValue(Description);
 
-            if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
 
-            if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 
-            return new UpdateCommand
-            {
-                Entity = "WorkItem",
-                Id = this.Id.HasValue ? new Value.I64Value(this.Id.Value) : null,
-                Values = record
+            return new UpdateCommand { 
+                Entity = "WorkItem", 
+                Id = this.Id.HasValue ? new Value.I64Value(this.Id.Value) : null, 
+                Values = record 
             };
         }
 
@@ -200,8 +261,7 @@ namespace Generated.Models
         {
             if (!Id.HasValue || !Version.HasValue)
                 throw new InvalidOperationException("Delete requires a loaded id and version");
-            return new DeleteCommand
-            {
+            return new DeleteCommand {
                 Entity = "WorkItem",
                 Id = new Value.I64Value(Id.Value),
                 Version = new Value.I64Value(Version.Value)
@@ -213,61 +273,61 @@ namespace Generated.Models
             return new SelectQuery("WorkItem");
         }
 
-        public WorkItem UpdateId(long? value)
-        {
-            this.Id = value;
-            MarkLoaded("Id");
-            _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
-            return this;
-        }
+                public WorkItem UpdateId(long? value)
+                {
+                    this.Id = value;
+                    MarkLoaded("Id");
+                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    return this;
+                }
 
-        public WorkItem UpdateTitle(string value)
-        {
-            this.Title = value;
-            MarkLoaded("Title");
-            _entityRoot.Set(TeaqlEntityKey(), "title", TeaqlValue(value));
-            return this;
-        }
+                public WorkItem UpdateTitle(string value)
+                {
+                    this.Title = value;
+                    MarkLoaded("Title");
+                    _entityRoot.Set(TeaqlEntityKey(), "title", TeaqlValue(value));
+                    return this;
+                }
 
-        public WorkItem UpdateDescription(string value)
-        {
-            this.Description = value;
-            MarkLoaded("Description");
-            _entityRoot.Set(TeaqlEntityKey(), "description", TeaqlValue(value));
-            return this;
-        }
+                public WorkItem UpdateDescription(string value)
+                {
+                    this.Description = value;
+                    MarkLoaded("Description");
+                    _entityRoot.Set(TeaqlEntityKey(), "description", TeaqlValue(value));
+                    return this;
+                }
 
-        public WorkItem UpdatePlatform(long? value)
-        {
-            this.Platform = value;
-            MarkLoaded("Platform");
-            _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
-            return this;
-        }
+                public WorkItem UpdatePlatform(long? value)
+                {
+                    this.Platform = value;
+                    MarkLoaded("Platform");
+                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
+                    return this;
+                }
 
-        public WorkItem UpdateVersion(long? value)
-        {
-            this.Version = value;
-            MarkLoaded("Version");
-            _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
-            return this;
-        }
-        public WorkItem UpdatePlatform(Platform value)
-        {
-            this.Platform = value?.Id;
-            MarkLoaded("Platform");
-            _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(this.Platform));
-            return this;
-        }
+                public WorkItem UpdateVersion(long? value)
+                {
+                    this.Version = value;
+                    MarkLoaded("Version");
+                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    return this;
+                }
+                public WorkItem UpdatePlatform(Platform value)
+                {
+                    this.Platform = value?.Id;
+                    MarkLoaded("Platform");
+                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(this.Platform));
+                    return this;
+                }
 
 
-        public WorkItem UpdatePlatformId(long? value)
-        {
-            this.Platform = value;
-            MarkLoaded("Platform");
-            _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
-            return this;
-        }
+                public WorkItem UpdatePlatformId(long? value)
+                {
+                    this.Platform = value;
+                    MarkLoaded("Platform");
+                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
+                    return this;
+                }
 
     }
 }

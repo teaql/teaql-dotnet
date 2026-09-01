@@ -125,24 +125,29 @@ public class RuntimeTelemetryTests
     }
 
     [Fact]
-    public async Task DiagnosticSqlLogIsExplicitAndUsesDebugQuery()
+    public async Task DiagnosticSqlLogDefaultsOnAndSupportsIndependentSwitches()
     {
         var output = new StringWriter();
         var context = new UserContext().WithDataService(new StubDataService());
-        await context.RequireResource<IDataService>().QueryAsync(
-            new QueryRequest { Query = new SelectQuery("School") });
-        Assert.Equal("", output.ToString());
+        Assert.True(context.QuerySqlLogEnabled);
+        Assert.True(context.MutationSqlLogEnabled);
 
         context.WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(output));
         await context.RequireResource<IDataService>().QueryAsync(
             new QueryRequest { Query = new SelectQuery("School") });
         Assert.Contains("SELECT * FROM school_data WHERE name = 'O''Brien 学校'", output.ToString());
+        Assert.Contains("Parameterized SQL:", output.ToString());
+        Assert.Contains("Debug SQL:", output.ToString());
 
         var before = output.ToString();
-        context.WithDiagnosticSqlLogSink(null);
+        context.DisableQuerySqlLog();
         await context.RequireResource<IDataService>().QueryAsync(
             new QueryRequest { Query = new SelectQuery("School") });
         Assert.Equal(before, output.ToString());
+        Assert.True(context.MutationSqlLogEnabled);
+        context.EnableQuerySqlLog().DisableMutationSqlLog();
+        Assert.True(context.QuerySqlLogEnabled);
+        Assert.False(context.MutationSqlLogEnabled);
     }
 
     [Fact]
