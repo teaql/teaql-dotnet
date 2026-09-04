@@ -55,7 +55,7 @@ namespace TeaQL.TfpEndpoint
         public Task<Dictionary<string, object>> HandleQueryAsync(string payloadJson) =>
             throw new TfpEndpointException("TFP_UNAUTHORIZED", "Trusted federation context is required");
 
-        public async Task<Dictionary<string, object>> HandleQueryAsync(
+        public Task<Dictionary<string, object>> HandleQueryAsync(
             string payloadJson, IReadOnlyDictionary<string, string> carrier)
             => throw new TfpEndpointException("TFP_UNAUTHORIZED", "Trusted federation context is required");
 
@@ -172,7 +172,7 @@ namespace TeaQL.TfpEndpoint
         public Task<Dictionary<string, object>> HandleMutationAsync(string payloadJson) =>
             throw new TfpEndpointException("TFP_UNAUTHORIZED", "Trusted federation context is required");
 
-        public async Task<Dictionary<string, object>> HandleMutationAsync(
+        public Task<Dictionary<string, object>> HandleMutationAsync(
             string payloadJson, IReadOnlyDictionary<string, string> carrier)
             => throw new TfpEndpointException("TFP_UNAUTHORIZED", "Trusted federation context is required");
 
