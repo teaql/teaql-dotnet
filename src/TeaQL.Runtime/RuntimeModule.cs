@@ -20,7 +20,8 @@ public class RuntimeModule
         IEnumerable<string> entities,
         IReadOnlyDictionary<string, IEntityChecker> checkers,
         IReadOnlyDictionary<string, Record> schemaSamples,
-        IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> requiredFields)
+        IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> requiredFields,
+        IReadOnlyDictionary<string, IReadOnlyList<RelationDescriptor>>? relations = null)
     {
         foreach (var entity in entities)
         {
@@ -38,6 +39,8 @@ public class RuntimeModule
                     descriptor.Property(property);
                 }
             }
+            if (relations != null && relations.TryGetValue(entity, out var entityRelations))
+                foreach (var relation in entityRelations) descriptor.Relation(relation);
             Entity(descriptor);
         }
         foreach (var (entity, checker) in checkers) Checker(entity, checker);
