@@ -56,6 +56,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
     public async Task<QueryResult> QueryAsync(QueryRequest request)
     {
+        request.Query.NormalizeGeneratedFilters();
         request.Query.PrepareForList();
         var entityDesc = SchemaProvider.GetEntity(request.Query.Entity)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {request.Query.Entity}");

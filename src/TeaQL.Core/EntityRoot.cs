@@ -14,6 +14,8 @@ public sealed record EntityKey
         EntityType = entityType;
         Id = id ?? throw new ArgumentNullException(nameof(id));
     }
+
+    public EntityKey(string entityType, long id) : this(entityType, new Value.I64Value(id)) { }
 }
 
 /// <summary>Pending mutation ledger shared by one generated object graph.</summary>
@@ -70,6 +72,13 @@ public sealed class EntityRoot
     public void MarkAsDeleted(EntityKey key) { _changes.TryRemove(key, out _); _deletedKeys[key] = 0; }
     public bool IsNew(EntityKey key) => _newKeys.ContainsKey(key);
     public bool IsDeleted(EntityKey key) => _deletedKeys.ContainsKey(key);
+    public bool IsEmpty => _changes.IsEmpty && _newKeys.IsEmpty && _deletedKeys.IsEmpty;
+
+    public void MarkAsPersisted(EntityKey key)
+    {
+        _newKeys.TryRemove(key, out _);
+        _deletedKeys.TryRemove(key, out _);
+    }
 
     public void ClearCommitted()
     {

@@ -56,11 +56,28 @@ public abstract record Expr
         Binary(Soundex(Column(column)), BinaryOp.Eq, Soundex(Value(value)));
 
     public static Expr Eq(string column, Value value) => Binary(Column(column), BinaryOp.Eq, Value(value));
+    public static Expr Eq(string column, object? value) => Eq(column, Core.Value.FromObject(value));
     public static Expr Ne(string column, Value value) => Binary(Column(column), BinaryOp.Ne, Value(value));
+    public static Expr Ne(string column, object? value) => Ne(column, Core.Value.FromObject(value));
     public static Expr Gt(string column, Value value) => Binary(Column(column), BinaryOp.Gt, Value(value));
+    public static Expr Gt(string column, object? value) => Gt(column, Core.Value.FromObject(value));
     public static Expr Gte(string column, Value value) => Binary(Column(column), BinaryOp.Gte, Value(value));
+    public static Expr Gte(string column, object? value) => Gte(column, Core.Value.FromObject(value));
     public static Expr Lt(string column, Value value) => Binary(Column(column), BinaryOp.Lt, Value(value));
+    public static Expr Lt(string column, object? value) => Lt(column, Core.Value.FromObject(value));
     public static Expr Lte(string column, Value value) => Binary(Column(column), BinaryOp.Lte, Value(value));
+    public static Expr Lte(string column, object? value) => Lte(column, Core.Value.FromObject(value));
+
+    public static Expr In(string column, object? values) => InList(column, ObjectValues(values));
+    public static Expr NotIn(string column, object? values) => NotInList(column, ObjectValues(values));
+
+    private static IEnumerable<Value> ObjectValues(object? values) => values switch
+    {
+        null => Array.Empty<Value>(),
+        IEnumerable<Value> typed => typed,
+        System.Collections.IEnumerable items => items.Cast<object?>().Select(Core.Value.FromObject),
+        _ => new[] { Core.Value.FromObject(values) }
+    };
     
     public static Expr Like(string column, string pattern) => 
         Binary(Column(column), BinaryOp.Like, Value(new Core.Value.TextValue(pattern)));

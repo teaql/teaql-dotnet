@@ -6,6 +6,31 @@ namespace TeaQL.Core.Tests;
 public class SelectQueryTests
 {
     [Fact]
+    public void GeneratedQuerySurfaceNormalizesToTypedAst()
+    {
+        var query = new SelectQuery("School");
+        query.Projections.Add("name");
+        query.AndFilter(new FilterExpression { Operator = "eq", Field = "school_type", Expected = 1001L });
+        query.Purpose("verify generated query ABI");
+        query.OrderBy("id", "desc");
+        query.NormalizeGeneratedFilters();
+
+        var filter = Assert.IsType<Expr.AndExpr>(query.FilterCondition);
+        Assert.Single(filter.Parts);
+        Assert.Equal("verify generated query ABI", query.PurposeText);
+        Assert.Equal(SortDirection.Desc, Assert.Single(query.OrderByItems).Direction);
+        Assert.Equal("name", Assert.Single(query.Copy().Projection));
+    }
+
+    [Fact]
+    public void GeneratedInPredicateConvertsNativeCollections()
+    {
+        var expression = Expr.In("id", new long[] { 1, 2 });
+        var binary = Assert.IsType<Expr.BinaryExpr>(expression);
+        var list = Assert.IsType<Value.ListValue>(Assert.IsType<Expr.ValueExpr>(binary.Right).NodeValue);
+        Assert.Equal(2, list.Values.Count);
+    }
+    [Fact]
     public void MaterializedListHardLimitIsLocalAndEnforced()
     {
         Assert.Equal((ulong)10_000, new SelectQuery("Order").PrepareForList().Slice!.Limit);

@@ -68,6 +68,39 @@ public record StreamConfig(int ChunkSize = 1000);
 
 public sealed record IdSetPaginationOptions(string Namespace, int TtlSeconds, ulong MaxIds);
 
+/// <summary>Stable generated-code representation which is normalized into the typed expression AST.</summary>
+public sealed class FilterExpression
+{
+    public required string Operator { get; init; }
+    public required string Field { get; init; }
+    public object? Expected { get; init; }
+
+    public Expr ToExpr() => Operator switch
+    {
+        "eq" => Expr.Eq(Field, Expected), "ne" => Expr.Ne(Field, Expected),
+        "gt" => Expr.Gt(Field, Expected), "gte" => Expr.Gte(Field, Expected),
+        "lt" => Expr.Lt(Field, Expected), "lte" => Expr.Lte(Field, Expected),
+        "contain" => Expr.Contain(Field, Expected?.ToString() ?? ""),
+        "not_contain" => Expr.NotContain(Field, Expected?.ToString() ?? ""),
+        "begin_with" => Expr.BeginWith(Field, Expected?.ToString() ?? ""),
+        "not_begin_with" => Expr.NotBeginWith(Field, Expected?.ToString() ?? ""),
+        "end_with" => Expr.EndWith(Field, Expected?.ToString() ?? ""),
+        "not_end_with" => Expr.NotEndWith(Field, Expected?.ToString() ?? ""),
+        "sound_like" => Expr.SoundLike(Field, Value.FromObject(Expected)),
+        "in" => Expr.In(Field, Expected), "not_in" => Expr.NotIn(Field, Expected),
+        "is_null" => Expr.IsNull(Field), "is_not_null" => Expr.IsNotNull(Field),
+        "between" when Expected is System.Collections.IEnumerable sequence => Between(sequence),
+        _ => throw new NotSupportedException($"Unsupported generated filter operator: {Operator}")
+    };
+
+    private Expr Between(System.Collections.IEnumerable sequence)
+    {
+        var values = sequence.Cast<object?>().Take(2).ToArray();
+        if (values.Length != 2) throw new ArgumentException("between requires two values");
+        return Expr.Between(Field, Value.FromObject(values[0]), Value.FromObject(values[1]));
+    }
+}
+
 public record SelectQuery
 {
     public const ulong DefaultHardLimit = 10_000;
@@ -100,6 +133,14 @@ public record SelectQuery
     public IdSetPaginationOptions? IdSetPagination { get; set; }
     [JsonIgnore]
     public ulong? TopNProbeThreshold { get; set; }
+    public List<FilterExpression> Filters { get; set; } = new();
+    public List<string> Projections => Projection;
+    public List<OrderBy> Orders => OrderByItems;
+    public List<Aggregate> Aggregates => AggregateItems;
+    public List<string> GroupFields => GroupByItems;
+    public List<RelationLoad> Relations => RelationLoads;
+    public List<FacetRequest> Facets { get; set; } = new();
+    public string? PurposeText { get; private set; }
 
     public SelectQuery() { }
 
@@ -153,6 +194,21 @@ public record SelectQuery
     public SelectQuery AndFilter(Expr filter)
     {
         FilterCondition = FilterCondition != null ? FilterCondition.And(filter) : filter;
+        return this;
+    }
+
+    public SelectQuery AndFilter(object filter)
+    {
+        if (filter is Expr expression) return AndFilter(expression);
+        if (filter is FilterExpression generated) Filters.Add(generated);
+        else throw new ArgumentException("Filter must be a TeaQL expression", nameof(filter));
+        return this;
+    }
+
+    public SelectQuery NormalizeGeneratedFilters()
+    {
+        if (Filters.Count == 0) return this;
+        FilterCondition = Expr.And(Filters.Select(item => item.ToExpr()));
         return this;
     }
 
@@ -240,6 +296,8 @@ public record SelectQuery
         return this;
     }
 
+    public SelectQuery Purpose(string purpose) { PurposeText = purpose; return this; }
+
     public SelectQuery RawSql(string rawSql)
     {
         RawSqlText = rawSql;
@@ -274,6 +332,28 @@ public record SelectQuery
     {
         RelationLoads.Add(new RelationLoad(name, query));
         return this;
+    }
+
+    public SelectQuery RelationQuery(string name, string targetEntity, string foreignKey, bool many, SelectQuery query) =>
+        RelationQuery(name, query);
+
+    public SelectQuery ForwardRelationQuery(string name, string targetEntity, string localKey, SelectQuery query) =>
+        RelationQuery(name, query);
+
+    public SelectQuery RelationAggregate(string name, string targetEntity, string foreignKey, string alias, SelectQuery query, bool singleResult)
+    {
+        RelationAggregates.Add(new RelationAggregate(name, alias, query, singleResult));
+        return this;
+    }
+
+    public SelectQuery OrderBy(string field, string direction) =>
+        OrderBy(string.Equals(direction, "desc", StringComparison.OrdinalIgnoreCase)
+            ? Core.OrderBy.Desc(field) : Core.OrderBy.Asc(field));
+
+    public SelectQuery Aggregate(string function, string field, string alias)
+    {
+        var aggregate = Enum.Parse<AggregateFunction>(function, true);
+        return Aggregate(new Core.Aggregate(aggregate, field, alias));
     }
 
     public SelectQuery Limit(ulong limit)
@@ -328,11 +408,21 @@ public record SelectQuery
         return this;
     }
 
+    public SelectQuery OptimizePaginationWithIdSet(string namespaceName, int ttlSeconds, int maxIds) =>
+        OptimizePaginationWithIdSet(namespaceName, ttlSeconds, checked((ulong)maxIds));
+
+    public SelectQuery OptimizeForContinuousPageFetch() => OptimizePaginationWithIdSet();
+    public SelectQuery OptimizeForContinuousPageFetchWith(string namespaceName, int ttlSeconds) =>
+        OptimizePaginationWithIdSet(namespaceName, ttlSeconds, 3_000_000);
+
     public SelectQuery TopNProbeParentThreshold(ulong threshold)
     {
         TopNProbeThreshold = threshold;
         return this;
     }
+
+    public SelectQuery TopNProbeParentThreshold(int threshold) =>
+        TopNProbeParentThreshold(checked((ulong)threshold));
 
     public SelectQuery CloneForExecution()
     {
@@ -362,9 +452,14 @@ public record SelectQuery
             ChildEnhancements = new List<SelectQuery>(ChildEnhancements),
             StreamConfig = StreamConfig,
             IdSetPagination = IdSetPagination,
-            TopNProbeThreshold = TopNProbeThreshold
+            TopNProbeThreshold = TopNProbeThreshold,
+            Filters = new List<FilterExpression>(Filters),
+            Facets = new List<FacetRequest>(Facets),
+            PurposeText = PurposeText
         };
     }
+
+    public SelectQuery Copy() => CloneForExecution();
 
     public SelectQuery PartitionByField(string field)
     {

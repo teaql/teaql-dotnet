@@ -40,4 +40,16 @@ public class EntityRootTests
         Assert.True(root.IsNew(persisted)); Assert.True(root.Change(persisted).ContainsKey("quantity"));
         root.ClearEntity(persisted); Assert.False(root.IsNew(persisted)); Assert.Empty(root.Change(persisted));
     }
+
+    [Fact]
+    public void GeneratedEntityLifecycleCanUseNativeIdAndPersistedBoundary()
+    {
+        var root = new EntityRoot();
+        var key = new EntityKey("School", 1001);
+        Assert.True(root.IsEmpty);
+        root.MarkAsNew(key);
+        Assert.False(root.IsEmpty);
+        root.MarkAsPersisted(key);
+        Assert.True(root.IsEmpty);
+    }
 }

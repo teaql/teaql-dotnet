@@ -54,6 +54,22 @@ public record QuerySelection
         var query = RequestHelpers.ApplyRelationSelections(Query, RelationSelections);
         return RequestHelpers.ApplyRuntimeMetadata(query, QueryOptions, ChildEnhancements);
     }
+
+    public QuerySelection Copy() => new(Query.Copy())
+    {
+        RelationSelections = new List<RelationSelection>(RelationSelections),
+        RelationFilters = new List<RelationFilter>(RelationFilters),
+        ChildEnhancements = new List<QuerySelection>(ChildEnhancements),
+        QueryOptions = QueryOptions with
+        {
+            RawSqlSearchCriteria = new List<string>(QueryOptions.RawSqlSearchCriteria),
+            DynamicProperties = new List<RawDynamicProperty>(QueryOptions.DynamicProperties),
+            RawProjections = new List<BuilderRawProjection>(QueryOptions.RawProjections),
+            RelationAggregates = new List<BuilderRelationAggregate>(QueryOptions.RelationAggregates),
+            ObjectGroupBys = new List<BuilderObjectGroupBy>(QueryOptions.ObjectGroupBys),
+            Facets = new List<FacetRequest>(QueryOptions.Facets)
+        }
+    };
 }
 
 public record RelationSelection
@@ -136,7 +152,12 @@ public record BuilderRawProjection(string PropertyName, string RawSqlSegment)
 
 public record BuilderRelationAggregate(string RelationName, string Alias, QuerySelection Query, bool SingleResult);
 
-public record FacetRequest(string FacetName, string RelationName, QuerySelection Query, bool IncludeAllFacets);
+public record FacetRequest(string FacetName, string RelationName, SelectQuery Query, bool IncludeAllFacets)
+{
+    public string Name => FacetName;
+    public FacetRequest(string name, string relationName, QuerySelection query, bool includeAllFacets)
+        : this(name, relationName, query.IntoQuery(), includeAllFacets) { }
+}
 
 public record BuilderObjectGroupBy(string PropertyName, string StorageField, QuerySelection Query);
 

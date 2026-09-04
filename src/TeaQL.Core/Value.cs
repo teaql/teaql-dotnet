@@ -18,11 +18,58 @@ public abstract record Value
     public sealed record JsonValue(JsonNode? Value) : Value;
     public sealed record DateValue(DateTime Value) : Value;
     public sealed record TimestampValue(long Milliseconds) : Value;
+    public sealed record DateTimeValue(DateTime Value) : Value
+    {
+        public DateTimeValue(DateTimeOffset value) : this(value.UtcDateTime) { }
+    }
+    public sealed record TimeValue(TimeSpan Value) : Value;
     public sealed record ObjectValue(Record Value) : Value;
     public sealed record ListValue(List<Value> Values) : Value;
     public sealed record TypedNullValue(DataType Type) : Value;
 
+    /// <summary>Language-native representation used by generated checkers and diagnostics.</summary>
+    public object? Raw => this switch
+    {
+        NullValue or TypedNullValue => null,
+        BoolValue(var value) => value,
+        I64Value(var value) => value,
+        U64Value(var value) => value,
+        F64Value(var value) => value,
+        DecimalValue(var value) => value,
+        TextValue(var value) => value,
+        JsonValue(var value) => value,
+        DateValue(var value) => value,
+        TimestampValue(var value) => value,
+        DateTimeValue(var value) => value,
+        TimeValue(var value) => value,
+        ObjectValue(var value) => value,
+        ListValue(var values) => values,
+        _ => null
+    };
+
     public static Value Object(Record record) => new ObjectValue(record);
+
+    public static Value FromObject(object? value) => value switch
+    {
+        null => new NullValue(),
+        Value existing => existing,
+        bool item => new BoolValue(item),
+        byte item => new I64Value(item),
+        short item => new I64Value(item),
+        int item => new I64Value(item),
+        long item => new I64Value(item),
+        uint item => new U64Value(item),
+        ulong item => new U64Value(item),
+        float item => new F64Value(item),
+        double item => new F64Value(item),
+        decimal item => new DecimalValue(item),
+        string item => new TextValue(item),
+        DateTime item => new TimestampValue(new DateTimeOffset(item).ToUnixTimeMilliseconds()),
+        DateTimeOffset item => new TimestampValue(item.ToUnixTimeMilliseconds()),
+        Record item => new ObjectValue(item),
+        IEnumerable<object?> items => new ListValue(items.Select(FromObject).ToList()),
+        _ => throw new ArgumentException($"Unsupported TeaQL value type: {value.GetType().FullName}", nameof(value))
+    };
 
     public long? TryI64() => this switch
     {
@@ -82,6 +129,7 @@ public abstract record Value
     public long? TryTimestamp() => this switch
     {
         TimestampValue(var v) => v,
+        DateTimeValue(var v) => new DateTimeOffset(v).ToUnixTimeMilliseconds(),
         TextValue(var v) => DateTime.TryParse(v, out var dt) ? new DateTimeOffset(dt).ToUnixTimeMilliseconds() : null,
         I64Value(var v) => v,
         U64Value(var v) => v <= long.MaxValue ? (long)v : null,
@@ -100,6 +148,8 @@ public abstract record Value
         Value.JsonValue(var v) => v?.DeepClone(),
         DateValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v.ToString("yyyy-MM-dd")),
         TimestampValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
+        DateTimeValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
+        TimeValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v.ToString()),
         ObjectValue(var v) => v.ToJsonValue(),
         ListValue(var v) => new JsonArray(v.Select(item => item.ToJsonValue()).ToArray()),
         TypedNullValue => null,

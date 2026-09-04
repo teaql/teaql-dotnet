@@ -7,6 +7,13 @@ namespace TeaQL.Core.Tests;
 public class ValueTests
 {
     [Fact]
+    public void Raw_ExposesNativeValuesWithoutWeakeningTypedVariants()
+    {
+        Assert.Equal(42L, new Value.I64Value(42).Raw);
+        Assert.Equal("teaql", new Value.TextValue("teaql").Raw);
+        Assert.Null(new Value.NullValue().Raw);
+    }
+    [Fact]
     public void Value_TryI64_AcceptsRepresentableNumericVariants()
     {
         Assert.Equal(long.MinValue, new Value.I64Value(long.MinValue).TryI64());
