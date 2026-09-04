@@ -13,14 +13,14 @@ namespace TeaQL.CacheIntegration.Redis.Tests
         public void Constructor_ThrowsArgumentNullException_WhenInnerServiceIsNull()
         {
             var mockRedis = new Mock<IConnectionMultiplexer>();
-            Assert.Throws<ArgumentNullException>(() => new RedisDataServiceDecorator(null, mockRedis.Object, TimeSpan.FromMinutes(5)));
+            Assert.Throws<ArgumentNullException>(() => new RedisDataServiceDecorator(null!, mockRedis.Object, TimeSpan.FromMinutes(5)));
         }
 
         [Fact]
         public void Constructor_ThrowsArgumentNullException_WhenConnectionIsNull()
         {
             var mockInnerService = new Mock<IDataService>();
-            Assert.Throws<ArgumentNullException>(() => new RedisDataServiceDecorator(mockInnerService.Object, null, TimeSpan.FromMinutes(5)));
+            Assert.Throws<ArgumentNullException>(() => new RedisDataServiceDecorator(mockInnerService.Object, null!, TimeSpan.FromMinutes(5)));
         }
 
         [Fact]
