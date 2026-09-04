@@ -12,8 +12,8 @@ namespace Generated.Requests
     public class WorkItemRequest
     {
         private SelectQuery _query;
-        private string _purpose;
-        private string _comment;
+        private string? _purpose;
+        private string? _comment;
 
         public WorkItemRequest()
         {
@@ -658,9 +658,9 @@ namespace Generated.Requests
         private async Task<QueryResult> ExecuteForListInternalAsync(UserContext context)
         {
             EnsureIntent();
-            var service = context.RequireDataService();
+            var service = context.RequireResource<IDataService>();
             var req = new QueryRequest(_query);
-            var result = await service.QueryAsync(context, req);
+            var result = await service.QueryAsync(req);
             foreach (var facet in _query.Facets)
             {
                 var membership = _query.Copy();
@@ -671,20 +671,20 @@ namespace Generated.Requests
                 membership.GroupFields.Clear();
                 membership.Projections.Clear();
                 membership.Project(facet.RelationName);
-                var membershipRows = (await service.QueryAsync(context, new QueryRequest(membership))).Rows;
+                var membershipRows = (await service.QueryAsync(new QueryRequest(membership))).Rows;
                 var counts = membershipRows
                     .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
-                    .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw))
+                    .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw)!)
                     .ToDictionary(group => group.Key, group => group.Count());
 
                 var nested = facet.Query.Copy();
                 nested.Facets.Clear();
                 var countAliases = nested.Aggregates
-                    .Where(aggregate => string.Equals(aggregate.Function, "Count", StringComparison.OrdinalIgnoreCase))
+                    .Where(aggregate => aggregate.Function == AggregateFunction.Count)
                     .Select(aggregate => aggregate.Alias).ToArray();
                 nested.Aggregates.Clear();
                 nested.GroupFields.Clear();
-                var facetRows = (await service.QueryAsync(context, new QueryRequest(nested))).Rows;
+                var facetRows = (await service.QueryAsync(new QueryRequest(nested))).Rows;
                 var decorated = new SmartList<Record>();
                 foreach (var row in facetRows)
                 {
@@ -706,21 +706,21 @@ namespace Generated.Requests
             EnsureIntent();
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
             if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
-            var service = context.RequireDataService();
+            var service = context.RequireResource<IDataService>();
             _query.Offset(offset);
             _query.Limit(limit);
-            var result = await service.QueryAsync(context, new QueryRequest(_query));
+            var result = await service.QueryAsync(new QueryRequest(_query));
             long totalCount;
             if (_query.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
             {
-                totalCount = context.IdSetCount;
+                totalCount = checked((long)context.IdSetCount);
             }
             else
             {
                 var countQuery = new SelectQuery("WorkItem");
                 foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
                 countQuery.Aggregate("Count", "id", "count");
-                var countResult = await service.QueryAsync(context, new QueryRequest(countQuery));
+                var countResult = await service.QueryAsync(new QueryRequest(countQuery));
                 totalCount = countResult.Rows.Count == 0
                     ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
             }
@@ -737,11 +737,11 @@ namespace Generated.Requests
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             EnsureIntent();
-            var service = context.RequireDataService();
-            if (service is not IStreamingDataService streaming)
+            var service = context.RequireResource<IDataService>();
+            if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             await foreach (var chunk in streaming.QueryStreamAsync(
-                context, new QueryRequest(_query), chunkSize, cancellationToken).WithCancellation(cancellationToken))
+                new QueryRequest(_query), chunkSize, cancellationToken).WithCancellation(cancellationToken))
             {
                 var queryRoot = new EntityRoot();
                 foreach (var row in chunk.Rows)
@@ -818,7 +818,7 @@ namespace Generated.Requests
             CancellationToken cancellationToken = default)
             => _executeForStream(context, chunkSize, cancellationToken);
 
-        public async Task<Generated.Models.WorkItem> ExecuteForOneAsync(
+        public async Task<Generated.Models.WorkItem?> ExecuteForOneAsync(
             UserContext context)
         {
             _limitOne();

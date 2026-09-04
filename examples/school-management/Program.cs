@@ -2,6 +2,11 @@ using Generated;
 using Generated.Models;
 using Generated.Requests;
 using TeaQL.Core;
+using TeaQL.DataService;
+using TeaQL.Provider.Sqlite;
+using TeaQL.Runtime;
+using TeaQL.Sql;
+using Microsoft.Data.Sqlite;
 
 static void Require(bool condition, string message)
 {
@@ -11,9 +16,12 @@ static void Require(bool condition, string message)
 var database = Path.Combine(Path.GetTempPath(), $"teaql-school-dotnet-{Guid.NewGuid():N}.sqlite");
 try
 {
-    await using var service = new SqliteDataService($"Data Source={database}");
+    await using var connection = new SqliteConnection($"Data Source={database}");
+    await connection.OpenAsync();
     var module = GeneratedRuntimeModule.Module;
-    var context = new UserContext { DataService = service }.Install(module);
+    var service = new SqlDataServiceExecutor(
+        new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
+    var context = module.IntoContext().WithDataService(service);
 
     await context.EnsureSchemaAsync();
     await context.EnsureSchemaAsync();
@@ -64,7 +72,9 @@ try
         ("negative ends with", Q.Schools().WithNameNotEndingWith("Academy"), 1),
         ("number range", Q.Schools().WithStudentCapacityBetween(700, 900), 1),
         ("strict comparison", Q.Schools().WithStudentCapacityGreaterThan(799).WithStudentCapacityLessThan(801), 1),
-        ("date range", Q.Schools().WithEstablishedDateBetween(new DateTime(1995, 1, 1), new DateTime(1995, 12, 31)), 1),
+        ("date range", Q.Schools().WithEstablishedDateBetween(
+            new Value.DateValue(new DateTime(1995, 1, 1)),
+            new Value.DateValue(new DateTime(1995, 12, 31))), 1),
         ("known", Q.Schools().WithAddressIsKnown(), 1),
         ("unknown", Q.Schools().WithAddressIsUnknown(), 0),
         ("boolean true", Q.Schools().WhichAreActive(), 1),
@@ -99,4 +109,9 @@ try
 finally
 {
     if (File.Exists(database)) File.Delete(database);
+}
+
+sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
+{
+    public EntityDescriptor? GetEntity(string name) => module.Metadata.GetEntity(name);
 }

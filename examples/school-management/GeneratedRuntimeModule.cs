@@ -4,37 +4,37 @@ namespace Generated;
 
 internal sealed class PlatformChecker : IEntityChecker
 {
-    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTime now)
+    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now)
     {
-        var values = request.Command is InsertCommand insert ? insert.Values
-            : request.Command is UpdateCommand update ? update.Values : new Record();
-        var creating = request.Command is InsertCommand;
-        var updating = request.Command is UpdateCommand;
+        var values = request is InsertMutationRequest insert ? insert.Command.Values
+            : request is UpdateMutationRequest update ? update.Command.Values : new Record();
+        var creating = request is InsertMutationRequest;
+        var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.DateTimeValue(now);
+            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
             context.RecordFixEvidence(new FixEvidence("Platform", "create_time", FixEvidenceSource.Clock, "graphClock"));
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.DateTimeValue(now);
+            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
             context.RecordFixEvidence(new FixEvidence("Platform", "update_time", FixEvidenceSource.Clock, "graphClock"));
         }
         if (updating) {
-            values["update_time"] = new Value.DateTimeValue(now);
+            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
             context.RecordFixEvidence(new FixEvidence("Platform", "update_time", FixEvidenceSource.Clock, "graphClock"));
         }
 
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("name")));
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("name")));
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
 
-        if ((creating && !values.ContainsKey("base_url")) || (values.TryGetValue("base_url", out var checkBaseUrl) && checkBaseUrl is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("base_url")));
-        if (values.TryGetValue("base_url", out var maxLenBaseUrl) && maxLenBaseUrl.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("base_url")));
+        if ((creating && !values.ContainsKey("base_url")) || (values.TryGetValue("base_url", out var checkBaseUrl) && checkBaseUrl is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("base_url") });
+        if (values.TryGetValue("base_url", out var maxLenBaseUrl) && maxLenBaseUrl.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("base_url") });
 
-        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("create_time")));
+        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("create_time") });
 
-        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("update_time")));
+        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("update_time") });
 
 
         return results;
@@ -43,23 +43,23 @@ internal sealed class PlatformChecker : IEntityChecker
 
 internal sealed class SchoolTypeChecker : IEntityChecker
 {
-    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTime now)
+    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now)
     {
-        var values = request.Command is InsertCommand insert ? insert.Values
-            : request.Command is UpdateCommand update ? update.Values : new Record();
-        var creating = request.Command is InsertCommand;
-        var updating = request.Command is UpdateCommand;
+        var values = request is InsertMutationRequest insert ? insert.Command.Values
+            : request is UpdateMutationRequest update ? update.Command.Values : new Record();
+        var creating = request is InsertMutationRequest;
+        var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("platform")));
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
 
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("name")));
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("name")));
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
 
-        if ((creating && !values.ContainsKey("code")) || (values.TryGetValue("code", out var checkCode) && checkCode is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("code")));
-        if (values.TryGetValue("code", out var maxLenCode) && maxLenCode.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("code")));
+        if ((creating && !values.ContainsKey("code")) || (values.TryGetValue("code", out var checkCode) && checkCode is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("code") });
+        if (values.TryGetValue("code", out var maxLenCode) && maxLenCode.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("code") });
 
-        if ((creating && !values.ContainsKey("display_order")) || (values.TryGetValue("display_order", out var checkDisplayOrder) && checkDisplayOrder is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("display_order")));
+        if ((creating && !values.ContainsKey("display_order")) || (values.TryGetValue("display_order", out var checkDisplayOrder) && checkDisplayOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("display_order") });
 
 
         return results;
@@ -68,47 +68,47 @@ internal sealed class SchoolTypeChecker : IEntityChecker
 
 internal sealed class SchoolChecker : IEntityChecker
 {
-    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTime now)
+    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now)
     {
-        var values = request.Command is InsertCommand insert ? insert.Values
-            : request.Command is UpdateCommand update ? update.Values : new Record();
-        var creating = request.Command is InsertCommand;
-        var updating = request.Command is UpdateCommand;
+        var values = request is InsertMutationRequest insert ? insert.Command.Values
+            : request is UpdateMutationRequest update ? update.Command.Values : new Record();
+        var creating = request is InsertMutationRequest;
+        var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.DateTimeValue(now);
+            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
             context.RecordFixEvidence(new FixEvidence("School", "create_time", FixEvidenceSource.Clock, "graphClock"));
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.DateTimeValue(now);
+            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
             context.RecordFixEvidence(new FixEvidence("School", "update_time", FixEvidenceSource.Clock, "graphClock"));
         }
         if (updating) {
-            values["update_time"] = new Value.DateTimeValue(now);
+            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
             context.RecordFixEvidence(new FixEvidence("School", "update_time", FixEvidenceSource.Clock, "graphClock"));
         }
 
 
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("platform")));
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
 
-        if ((creating && !values.ContainsKey("school_type")) || (values.TryGetValue("school_type", out var checkSchoolType) && checkSchoolType is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("school_type")));
+        if ((creating && !values.ContainsKey("school_type")) || (values.TryGetValue("school_type", out var checkSchoolType) && checkSchoolType is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("school_type") });
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("name")));
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("name")));
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
 
-        if ((creating && !values.ContainsKey("address")) || (values.TryGetValue("address", out var checkAddress) && checkAddress is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("address")));
-        if (values.TryGetValue("address", out var maxLenAddress) && maxLenAddress.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("address")));
+        if ((creating && !values.ContainsKey("address")) || (values.TryGetValue("address", out var checkAddress) && checkAddress is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("address") });
+        if (values.TryGetValue("address", out var maxLenAddress) && maxLenAddress.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("address") });
 
-        if ((creating && !values.ContainsKey("established_date")) || (values.TryGetValue("established_date", out var checkEstablishedDate) && checkEstablishedDate is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("established_date")));
+        if ((creating && !values.ContainsKey("established_date")) || (values.TryGetValue("established_date", out var checkEstablishedDate) && checkEstablishedDate is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("established_date") });
 
-        if ((creating && !values.ContainsKey("student_capacity")) || (values.TryGetValue("student_capacity", out var checkStudentCapacity) && checkStudentCapacity is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("student_capacity")));
+        if ((creating && !values.ContainsKey("student_capacity")) || (values.TryGetValue("student_capacity", out var checkStudentCapacity) && checkStudentCapacity is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("student_capacity") });
 
-        if ((creating && !values.ContainsKey("active")) || (values.TryGetValue("active", out var checkActive) && checkActive is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("active")));
+        if ((creating && !values.ContainsKey("active")) || (values.TryGetValue("active", out var checkActive) && checkActive is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("active") });
 
-        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("create_time")));
+        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("create_time") });
 
-        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("update_time")));
+        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("update_time") });
 
 
         return results;
@@ -134,8 +134,8 @@ public static class GeneratedRuntimeModule
             ["id"] = new Value.I64Value(0),
             ["name"] = new Value.TextValue(""),
             ["base_url"] = new Value.TextValue(""),
-            ["create_time"] = new Value.DateTimeValue(DateTime.UnixEpoch),
-            ["update_time"] = new Value.DateTimeValue(DateTime.UnixEpoch),
+            ["create_time"] = new Value.TimestampValue(0),
+            ["update_time"] = new Value.TimestampValue(0),
             ["version"] = new Value.I64Value(0)
         },
        ["SchoolType"] = new Record {
@@ -155,8 +155,8 @@ public static class GeneratedRuntimeModule
             ["established_date"] = new Value.DateValue(DateTime.UnixEpoch),
             ["student_capacity"] = new Value.I64Value(0),
             ["active"] = new Value.BoolValue(false),
-            ["create_time"] = new Value.DateTimeValue(DateTime.UnixEpoch),
-            ["update_time"] = new Value.DateTimeValue(DateTime.UnixEpoch),
+            ["create_time"] = new Value.TimestampValue(0),
+            ["update_time"] = new Value.TimestampValue(0),
             ["version"] = new Value.I64Value(0)
         }
     }, new Dictionary<string, IReadOnlyDictionary<string, bool>>
@@ -190,7 +190,21 @@ public static class GeneratedRuntimeModule
            ["update_time"] = true,
            ["version"] = true
         }
-    }).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }, new Dictionary<string, IReadOnlyList<RelationDescriptor>>
+    {
+       ["Platform"] = new List<RelationDescriptor> {
+            RelationDescriptor.New("SchoolTypeList", "SchoolType").LocalKey("id").ForeignKey("platform").Many(),
+            RelationDescriptor.New("SchoolList", "School").LocalKey("id").ForeignKey("platform").Many()
+        },
+       ["SchoolType"] = new List<RelationDescriptor> {
+            RelationDescriptor.New("Platform", "Platform").LocalKey("platform").ForeignKey("id"),
+            RelationDescriptor.New("SchoolList", "School").LocalKey("id").ForeignKey("school_type").Many()
+        },
+       ["School"] = new List<RelationDescriptor> {
+            RelationDescriptor.New("Platform", "Platform").LocalKey("platform").ForeignKey("id"),
+            RelationDescriptor.New("SchoolType", "SchoolType").LocalKey("school_type").ForeignKey("id")
+        }
+    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "base_url", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["base_url"] = ["base_url"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("SchoolType", ["platform", "id", "name", "code", "display_order", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("School", ["id", "platform", "school_type", "name", "address", "established_date", "student_capacity", "active", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["school_type"] = ["school_type"], ["name"] = ["name"], ["address"] = ["address"], ["established_date"] = ["established_date"], ["student_capacity"] = ["student_capacity"], ["active"] = ["active"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

@@ -9,9 +9,17 @@ if [[ "${actual[*]}" != "${expected[*]}" ]]; then
   exit 1
 fi
 
-dotnet run --project "$repo/examples/conformance/runtime-example-conformance-service-console.csproj"
-dotnet run --project "$repo/examples/runtime-logging/runtime-logging.csproj"
-dotnet run --project "$repo/examples/school-management/school-management-service-lib.csproj"
-dotnet run --project "$repo/examples/order-management/dotnet-app-console/dotnet-app-console.csproj"
-dotnet run --project "$repo/examples/task_board/TaskBoardExample/TaskBoardExample.csproj"
+mapfile -t embedded_runtime_files < <(find "$repo/examples" -type f -name TeaQLCore.cs -print)
+if ((${#embedded_runtime_files[@]})); then
+  printf 'generated examples must depend on the packaged runtime; embedded TeaQLCore.cs: %s\n' \
+    "${embedded_runtime_files[@]}" >&2
+  exit 1
+fi
+
+runtime_source_root="${TeaQLRuntimeSourceRoot:-$repo}"
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/conformance/runtime-example-conformance-service-console.csproj"
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/runtime-logging/runtime-logging.csproj"
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/school-management/school-management-service-lib.csproj"
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/order-management/dotnet-app-console/dotnet-app-console.csproj"
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/task_board/TaskBoardExample/TaskBoardExample.csproj"
 echo "PASS: all .NET examples"

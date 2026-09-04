@@ -4,15 +4,15 @@ namespace Generated;
 
 internal sealed class PlatformChecker : IEntityChecker
 {
-    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTime now)
+    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now)
     {
-        var values = request.Command is InsertCommand insert ? insert.Values
-            : request.Command is UpdateCommand update ? update.Values : new Record();
-        var creating = request.Command is InsertCommand;
-        var updating = request.Command is UpdateCommand;
+        var values = request is InsertMutationRequest insert ? insert.Command.Values
+            : request is UpdateMutationRequest update ? update.Command.Values : new Record();
+        var creating = request is InsertMutationRequest;
+        var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("name")));
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("name")));
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
 
 
         return results;
@@ -21,20 +21,20 @@ internal sealed class PlatformChecker : IEntityChecker
 
 internal sealed class WorkItemChecker : IEntityChecker
 {
-    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTime now)
+    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now)
     {
-        var values = request.Command is InsertCommand insert ? insert.Values
-            : request.Command is UpdateCommand update ? update.Values : new Record();
-        var creating = request.Command is InsertCommand;
-        var updating = request.Command is UpdateCommand;
+        var values = request is InsertMutationRequest insert ? insert.Command.Values
+            : request is UpdateMutationRequest update ? update.Command.Values : new Record();
+        var creating = request is InsertMutationRequest;
+        var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("title")) || (values.TryGetValue("title", out var checkTitle) && checkTitle is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("title")));
-        if (values.TryGetValue("title", out var minLenTitle) && minLenTitle.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult("min_length", ObjectLocation.Property("title")));
-        if (values.TryGetValue("title", out var maxLenTitle) && maxLenTitle.Raw?.ToString()?.Length > 80) results.Add(new CheckResult("max_length", ObjectLocation.Property("title")));
+        if ((creating && !values.ContainsKey("title")) || (values.TryGetValue("title", out var checkTitle) && checkTitle is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("title") });
+        if (values.TryGetValue("title", out var minLenTitle) && minLenTitle.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", Location = ObjectLocation.Property("title") });
+        if (values.TryGetValue("title", out var maxLenTitle) && maxLenTitle.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("title") });
 
-        if (values.TryGetValue("description", out var maxLenDescription) && maxLenDescription.Raw?.ToString()?.Length > 100) results.Add(new CheckResult("max_length", ObjectLocation.Property("description")));
+        if (values.TryGetValue("description", out var maxLenDescription) && maxLenDescription.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("description") });
 
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult("required", ObjectLocation.Property("platform")));
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
 
 
         return results;
@@ -80,7 +80,15 @@ public static class GeneratedRuntimeModule
            ["platform"] = true,
            ["version"] = true
         }
-    }).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }, new Dictionary<string, IReadOnlyList<RelationDescriptor>>
+    {
+       ["Platform"] = new List<RelationDescriptor> {
+            RelationDescriptor.New("WorkItemList", "WorkItem").LocalKey("id").ForeignKey("platform").Many()
+        },
+       ["WorkItem"] = new List<RelationDescriptor> {
+            RelationDescriptor.New("Platform", "Platform").LocalKey("platform").ForeignKey("id")
+        }
+    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("WorkItem", ["id", "title", "description", "platform", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["title"] = ["title"], ["description"] = ["description"], ["platform"] = ["platform"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

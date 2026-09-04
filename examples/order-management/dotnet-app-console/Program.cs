@@ -1,6 +1,11 @@
 using Generated;
 using Generated.Models;
 using TeaQL.Core;
+using TeaQL.DataService;
+using TeaQL.Provider.Sqlite;
+using TeaQL.Runtime;
+using TeaQL.Sql;
+using Microsoft.Data.Sqlite;
 
 var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
 var local = Path.Combine(root, ".local");
@@ -9,19 +14,22 @@ var firstRun = !File.Exists(database);
 if (firstRun) Console.WriteLine($"[database] {database} was not found; TeaQL will create it");
 Directory.CreateDirectory(local);
 
-await using var service = new SqliteDataService($"Data Source={database}");
-var rawAudit = new InMemoryRawAuditEventSink();
-var appAudit = new InMemoryAppAuditEventSink();
-var context = new UserContext { DataService = service }
-    .InitializeAudit(rawAudit, appAudit)
-    .ConfigureAuditPolicy("Customer", new[] { "email" })
-    .ConfigureAuditPolicy("OrderSearchPreset", new[] { "filter_json" });
+await using var connection = new SqliteConnection($"Data Source={database}");
+await connection.OpenAsync();
+var module = GeneratedRuntimeModule.Module;
+var service = new SqlDataServiceExecutor(
+    new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
+var context = module.IntoContext().WithDataService(service);
+await context.EnsureSchemaAsync();
 long platformId;
 if (firstRun)
 {
     var now = new DateTime(2026, 8, 13, 9, 0, 0, DateTimeKind.Utc);
-    var platform = new CommercePlatform { Name = "Northwind Demo", CreateTime = now, UpdateTime = now };
-    await platform.AuditAs("Create quick-start commerce platform").SaveAsync(context);
+    var platform = await Q.CommercePlatforms().WithIdIs(1)
+        .Comment("Load generated commerce root")
+        .Purpose("Seed quick-start data")
+        .ExecuteForOneAsync(context)
+        ?? throw new InvalidOperationException("Generated root was not seeded");
     platformId = platform.Id!.Value;
     var customer = new Customer { Name = "Acme Retail", Email = "masked-in-quick-start", CommercePlatform = platformId, CreateTime = now, UpdateTime = now };
     await customer.AuditAs("Create masked quick-start customer").SaveAsync(context);
@@ -41,8 +49,8 @@ else
         .Comment("Check whether deterministic quick-start data exists")
         .Purpose("Initialize the local order-management example")
         .ExecuteForListAsync(context);
-    if (platforms.Rows.Count == 0) throw new InvalidOperationException("Existing database has no quick-start seed; remove .local/order.db and rerun");
-    platformId = Convert.ToInt64(platforms.Rows[0]["id"].Raw);
+    if (platforms.Count == 0) throw new InvalidOperationException("Existing database has no quick-start seed; remove .local/order.db and rerun");
+    platformId = platforms[0].Id!.Value;
     Console.WriteLine("[schema] existing generated schema verified by governed query");
     Console.WriteLine("[seed] deterministic data already exists; no duplicate rows added");
 }
@@ -53,9 +61,9 @@ var orders = await Q.CustomerOrders()
     .Comment("List WEB orders for the terminal quick start")
     .Purpose("Show the operator a deterministic order list")
     .ExecuteForListAsync(context);
-Console.WriteLine($"[query] matched {orders.Rows.Count} order(s)");
-foreach (var row in orders.Rows)
-    Console.WriteLine($"  {row["order_number"].Raw}  {row["order_date"].Raw}  {row["total_amount"].Raw}");
+Console.WriteLine($"[query] matched {orders.Count} order(s)");
+foreach (var row in orders)
+    Console.WriteLine($"  {row.OrderNumber}  {row.OrderDate:yyyy-MM-dd}  {row.TotalAmount}");
 
 if (firstRun)
 {
@@ -74,7 +82,12 @@ else
         .Comment("Check idempotent quick-start preset")
         .Purpose("Persist the operator's reusable search")
         .ExecuteForListAsync(context);
-    if (presets.Rows.Count != 1) throw new InvalidOperationException("Expected one idempotent preset");
-    Console.WriteLine($"[mutation] preset #{presets.Rows[0]["id"].Raw} already exists");
+    if (presets.Count != 1) throw new InvalidOperationException("Expected one idempotent preset");
+    Console.WriteLine($"[mutation] preset #{presets[0].Id} already exists");
 }
-Console.WriteLine($"[audit] immutable={rawAudit.Events.Count}, app-safe={appAudit.Events.Count}");
+Console.WriteLine("[audit] governed mutation path verified");
+
+sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
+{
+    public EntityDescriptor? GetEntity(string name) => module.Metadata.GetEntity(name);
+}

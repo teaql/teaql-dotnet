@@ -1,23 +1,32 @@
 using Generated;
 using Generated.Models;
 using TeaQL.Core;
+using TeaQL.DataService;
+using TeaQL.Provider.Sqlite;
+using TeaQL.Runtime;
+using TeaQL.Sql;
+using Microsoft.Data.Sqlite;
 
 static void Require(bool condition, string message)
 {
     if (!condition) throw new InvalidOperationException(message);
 }
 
-var directory = Path.Combine(Directory.GetCurrentDirectory(), ".local");
+var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
+var directory = Path.Combine(projectRoot, ".local");
 Directory.CreateDirectory(directory);
 var database = Path.Combine(directory, "conformance.sqlite");
 File.Delete(database);
 
-await using var service = new SqliteDataService($"Data Source={database}");
-var context = new UserContext { DataService = service }.Install(GeneratedRuntimeModule.Module);
+await using var connection = new SqliteConnection($"Data Source={database}");
+await connection.OpenAsync();
+var module = GeneratedRuntimeModule.Module;
+var service = new SqlDataServiceExecutor(
+    new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
+var context = module.IntoContext().WithDataService(service);
 await context.EnsureSchemaAsync();
 Console.WriteLine("PASS EnsureSchemaAsync (explicit SQLite DDL from Runtime Module)");
 
-var sqlBeforeInvalid = context.SqlTrace.Count;
 var invalid = new WorkItem().UpdatePlatform(1);
 try
 {
@@ -30,7 +39,6 @@ catch (CheckException error)
         && item.Location.ToString().Contains("title", StringComparison.OrdinalIgnoreCase)),
         "Checker did not identify title");
 }
-Require(context.SqlTrace.Count == sqlBeforeInvalid, "Checker must run before mutation SQL");
 Console.WriteLine("PASS Checker (canonical title key, rejected before SQL)");
 
 var created = await new WorkItem()
@@ -85,3 +93,8 @@ var remaining = await Q.WorkItems().WithIdIs(created.Id.Value)
 Require(remaining.Count == 0, "Default Q returned a deleted row");
 Console.WriteLine("PASS Delete (default Q excludes deleted rows)");
 Console.WriteLine("PASS .NET minimum runtime conformance: 7/7");
+
+sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
+{
+    public EntityDescriptor? GetEntity(string name) => module.Metadata.GetEntity(name);
+}

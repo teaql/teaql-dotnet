@@ -15,18 +15,24 @@ namespace Generated.Models
         private EntityKey TeaqlEntityKey() => new EntityKey("Platform", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
         internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; } foreach (var child in WorkItemList) child.AttachRoot(root); }
-        private static Value TeaqlValue(object value) => value switch {
+        private static Value TeaqlValue(object? value) => value switch {
             null => new Value.NullValue(), string v => new Value.TextValue(v), bool v => new Value.BoolValue(v),
-            double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.DateTimeValue(v), TimeSpan v => new Value.TimeValue(v),
-            int v => new Value.I64Value(v), long v => new Value.I64Value(v), _ => new Value.ObjectValue(value)
+            double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.TimestampValue(new DateTimeOffset(v).ToUnixTimeMilliseconds()), TimeSpan v => new Value.TimeValue(v),
+            int v => new Value.I64Value(v), long v => new Value.I64Value(v), _ => throw new ArgumentException($"Unsupported TeaQL value type: {value.GetType().FullName}")
+        };
+        private static DateTime TeaqlDateTime(Value value) => value switch {
+            Value.TimestampValue v => DateTimeOffset.FromUnixTimeMilliseconds(v.Milliseconds).UtcDateTime,
+            Value.DateTimeValue v => v.Value,
+            Value.DateValue v => v.Value,
+            _ => Convert.ToDateTime(value.Raw)
         };
         public Platform() { _entityRoot.MarkAsNew(TeaqlEntityKey()); }
                 public long? Id { get; set; }
-                public string Name { get; set; }
+                public string? Name { get; set; }
                 public long? Version { get; set; }
                 public List<WorkItem> WorkItemList { get; } = new List<WorkItem>();
 
-        private string _comment;
+        private string? _comment;
         private bool _markedForDeletion;
         private bool _fullyLoaded = true;
         private HashSet<string> _loadedFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -135,11 +141,11 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("id"), Message: "Mutation requires a fully loaded entity") });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("name"), Message: "Mutation requires a fully loaded entity") });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("version"), Message: "Mutation requires a fully loaded entity") });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -148,19 +154,19 @@ namespace Generated.Models
                 ((UpdateCommand)command).Values = _entityRoot.Change(TeaqlEntityKey());
                 if (Version.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(Version.Value);
             }
-            context.CheckAndFix(new MutationRequest { Command = command, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot });
+            context.PreflightMutation(TeaqlMutationRequest(command));
             for (var index = 0; index < WorkItemList.Count; index++)
             {
                 var child = WorkItemList[index];
                 child.AttachRoot(_entityRoot);
                 child.UpdatePlatformId(Id ?? _ledgerId);
-                child.AuditAs(_comment);
+                child.AuditAs(_comment!);
                 try { child.TeaqlPreflightGraph(context); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("work_item_list").Index(index);
                     throw new CheckException(error.Violations.Select(violation =>
-                        violation with { Location = violation.Location.PrefixedBy(prefix) }).ToArray());
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
                 }
             }
         }
@@ -208,9 +214,9 @@ namespace Generated.Models
                 ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
                 if (Version.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(Version.Value);
             }
-            var req = new MutationRequest { Command = cmd, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot };
-            var result = await context.DataService.MutateAsync(context, req);
-            if (result is not MutationResult mutationResult || mutationResult.PersistedRecord == null)
+            var req = TeaqlMutationRequest(cmd);
+            var mutationResult = await context.RequireResource<IDataService>().MutateAsync(req);
+            if (mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for Platform");
             var saved = FromRecord(mutationResult.PersistedRecord);
             var oldKey = TeaqlEntityKey();
@@ -225,17 +231,25 @@ namespace Generated.Models
                 var child = WorkItemList[index];
                 child.AttachRoot(_entityRoot);
                 child.UpdatePlatformId(Id);
-                child.AuditAs(_comment);
+                child.AuditAs(_comment!);
                 try { await child.TeaqlSaveWithinGraphAsync(context); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("work_item_list").Index(index);
                     throw new CheckException(error.Violations.Select(violation =>
-                        violation with { Location = violation.Location.PrefixedBy(prefix) }).ToArray());
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
                 }
             }
             return saved;
         }
+
+        private MutationRequest TeaqlMutationRequest(object command) => command switch
+        {
+            InsertCommand insert => MutationRequest.Create(insert, _comment!, TeaqlEntityKey(), _entityRoot),
+            UpdateCommand update => MutationRequest.Create(update, _comment!, TeaqlEntityKey(), _entityRoot),
+            DeleteCommand delete => MutationRequest.Create(delete, _comment!, TeaqlEntityKey(), _entityRoot),
+            _ => throw new InvalidOperationException("Unsupported mutation command")
+        };
 
         public InsertCommand ToInsertCommand()
         {
@@ -258,7 +272,8 @@ namespace Generated.Models
 
             return new UpdateCommand { 
                 Entity = "Platform", 
-                Id = this.Id.HasValue ? new Value.I64Value(this.Id.Value) : null, 
+                Id = this.Id.HasValue ? new Value.I64Value(this.Id.Value) : throw new InvalidOperationException("Update requires a loaded id"),
+                ExpectedVersionValue = this.Version,
                 Values = record 
             };
         }

@@ -31,7 +31,7 @@ namespace Generated
     {
         private readonly T _value;
         private readonly bool _hasValue;
-        private readonly TeaQLNotLoadedException _notLoaded;
+        private readonly TeaQLNotLoadedException? _notLoaded;
 
         public bool HasValue
         {
@@ -42,7 +42,7 @@ namespace Generated
             }
         }
 
-        public ValueExpression(T value, bool hasValue = true, TeaQLNotLoadedException notLoaded = null)
+        public ValueExpression(T value, bool hasValue = true, TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _hasValue = hasValue;
@@ -67,16 +67,16 @@ namespace Generated
 
     public sealed class PlatformExpression
     {
-        private readonly Generated.Models.Platform _value;
+        private readonly Generated.Models.Platform? _value;
         private readonly string _root;
         private readonly string _path;
-        private readonly TeaQLNotLoadedException _notLoaded;
+        private readonly TeaQLNotLoadedException? _notLoaded;
 
         public PlatformExpression(
-            Generated.Models.Platform value,
+            Generated.Models.Platform? value,
             string root = "Platform(null)",
             string path = "",
-            TeaQLNotLoadedException notLoaded = null)
+            TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
@@ -84,7 +84,7 @@ namespace Generated
             _notLoaded = notLoaded;
         }
 
-        public Generated.Models.Platform Eval()
+        public Generated.Models.Platform? Eval()
         {
             if (_notLoaded != null) throw _notLoaded;
             return _value;
@@ -100,24 +100,24 @@ namespace Generated
             return new ValueExpression<long?>(_value.Id);
         }
 
-        public ValueExpression<string> Name()
+        public ValueExpression<string?> Name()
         {
-            if (_notLoaded != null) return ValueExpression<string>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<string>.Missing();
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            if (_value is null) return ValueExpression<string?>.Missing();
             var path = ExpressionPath.Append(_path, "Name");
             if (!_value.IsLoaded("Name"))
-                return ValueExpression<string>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
-            return new ValueExpression<string>(_value.Name);
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
+            return new ValueExpression<string?>(_value.Name);
         }
 
-        public ValueExpression<string> BaseUrl()
+        public ValueExpression<string?> BaseUrl()
         {
-            if (_notLoaded != null) return ValueExpression<string>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<string>.Missing();
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            if (_value is null) return ValueExpression<string?>.Missing();
             var path = ExpressionPath.Append(_path, "BaseUrl");
             if (!_value.IsLoaded("BaseUrl"))
-                return ValueExpression<string>.NotLoaded(new TeaQLNotLoadedException(_root, path, "BaseUrl"));
-            return new ValueExpression<string>(_value.BaseUrl);
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "BaseUrl"));
+            return new ValueExpression<string?>(_value.BaseUrl);
         }
 
         public ValueExpression<System.DateTime?> CreateTime()
@@ -177,16 +177,16 @@ namespace Generated
 
     public sealed class SchoolTypeExpression
     {
-        private readonly Generated.Models.SchoolType _value;
+        private readonly Generated.Models.SchoolType? _value;
         private readonly string _root;
         private readonly string _path;
-        private readonly TeaQLNotLoadedException _notLoaded;
+        private readonly TeaQLNotLoadedException? _notLoaded;
 
         public SchoolTypeExpression(
-            Generated.Models.SchoolType value,
+            Generated.Models.SchoolType? value,
             string root = "SchoolType(null)",
             string path = "",
-            TeaQLNotLoadedException notLoaded = null)
+            TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
@@ -194,7 +194,7 @@ namespace Generated
             _notLoaded = notLoaded;
         }
 
-        public Generated.Models.SchoolType Eval()
+        public Generated.Models.SchoolType? Eval()
         {
             if (_notLoaded != null) throw _notLoaded;
             return _value;
@@ -210,24 +210,24 @@ namespace Generated
             return new ValueExpression<long?>(_value.Id);
         }
 
-        public ValueExpression<string> Name()
+        public ValueExpression<string?> Name()
         {
-            if (_notLoaded != null) return ValueExpression<string>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<string>.Missing();
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            if (_value is null) return ValueExpression<string?>.Missing();
             var path = ExpressionPath.Append(_path, "Name");
             if (!_value.IsLoaded("Name"))
-                return ValueExpression<string>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
-            return new ValueExpression<string>(_value.Name);
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
+            return new ValueExpression<string?>(_value.Name);
         }
 
-        public ValueExpression<string> Code()
+        public ValueExpression<string?> Code()
         {
-            if (_notLoaded != null) return ValueExpression<string>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<string>.Missing();
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            if (_value is null) return ValueExpression<string?>.Missing();
             var path = ExpressionPath.Append(_path, "Code");
             if (!_value.IsLoaded("Code"))
-                return ValueExpression<string>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Code"));
-            return new ValueExpression<string>(_value.Code);
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Code"));
+            return new ValueExpression<string?>(_value.Code);
         }
 
         public ValueExpression<decimal?> DisplayOrder()
@@ -285,16 +285,16 @@ namespace Generated
 
     public sealed class SchoolExpression
     {
-        private readonly Generated.Models.School _value;
+        private readonly Generated.Models.School? _value;
         private readonly string _root;
         private readonly string _path;
-        private readonly TeaQLNotLoadedException _notLoaded;
+        private readonly TeaQLNotLoadedException? _notLoaded;
 
         public SchoolExpression(
-            Generated.Models.School value,
+            Generated.Models.School? value,
             string root = "School(null)",
             string path = "",
-            TeaQLNotLoadedException notLoaded = null)
+            TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
@@ -302,7 +302,7 @@ namespace Generated
             _notLoaded = notLoaded;
         }
 
-        public Generated.Models.School Eval()
+        public Generated.Models.School? Eval()
         {
             if (_notLoaded != null) throw _notLoaded;
             return _value;
@@ -318,24 +318,24 @@ namespace Generated
             return new ValueExpression<long?>(_value.Id);
         }
 
-        public ValueExpression<string> Name()
+        public ValueExpression<string?> Name()
         {
-            if (_notLoaded != null) return ValueExpression<string>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<string>.Missing();
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            if (_value is null) return ValueExpression<string?>.Missing();
             var path = ExpressionPath.Append(_path, "Name");
             if (!_value.IsLoaded("Name"))
-                return ValueExpression<string>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
-            return new ValueExpression<string>(_value.Name);
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
+            return new ValueExpression<string?>(_value.Name);
         }
 
-        public ValueExpression<string> Address()
+        public ValueExpression<string?> Address()
         {
-            if (_notLoaded != null) return ValueExpression<string>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<string>.Missing();
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            if (_value is null) return ValueExpression<string?>.Missing();
             var path = ExpressionPath.Append(_path, "Address");
             if (!_value.IsLoaded("Address"))
-                return ValueExpression<string>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Address"));
-            return new ValueExpression<string>(_value.Address);
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Address"));
+            return new ValueExpression<string?>(_value.Address);
         }
 
         public ValueExpression<System.DateTime?> EstablishedDate()
@@ -448,23 +448,23 @@ namespace Generated
         private readonly string _root;
         private readonly string _path;
         private readonly bool _present;
-        private readonly TeaQLNotLoadedException _notLoaded;
+        private readonly TeaQLNotLoadedException? _notLoaded;
 
         public PlatformListExpression(
-            IReadOnlyList<Generated.Models.Platform> items,
-            string root = "Platform(null)",
+            IReadOnlyList<Generated.Models.Platform>? items,
+            string? root = "Platform(null)",
             string path = "",
             bool present = true,
-            TeaQLNotLoadedException notLoaded = null)
+            TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.Platform>();
-            _root = root;
+            _root = root ?? "Platform(null)";
             _path = path;
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static PlatformListExpression Missing(string root = null, string path = "") =>
+        public static PlatformListExpression Missing(string? root = null, string path = "") =>
             new(new List<Generated.Models.Platform>(), root, path, false);
 
         public ValueExpression<int> Size()
@@ -491,23 +491,23 @@ namespace Generated
         private readonly string _root;
         private readonly string _path;
         private readonly bool _present;
-        private readonly TeaQLNotLoadedException _notLoaded;
+        private readonly TeaQLNotLoadedException? _notLoaded;
 
         public SchoolTypeListExpression(
-            IReadOnlyList<Generated.Models.SchoolType> items,
-            string root = "SchoolType(null)",
+            IReadOnlyList<Generated.Models.SchoolType>? items,
+            string? root = "SchoolType(null)",
             string path = "",
             bool present = true,
-            TeaQLNotLoadedException notLoaded = null)
+            TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.SchoolType>();
-            _root = root;
+            _root = root ?? "SchoolType(null)";
             _path = path;
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static SchoolTypeListExpression Missing(string root = null, string path = "") =>
+        public static SchoolTypeListExpression Missing(string? root = null, string path = "") =>
             new(new List<Generated.Models.SchoolType>(), root, path, false);
 
         public ValueExpression<int> Size()
@@ -534,23 +534,23 @@ namespace Generated
         private readonly string _root;
         private readonly string _path;
         private readonly bool _present;
-        private readonly TeaQLNotLoadedException _notLoaded;
+        private readonly TeaQLNotLoadedException? _notLoaded;
 
         public SchoolListExpression(
-            IReadOnlyList<Generated.Models.School> items,
-            string root = "School(null)",
+            IReadOnlyList<Generated.Models.School>? items,
+            string? root = "School(null)",
             string path = "",
             bool present = true,
-            TeaQLNotLoadedException notLoaded = null)
+            TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.School>();
-            _root = root;
+            _root = root ?? "School(null)";
             _path = path;
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static SchoolListExpression Missing(string root = null, string path = "") =>
+        public static SchoolListExpression Missing(string? root = null, string path = "") =>
             new(new List<Generated.Models.School>(), root, path, false);
 
         public ValueExpression<int> Size()
@@ -573,17 +573,17 @@ namespace Generated
 
     public static class E
     {
-        public static PlatformExpression Platform(Generated.Models.Platform value)
+        public static PlatformExpression Platform(Generated.Models.Platform? value)
         {
             return new PlatformExpression(value, $"Platform(id={value?.Id})");
         }
 
-        public static SchoolTypeExpression SchoolType(Generated.Models.SchoolType value)
+        public static SchoolTypeExpression SchoolType(Generated.Models.SchoolType? value)
         {
             return new SchoolTypeExpression(value, $"SchoolType(id={value?.Id})");
         }
 
-        public static SchoolExpression School(Generated.Models.School value)
+        public static SchoolExpression School(Generated.Models.School? value)
         {
             return new SchoolExpression(value, $"School(id={value?.Id})");
         }
