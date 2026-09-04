@@ -184,6 +184,9 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             else
                 await EnsureIdFloorAsync(entityName, OptimisticIdSpace.Floor(explicitId, entityName));
         }
+        if (request is InsertMutationRequest versionedInsert && entityDesc.VersionProperty() is { } insertVersion
+            && !versionedInsert.Command.Values.ContainsKey(insertVersion.Name))
+            versionedInsert.Command.Values[insertVersion.Name] = new Value.I64Value(1);
 
         CompiledQuery compiled;
         try
@@ -691,6 +694,9 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             else
                 await EnsureIdFloorAsync(entityName, OptimisticIdSpace.Floor(explicitId, entityName));
         }
+        if (request is InsertMutationRequest versionedInsert && entityDesc.VersionProperty() is { } insertVersion
+            && !versionedInsert.Command.Values.ContainsKey(insertVersion.Name))
+            versionedInsert.Command.Values[insertVersion.Name] = new Value.I64Value(1);
 
         CompiledQuery compiled;
         try
