@@ -7,7 +7,7 @@ public enum MutationKind { Insert, Update, Delete, Recover }
 public record InsertCommand
 {
     public string Entity { get; init; } = "";
-    public Record Values { get; init; } = new();
+    public Record Values { get; set; } = new();
     public List<TraceNode> TraceChain { get; init; } = new();
 
     public InsertCommand() { }
@@ -22,6 +22,8 @@ public record InsertCommand
         Values[field] = value;
         return this;
     }
+
+    public InsertCommand Value(string field, object? value) => Value(field, Core.Value.FromObject(value));
 }
 
 public record UpdateCommand
@@ -29,7 +31,7 @@ public record UpdateCommand
     public string Entity { get; init; } = "";
     public Value Id { get; init; } = new Value.NullValue();
     public long? ExpectedVersionValue { get; set; }
-    public Record Values { get; init; } = new();
+    public Record Values { get; set; } = new();
     public List<TraceNode> TraceChain { get; init; } = new();
     public Record? OldValues { get; init; }
 
@@ -52,6 +54,8 @@ public record UpdateCommand
         Values[field] = value;
         return this;
     }
+
+    public UpdateCommand Value(string field, object? value) => Value(field, Core.Value.FromObject(value));
 }
 
 public record BatchInsertCommand
@@ -77,6 +81,11 @@ public record DeleteCommand
     public string Entity { get; init; } = "";
     public Value Id { get; init; } = new Value.NullValue();
     public long? ExpectedVersionValue { get; set; }
+    public Value Version
+    {
+        get => ExpectedVersionValue is long version ? new Value.I64Value(version) : new Value.NullValue();
+        init => ExpectedVersionValue = value.TryI64();
+    }
     public bool SoftDelete { get; set; } = true;
     public List<TraceNode> TraceChain { get; init; } = new();
 

@@ -27,6 +27,8 @@ public class QueryRequest
     public string? Purpose { get; set; }
     /// <summary>Runtime-only observer; providers must not serialize it.</summary>
     public IRelationLoadObserver? RelationLoadObserver { get; set; }
+    public QueryRequest() { }
+    public QueryRequest(SelectQuery query) => Query = query;
 }
 
 public interface IRelationLoadObserver
@@ -44,8 +46,34 @@ public class QueryResult
 
 public abstract class MutationRequest
 {
+    public EntityKey? LedgerKey { get; init; }
+    public EntityRoot? LedgerRoot { get; init; }
     public abstract IReadOnlyList<TraceNode> TraceChain { get; }
     public abstract string? Comment { get; }
+
+    public static MutationRequest Create(InsertCommand command, string comment, EntityKey ledgerKey, EntityRoot ledgerRoot)
+    {
+        AddAuditTrace(command.TraceChain, command.Entity, comment);
+        return new InsertMutationRequest(command) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
+    }
+
+    public static MutationRequest Create(UpdateCommand command, string comment, EntityKey ledgerKey, EntityRoot ledgerRoot)
+    {
+        AddAuditTrace(command.TraceChain, command.Entity, comment);
+        return new UpdateMutationRequest(command) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
+    }
+
+    public static MutationRequest Create(DeleteCommand command, string comment, EntityKey ledgerKey, EntityRoot ledgerRoot)
+    {
+        AddAuditTrace(command.TraceChain, command.Entity, comment);
+        return new DeleteMutationRequest(command) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
+    }
+
+    private static void AddAuditTrace(List<TraceNode> trace, string entity, string comment)
+    {
+        if (string.IsNullOrWhiteSpace(comment)) throw new ArgumentException("Mutation audit comment is required", nameof(comment));
+        trace.Add(new TraceNode(entity, null, comment));
+    }
 }
 
 public class InsertMutationRequest : MutationRequest

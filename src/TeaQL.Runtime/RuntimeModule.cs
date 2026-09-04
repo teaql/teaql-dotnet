@@ -12,6 +12,49 @@ public class RuntimeModule
     internal Dictionary<string, IEntityChecker> Checkers { get; } = new();
     internal Func<UserContext, Task>? GeneratedBootstrapCallback { get; private set; }
 
+    public RuntimeModule() { }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public RuntimeModule(
+        IEnumerable<string> entities,
+        IReadOnlyDictionary<string, IEntityChecker> checkers,
+        IReadOnlyDictionary<string, Record> schemaSamples,
+        IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> requiredFields)
+    {
+        foreach (var entity in entities)
+        {
+            var descriptor = EntityDescriptor.New(entity);
+            if (schemaSamples.TryGetValue(entity, out var sample))
+            {
+                foreach (var (field, value) in sample)
+                {
+                    var property = TeaQL.Core.PropertyDescriptor.New(field, DataTypeFor(value)).ColumnName(field);
+                    if (requiredFields.TryGetValue(entity, out var required)
+                        && required.TryGetValue(field, out var isRequired) && isRequired)
+                        property = property.NotNull();
+                    if (string.Equals(field, "id", StringComparison.OrdinalIgnoreCase)) property = property.Id();
+                    if (string.Equals(field, "version", StringComparison.OrdinalIgnoreCase)) property = property.Version();
+                    descriptor.Property(property);
+                }
+            }
+            Entity(descriptor);
+        }
+        foreach (var (entity, checker) in checkers) Checker(entity, checker);
+    }
+
+    private static DataType DataTypeFor(Value value) => value switch
+    {
+        Value.BoolValue => DataType.Bool,
+        Value.I64Value => DataType.I64,
+        Value.U64Value => DataType.U64,
+        Value.F64Value => DataType.F64,
+        Value.DecimalValue => DataType.Decimal,
+        Value.JsonValue => DataType.Json,
+        Value.DateValue => DataType.Date,
+        Value.TimestampValue or Value.DateTimeValue => DataType.Timestamp,
+        _ => DataType.Text
+    };
+
     /// <summary>
     /// Generator integration point. Applications should install the generated RuntimeModule and call
     /// UserContext.EnsureSchemaAsync rather than invoking this callback directly.

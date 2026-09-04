@@ -36,10 +36,10 @@ public sealed class EntityRoot
         _changes.ToDictionary(item => item.Key,
             item => (IReadOnlyDictionary<string, Value>)new Dictionary<string, Value>(item.Value));
 
-    public IReadOnlyDictionary<string, Value> Change(EntityKey key) =>
+    public Record Change(EntityKey key) =>
         _changes.TryGetValue(key, out var values)
-            ? new Dictionary<string, Value>(values)
-            : new Dictionary<string, Value>();
+            ? new Record(values)
+            : new Record();
 
     public void MergeFrom(EntityRoot other)
     {
