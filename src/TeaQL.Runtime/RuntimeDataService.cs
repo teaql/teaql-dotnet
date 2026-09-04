@@ -165,11 +165,11 @@ public sealed class RuntimeDataService : IDataService
         return "teaql:id-set:v1:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity))).ToLowerInvariant();
     }
 
-    public Task<MutationResult> MutateAsync(MutationRequest request)
+    public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
         _context.CheckAndFix(request);
         var entity = EntityName(request);
-        return _context.RuntimeTelemetry.ObserveAsync(
+        var result = await _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("mutation", $"{entity}.mutate",
                 new Dictionary<string, object>
                 {
@@ -180,8 +180,69 @@ public sealed class RuntimeDataService : IDataService
             result => new Dictionary<string, object>
             {
                 ["teaql.result.cardinality"] = result.AffectedRows
-            });
+            }).ConfigureAwait(false);
+        await PublishMutationAuditAsync(request, result).ConfigureAwait(false);
+        return result;
     }
+
+    private async Task PublishMutationAuditAsync(MutationRequest request, MutationResult result)
+    {
+        if (result.AffectedRows == 0 || _context.GetResource<IAppAuditEventSink>() == null) return;
+        var changedFields = ChangedFields(request).OrderBy(field => field, StringComparer.Ordinal).ToArray();
+        var safeEvent = new Dictionary<string, object?>
+        {
+            ["actor"] = _context.UserIdentifier,
+            ["category"] = _context.GetNamedResource<string>("bootstrapCategory") ?? "mutation",
+            ["reason"] = request.Comment,
+            ["entityType"] = EntityName(request),
+            ["entityId"] = EntityId(request, result),
+            ["mutationKind"] = MutationKind(request),
+            ["changedFields"] = changedFields,
+            ["changedFieldCount"] = changedFields.Length,
+            ["resultVersion"] = PersistedValue(result, "version"),
+            ["affectedRows"] = result.AffectedRows
+        };
+        await _context.PublishAppAuditEventAsync(
+            EntityName(request), MutationKind(request), changedFields.Length, safeEvent).ConfigureAwait(false);
+    }
+
+    private static IEnumerable<string> ChangedFields(MutationRequest request) => request switch
+    {
+        InsertMutationRequest insert => insert.Command.Values.Keys,
+        UpdateMutationRequest update => update.Command.Values.Keys,
+        DeleteMutationRequest => ["version"],
+        RecoverMutationRequest => ["version"],
+        BatchMutationRequest batch => batch.Requests.SelectMany(ChangedFields).Distinct(StringComparer.Ordinal),
+        _ => []
+    };
+
+    private static object? EntityId(MutationRequest request, MutationResult result) =>
+        PersistedValue(result, "id") ?? request switch
+        {
+            InsertMutationRequest insert when insert.Command.Values.TryGetValue("id", out var id) => SafeValue(id),
+            UpdateMutationRequest update => SafeValue(update.Command.Id),
+            DeleteMutationRequest delete => SafeValue(delete.Command.Id),
+            RecoverMutationRequest recover => SafeValue(recover.Command.Id),
+            _ => null
+        };
+
+    private static object? PersistedValue(MutationResult result, string field) =>
+        result.PersistedRecord != null && result.PersistedRecord.TryGetValue(field, out var value)
+            ? SafeValue(value) : null;
+
+    private static object? SafeValue(Value value) => value switch
+    {
+        Value.BoolValue(var item) => item,
+        Value.I64Value(var item) => item,
+        Value.U64Value(var item) => item,
+        Value.F64Value(var item) => item,
+        Value.DecimalValue(var item) => item,
+        Value.TextValue(var item) => item,
+        Value.DateValue(var item) => item,
+        Value.TimestampValue(var item) => item,
+        Value.NullValue or Value.TypedNullValue => null,
+        _ => null
+    };
 
     private async Task<QueryResult> ObserveProviderQueryAsync(QueryRequest request)
     {
