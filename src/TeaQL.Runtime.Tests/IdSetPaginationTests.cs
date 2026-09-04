@@ -43,6 +43,9 @@ public class IdSetPaginationTests
         Assert.Equal("ID_SET_HIT", context.IdSetPlan);
         Assert.Equal(3, provider.Calls);
         Assert.DoesNotContain(provider.Queries, query => query.AggregateItems.Count != 0);
+        var build = Assert.Single(provider.Queries.Where(query => query.Projection.SequenceEqual(new[] { "id" })));
+        Assert.Equal(101UL, build.HardLimitValue);
+        Assert.Equal(101UL, build.Slice?.Limit);
     }
 
     [Fact]

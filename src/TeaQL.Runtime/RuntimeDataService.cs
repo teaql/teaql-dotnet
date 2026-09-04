@@ -91,6 +91,7 @@ public sealed class RuntimeDataService : IDataService
                     idQuery.RelationAggregates.Clear();
                     idQuery.ChildEnhancements.Clear();
                     idQuery.Slice = new Slice(options.MaxIds == ulong.MaxValue ? ulong.MaxValue : options.MaxIds + 1, 0);
+                    idQuery.HardLimit(options.MaxIds == ulong.MaxValue ? ulong.MaxValue : options.MaxIds + 1);
                     idQuery.IdSetPagination = null;
                     var idResult = await ObserveProviderQueryAsync(CopyRequest(request, idQuery)).ConfigureAwait(false);
                     var ids = new List<ulong>(idResult.Rows.Count);
