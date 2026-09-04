@@ -363,6 +363,10 @@ public record SelectQuery
         return this;
     }
 
+    public SelectQuery Limit(int limit) => limit < 0
+        ? throw new ArgumentOutOfRangeException(nameof(limit))
+        : Limit((ulong)limit);
+
     /// Override the outer materialized-list ceiling. Most callers should keep 10,000.
     public SelectQuery HardLimit(ulong hardLimit)
     {
@@ -392,6 +396,10 @@ public record SelectQuery
         Slice = Slice with { Offset = offset };
         return this;
     }
+
+    public SelectQuery Offset(int offset) => offset < 0
+        ? throw new ArgumentOutOfRangeException(nameof(offset))
+        : Offset((ulong)offset);
 
     public SelectQuery Page(ulong offset, ulong limit) => Offset(offset).Limit(limit);
 

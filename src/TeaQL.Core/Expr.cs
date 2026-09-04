@@ -54,6 +54,8 @@ public abstract record Expr
 
     public static Expr SoundLike(string column, Value value) => 
         Binary(Soundex(Column(column)), BinaryOp.Eq, Soundex(Value(value)));
+    public static Expr SoundLike(string column, object? value) =>
+        SoundLike(column, Core.Value.FromObject(value));
 
     public static Expr Eq(string column, Value value) => Binary(Column(column), BinaryOp.Eq, Value(value));
     public static Expr Eq(string column, object? value) => Eq(column, Core.Value.FromObject(value));
@@ -135,6 +137,8 @@ public abstract record Expr
 
     public static Expr Between(string column, Value lower, Value upper) => 
         new BetweenExpr(Column(column), Value(lower), Value(upper));
+    public static Expr Between(string column, object? lower, object? upper) =>
+        Between(column, Core.Value.FromObject(lower), Core.Value.FromObject(upper));
 
     public static Expr IsNull(string column) => new IsNullExpr(Column(column));
     public static Expr IsNotNull(string column) => new IsNotNullExpr(Column(column));
