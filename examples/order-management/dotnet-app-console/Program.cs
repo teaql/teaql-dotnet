@@ -9,10 +9,11 @@ using Microsoft.Data.Sqlite;
 
 var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
 var local = Path.Combine(root, ".local");
-var database = Path.Combine(local, "order.db");
+var database = Environment.GetEnvironmentVariable("TEAQL_ORDER_MANAGEMENT_DB")
+    ?? Path.Combine(local, "order.db");
 var firstRun = !File.Exists(database);
 if (firstRun) Console.WriteLine($"[database] {database} was not found; TeaQL will create it");
-Directory.CreateDirectory(local);
+Directory.CreateDirectory(Path.GetDirectoryName(database)!);
 
 await using var connection = new SqliteConnection($"Data Source={database}");
 await connection.OpenAsync();
