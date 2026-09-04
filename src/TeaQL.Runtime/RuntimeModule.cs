@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using TeaQL.Core;
 using TeaQL.DataService;
 
@@ -9,11 +10,21 @@ public class RuntimeModule
     public InMemoryMetadataStore Metadata { get; } = new();
     public InMemoryEntityRegistry EntityRegistry { get; } = new();
     internal Dictionary<string, IEntityChecker> Checkers { get; } = new();
-    internal List<BootstrapEntity> RootEntities { get; } = new();
-    internal List<BootstrapEntity> ConstantEntities { get; } = new();
+    internal Func<UserContext, Task>? GeneratedBootstrapCallback { get; private set; }
 
-    public RuntimeModule RootEntity(BootstrapEntity entity) { RootEntities.Add(entity); return this; }
-    public RuntimeModule ConstantEntity(BootstrapEntity entity) { ConstantEntities.Add(entity); return this; }
+    /// <summary>
+    /// Generator integration point. Applications should install the generated RuntimeModule and call
+    /// UserContext.EnsureSchemaAsync rather than invoking this callback directly.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public RuntimeModule GeneratedBootstrap(Func<UserContext, Task> callback)
+    {
+        ArgumentNullException.ThrowIfNull(callback);
+        GeneratedBootstrapCallback = GeneratedBootstrapCallback == null
+            ? callback
+            : Compose(GeneratedBootstrapCallback, callback);
+        return this;
+    }
 
     public RuntimeModule Checker(string entity, IEntityChecker checker)
     {
@@ -36,19 +47,24 @@ public class RuntimeModule
         foreach (var descriptor in other.Metadata.GetAllEntities()) combined.Entity(descriptor);
         foreach (var checker in Checkers) combined.Checker(checker.Key, checker.Value);
         foreach (var checker in other.Checkers) combined.Checker(checker.Key, checker.Value);
-        combined.RootEntities.AddRange(RootEntities);
-        combined.RootEntities.AddRange(other.RootEntities);
-        combined.ConstantEntities.AddRange(ConstantEntities);
-        combined.ConstantEntities.AddRange(other.ConstantEntities);
+        if (GeneratedBootstrapCallback != null) combined.GeneratedBootstrap(GeneratedBootstrapCallback);
+        if (other.GeneratedBootstrapCallback != null) combined.GeneratedBootstrap(other.GeneratedBootstrapCallback);
         return combined;
     }
+
+    private static Func<UserContext, Task> Compose(
+        Func<UserContext, Task> first, Func<UserContext, Task> second) => async context =>
+    {
+        await first(context).ConfigureAwait(false);
+        await second(context).ConfigureAwait(false);
+    };
 
     public void ApplyTo(UserContext context)
     {
         context.Metadata = Metadata;
         context.EntityRegistry = EntityRegistry;
         context.InstallCheckers(Checkers);
-        context.InstallBootstrapEntities(RootEntities, ConstantEntities);
+        context.InstallGeneratedBootstrap(GeneratedBootstrapCallback);
     }
 
     public UserContext IntoContext()
@@ -58,8 +74,6 @@ public class RuntimeModule
         return context;
     }
 }
-
-public sealed record BootstrapEntity(string Entity, long Id, Record Values);
 
 public interface IEntityChecker
 {

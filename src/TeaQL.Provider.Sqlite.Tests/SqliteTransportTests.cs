@@ -62,25 +62,40 @@ namespace TeaQL.Provider.Sqlite.Tests
         }
 
         [Fact]
-        public async Task SchoolBootstrapIsIdempotentPreservesRootAndReconcilesConstants()
+        public async Task GeneratedBootstrapRunsAfterSchemaThroughInstalledContext()
         {
             var platform = EntityDescriptor.New("Platform").TableName("platform_data")
                 .Property(PropertyDescriptor.New("id", DataType.I64).Id())
                 .Property(PropertyDescriptor.New("name", DataType.Text))
                 .Property(PropertyDescriptor.New("version", DataType.I64).Version());
-            var schoolType = EntityDescriptor.New("SchoolType").TableName("school_type_data")
-                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
-                .Property(PropertyDescriptor.New("name", DataType.Text))
-                .Property(PropertyDescriptor.New("code", DataType.Text))
-                .Property(PropertyDescriptor.New("version", DataType.I64).Version());
-            var primaryValues = new Record
-                { ["name"] = new Value.TextValue("Primary"), ["code"] = new Value.TextValue("PRIMARY") };
-            var module = new RuntimeModule().Entity(platform).Entity(schoolType)
-                .RootEntity(new BootstrapEntity("Platform", 1, new Record
-                    { ["name"] = new Value.TextValue("Campus Learning Platform") }))
-                .ConstantEntity(new BootstrapEntity("SchoolType", 1001, primaryValues))
-                .ConstantEntity(new BootstrapEntity("SchoolType", 1002, new Record
-                    { ["name"] = new Value.TextValue("Secondary"), ["code"] = new Value.TextValue("SECONDARY") }));
+            var calls = new List<string>();
+            var module = new RuntimeModule().Entity(platform)
+                .GeneratedBootstrap(async context =>
+                {
+                    calls.Add("first");
+                    var service = context.RequireResource<IDataService>();
+                    var before = await service.QueryAsync(new QueryRequest
+                    {
+                        Query = new SelectQuery("Platform"),
+                        Comment = "what: inspect generated bootstrap state",
+                        Purpose = "why: verify schema exists before generated bootstrap"
+                    });
+                    if (before.Rows.Count == 0)
+                    {
+                        var command = new InsertCommand("Platform")
+                            .Value("id", new Value.I64Value(1))
+                            .Value("name", new Value.TextValue("Campus Learning Platform"))
+                            .Value("version", new Value.I64Value(1));
+                        command.TraceChain.Add(new TraceNode(
+                            "Platform", 1, "initialize generated Platform root"));
+                        await service.MutateAsync(new InsertMutationRequest(command));
+                    }
+                })
+                .GeneratedBootstrap(context =>
+                {
+                    calls.Add("second");
+                    return Task.CompletedTask;
+                });
             var executor = new SqlDataServiceExecutor(
                 new SqliteDialect(), _transport, new ModuleSchemaProvider(module));
             var context = module.IntoContext();
@@ -89,6 +104,7 @@ namespace TeaQL.Provider.Sqlite.Tests
 
             await context.EnsureSchemaAsync();
             await context.EnsureSchemaAsync();
+            Assert.Equal(new[] { "first", "second", "first", "second" }, calls);
             using (var soundex = _connection.CreateCommand())
             {
                 soundex.CommandText = "SELECT soundex('Robert'), soundex('Robert') = soundex('Rupert'), soundex(NULL)";
@@ -98,21 +114,9 @@ namespace TeaQL.Provider.Sqlite.Tests
                 Assert.Equal(1L, reader.GetInt64(1));
                 Assert.Equal("?000", reader.GetString(2));
             }
-            await executor.MutateAsync(new UpdateMutationRequest(
-                new UpdateCommand("Platform", new Value.I64Value(1))
-                    .Value("name", new Value.TextValue("Customer Name"))));
-            primaryValues["name"] = new Value.TextValue("Primary School");
-            await context.EnsureSchemaAsync();
-
             var roots = await executor.QueryAsync(new QueryRequest { Query = new SelectQuery("Platform") });
-            var constants = await executor.QueryAsync(new QueryRequest { Query = new SelectQuery("SchoolType") });
             Assert.Single(roots.Rows);
-            Assert.Equal("Customer Name", roots.Rows[0]["name"].TryText());
-            Assert.Equal(2, constants.Rows.Count);
-            Assert.Equal("Primary School", constants.Rows.Single(row => row["id"].TryI64() == 1001)["name"].TryText());
-            Assert.Equal(2, constants.Rows.Single(row => row["id"].TryI64() == 1001)["version"].TryI64());
-            Assert.Equal(1, constants.Rows.Single(row => row["id"].TryI64() == 1002)["version"].TryI64());
-            Assert.True(await executor.NextIdAsync("SchoolType") > 1002);
+            Assert.Equal("Campus Learning Platform", roots.Rows[0]["name"].TryText());
         }
 
         private sealed class ModuleSchemaProvider : ISchemaProvider

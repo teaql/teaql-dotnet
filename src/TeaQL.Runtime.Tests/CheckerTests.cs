@@ -7,6 +7,25 @@ namespace TeaQL.Runtime.Tests;
 public class CheckerTests
 {
     [Fact]
+    public void GeneratedBootstrapScopeSuppliesAndRestoresContextIdentity()
+    {
+        var context = new UserContext { UserIdentifier = "application-user" }
+            .WithActiveRoot("Tenant", 42);
+        context.InsertNamedResource("bootstrapCategory", "application-category");
+
+        using (context.EnterGeneratedBootstrap("Platform", 1))
+        {
+            Assert.Equal("teaql-generated-bootstrap", context.UserIdentifier);
+            Assert.Equal(new ContextEntityRef("Platform", 1), context.RequireActiveRoot("Platform"));
+            Assert.Equal("runtime-bootstrap", context.RequireNamedResource<string>("bootstrapCategory"));
+        }
+
+        Assert.Equal("application-user", context.UserIdentifier);
+        Assert.Equal(new ContextEntityRef("Tenant", 42), context.RequireActiveRoot("Tenant"));
+        Assert.Equal("application-category", context.RequireNamedResource<string>("bootstrapCategory"));
+    }
+
+    [Fact]
     public void ActiveRootIsTypedAndFailsClosed()
     {
         var context = new UserContext().WithActiveRoot("Tenant", 42);

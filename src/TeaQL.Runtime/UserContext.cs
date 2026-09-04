@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -252,6 +253,39 @@ public class UserContext
         return root;
     }
 
+    /// <summary>
+    /// Generator integration scope for generated bootstrap mutations. It supplies the stable audit
+    /// actor/category and active root, then restores the caller's context exactly on disposal.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public IDisposable EnterGeneratedBootstrap(string rootEntityType, long rootId)
+    {
+        var previousUser = UserIdentifier;
+        var hadRoot = _namedResources.TryGetValue(ActiveRootResource, out var previousRoot);
+        var hadCategory = _namedResources.TryGetValue("bootstrapCategory", out var previousCategory);
+        UserIdentifier = "teaql-generated-bootstrap";
+        WithActiveRoot(rootEntityType, rootId);
+        InsertNamedResource("bootstrapCategory", "runtime-bootstrap");
+        return new DelegateDisposable(() =>
+        {
+            UserIdentifier = previousUser;
+            RestoreNamedResource(ActiveRootResource, hadRoot, previousRoot);
+            RestoreNamedResource("bootstrapCategory", hadCategory, previousCategory);
+        });
+    }
+
+    private void RestoreNamedResource(string name, bool existed, object? value)
+    {
+        if (existed && value != null) _namedResources[name] = value;
+        else _namedResources.TryRemove(name, out _);
+    }
+
+    private sealed class DelegateDisposable(Action dispose) : IDisposable
+    {
+        private Action? _dispose = dispose;
+        public void Dispose() => Interlocked.Exchange(ref _dispose, null)?.Invoke();
+    }
+
     public SelectQuery ApplyRequestPolicy(SelectQuery query) =>
         RequireResource<IRequestPolicy>().Apply(query);
 
@@ -286,58 +320,14 @@ public class UserContext
         var metadata = Metadata ?? throw new InvalidOperationException("Missing metadata");
         foreach (var entity in metadata.GetAllEntities())
             await provider.EnsureSchemaAsync(new SchemaRequest { EntityName = entity.Name });
-        await EnsureBootstrapEntitiesAsync(provider);
+        if (_generatedBootstrap != null)
+            await _generatedBootstrap(this).ConfigureAwait(false);
     }
 
-    private IReadOnlyList<BootstrapEntity> _rootEntities = Array.Empty<BootstrapEntity>();
-    private IReadOnlyList<BootstrapEntity> _constantEntities = Array.Empty<BootstrapEntity>();
+    private Func<UserContext, Task>? _generatedBootstrap;
 
-    internal void InstallBootstrapEntities(
-        IReadOnlyList<BootstrapEntity> roots, IReadOnlyList<BootstrapEntity> constants)
-    {
-        _rootEntities = roots.ToArray();
-        _constantEntities = constants.ToArray();
-    }
-
-    private async Task EnsureBootstrapEntitiesAsync(ISchemaExecutor provider)
-    {
-        foreach (var seed in _rootEntities.Select(value => (value, false))
-                     .Concat(_constantEntities.Select(value => (value, true))))
-        {
-            var query = new SelectQuery(seed.value.Entity)
-                .Filter(Expr.Eq("id", new Value.I64Value(seed.value.Id)))
-                .Limit(1);
-            var rows = (await provider.QueryAsync(new QueryRequest { Query = query })).Rows;
-            if (rows.Count == 0)
-            {
-                var values = new Record(seed.value.Values)
-                {
-                    ["id"] = new Value.I64Value(seed.value.Id),
-                    ["version"] = new Value.I64Value(1)
-                };
-                await provider.MutateAsync(new InsertMutationRequest(
-                    new InsertCommand(seed.value.Entity) { Values = values }));
-            }
-            else if (seed.Item2)
-            {
-                var changed = new Record();
-                foreach (var pair in seed.value.Values)
-                    if (pair.Key != "id" && (!rows[0].TryGetValue(pair.Key, out var current)
-                        || !Equals(current, pair.Value))) changed[pair.Key] = pair.Value;
-                if (changed.Count > 0)
-                {
-                    var version = rows[0]["version"].TryI64()
-                        ?? throw new InvalidOperationException("Bootstrap row has no numeric version");
-                    await provider.MutateAsync(new UpdateMutationRequest(
-                        new UpdateCommand(seed.value.Entity, new Value.I64Value(seed.value.Id))
-                        { Values = changed }.ExpectedVersion(version)));
-                }
-            }
-            if (provider is not IIdGeneratorExecutor ids)
-                throw new NotSupportedException("Schema provider does not support ID floor synchronization");
-            await ids.EnsureIdFloorAsync(seed.value.Entity, checked((ulong)seed.value.Id));
-        }
-    }
+    internal void InstallGeneratedBootstrap(Func<UserContext, Task>? callback) =>
+        _generatedBootstrap = callback;
 
     public UserContext WithModule(RuntimeModule module)
     {
