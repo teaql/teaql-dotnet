@@ -358,14 +358,14 @@ namespace Generated
             return new ValueExpression<long?>(_value.StudentCapacity);
         }
 
-        public ValueExpression<long?> Active()
+        public ValueExpression<bool?> Active()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<long?>.Missing();
+            if (_notLoaded != null) return ValueExpression<bool?>.NotLoaded(_notLoaded);
+            if (_value is null) return ValueExpression<bool?>.Missing();
             var path = ExpressionPath.Append(_path, "Active");
             if (!_value.IsLoaded("Active"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Active"));
-            return new ValueExpression<long?>(_value.Active);
+                return ValueExpression<bool?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Active"));
+            return new ValueExpression<bool?>(_value.Active);
         }
 
         public ValueExpression<System.DateTime?> CreateTime()

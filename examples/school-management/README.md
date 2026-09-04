@@ -5,6 +5,6 @@ fixture. `dotnet run` verifies explicit SQLite schema creation, Platform and
 SchoolType seed creation, repeated-seed idempotency, and versioned reconciliation
 of a changed constant.
 
-The generated workspace currently carries its compact TeaQL runtime support in
-`TeaQLCore.cs`; the runtime repository separately retains the same executable
-bootstrap contract as an SQLite integration test.
+Bootstrap data is created and reconciled by generated typed entities through
+`AuditAs(...).SaveAsync(context)`. The schema provider performs DDL only; it does
+not interpret constants or issue bootstrap INSERT/UPDATE statements itself.

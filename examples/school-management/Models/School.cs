@@ -11,11 +11,13 @@ namespace Generated.Models
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
+        private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("School", Id ?? _ledgerId);
+        internal EntityRoot TeaqlMutationLedger => _entityRoot;
         internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; }  }
         private static Value TeaqlValue(object value) => value switch {
             null => new Value.NullValue(), string v => new Value.TextValue(v), bool v => new Value.BoolValue(v),
-            double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.DateTimeValue(v),
+            double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.DateTimeValue(v), TimeSpan v => new Value.TimeValue(v),
             int v => new Value.I64Value(v), long v => new Value.I64Value(v), _ => new Value.ObjectValue(value)
         };
         public School() { _entityRoot.MarkAsNew(TeaqlEntityKey()); }
@@ -26,7 +28,7 @@ namespace Generated.Models
                 public string Address { get; set; }
                 public DateTime? EstablishedDate { get; set; }
                 public long? StudentCapacity { get; set; }
-                public long? Active { get; set; }
+                public bool? Active { get; set; }
                 public DateTime? CreateTime { get; set; }
                 public DateTime? UpdateTime { get; set; }
                 public long? Version { get; set; }
@@ -41,6 +43,16 @@ namespace Generated.Models
         public bool IsLoaded(string field)
         {
             return _fullyLoaded || _loadedFields.Contains(field);
+        }
+
+        internal void TeaqlInitializeGeneratedBootstrapId(long value)
+        {
+            var oldKey = TeaqlEntityKey();
+            Id = value;
+            MarkLoaded("Id");
+            _entityRoot.Rekey(oldKey, TeaqlEntityKey());
+            _entityRoot.Set(TeaqlEntityKey(), "id", new Value.I64Value(value));
+            _teaqlForceCreate = true;
         }
 
         public School MarkLoaded(params string[] fields)
@@ -145,7 +157,7 @@ namespace Generated.Models
                     {
                         entity.MarkLoaded("Active");
                         if (activeValue.Raw != null)
-                            entity.Active = Convert.ToInt64(activeValue.Raw);
+                            entity.Active = Convert.ToBoolean(activeValue.Raw);
                     }
                     if (record.TryGetValue("create_time", out var createTimeValue))
                     {
@@ -171,15 +183,112 @@ namespace Generated.Models
             return entity;
         }
 
+        internal static School FromRecord(Record record, EntityRoot root)
+        {
+            var entity = FromRecord(record);
+            entity.AttachRoot(root);
+            return entity;
+        }
+
         public async Task<School> SaveAsync(UserContext context)
         {
+            return await context.ExecuteGraphSaveAsync(async () =>
+            {
+                TeaqlPreflightGraph(context);
+                return await TeaqlSaveWithinGraphAsync(context);
+            });
+        }
+
+        internal void TeaqlPreflightGraph(UserContext context)
+        {
+            if (string.IsNullOrWhiteSpace(_comment))
+                throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
+            var creating = !Id.HasValue || _teaqlForceCreate;
+            if (!creating && !_markedForDeletion)
+            {
+                if (!IsLoaded("Id"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("id"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Platform"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("platform"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("SchoolType"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("school_type"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Name"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("name"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Address"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("address"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("EstablishedDate"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("established_date"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("StudentCapacity"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("student_capacity"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Active"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("active"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("CreateTime"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("create_time"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("UpdateTime"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("update_time"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Version"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("version"), Message: "Mutation requires a fully loaded entity") });
+            }
+            var command = _markedForDeletion ? (object)ToDeleteCommand()
+                : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
+            if (!creating && !_markedForDeletion)
+            {
+                ((UpdateCommand)command).Values = _entityRoot.Change(TeaqlEntityKey());
+                if (Version.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(Version.Value);
+            }
+            context.CheckAndFix(new MutationRequest { Command = command, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot });
+        }
+
+        internal async Task<School> TeaqlSaveWithinGraphAsync(UserContext context)
+        {
+            var teaqlOriginalKey = TeaqlEntityKey();
+            var teaqlOriginalLedgerId = _ledgerId;
+            var teaqlOriginalMarkedForDeletion = _markedForDeletion;
+            var teaqlOriginalForceCreate = _teaqlForceCreate;
+            var teaqlOriginalFullyLoaded = _fullyLoaded;
+            var teaqlOriginalLoadedFields = new HashSet<string>(_loadedFields, StringComparer.OrdinalIgnoreCase);
+            var teaqlOriginalId = this.Id;
+            var teaqlOriginalPlatform = this.Platform;
+            var teaqlOriginalSchoolType = this.SchoolType;
+            var teaqlOriginalName = this.Name;
+            var teaqlOriginalAddress = this.Address;
+            var teaqlOriginalEstablishedDate = this.EstablishedDate;
+            var teaqlOriginalStudentCapacity = this.StudentCapacity;
+            var teaqlOriginalActive = this.Active;
+            var teaqlOriginalCreateTime = this.CreateTime;
+            var teaqlOriginalUpdateTime = this.UpdateTime;
+            var teaqlOriginalVersion = this.Version;
+            context.AfterGraphRollback(() =>
+            {
+                var currentKey = TeaqlEntityKey();
+                this.Id = teaqlOriginalId;
+                this.Platform = teaqlOriginalPlatform;
+                this.SchoolType = teaqlOriginalSchoolType;
+                this.Name = teaqlOriginalName;
+                this.Address = teaqlOriginalAddress;
+                this.EstablishedDate = teaqlOriginalEstablishedDate;
+                this.StudentCapacity = teaqlOriginalStudentCapacity;
+                this.Active = teaqlOriginalActive;
+                this.CreateTime = teaqlOriginalCreateTime;
+                this.UpdateTime = teaqlOriginalUpdateTime;
+                this.Version = teaqlOriginalVersion;
+                _ledgerId = teaqlOriginalLedgerId;
+                _markedForDeletion = teaqlOriginalMarkedForDeletion;
+                _teaqlForceCreate = teaqlOriginalForceCreate;
+                _fullyLoaded = teaqlOriginalFullyLoaded;
+                _loadedFields = teaqlOriginalLoadedFields;
+                _entityRoot.Rekey(currentKey, teaqlOriginalKey);
+            });
+            context.AfterGraphCommit(() =>
+            {
+                _entityRoot.ClearEntity(TeaqlEntityKey());
+                if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
+            });
             if (string.IsNullOrWhiteSpace(_comment))
             {
                 throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
             }
-            AttachRoot(context.EntityRoot);
-
-            var creating = !this.Id.HasValue;
+            var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
             var cmd = _markedForDeletion ? (object)ToDeleteCommand()
@@ -189,7 +298,7 @@ namespace Generated.Models
                 ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
                 if (Version.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(Version.Value);
             }
-            var req = new MutationRequest { Command = cmd, Comment = _comment, LedgerKey = TeaqlEntityKey() };
+            var req = new MutationRequest { Command = cmd, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot };
             var result = await context.DataService.MutateAsync(context, req);
             if (result is not MutationResult mutationResult || mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for School");
@@ -207,9 +316,8 @@ namespace Generated.Models
             this.UpdateTime = saved.UpdateTime;
             this.Version = saved.Version;
             _ledgerId = Id ?? _ledgerId;
+            _teaqlForceCreate = false;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
-            _entityRoot.ClearEntity(TeaqlEntityKey());
-            if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
             return saved;
         }
 
@@ -230,11 +338,11 @@ namespace Generated.Models
 
                     if (StudentCapacity.HasValue) record["student_capacity"] = new Value.I64Value(StudentCapacity.Value);
 
-                    if (Active.HasValue) record["active"] = new Value.I64Value(Active.Value);
+                    if (Active.HasValue) record["active"] = new Value.BoolValue(Active.Value);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.DateValue(CreateTime.Value);
+                    if (CreateTime.HasValue) record["create_time"] = new Value.DateTimeValue(CreateTime.Value);
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.DateValue(UpdateTime.Value);
+                    if (UpdateTime.HasValue) record["update_time"] = new Value.DateTimeValue(UpdateTime.Value);
 
                     if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 
@@ -256,11 +364,11 @@ namespace Generated.Models
 
                     if (StudentCapacity.HasValue) record["student_capacity"] = new Value.I64Value(StudentCapacity.Value);
 
-                    if (Active.HasValue) record["active"] = new Value.I64Value(Active.Value);
+                    if (Active.HasValue) record["active"] = new Value.BoolValue(Active.Value);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.DateValue(CreateTime.Value);
+                    if (CreateTime.HasValue) record["create_time"] = new Value.DateTimeValue(CreateTime.Value);
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.DateValue(UpdateTime.Value);
+                    if (UpdateTime.HasValue) record["update_time"] = new Value.DateTimeValue(UpdateTime.Value);
 
                     if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
 
@@ -343,7 +451,7 @@ namespace Generated.Models
                     return this;
                 }
 
-                public School UpdateActive(long? value)
+                public School UpdateActive(bool? value)
                 {
                     this.Active = value;
                     MarkLoaded("Active");

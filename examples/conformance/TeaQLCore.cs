@@ -17,20 +17,21 @@ namespace TeaQL.Core
         public IReadOnlyDictionary<string, IEntityChecker> Checkers { get; }
         public IReadOnlyDictionary<string, Record> SchemaSamples { get; }
         public IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> SchemaRequired { get; }
-        public IReadOnlyList<BootstrapEntity> RootEntities { get; }
-        public IReadOnlyList<BootstrapEntity> ConstantEntities { get; }
-        public RuntimeModule(IEnumerable<string> entities, IReadOnlyDictionary<string, IEntityChecker> checkers = null, IReadOnlyDictionary<string, Record> schemaSamples = null, IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> schemaRequired = null, IEnumerable<BootstrapEntity> rootEntities = null, IEnumerable<BootstrapEntity> constantEntities = null) {
+        internal Func<UserContext, Task> GeneratedBootstrapCallback { get; private set; }
+        public RuntimeModule(IEnumerable<string> entities, IReadOnlyDictionary<string, IEntityChecker> checkers = null, IReadOnlyDictionary<string, Record> schemaSamples = null, IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> schemaRequired = null) {
             Entities = Array.AsReadOnly(entities.Distinct(StringComparer.Ordinal).ToArray());
             Checkers = checkers ?? new Dictionary<string, IEntityChecker>();
             SchemaSamples = schemaSamples ?? new Dictionary<string, Record>();
             SchemaRequired = schemaRequired ?? new Dictionary<string, IReadOnlyDictionary<string, bool>>();
-            RootEntities = Array.AsReadOnly((rootEntities ?? Array.Empty<BootstrapEntity>()).ToArray());
-            ConstantEntities = Array.AsReadOnly((constantEntities ?? Array.Empty<BootstrapEntity>()).ToArray());
         }
-        public RuntimeModule And(RuntimeModule other) =>
-            new RuntimeModule(Entities.Concat(other.Entities), Checkers.Concat(other.Checkers).ToDictionary(x => x.Key, x => x.Value), SchemaSamples.Concat(other.SchemaSamples).ToDictionary(x => x.Key, x => x.Value), SchemaRequired.Concat(other.SchemaRequired).ToDictionary(x => x.Key, x => x.Value), RootEntities.Concat(other.RootEntities), ConstantEntities.Concat(other.ConstantEntities));
+        internal RuntimeModule GeneratedBootstrap(Func<UserContext, Task> callback) { GeneratedBootstrapCallback = callback; return this; }
+        public RuntimeModule And(RuntimeModule other) {
+            var combined = new RuntimeModule(Entities.Concat(other.Entities), Checkers.Concat(other.Checkers).ToDictionary(x => x.Key, x => x.Value), SchemaSamples.Concat(other.SchemaSamples).ToDictionary(x => x.Key, x => x.Value), SchemaRequired.Concat(other.SchemaRequired).ToDictionary(x => x.Key, x => x.Value));
+            var first = GeneratedBootstrapCallback; var second = other.GeneratedBootstrapCallback;
+            if (first != null || second != null) combined.GeneratedBootstrap(async context => { if (first != null) await first(context); if (second != null) await second(context); });
+            return combined;
+        }
     }
-    public sealed record BootstrapEntity(string Entity, long Id, Record Values);
     public abstract record ObjectLocationSegment
     {
         private ObjectLocationSegment() { }
@@ -438,20 +439,20 @@ namespace TeaQL.Core
     }
     public class MutationResult { public bool Success { get; set; } public long Id { get; set; } public long Version { get; set; } public bool Deleted { get; set; } public Record PersistedRecord { get; set; } }
     public class AuditFieldChange { public string Field { get; set; } public object OldValue { get; set; } public object NewValue { get; set; } }
-    public class RawAuditEvent { public string Kind { get; set; } public string Entity { get; set; } public long Id { get; set; } public string Reason { get; set; } public IReadOnlyList<AuditFieldChange> Changes { get; set; } }
+    public class RawAuditEvent { public string Kind { get; set; } public string Entity { get; set; } public long Id { get; set; } public long Version { get; set; } public string Reason { get; set; } public string Actor { get; set; } public string Category { get; set; } public IReadOnlyList<AuditFieldChange> Changes { get; set; } }
     public class SafeAuditField { public string Field { get; set; } public string Value { get; set; } public bool Masked { get; set; } public bool Truncated { get; set; } }
-    public class SafeAuditEvent { public string Kind { get; set; } public string Entity { get; set; } public long Id { get; set; } public string Reason { get; set; } public IReadOnlyList<SafeAuditField> Fields { get; set; } }
+    public class SafeAuditEvent { public string Kind { get; set; } public string Entity { get; set; } public long Id { get; set; } public long Version { get; set; } public string Reason { get; set; } public string Actor { get; set; } public string Category { get; set; } public IReadOnlyList<SafeAuditField> Fields { get; set; } }
     public interface IRawAuditEventSink { Task OnEventAsync(UserContext context, RawAuditEvent auditEvent); }
     public interface IAppAuditEventSink { Task OnSafeEventAsync(UserContext context, SafeAuditEvent auditEvent); }
     public class InMemoryRawAuditEventSink : IRawAuditEventSink
     {
         public List<RawAuditEvent> Events { get; } = new();
-        public Task OnEventAsync(UserContext context, RawAuditEvent auditEvent) { Events.Add(auditEvent); return Task.CompletedTask; }
+        public Task OnEventAsync(UserContext context, RawAuditEvent auditEvent) { lock (Events) Events.Add(auditEvent); return Task.CompletedTask; }
     }
     public class InMemoryAppAuditEventSink : IAppAuditEventSink
     {
         public List<SafeAuditEvent> Events { get; } = new();
-        public Task OnSafeEventAsync(UserContext context, SafeAuditEvent auditEvent) { Events.Add(auditEvent); return Task.CompletedTask; }
+        public Task OnSafeEventAsync(UserContext context, SafeAuditEvent auditEvent) { lock (Events) Events.Add(auditEvent); return Task.CompletedTask; }
     }
     public sealed class SqlExecutionEvidence
     {
@@ -529,6 +530,7 @@ namespace TeaQL.Core
         }
         public IReadOnlyList<string> RuntimeEntities { get; private set; } = Array.Empty<string>();
         private RuntimeModule _runtimeModule;
+        private string _bootstrapAuditCategory;
         public UserContext Install(RuntimeModule module)
         {
             RuntimeEntities = module.Entities;
@@ -536,13 +538,21 @@ namespace TeaQL.Core
             _runtimeModule = module;
             return this;
         }
-        public Task EnsureSchemaAsync()
+        public async Task EnsureSchemaAsync()
         {
             if (_runtimeModule == null) throw new InvalidOperationException("Install a RuntimeModule before EnsureSchemaAsync().");
             if (RequireDataService() is not ISchemaExecutor schema)
                 throw new NotSupportedException("The configured DataService does not support schema reconciliation.");
-            return schema.EnsureSchemaAsync(_runtimeModule);
+            await schema.EnsureSchemaAsync(_runtimeModule);
+            if (_runtimeModule.GeneratedBootstrapCallback != null) await _runtimeModule.GeneratedBootstrapCallback(this);
         }
+        internal IDisposable EnterGeneratedBootstrap(string rootEntityType, long rootId)
+        {
+            var previousUser = UserIdentifier; var previousRoot = _activeRoot; var previousCategory = _bootstrapAuditCategory;
+            UserIdentifier = "teaql-generated-bootstrap"; _bootstrapAuditCategory = "runtime-bootstrap"; WithActiveRoot(rootEntityType, rootId);
+            return new RestoreScope(() => { UserIdentifier = previousUser; _activeRoot = previousRoot; _bootstrapAuditCategory = previousCategory; });
+        }
+        private sealed class RestoreScope : IDisposable { private Action _restore; public RestoreScope(Action restore) { _restore = restore; } public void Dispose() { Interlocked.Exchange(ref _restore, null)?.Invoke(); } }
         private IReadOnlyDictionary<string, IEntityChecker> _checkers = new Dictionary<string, IEntityChecker>();
         private sealed class GraphSaveSession { }
         private readonly System.Threading.AsyncLocal<GraphSaveSession> _ambientGraphSave = new();
@@ -686,7 +696,7 @@ namespace TeaQL.Core
             var kind = command is InsertCommand ? "created" : command is UpdateCommand ? "updated" : "deleted";
             var entity = command is InsertCommand insert ? insert.Entity : command is UpdateCommand update ? update.Entity : ((DeleteCommand)command).Entity;
             var values = command is InsertCommand inserted ? inserted.Values : command is UpdateCommand updated ? updated.Values : new Record();
-            var raw = new RawAuditEvent { Kind = kind, Entity = entity, Id = result.Id, Reason = reason,
+            var raw = new RawAuditEvent { Kind = kind, Entity = entity, Id = result.Id, Version = result.Version, Reason = reason, Actor = UserIdentifier, Category = _bootstrapAuditCategory,
                 Changes = values.Select(pair => new AuditFieldChange { Field = pair.Key, NewValue = pair.Value.Raw }).ToList() };
             if (_standardAuditSink != null) await _standardAuditSink.OnEventAsync(this, raw);
             if (_appAuditSink != null)
@@ -694,7 +704,7 @@ namespace TeaQL.Core
                 _auditMaskFields.TryGetValue(entity, out var masks);
                 _auditValueMaxLengths.TryGetValue(entity, out var limit);
                 var safeFields = raw.Changes.Select(change => BuildSafeField(change, masks, limit)).ToList();
-                await _appAuditSink.OnSafeEventAsync(this, new SafeAuditEvent { Kind = kind, Entity = entity, Id = result.Id, Reason = reason, Fields = safeFields });
+                await _appAuditSink.OnSafeEventAsync(this, new SafeAuditEvent { Kind = kind, Entity = entity, Id = result.Id, Version = result.Version, Reason = reason, Actor = UserIdentifier, Category = _bootstrapAuditCategory, Fields = safeFields });
             }
         }
 
@@ -1092,41 +1102,9 @@ namespace TeaQL.Core
                     ? configuredRequired : new Dictionary<string, bool>();
                 await EnsureStorageAsync(entity, sample, required);
             }
-            foreach (var seed in module.RootEntities) await EnsureBootstrapAsync(seed, false);
-            foreach (var seed in module.ConstantEntities) await EnsureBootstrapAsync(seed, true);
         }
 
         protected virtual Task EnsureProviderCapabilitiesAsync() => Task.CompletedTask;
-
-        private async Task EnsureBootstrapAsync(BootstrapEntity seed, bool reconcile)
-        {
-            var values = new Record(); foreach (var pair in seed.Values) values[pair.Key] = pair.Value;
-            values["id"] = new Value.I64Value(seed.Id); values["version"] = new Value.I64Value(1);
-            await EnsureStorageAsync(seed.Entity, values);
-            await using var connection = await OpenConnectionAsync();
-            await using var count = connection.CreateCommand();
-            count.CommandText = $"SELECT COUNT(*) FROM {Quote(TableName(seed.Entity))} WHERE {Quote("id")} = @id";
-            AddParameter(count, "id", seed.Id);
-            var exists = Convert.ToInt64(await count.ExecuteScalarAsync()) != 0;
-            if (!exists)
-            {
-                await using var insert = connection.CreateCommand();
-                var fields = values.Keys.ToList();
-                insert.CommandText = $"INSERT INTO {Quote(TableName(seed.Entity))} ({string.Join(", ", fields.Select(Quote))}) VALUES ({string.Join(", ", fields.Select((_, i) => "@p" + i))})";
-                for (var i = 0; i != fields.Count; i++) AddParameter(insert, "p" + i, ToDbValue(values[fields[i]]));
-                await insert.ExecuteNonQueryAsync();
-            }
-            else if (reconcile && seed.Values.Count > 0)
-            {
-                await using var update = connection.CreateCommand();
-                var fields = seed.Values.Keys.Where(field => field != "id" && field != "version").ToList();
-                update.CommandText = $"UPDATE {Quote(TableName(seed.Entity))} SET {string.Join(", ", fields.Select((field, i) => Quote(field) + " = @p" + i))}, {Quote("version")} = {Quote("version")} + 1 WHERE {Quote("id")} = @id AND ({string.Join(" OR ", fields.Select((field, i) => Quote(field) + " <> @p" + i))})";
-                for (var i = 0; i != fields.Count; i++) AddParameter(update, "p" + i, ToDbValue(seed.Values[fields[i]]));
-                AddParameter(update, "id", seed.Id);
-                if (fields.Count > 0) await update.ExecuteNonQueryAsync();
-            }
-            await EnsureIdFloorAsync(seed.Entity, seed.Id);
-        }
 
         public async Task<object> MutateAsync(UserContext context, MutationRequest req)
         {

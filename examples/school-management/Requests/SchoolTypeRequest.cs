@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,6 +72,24 @@ namespace Generated.Requests
             return this;
         }
 
+        public SchoolTypeRequest OptimizePaginationWithIdSet()
+        {
+            _query.OptimizePaginationWithIdSet();
+            return this;
+        }
+
+        public SchoolTypeRequest OptimizePaginationWithIdSet(string namespaceName, int ttlSeconds, int maxIds)
+        {
+            _query.OptimizePaginationWithIdSet(namespaceName, ttlSeconds, maxIds);
+            return this;
+        }
+
+        public SchoolTypeRequest TopNProbeParentThreshold(int threshold)
+        {
+            _query.TopNProbeParentThreshold(threshold);
+            return this;
+        }
+
         public SchoolTypeRequest Limit(int n)
         {
             _query.Limit(n);
@@ -135,6 +154,17 @@ namespace Generated.Requests
                     _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
                     return this;
                 }
+                public SchoolTypeRequest WithPlatformMatching(PlatformRequest related)
+                {
+                    _query.AndFilter(Expr.InSubquery("platform", EntityDescriptor.New("Platform"), related.GetQuery(), "id"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithoutPlatformMatching(PlatformRequest related)
+                {
+                    _query.AndFilter(Expr.NotInSubquery("platform", EntityDescriptor.New("Platform"), related.GetQuery(), "id"));
+                    return this;
+                }
 
                 public SchoolTypeRequest FilterByPlatform(object val)
                 {
@@ -145,6 +175,18 @@ namespace Generated.Requests
                 public SchoolTypeRequest FilterByPlatformIn(params object[] vals)
                 {
                     _query.AndFilter(Expr.In("platform", vals));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithPlatformIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull("platform"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithPlatformIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull("platform"));
                     return this;
                 }
 
@@ -314,6 +356,12 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public SchoolTypeRequest WithNameSoundingLike(string val)
+                {
+                    _query.AndFilter(Expr.SoundLike("name", val));
+                    return this;
+                }
+
                 public SchoolTypeRequest WithCodeContaining(string val)
                 {
                     _query.AndFilter(Expr.Contain("code", val));
@@ -411,6 +459,12 @@ namespace Generated.Requests
                 public SchoolTypeRequest WithCodeNotEndingWith(string val)
                 {
                     _query.AndFilter(Expr.NotEndWith("code", val));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithCodeSoundingLike(string val)
+                {
+                    _query.AndFilter(Expr.SoundLike("code", val));
                     return this;
                 }
 
@@ -619,82 +673,82 @@ namespace Generated.Requests
             return this;
         }
 
-                public SchoolTypeRequest minDisplayOrder()
+                public SchoolTypeRequest MinDisplayOrder()
                 {
-                    return minDisplayOrderAs("minOfDisplayOrder");
+                    return MinDisplayOrderAs("minOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest minDisplayOrderAs(string retName)
+                public SchoolTypeRequest MinDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("min", "display_order", retName);
                     return this;
                 }
-                public SchoolTypeRequest maxDisplayOrder()
+                public SchoolTypeRequest MaxDisplayOrder()
                 {
-                    return maxDisplayOrderAs("maxOfDisplayOrder");
+                    return MaxDisplayOrderAs("maxOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest maxDisplayOrderAs(string retName)
+                public SchoolTypeRequest MaxDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("max", "display_order", retName);
                     return this;
                 }
-                public SchoolTypeRequest sumDisplayOrder()
+                public SchoolTypeRequest SumDisplayOrder()
                 {
-                    return sumDisplayOrderAs("sumOfDisplayOrder");
+                    return SumDisplayOrderAs("sumOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest sumDisplayOrderAs(string retName)
+                public SchoolTypeRequest SumDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("sum", "display_order", retName);
                     return this;
                 }
-                public SchoolTypeRequest avgDisplayOrder()
+                public SchoolTypeRequest AvgDisplayOrder()
                 {
-                    return avgDisplayOrderAs("avgOfDisplayOrder");
+                    return AvgDisplayOrderAs("avgOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest avgDisplayOrderAs(string retName)
+                public SchoolTypeRequest AvgDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("avg", "display_order", retName);
                     return this;
                 }
-                public SchoolTypeRequest standardDeviationDisplayOrder()
+                public SchoolTypeRequest StandardDeviationDisplayOrder()
                 {
-                    return standardDeviationDisplayOrderAs("standardDeviationOfDisplayOrder");
+                    return StandardDeviationDisplayOrderAs("standardDeviationOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest standardDeviationDisplayOrderAs(string retName)
+                public SchoolTypeRequest StandardDeviationDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("stddev", "display_order", retName);
                     return this;
                 }
-                public SchoolTypeRequest squareRootOfPopulationStandardDeviationDisplayOrder()
+                public SchoolTypeRequest SquareRootOfPopulationStandardDeviationDisplayOrder()
                 {
-                    return squareRootOfPopulationStandardDeviationDisplayOrderAs("squareRootOfPopulationStandardDeviationOfDisplayOrder");
+                    return SquareRootOfPopulationStandardDeviationDisplayOrderAs("squareRootOfPopulationStandardDeviationOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest squareRootOfPopulationStandardDeviationDisplayOrderAs(string retName)
+                public SchoolTypeRequest SquareRootOfPopulationStandardDeviationDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("stddev_pop", "display_order", retName);
                     return this;
                 }
-                public SchoolTypeRequest sampleVarianceDisplayOrder()
+                public SchoolTypeRequest SampleVarianceDisplayOrder()
                 {
-                    return sampleVarianceDisplayOrderAs("sampleVarianceOfDisplayOrder");
+                    return SampleVarianceDisplayOrderAs("sampleVarianceOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest sampleVarianceDisplayOrderAs(string retName)
+                public SchoolTypeRequest SampleVarianceDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("var_samp", "display_order", retName);
                     return this;
                 }
-                public SchoolTypeRequest samplePopulationVarianceDisplayOrder()
+                public SchoolTypeRequest SamplePopulationVarianceDisplayOrder()
                 {
-                    return samplePopulationVarianceDisplayOrderAs("samplePopulationVarianceOfDisplayOrder");
+                    return SamplePopulationVarianceDisplayOrderAs("samplePopulationVarianceOfDisplayOrder");
                 }
 
-                public SchoolTypeRequest samplePopulationVarianceDisplayOrderAs(string retName)
+                public SchoolTypeRequest SamplePopulationVarianceDisplayOrderAs(string retName)
                 {
                     _query.Aggregate("var_pop", "display_order", retName);
                     return this;
@@ -775,13 +829,161 @@ namespace Generated.Requests
                     _query.RelationQuery("SchoolList", "School", "school_type", true, child.GetQuery());
                     return this;
                 }
+                public SchoolTypeRequest HaveSchools()
+                    => WithSchoolListMatching(new SchoolRequest());
+
+                public SchoolTypeRequest HaveNoSchools()
+                    => WithoutSchoolListMatching(new SchoolRequest());
+
+                public SchoolTypeRequest WithSchoolListMatching(SchoolRequest child)
+                {
+                    _query.AndFilter(Expr.InSubquery("id", EntityDescriptor.New("School"), child.GetQuery(), "school_type"));
+                    return this;
+                }
+
+                public SchoolTypeRequest WithoutSchoolListMatching(SchoolRequest child)
+                {
+                    _query.AndFilter(Expr.NotInSubquery("id", EntityDescriptor.New("School"), child.GetQuery(), "school_type"));
+                    return this;
+                }
+                public SchoolTypeRequest CountSchools()
+                    => CountSchoolsAs("countSchools");
+
+                public SchoolTypeRequest CountSchoolsAs(string alias)
+                    => CountSchoolsWith(alias, new SchoolRequest());
+
+                public SchoolTypeRequest CountSchoolsWith(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("Count", "id", alias);
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+
+                public SchoolTypeRequest MinStudentCapacityOfSchools()
+                    => MinStudentCapacityOfSchoolsAs("minOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest MinStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("min", "student_capacity", "min_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest MaxStudentCapacityOfSchools()
+                    => MaxStudentCapacityOfSchoolsAs("maxOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest MaxStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("max", "student_capacity", "max_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest SumStudentCapacityOfSchools()
+                    => SumStudentCapacityOfSchoolsAs("sumOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest SumStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("sum", "student_capacity", "sum_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest AvgStudentCapacityOfSchools()
+                    => AvgStudentCapacityOfSchoolsAs("avgOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest AvgStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("avg", "student_capacity", "avg_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest StandardDeviationStudentCapacityOfSchools()
+                    => StandardDeviationStudentCapacityOfSchoolsAs("standardDeviationOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest StandardDeviationStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("stddev", "student_capacity", "standardDeviation_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest SquareRootOfPopulationStandardDeviationStudentCapacityOfSchools()
+                    => SquareRootOfPopulationStandardDeviationStudentCapacityOfSchoolsAs("squareRootOfPopulationStandardDeviationOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest SquareRootOfPopulationStandardDeviationStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("stddev_pop", "student_capacity", "squareRootOfPopulationStandardDeviation_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest SampleVarianceStudentCapacityOfSchools()
+                    => SampleVarianceStudentCapacityOfSchoolsAs("sampleVarianceOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest SampleVarianceStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("var_samp", "student_capacity", "sampleVariance_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest SamplePopulationVarianceStudentCapacityOfSchools()
+                    => SamplePopulationVarianceStudentCapacityOfSchoolsAs("samplePopulationVarianceOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public SchoolTypeRequest SamplePopulationVarianceStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("var_pop", "student_capacity", "samplePopulationVariance_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "school_type", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public SchoolTypeRequest FacetByPlatformAs(
+                    string name, PlatformRequest request,
+                    bool includeAllFacets = true)
+                {
+                    _query.Facets.Add(new FacetRequest(
+                        name, "platform", request.GetQuery(), includeAllFacets));
+                    return this;
+                }
+
 
         private async Task<QueryResult> ExecuteForListInternalAsync(UserContext context)
         {
             EnsureIntent();
             var service = context.RequireDataService();
             var req = new QueryRequest(_query);
-            return await service.QueryAsync(context, req);
+            var result = await service.QueryAsync(context, req);
+            foreach (var facet in _query.Facets)
+            {
+                var membership = _query.Copy();
+                membership.Facets.Clear();
+                membership.Relations.Clear();
+                membership.Orders.Clear();
+                membership.Aggregates.Clear();
+                membership.GroupFields.Clear();
+                membership.Projections.Clear();
+                membership.Project(facet.RelationName);
+                var membershipRows = (await service.QueryAsync(context, new QueryRequest(membership))).Rows;
+                var counts = membershipRows
+                    .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
+                    .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw))
+                    .ToDictionary(group => group.Key, group => group.Count());
+
+                var nested = facet.Query.Copy();
+                nested.Facets.Clear();
+                var countAliases = nested.Aggregates
+                    .Where(aggregate => string.Equals(aggregate.Function, "Count", StringComparison.OrdinalIgnoreCase))
+                    .Select(aggregate => aggregate.Alias).ToArray();
+                nested.Aggregates.Clear();
+                nested.GroupFields.Clear();
+                var facetRows = (await service.QueryAsync(context, new QueryRequest(nested))).Rows;
+                var decorated = new SmartList<Record>();
+                foreach (var row in facetRows)
+                {
+                    var key = row.TryGetValue("id", out var id) ? Convert.ToString(id.Raw) : null;
+                    var count = key != null && counts.TryGetValue(key, out var value) ? value : 0;
+                    if (!facet.IncludeAllFacets && count == 0) continue;
+                    foreach (var alias in countAliases.Length == 0 ? new[] { "count" } : countAliases)
+                        row[alias] = new Value.I64Value(count);
+                    decorated.Add(row);
+                }
+                result.Facets[facet.Name] = decorated;
+            }
+            return result;
         }
 
         private async Task<SchoolTypePage> ExecuteForPageInternalAsync(
@@ -791,19 +993,27 @@ namespace Generated.Requests
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
             if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireDataService();
-            var countQuery = new SelectQuery("SchoolType");
-            foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
-            countQuery.Aggregate("Count", "id", "count");
-            var countResult = await service.QueryAsync(context, new QueryRequest(countQuery));
-            var totalCount = countResult.Rows.Count == 0
-                ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
-
             _query.Offset(offset);
             _query.Limit(limit);
             var result = await service.QueryAsync(context, new QueryRequest(_query));
+            long totalCount;
+            if (_query.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
+            {
+                totalCount = context.IdSetCount;
+            }
+            else
+            {
+                var countQuery = new SelectQuery("SchoolType");
+                foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
+                countQuery.Aggregate("Count", "id", "count");
+                var countResult = await service.QueryAsync(context, new QueryRequest(countQuery));
+                totalCount = countResult.Rows.Count == 0
+                    ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
+            }
             var rows = new SmartList<Generated.Models.SchoolType>();
+            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                rows.Add(Generated.Models.SchoolType.FromRecord(row));
+                rows.Add(Generated.Models.SchoolType.FromRecord(row, queryRoot));
             return new SchoolTypePage(rows, totalCount);
         }
 
@@ -819,8 +1029,9 @@ namespace Generated.Requests
             await foreach (var chunk in streaming.QueryStreamAsync(
                 context, new QueryRequest(_query), chunkSize, cancellationToken).WithCancellation(cancellationToken))
             {
+                var queryRoot = new EntityRoot();
                 foreach (var row in chunk.Rows)
-                    yield return Generated.Models.SchoolType.FromRecord(row);
+                    yield return Generated.Models.SchoolType.FromRecord(row, queryRoot);
             }
         }
 
@@ -876,8 +1087,10 @@ namespace Generated.Requests
         {
             var result = await ExecuteForRowsAsync(context);
             var entities = new SmartList<Generated.Models.SchoolType>();
+            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                entities.Add(Generated.Models.SchoolType.FromRecord(row));
+                entities.Add(Generated.Models.SchoolType.FromRecord(row, queryRoot));
+            entities.Facets = result.Facets;
             return entities;
         }
 

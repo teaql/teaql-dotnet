@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,6 +69,24 @@ namespace Generated.Requests
         public PlatformRequest OptimizeForContinuousPageFetchWith(string namespaceName, int ttlSeconds)
         {
             _query.OptimizeForContinuousPageFetchWith(namespaceName, ttlSeconds);
+            return this;
+        }
+
+        public PlatformRequest OptimizePaginationWithIdSet()
+        {
+            _query.OptimizePaginationWithIdSet();
+            return this;
+        }
+
+        public PlatformRequest OptimizePaginationWithIdSet(string namespaceName, int ttlSeconds, int maxIds)
+        {
+            _query.OptimizePaginationWithIdSet(namespaceName, ttlSeconds, maxIds);
+            return this;
+        }
+
+        public PlatformRequest TopNProbeParentThreshold(int threshold)
+        {
+            _query.TopNProbeParentThreshold(threshold);
             return this;
         }
 
@@ -297,6 +316,12 @@ namespace Generated.Requests
                     return this;
                 }
 
+                public PlatformRequest WithNameSoundingLike(string val)
+                {
+                    _query.AndFilter(Expr.SoundLike("name", val));
+                    return this;
+                }
+
                 public PlatformRequest WithBaseUrlContaining(string val)
                 {
                     _query.AndFilter(Expr.Contain("base_url", val));
@@ -394,6 +419,12 @@ namespace Generated.Requests
                 public PlatformRequest WithBaseUrlNotEndingWith(string val)
                 {
                     _query.AndFilter(Expr.NotEndWith("base_url", val));
+                    return this;
+                }
+
+                public PlatformRequest WithBaseUrlSoundingLike(string val)
+                {
+                    _query.AndFilter(Expr.SoundLike("base_url", val));
                     return this;
                 }
 
@@ -766,13 +797,254 @@ namespace Generated.Requests
                     _query.RelationQuery("SchoolList", "School", "platform", true, child.GetQuery());
                     return this;
                 }
+                public PlatformRequest HaveSchoolTypes()
+                    => WithSchoolTypeListMatching(new SchoolTypeRequest());
+
+                public PlatformRequest HaveNoSchoolTypes()
+                    => WithoutSchoolTypeListMatching(new SchoolTypeRequest());
+
+                public PlatformRequest WithSchoolTypeListMatching(SchoolTypeRequest child)
+                {
+                    _query.AndFilter(Expr.InSubquery("id", EntityDescriptor.New("SchoolType"), child.GetQuery(), "platform"));
+                    return this;
+                }
+
+                public PlatformRequest WithoutSchoolTypeListMatching(SchoolTypeRequest child)
+                {
+                    _query.AndFilter(Expr.NotInSubquery("id", EntityDescriptor.New("SchoolType"), child.GetQuery(), "platform"));
+                    return this;
+                }
+                public PlatformRequest HaveSchools()
+                    => WithSchoolListMatching(new SchoolRequest());
+
+                public PlatformRequest HaveNoSchools()
+                    => WithoutSchoolListMatching(new SchoolRequest());
+
+                public PlatformRequest WithSchoolListMatching(SchoolRequest child)
+                {
+                    _query.AndFilter(Expr.InSubquery("id", EntityDescriptor.New("School"), child.GetQuery(), "platform"));
+                    return this;
+                }
+
+                public PlatformRequest WithoutSchoolListMatching(SchoolRequest child)
+                {
+                    _query.AndFilter(Expr.NotInSubquery("id", EntityDescriptor.New("School"), child.GetQuery(), "platform"));
+                    return this;
+                }
+                public PlatformRequest CountSchoolTypes()
+                    => CountSchoolTypesAs("countSchoolTypes");
+
+                public PlatformRequest CountSchoolTypesAs(string alias)
+                    => CountSchoolTypesWith(alias, new SchoolTypeRequest());
+
+                public PlatformRequest CountSchoolTypesWith(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("Count", "id", alias);
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+
+                public PlatformRequest MinDisplayOrderOfSchoolTypes()
+                    => MinDisplayOrderOfSchoolTypesAs("minOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest MinDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("min", "display_order", "min_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest MaxDisplayOrderOfSchoolTypes()
+                    => MaxDisplayOrderOfSchoolTypesAs("maxOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest MaxDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("max", "display_order", "max_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SumDisplayOrderOfSchoolTypes()
+                    => SumDisplayOrderOfSchoolTypesAs("sumOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest SumDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("sum", "display_order", "sum_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest AvgDisplayOrderOfSchoolTypes()
+                    => AvgDisplayOrderOfSchoolTypesAs("avgOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest AvgDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("avg", "display_order", "avg_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest StandardDeviationDisplayOrderOfSchoolTypes()
+                    => StandardDeviationDisplayOrderOfSchoolTypesAs("standardDeviationOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest StandardDeviationDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("stddev", "display_order", "standardDeviation_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SquareRootOfPopulationStandardDeviationDisplayOrderOfSchoolTypes()
+                    => SquareRootOfPopulationStandardDeviationDisplayOrderOfSchoolTypesAs("squareRootOfPopulationStandardDeviationOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest SquareRootOfPopulationStandardDeviationDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("stddev_pop", "display_order", "squareRootOfPopulationStandardDeviation_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SampleVarianceDisplayOrderOfSchoolTypes()
+                    => SampleVarianceDisplayOrderOfSchoolTypesAs("sampleVarianceOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest SampleVarianceDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("var_samp", "display_order", "sampleVariance_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SamplePopulationVarianceDisplayOrderOfSchoolTypes()
+                    => SamplePopulationVarianceDisplayOrderOfSchoolTypesAs("samplePopulationVarianceOfDisplayOrderOfSchoolTypes", new SchoolTypeRequest());
+
+                public PlatformRequest SamplePopulationVarianceDisplayOrderOfSchoolTypesAs(string alias, SchoolTypeRequest child)
+                {
+                    child.GetQuery().Aggregate("var_pop", "display_order", "samplePopulationVariance_display_order");
+                    _query.RelationAggregate("SchoolTypeList", "SchoolType", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest CountSchools()
+                    => CountSchoolsAs("countSchools");
+
+                public PlatformRequest CountSchoolsAs(string alias)
+                    => CountSchoolsWith(alias, new SchoolRequest());
+
+                public PlatformRequest CountSchoolsWith(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("Count", "id", alias);
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+
+                public PlatformRequest MinStudentCapacityOfSchools()
+                    => MinStudentCapacityOfSchoolsAs("minOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest MinStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("min", "student_capacity", "min_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest MaxStudentCapacityOfSchools()
+                    => MaxStudentCapacityOfSchoolsAs("maxOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest MaxStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("max", "student_capacity", "max_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SumStudentCapacityOfSchools()
+                    => SumStudentCapacityOfSchoolsAs("sumOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest SumStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("sum", "student_capacity", "sum_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest AvgStudentCapacityOfSchools()
+                    => AvgStudentCapacityOfSchoolsAs("avgOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest AvgStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("avg", "student_capacity", "avg_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest StandardDeviationStudentCapacityOfSchools()
+                    => StandardDeviationStudentCapacityOfSchoolsAs("standardDeviationOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest StandardDeviationStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("stddev", "student_capacity", "standardDeviation_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SquareRootOfPopulationStandardDeviationStudentCapacityOfSchools()
+                    => SquareRootOfPopulationStandardDeviationStudentCapacityOfSchoolsAs("squareRootOfPopulationStandardDeviationOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest SquareRootOfPopulationStandardDeviationStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("stddev_pop", "student_capacity", "squareRootOfPopulationStandardDeviation_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SampleVarianceStudentCapacityOfSchools()
+                    => SampleVarianceStudentCapacityOfSchoolsAs("sampleVarianceOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest SampleVarianceStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("var_samp", "student_capacity", "sampleVariance_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
+                public PlatformRequest SamplePopulationVarianceStudentCapacityOfSchools()
+                    => SamplePopulationVarianceStudentCapacityOfSchoolsAs("samplePopulationVarianceOfStudentCapacityOfSchools", new SchoolRequest());
+
+                public PlatformRequest SamplePopulationVarianceStudentCapacityOfSchoolsAs(string alias, SchoolRequest child)
+                {
+                    child.GetQuery().Aggregate("var_pop", "student_capacity", "samplePopulationVariance_student_capacity");
+                    _query.RelationAggregate("SchoolList", "School", "platform", alias, child.GetQuery(), true);
+                    return this;
+                }
 
         private async Task<QueryResult> ExecuteForListInternalAsync(UserContext context)
         {
             EnsureIntent();
             var service = context.RequireDataService();
             var req = new QueryRequest(_query);
-            return await service.QueryAsync(context, req);
+            var result = await service.QueryAsync(context, req);
+            foreach (var facet in _query.Facets)
+            {
+                var membership = _query.Copy();
+                membership.Facets.Clear();
+                membership.Relations.Clear();
+                membership.Orders.Clear();
+                membership.Aggregates.Clear();
+                membership.GroupFields.Clear();
+                membership.Projections.Clear();
+                membership.Project(facet.RelationName);
+                var membershipRows = (await service.QueryAsync(context, new QueryRequest(membership))).Rows;
+                var counts = membershipRows
+                    .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
+                    .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw))
+                    .ToDictionary(group => group.Key, group => group.Count());
+
+                var nested = facet.Query.Copy();
+                nested.Facets.Clear();
+                var countAliases = nested.Aggregates
+                    .Where(aggregate => string.Equals(aggregate.Function, "Count", StringComparison.OrdinalIgnoreCase))
+                    .Select(aggregate => aggregate.Alias).ToArray();
+                nested.Aggregates.Clear();
+                nested.GroupFields.Clear();
+                var facetRows = (await service.QueryAsync(context, new QueryRequest(nested))).Rows;
+                var decorated = new SmartList<Record>();
+                foreach (var row in facetRows)
+                {
+                    var key = row.TryGetValue("id", out var id) ? Convert.ToString(id.Raw) : null;
+                    var count = key != null && counts.TryGetValue(key, out var value) ? value : 0;
+                    if (!facet.IncludeAllFacets && count == 0) continue;
+                    foreach (var alias in countAliases.Length == 0 ? new[] { "count" } : countAliases)
+                        row[alias] = new Value.I64Value(count);
+                    decorated.Add(row);
+                }
+                result.Facets[facet.Name] = decorated;
+            }
+            return result;
         }
 
         private async Task<PlatformPage> ExecuteForPageInternalAsync(
@@ -782,19 +1054,27 @@ namespace Generated.Requests
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
             if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireDataService();
-            var countQuery = new SelectQuery("Platform");
-            foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
-            countQuery.Aggregate("Count", "id", "count");
-            var countResult = await service.QueryAsync(context, new QueryRequest(countQuery));
-            var totalCount = countResult.Rows.Count == 0
-                ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
-
             _query.Offset(offset);
             _query.Limit(limit);
             var result = await service.QueryAsync(context, new QueryRequest(_query));
+            long totalCount;
+            if (_query.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
+            {
+                totalCount = context.IdSetCount;
+            }
+            else
+            {
+                var countQuery = new SelectQuery("Platform");
+                foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
+                countQuery.Aggregate("Count", "id", "count");
+                var countResult = await service.QueryAsync(context, new QueryRequest(countQuery));
+                totalCount = countResult.Rows.Count == 0
+                    ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
+            }
             var rows = new SmartList<Generated.Models.Platform>();
+            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                rows.Add(Generated.Models.Platform.FromRecord(row));
+                rows.Add(Generated.Models.Platform.FromRecord(row, queryRoot));
             return new PlatformPage(rows, totalCount);
         }
 
@@ -810,8 +1090,9 @@ namespace Generated.Requests
             await foreach (var chunk in streaming.QueryStreamAsync(
                 context, new QueryRequest(_query), chunkSize, cancellationToken).WithCancellation(cancellationToken))
             {
+                var queryRoot = new EntityRoot();
                 foreach (var row in chunk.Rows)
-                    yield return Generated.Models.Platform.FromRecord(row);
+                    yield return Generated.Models.Platform.FromRecord(row, queryRoot);
             }
         }
 
@@ -867,8 +1148,10 @@ namespace Generated.Requests
         {
             var result = await ExecuteForRowsAsync(context);
             var entities = new SmartList<Generated.Models.Platform>();
+            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                entities.Add(Generated.Models.Platform.FromRecord(row));
+                entities.Add(Generated.Models.Platform.FromRecord(row, queryRoot));
+            entities.Facets = result.Facets;
             return entities;
         }
 

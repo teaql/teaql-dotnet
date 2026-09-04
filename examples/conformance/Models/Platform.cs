@@ -11,6 +11,7 @@ namespace Generated.Models
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
+        private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("Platform", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
         internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; } foreach (var child in WorkItemList) child.AttachRoot(root); }
@@ -33,6 +34,16 @@ namespace Generated.Models
         public bool IsLoaded(string field)
         {
             return _fullyLoaded || _loadedFields.Contains(field);
+        }
+
+        internal void TeaqlInitializeGeneratedBootstrapId(long value)
+        {
+            var oldKey = TeaqlEntityKey();
+            Id = value;
+            MarkLoaded("Id");
+            _entityRoot.Rekey(oldKey, TeaqlEntityKey());
+            _entityRoot.Set(TeaqlEntityKey(), "id", new Value.I64Value(value));
+            _teaqlForceCreate = true;
         }
 
         public Platform MarkLoaded(params string[] fields)
@@ -120,7 +131,7 @@ namespace Generated.Models
         {
             if (string.IsNullOrWhiteSpace(_comment))
                 throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
-            var creating = !Id.HasValue;
+            var creating = !Id.HasValue || _teaqlForceCreate;
             if (!creating && !_markedForDeletion)
             {
                 if (!IsLoaded("Id"))
@@ -159,6 +170,7 @@ namespace Generated.Models
             var teaqlOriginalKey = TeaqlEntityKey();
             var teaqlOriginalLedgerId = _ledgerId;
             var teaqlOriginalMarkedForDeletion = _markedForDeletion;
+            var teaqlOriginalForceCreate = _teaqlForceCreate;
             var teaqlOriginalFullyLoaded = _fullyLoaded;
             var teaqlOriginalLoadedFields = new HashSet<string>(_loadedFields, StringComparer.OrdinalIgnoreCase);
             var teaqlOriginalId = this.Id;
@@ -172,6 +184,7 @@ namespace Generated.Models
                 this.Version = teaqlOriginalVersion;
                 _ledgerId = teaqlOriginalLedgerId;
                 _markedForDeletion = teaqlOriginalMarkedForDeletion;
+                _teaqlForceCreate = teaqlOriginalForceCreate;
                 _fullyLoaded = teaqlOriginalFullyLoaded;
                 _loadedFields = teaqlOriginalLoadedFields;
                 _entityRoot.Rekey(currentKey, teaqlOriginalKey);
@@ -185,7 +198,7 @@ namespace Generated.Models
             {
                 throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
             }
-            var creating = !this.Id.HasValue;
+            var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
             var cmd = _markedForDeletion ? (object)ToDeleteCommand()
@@ -205,6 +218,7 @@ namespace Generated.Models
             this.Name = saved.Name;
             this.Version = saved.Version;
             _ledgerId = Id ?? _ledgerId;
+            _teaqlForceCreate = false;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
             for (var index = 0; index < WorkItemList.Count; index++)
             {

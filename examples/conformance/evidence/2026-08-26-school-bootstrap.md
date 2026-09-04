@@ -1,5 +1,10 @@
 # School bootstrap and repeated-bootstrap evidence
 
+> Historical evidence: this report records the pre-GABM implementation and its
+> failure at that time. It is superseded by the executable
+> `../../school-management` example, where generated typed mutation bootstrap now
+> passes initial seed, repeated idempotency and constant reconciliation checks.
+
 Date: 2026-08-26  
 Runtime revision: `7ed0e72`  
 Generator endpoint: `https://api.teaql.io/latest/generate`  
@@ -49,4 +54,3 @@ The process exited successfully: both DDL passes completed, but no bootstrap rec
 | Bootstrap advances constant ID floor | NOT REACHED |
 
 Overall: **GAP**. This is not equivalent to the separately passing explicit-ID/ID-floor unit test. Generated root and constant metadata must be added to the Runtime Module and reconciled explicitly by `EnsureSchemaAsync`.
-

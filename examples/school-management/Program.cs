@@ -28,11 +28,15 @@ try
     Require(constants[0].Version == 1 && constants[1].Version == 1,
         "Repeated ensureSchema was not idempotent");
 
-    module.ConstantEntities[0].Values["name"] = new Value.TextValue("Primary School");
+    var drifted = await Q.SchoolTypes().WithIdIs(1001).Comment("load constant for drift simulation")
+        .Purpose("verify generated bootstrap reconciliation").ExecuteForOneAsync(context)
+        ?? throw new InvalidOperationException("Seeded SchoolType 1001 was not found");
+    drifted.UpdateName("Drifted Primary");
+    await drifted.AuditAs("simulate out-of-band constant drift").SaveAsync(context);
     await context.EnsureSchemaAsync();
     var changed = await Q.SchoolTypes().WithIdIs(1001).Comment("verify constant reconciliation")
         .Purpose("local runtime verification").ExecuteForOneAsync(context);
-    Require(changed?.Name == "Primary School" && changed.Version == 2,
+    Require(changed?.Name == "Primary" && changed.Version == 3,
         "Changed constant was not reconciled exactly once");
 
     var school = Q.Schools().Comment("create School Query conformance fixture")
@@ -43,7 +47,7 @@ try
     school.UpdateAddress("12 River Road, Springfield");
     school.UpdateEstablishedDate(new DateTime(1995, 9, 1));
     school.UpdateStudentCapacity(800);
-    school.UpdateActive(1);
+    school.UpdateActive(true);
     await school.AuditAs("create School Query conformance fixture").SaveAsync(context);
 
     var queryCases = new List<(string Label, SchoolRequest Request, int Expected)>

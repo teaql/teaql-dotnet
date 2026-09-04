@@ -80,5 +80,31 @@ public static class GeneratedRuntimeModule
            ["platform"] = true,
            ["version"] = true
         }
-    }, new[] { new BootstrapEntity("Platform", 1, new Record { ["name"] = new Value.TextValue("Runtime Example") }) }, Array.Empty<BootstrapEntity>());
+    }).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+
+    private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
+    {
+        Exception? lastError = null;
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            try { await EnsureGeneratedBootstrapOnceAsync(context); return; }
+            catch (Exception error) { lastError = error; if (attempt < 4) await Task.Delay((attempt + 1) * 10); }
+        }
+        throw lastError!;
+    }
+
+    private static async Task EnsureGeneratedBootstrapOnceAsync(UserContext context)
+    {
+        using var bootstrapScope = context.EnterGeneratedBootstrap("Platform", 1);
+        var domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
+        if (domainRoot == null)
+        {
+            var created = Q.Platforms().Comment("what: create generated Domain Root").Purpose("why: initialize runtime bootstrap").NewEntity(context);
+            created.TeaqlInitializeGeneratedBootstrapId(1);
+            created.UpdateName("Runtime Example");
+            try { domainRoot = await created.AuditAs("create generated Domain Root Platform").SaveAsync(context); }
+            catch { domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: recover concurrent Domain Root bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (domainRoot == null) throw; }
+        }
+    }
+
 }

@@ -11,11 +11,13 @@ namespace Generated.Models
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
+        private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("SchoolType", Id ?? _ledgerId);
+        internal EntityRoot TeaqlMutationLedger => _entityRoot;
         internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; } foreach (var child in SchoolList) child.AttachRoot(root); }
         private static Value TeaqlValue(object value) => value switch {
             null => new Value.NullValue(), string v => new Value.TextValue(v), bool v => new Value.BoolValue(v),
-            double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.DateTimeValue(v),
+            double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.DateTimeValue(v), TimeSpan v => new Value.TimeValue(v),
             int v => new Value.I64Value(v), long v => new Value.I64Value(v), _ => new Value.ObjectValue(value)
         };
         public SchoolType() { _entityRoot.MarkAsNew(TeaqlEntityKey()); }
@@ -36,6 +38,16 @@ namespace Generated.Models
         public bool IsLoaded(string field)
         {
             return _fullyLoaded || _loadedFields.Contains(field);
+        }
+
+        internal void TeaqlInitializeGeneratedBootstrapId(long value)
+        {
+            var oldKey = TeaqlEntityKey();
+            Id = value;
+            MarkLoaded("Id");
+            _entityRoot.Rekey(oldKey, TeaqlEntityKey());
+            _entityRoot.Set(TeaqlEntityKey(), "id", new Value.I64Value(value));
+            _teaqlForceCreate = true;
         }
 
         public SchoolType MarkLoaded(params string[] fields)
@@ -132,15 +144,106 @@ namespace Generated.Models
             return entity;
         }
 
+        internal static SchoolType FromRecord(Record record, EntityRoot root)
+        {
+            var entity = FromRecord(record);
+            entity.AttachRoot(root);
+            return entity;
+        }
+
         public async Task<SchoolType> SaveAsync(UserContext context)
         {
+            return await context.ExecuteGraphSaveAsync(async () =>
+            {
+                TeaqlPreflightGraph(context);
+                return await TeaqlSaveWithinGraphAsync(context);
+            });
+        }
+
+        internal void TeaqlPreflightGraph(UserContext context)
+        {
+            if (string.IsNullOrWhiteSpace(_comment))
+                throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
+            var creating = !Id.HasValue || _teaqlForceCreate;
+            if (!creating && !_markedForDeletion)
+            {
+                if (!IsLoaded("Platform"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("platform"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Id"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("id"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Name"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("name"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Code"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("code"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("DisplayOrder"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("display_order"), Message: "Mutation requires a fully loaded entity") });
+                if (!IsLoaded("Version"))
+                    throw new CheckException(new[] { new CheckResult("invalid_type", ObjectLocation.Property("version"), Message: "Mutation requires a fully loaded entity") });
+            }
+            var command = _markedForDeletion ? (object)ToDeleteCommand()
+                : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
+            if (!creating && !_markedForDeletion)
+            {
+                ((UpdateCommand)command).Values = _entityRoot.Change(TeaqlEntityKey());
+                if (Version.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(Version.Value);
+            }
+            context.CheckAndFix(new MutationRequest { Command = command, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot });
+            for (var index = 0; index < SchoolList.Count; index++)
+            {
+                var child = SchoolList[index];
+                child.AttachRoot(_entityRoot);
+                child.UpdateSchoolTypeId(Id ?? _ledgerId);
+                child.AuditAs(_comment);
+                try { child.TeaqlPreflightGraph(context); }
+                catch (CheckException error)
+                {
+                    var prefix = ObjectLocation.Property("school_list").Index(index);
+                    throw new CheckException(error.Violations.Select(violation =>
+                        violation with { Location = violation.Location.PrefixedBy(prefix) }).ToArray());
+                }
+            }
+        }
+
+        internal async Task<SchoolType> TeaqlSaveWithinGraphAsync(UserContext context)
+        {
+            var teaqlOriginalKey = TeaqlEntityKey();
+            var teaqlOriginalLedgerId = _ledgerId;
+            var teaqlOriginalMarkedForDeletion = _markedForDeletion;
+            var teaqlOriginalForceCreate = _teaqlForceCreate;
+            var teaqlOriginalFullyLoaded = _fullyLoaded;
+            var teaqlOriginalLoadedFields = new HashSet<string>(_loadedFields, StringComparer.OrdinalIgnoreCase);
+            var teaqlOriginalPlatform = this.Platform;
+            var teaqlOriginalId = this.Id;
+            var teaqlOriginalName = this.Name;
+            var teaqlOriginalCode = this.Code;
+            var teaqlOriginalDisplayOrder = this.DisplayOrder;
+            var teaqlOriginalVersion = this.Version;
+            context.AfterGraphRollback(() =>
+            {
+                var currentKey = TeaqlEntityKey();
+                this.Platform = teaqlOriginalPlatform;
+                this.Id = teaqlOriginalId;
+                this.Name = teaqlOriginalName;
+                this.Code = teaqlOriginalCode;
+                this.DisplayOrder = teaqlOriginalDisplayOrder;
+                this.Version = teaqlOriginalVersion;
+                _ledgerId = teaqlOriginalLedgerId;
+                _markedForDeletion = teaqlOriginalMarkedForDeletion;
+                _teaqlForceCreate = teaqlOriginalForceCreate;
+                _fullyLoaded = teaqlOriginalFullyLoaded;
+                _loadedFields = teaqlOriginalLoadedFields;
+                _entityRoot.Rekey(currentKey, teaqlOriginalKey);
+            });
+            context.AfterGraphCommit(() =>
+            {
+                _entityRoot.ClearEntity(TeaqlEntityKey());
+                if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
+            });
             if (string.IsNullOrWhiteSpace(_comment))
             {
                 throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
             }
-            AttachRoot(context.EntityRoot);
-
-            var creating = !this.Id.HasValue;
+            var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
             var cmd = _markedForDeletion ? (object)ToDeleteCommand()
@@ -150,7 +253,7 @@ namespace Generated.Models
                 ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
                 if (Version.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(Version.Value);
             }
-            var req = new MutationRequest { Command = cmd, Comment = _comment, LedgerKey = TeaqlEntityKey() };
+            var req = new MutationRequest { Command = cmd, Comment = _comment, LedgerKey = TeaqlEntityKey(), LedgerRoot = _entityRoot };
             var result = await context.DataService.MutateAsync(context, req);
             if (result is not MutationResult mutationResult || mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for SchoolType");
@@ -163,16 +266,22 @@ namespace Generated.Models
             this.DisplayOrder = saved.DisplayOrder;
             this.Version = saved.Version;
             _ledgerId = Id ?? _ledgerId;
+            _teaqlForceCreate = false;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
-            foreach (var child in SchoolList)
+            for (var index = 0; index < SchoolList.Count; index++)
             {
+                var child = SchoolList[index];
                 child.AttachRoot(_entityRoot);
                 child.UpdateSchoolTypeId(Id);
                 child.AuditAs(_comment);
-                await child.SaveAsync(context);
+                try { await child.TeaqlSaveWithinGraphAsync(context); }
+                catch (CheckException error)
+                {
+                    var prefix = ObjectLocation.Property("school_list").Index(index);
+                    throw new CheckException(error.Violations.Select(violation =>
+                        violation with { Location = violation.Location.PrefixedBy(prefix) }).ToArray());
+                }
             }
-            _entityRoot.ClearEntity(TeaqlEntityKey());
-            if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
             return saved;
         }
 
