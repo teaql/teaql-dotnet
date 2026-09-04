@@ -208,7 +208,9 @@ public record SelectQuery
     public SelectQuery NormalizeGeneratedFilters()
     {
         if (Filters.Count == 0) return this;
-        FilterCondition = Expr.And(Filters.Select(item => item.ToExpr()));
+        var generated = Expr.And(Filters.Select(item => item.ToExpr()));
+        FilterCondition = FilterCondition == null ? generated : FilterCondition.And(generated);
+        Filters.Clear();
         return this;
     }
 
