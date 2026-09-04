@@ -21,8 +21,13 @@ public sealed class CheckResult
     public string ModelPath => Location.ModelPath;
     public string NativePath => Location.NativePath;
     public string InstancePath => Location.InstancePath;
+    public string? EntityType {get;init;}
+    public string? SourceInstancePath {get;init;}
     public object? InputValue {get;init;} public object? SystemValue {get;init;} public string? Message {get;set;}
+    public WireCheckResult ToWire(JsonFieldNamingProfile profile=JsonFieldNamingProfile.CamelCase)=>new(RuleId,EntityType,Location.Segments,Location.InstancePathWith(profile),SourceInstancePath,InputValue,SystemValue,Message);
 }
+
+public sealed record WireCheckResult(string RuleId,string? EntityType,IReadOnlyList<ObjectLocationSegment> Location,string InstancePath,string? SourceInstancePath,object? InputValue,object? SystemValue,string? Message);
 
 public sealed class CheckException(IReadOnlyList<CheckResult> violations)
     : Exception("Check failed: " + string.Join("; ", violations.Select(x => x.Message ?? $"{x.RuleId}:{x.Location}")))

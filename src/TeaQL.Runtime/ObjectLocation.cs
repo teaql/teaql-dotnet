@@ -1,5 +1,23 @@
 namespace TeaQL.Runtime;
 
+public enum JsonFieldNamingProfile
+{
+    CamelCase,
+    SnakeCase,
+    PascalCase
+}
+
+public static class JsonFieldNamingProfiles
+{
+    public static JsonFieldNamingProfile Parse(string? value) => value switch
+    {
+        null or "" or "camelCase" => JsonFieldNamingProfile.CamelCase,
+        "snake_case" => JsonFieldNamingProfile.SnakeCase,
+        "PascalCase" => JsonFieldNamingProfile.PascalCase,
+        _ => throw new ArgumentException($"Unsupported json_field_naming: {value}", nameof(value))
+    };
+}
+
 public abstract record ObjectLocationSegment
 {
     private ObjectLocationSegment() { }
@@ -46,12 +64,21 @@ public sealed record ObjectLocation
 
     public string NativePath => Render(ToPascalCase);
 
-    public string InstancePath => string.Concat(_segments.Select(segment => segment switch
+    public string InstancePath => InstancePathWith(JsonFieldNamingProfile.CamelCase);
+
+    public string InstancePathWith(JsonFieldNamingProfile profile) => string.Concat(_segments.Select(segment => segment switch
     {
-        ObjectLocationSegment.Property property => "/" + EscapePointer(ToLowerCamelCase(property.Name)),
+        ObjectLocationSegment.Property property => "/" + EscapePointer(RenderJsonField(property.Name, profile)),
         ObjectLocationSegment.Index index => "/" + index.Value,
         _ => throw new InvalidOperationException("Unsupported object-location segment")
     }));
+
+    private static string RenderJsonField(string name, JsonFieldNamingProfile profile) => profile switch
+    {
+        JsonFieldNamingProfile.SnakeCase => name,
+        JsonFieldNamingProfile.PascalCase => ToPascalCase(name),
+        _ => ToLowerCamelCase(name)
+    };
 
     public override string ToString() => NativePath;
 

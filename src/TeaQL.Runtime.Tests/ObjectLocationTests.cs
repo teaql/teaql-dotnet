@@ -26,6 +26,19 @@ public class ObjectLocationTests
         Assert.Equal("order_items[2].user_url", location.ModelPath);
         Assert.Equal("OrderItems[2].UserUrl", location.NativePath);
         Assert.Equal("/orderItems/2/userUrl", location.InstancePath);
+        Assert.Equal("/order_items/2/user_url", location.InstancePathWith(JsonFieldNamingProfile.SnakeCase));
+        Assert.Equal("/OrderItems/2/UserUrl", location.InstancePathWith(JsonFieldNamingProfile.PascalCase));
+    }
+
+    [Fact]
+    public void WireCheckerResultPreservesSubmittedAlias()
+    {
+        var result = new CheckResult { RuleId = "required", EntityType = "customer_account",
+            Location = ObjectLocation.Property("user_url"), SourceInstancePath = "/user_url" };
+        var wire = result.ToWire();
+        Assert.Equal("/userUrl", wire.InstancePath);
+        Assert.Equal("/user_url", wire.SourceInstancePath);
+        Assert.Single(wire.Location);
     }
 
     [Fact]
