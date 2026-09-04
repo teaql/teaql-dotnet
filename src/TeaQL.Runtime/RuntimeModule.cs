@@ -11,6 +11,7 @@ public class RuntimeModule
     public InMemoryEntityRegistry EntityRegistry { get; } = new();
     internal Dictionary<string, IEntityChecker> Checkers { get; } = new();
     internal Func<UserContext, Task>? GeneratedBootstrapCallback { get; private set; }
+    public Dictionary<string, WireEntityMetadata> WireMetadata { get; } = new();
 
     public RuntimeModule() { }
 
@@ -75,6 +76,8 @@ public class RuntimeModule
         return this;
     }
 
+    public RuntimeModule WireEntity(WireEntityMetadata metadata) { WireMetadata[metadata.EntityType] = metadata; return this; }
+
     public RuntimeModule Entity(EntityDescriptor descriptor)
     {
         EntityRegistry.Register(descriptor.Name);
@@ -88,6 +91,8 @@ public class RuntimeModule
         var combined = new RuntimeModule();
         foreach (var descriptor in Metadata.GetAllEntities()) combined.Entity(descriptor);
         foreach (var descriptor in other.Metadata.GetAllEntities()) combined.Entity(descriptor);
+        foreach (var metadata in WireMetadata.Values) combined.WireEntity(metadata);
+        foreach (var metadata in other.WireMetadata.Values) combined.WireEntity(metadata);
         foreach (var checker in Checkers) combined.Checker(checker.Key, checker.Value);
         foreach (var checker in other.Checkers) combined.Checker(checker.Key, checker.Value);
         if (GeneratedBootstrapCallback != null) combined.GeneratedBootstrap(GeneratedBootstrapCallback);
