@@ -36,10 +36,12 @@ public class GeneratedAbiTests
             new Dictionary<string, IReadOnlyDictionary<string, bool>>
             {
                 ["School"] = new Dictionary<string, bool> { ["id"] = true, ["name"] = true }
-            });
+            },
+            tableNames: new Dictionary<string, string> { ["School"] = "legacy_school" });
 
         var descriptor = Assert.Single(module.Metadata.GetAllEntities());
         Assert.Equal("School", descriptor.Name);
+        Assert.Equal("legacy_school", descriptor.TableNameValue);
         Assert.True(descriptor.PropertyByName("id")!.IsId);
         Assert.False(descriptor.PropertyByName("name")!.Nullable);
     }

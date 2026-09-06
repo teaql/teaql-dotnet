@@ -21,11 +21,14 @@ public class RuntimeModule
         IReadOnlyDictionary<string, IEntityChecker> checkers,
         IReadOnlyDictionary<string, Record> schemaSamples,
         IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> requiredFields,
-        IReadOnlyDictionary<string, IReadOnlyList<RelationDescriptor>>? relations = null)
+        IReadOnlyDictionary<string, IReadOnlyList<RelationDescriptor>>? relations = null,
+        IReadOnlyDictionary<string, string>? tableNames = null)
     {
         foreach (var entity in entities)
         {
             var descriptor = EntityDescriptor.New(entity);
+            if (tableNames != null && tableNames.TryGetValue(entity, out var tableName))
+                descriptor = descriptor.TableName(tableName);
             if (schemaSamples.TryGetValue(entity, out var sample))
             {
                 foreach (var (field, value) in sample)
