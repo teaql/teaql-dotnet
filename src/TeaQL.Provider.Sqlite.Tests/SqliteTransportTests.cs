@@ -119,6 +119,69 @@ namespace TeaQL.Provider.Sqlite.Tests
             Assert.Equal("Campus Learning Platform", roots.Rows[0]["name"].TryText());
         }
 
+        [Fact]
+        public async Task DynamicSearchKeepsOuterAndNestedTenantScopesWithUnknownClauses()
+        {
+            var platform = EntityDescriptor.New("Platform").TableName("platform_data")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("tenant_id", DataType.I64))
+                .Property(PropertyDescriptor.New("name", DataType.Text));
+            var school = EntityDescriptor.New("School").TableName("school_data")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("tenant_id", DataType.I64))
+                .Property(PropertyDescriptor.New("platform_id", DataType.I64))
+                .Property(PropertyDescriptor.New("name", DataType.Text));
+            var module = new RuntimeModule().Entity(platform).Entity(school);
+            var executor = new SqlDataServiceExecutor(new SqliteDialect(), _transport, new ModuleSchemaProvider(module));
+            var context = module.IntoContext();
+            context.WithDataService(executor);
+            await context.EnsureSchemaAsync();
+            // Provider-level fixture; application bootstrap remains a separate example gate.
+            using (var command = _connection.CreateCommand())
+            {
+                command.CommandText = """
+                    INSERT INTO platform_data(id,tenant_id,name) VALUES (1,7,'Campus'),(2,8,'Campus');
+                    INSERT INTO school_data(id,tenant_id,platform_id,name) VALUES
+                      (1,7,1,'School'),(2,7,1,'School'),(3,7,1,'School'),
+                      (4,8,1,'School'),(5,7,2,'School'),(6,7,1,'Other');
+                    """;
+                await command.ExecuteNonQueryAsync();
+            }
+            var models = new Dictionary<string, SearchModel>
+            {
+                ["School"] = new(new Dictionary<string,string> { ["id"] = "integer", ["name"] = "string" },
+                    new Dictionary<string,string> { ["platform"] = "Platform" }),
+                ["Platform"] = new(new Dictionary<string,string> { ["name"] = "string" }, new Dictionary<string,string>())
+            };
+            var basis = new SelectQuery("School").Project("id").Project("name")
+                .Filter(Expr.Eq("tenant_id", 7)).Limit(2)
+                .Comment("what: tenant school search").Purpose("why: schema drift regression");
+            basis.OrderByItems.Add(OrderBy.Desc("id"));
+            basis.HardLimitValue = 2;
+            var warnings = new List<DynamicSearchWarning>();
+            var merged = DynamicSearch.Merge(basis, """
+                {"filter":{"name":"School","platform.name":"Campus","old_name":"secret",
+                 "old_relation.name":"secret","platform.old_name":"secret"},
+                 "orderBy":[{"field":"removed","direction":"asc"},{"field":"name","direction":"asc"}]}
+                """, models, filter => filter.FieldPath switch
+                {
+                    "name" => Expr.Eq("name", filter.Value.GetString()),
+                    "platform.name" => Expr.InSubquery("platform_id", platform,
+                        new SelectQuery("Platform").Filter(Expr.Eq("tenant_id", 7))
+                            .AndFilter(Expr.Eq("name", filter.Value.GetString())), "id"),
+                    _ => throw new InvalidOperationException("Unbound trusted field")
+                }, order => OrderBy.Asc(order.FieldPath), warnings.Add);
+            var rows = await executor.QueryAsync(new QueryRequest
+            {
+                Query = merged.Query, Comment = basis.CommentText, Purpose = basis.PurposeText
+            });
+            Assert.Equal(new long[] { 3, 2 }, rows.Rows.Select(row => ((Value.I64Value)row["id"]).Value));
+            Assert.Equal(4, warnings.Count);
+            Assert.Equal(2UL, merged.Query.HardLimitValue);
+            Assert.Single(basis.OrderByItems);
+            Assert.IsType<Expr.BinaryExpr>(basis.FilterCondition);
+        }
+
         private sealed class ModuleSchemaProvider : ISchemaProvider
         {
             private readonly RuntimeModule _module;
