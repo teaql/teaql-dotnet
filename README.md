@@ -45,6 +45,35 @@ To ensure high extensibility and dependency isolation, this project adopts a mul
 
 ## Quick Start
 
+### Local dynamic-search schema drift
+
+`TeaQL.Core.DynamicSearch.Normalize` validates a local UI search envelope such as
+`{"filter":{"name":{"$contains":"Campus"}},"orderBy":[{"field":"id","direction":"desc"}]}`
+against application-owned `SearchModel` metadata. Unknown fields or relation
+paths remove the **whole clause** and return `DYNAMIC_SEARCH_UNKNOWN_FIELD`
+warnings (entity, clause and field path, never the submitted value). Warnings
+also go to stderr by default; pass a callback to integrate structured logging.
+
+`DynamicSearch.Merge` accepts an already-scoped `SelectQuery` and trusted
+filter/order bindings that produce native `Expr`/`OrderBy` objects. It clones the
+query, ANDs filters and appends ordering, retaining existing filters, hard limit,
+pagination and intent. Bindings must enforce related-query authorization too.
+Warnings are emitted only after all validation and bindings succeed.
+
+Supported scalar metadata types are `string`, `integer`, `number`, `boolean`,
+`date` (`yyyy-MM-dd`), `timestamp` (integer epoch milliseconds), and `decimal`
+(use a string for exact decimal digits). Operators are `$eq`, `$ne`, `$gt`,
+`$gte`, `$lt`, `$lte`, `$in`, `$notIn`, and string `$contains`. The default limit
+is 100 filter/order clauses, 16 path segments and 1,000 IN-list values.
+Invalid operators/types, malformed JSON and client-supplied trusted controls
+remain errors. TFP validation is unchanged. Generated automatic bindings are
+not supplied by this adapter; do not use it as an authorization policy.
+
+Regression evidence lives in `DynamicSearchTests` and
+`SqliteTransportTests.DynamicSearchKeepsOuterAndNestedTenantScopesWithUnknownClauses`.
+
+### Build and test
+
 The solution is natively built for .NET 8. You can build and test using the .NET CLI:
 ```bash
 dotnet build TeaQL.sln
