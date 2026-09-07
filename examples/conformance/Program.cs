@@ -12,6 +12,19 @@ static void Require(bool condition, string message)
     if (!condition) throw new InvalidOperationException(message);
 }
 
+var orderKey = new EntityKey("Order", 1);
+var executionKey = new EntityKey("InferenceExecution", 1);
+var targetLedger = new EntityRoot();
+var sourceLedger = new EntityRoot();
+targetLedger.SetOriginalVersion(orderKey, 3);
+sourceLedger.SetOriginalVersion(executionKey, 9);
+sourceLedger.Set(executionKey, "execution_status", new Value.TextValue("COMPLETED"));
+targetLedger.MergeFrom(sourceLedger);
+Require(targetLedger.OriginalVersion(orderKey) == 3, "Order#1 version was overwritten");
+Require(targetLedger.OriginalVersion(executionKey) == 9,
+    "InferenceExecution#1 version was resolved through Order#1");
+Console.WriteLine("PASS Mutation ledger identity (same ID, different entity types keep versions 3/9)");
+
 var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
 var directory = Path.Combine(projectRoot, ".local");
 Directory.CreateDirectory(directory);
@@ -92,7 +105,7 @@ var remaining = await Q.WorkItems().WithIdIs(created.Id.Value)
     .ExecuteForListAsync(context);
 Require(remaining.Count == 0, "Default Q returned a deleted row");
 Console.WriteLine("PASS Delete (default Q excludes deleted rows)");
-Console.WriteLine("PASS .NET minimum runtime conformance: 7/7");
+Console.WriteLine("PASS .NET minimum runtime conformance: 8/8");
 
 sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
 {
