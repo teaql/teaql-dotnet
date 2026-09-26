@@ -43,6 +43,37 @@ To ensure high extensibility and dependency isolation, this project adopts a mul
 *   **ASP.NET Core Web Endpoint**: Integrates instantly with `Microsoft.AspNetCore.Builder`, exposing underlying abstract data services as RESTful endpoints with just a few lines of code.
 *   **Redis Cache Decorator**: The `RedisDataServiceDecorator` enables transparent, underlying distributed caching for data interactions out-of-the-box.
 
+## Security Foundations
+
+TeaQL .NET provides the backend security profile used by generated services:
+
+- ordinary Query and Mutation logs retain intent, trace, parameterized SQL,
+  timing, and outcome without values;
+- value-bearing/copy-paste SQL requires an explicitly selected sensitive sink;
+- the TFP endpoint applies bounded requests, trusted tenant policy,
+  writable-field rules, and optimistic version at the provider boundary;
+- `UserContext` issues short-lived opaque entity references rather than
+  exposing raw internal ID/version pairs.
+
+```csharp
+var codec = new AeadEntityReferenceCodec(2, new Dictionary<uint, byte[]>
+{
+    [2] = activeKeyFromSecretManager,
+});
+var context = new UserContext().WithEntityReferenceCodec(codec);
+var token = context.EncodeEntityReference(
+    "OrderItem", 42, 7, "edit-order", TimeSpan.FromMinutes(15));
+var claims = context.DecodeEntityReference(token, "OrderItem", "edit-order");
+```
+
+The AES-256-GCM envelope supports rotation, expiry, entity-type binding, and
+purpose binding. Verification uses stable non-disclosing errors and missing key
+infrastructure fails closed. The shared Java/Rust/Go/.NET golden vector and the
+exact development-only raw-reference acknowledgement are defined in the
+canonical [opaque entity reference contract](https://github.com/teaql/teaql-conformance/blob/main/design/opaque-entity-references.md).
+Opaque references do not replace tenant, ownership, role, or optimistic-lock
+policy.
+
 ## Quick Start
 
 ### Local dynamic-search schema drift
