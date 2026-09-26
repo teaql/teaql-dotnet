@@ -177,7 +177,8 @@ public class ExecutionMetadata
     public string? ParameterizedQuery { get; set; }
     /// <summary>Structured bind values for trusted runtime diagnostics.</summary>
     public IReadOnlyList<Value> Parameters { get; set; } = Array.Empty<Value>();
-    public int ParameterCount => Parameters.Count;
+    private int? _parameterCount;
+    public int ParameterCount { get => _parameterCount ?? Parameters.Count; set => _parameterCount = value; }
     public string? DebugQuery { get; set; }
 }
 

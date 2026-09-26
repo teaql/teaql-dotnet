@@ -35,8 +35,17 @@ public interface IAppAuditEventSink
         CancellationToken cancellationToken = default);
 }
 
-/// <summary>Value-bearing SQL diagnostic destination; a text sink is configured by default.</summary>
+/// <summary>SQL diagnostic destination. The ordinary surface receives redacted metadata.</summary>
 public interface IDiagnosticSqlLogSink
+{
+    void Write(ExecutionMetadata metadata);
+}
+
+/// <summary>
+/// Explicit opt-in destination for value-bearing SQL diagnostics. Implementations must use
+/// restricted access and retention because values may contain credentials or personal data.
+/// </summary>
+public interface ISensitiveDiagnosticSqlLogSink
 {
     void Write(ExecutionMetadata metadata);
 }

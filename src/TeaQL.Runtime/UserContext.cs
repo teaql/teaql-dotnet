@@ -56,11 +56,13 @@ public class UserContext
     public IServiceProvider? ServiceProvider { get; set; }
     public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = NoopRuntimeTelemetry.Instance;
     public IDiagnosticSqlLogSink? DiagnosticSqlLogSink { get; private set; } = new TextDiagnosticSqlLogSink();
+    public ISensitiveDiagnosticSqlLogSink? SensitiveDiagnosticSqlLogSink { get; private set; }
     public bool QuerySqlLogEnabled { get; private set; } = true;
     public bool MutationSqlLogEnabled { get; private set; } = true;
     public TeaQLLocale Locale { get; private set; } = TeaQLLocale.English;
     public I18nCatalog I18nCatalog { get; private set; } = I18nCatalog.Builtin;
     public IIdSetStore IdSetStore { get; private set; } = DefaultIdSetStore;
+    public IEntityReferenceCodec? EntityReferenceCodec { get; private set; }
     public string IdSetPlan { get; private set; } = "ID_SET_DISABLED";
     public ulong IdSetCount { get; private set; }
     public string IdSetCountAccuracy { get; private set; } = "UNKNOWN";
@@ -97,6 +99,12 @@ public class UserContext
         return this;
     }
 
+    public UserContext WithSensitiveDiagnosticSqlLogSink(ISensitiveDiagnosticSqlLogSink? sink)
+    {
+        SensitiveDiagnosticSqlLogSink = sink;
+        return this;
+    }
+
     public UserContext EnableQuerySqlLog(bool enabled = true) { QuerySqlLogEnabled = enabled; return this; }
     public UserContext EnableMutationSqlLog(bool enabled = true) { MutationSqlLogEnabled = enabled; return this; }
     public UserContext DisableQuerySqlLog() => EnableQuerySqlLog(false);
@@ -107,8 +115,28 @@ public class UserContext
         if (metadata == null) return;
         var query = metadata.Operation == DataServiceOperation.Query;
         if ((query && !QuerySqlLogEnabled) || (!query && !MutationSqlLogEnabled)) return;
-        DiagnosticSqlLogSink?.Write(metadata);
+        SensitiveDiagnosticSqlLogSink?.Write(metadata);
+        DiagnosticSqlLogSink?.Write(RedactExecutionMetadata(metadata));
     }
+
+    private static ExecutionMetadata RedactExecutionMetadata(ExecutionMetadata source) => new()
+    {
+        Backend = source.Backend,
+        Operation = source.Operation,
+        StartedAt = source.StartedAt,
+        EndedAt = source.EndedAt,
+        AffectedRows = source.AffectedRows,
+        ResultCount = source.ResultCount,
+        TraceChain = new List<TraceNode>(source.TraceChain),
+        Comment = source.Comment,
+        Purpose = source.Purpose,
+        AuditReason = source.AuditReason,
+        BackendRequestId = source.BackendRequestId,
+        ParameterizedQuery = source.ParameterizedQuery,
+        ParameterCount = source.Parameters.Count,
+        Parameters = Array.Empty<Value>(),
+        DebugQuery = null
+    };
 
     public UserContext WithDataService(IDataService provider)
     {
@@ -118,6 +146,32 @@ public class UserContext
         if (provider is ISchemaExecutor schemaExecutor)
             InsertResource<ISchemaExecutor>(schemaExecutor);
         return this;
+    }
+
+    public UserContext WithEntityReferenceCodec(IEntityReferenceCodec codec)
+    {
+        EntityReferenceCodec = codec ?? throw new ArgumentNullException(nameof(codec));
+        return this;
+    }
+
+    public string EncodeEntityReference(string entityType, ulong id, long version, string purpose, TimeSpan lifetime)
+    {
+        if (EntityReferenceCodec != null) return EntityReferenceCodec.Encode(entityType, id, version, purpose, lifetime);
+        if (!DevelopmentRawEntityReferenceCodec.Enabled) throw new EntityReferenceTokenException("ENTITY_REFERENCE_CODEC_REQUIRED");
+        var now = DateTimeOffset.UtcNow;
+        return DevelopmentRawEntityReferenceCodec.Encode(new EntityReferenceClaims(entityType, id, version, now, now.Add(lifetime), purpose));
+    }
+
+    public EntityReferenceClaims DecodeEntityReference(string token, string expectedEntityType, string purpose)
+    {
+        if (EntityReferenceCodec != null) return EntityReferenceCodec.Decode(token, expectedEntityType, purpose);
+        if (!DevelopmentRawEntityReferenceCodec.Enabled) throw new EntityReferenceTokenException("ENTITY_REFERENCE_CODEC_REQUIRED");
+        var claims = DevelopmentRawEntityReferenceCodec.Decode(token);
+        if (claims.ExpiresAt <= DateTimeOffset.UtcNow
+            || !string.Equals(claims.EntityType, expectedEntityType, StringComparison.Ordinal)
+            || !string.Equals(claims.Purpose, purpose, StringComparison.Ordinal))
+            throw new EntityReferenceTokenException("ENTITY_REFERENCE_INVALID");
+        return claims;
     }
 
     public async Task<T> ExecuteGraphSaveAsync<T>(Func<Task<T>> work)

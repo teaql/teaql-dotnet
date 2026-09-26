@@ -354,7 +354,6 @@ public abstract class SqlDialect
             paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value + 1));
             assignments.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
-
         if (assignments.Count == 0)
             throw SqlCompileException.EmptyMutation("update");
 
@@ -368,6 +367,7 @@ public abstract class SqlDialect
             paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
             predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
+        AppendMutationGuards(entity, command.Guards, predicates, paramsList);
 
         var sql = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {string.Join(", ", assignments)} WHERE {string.Join(" AND ", predicates)}";
         return new CompiledQuery(sql, paramsList, null);
@@ -505,6 +505,7 @@ public abstract class SqlDialect
                 paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
                 predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
             }
+            AppendMutationGuards(entity, command.Guards, predicates, paramsList);
 
             var sqlSoft = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(1)} WHERE {string.Join(" AND ", predicates)}";
             return new CompiledQuery(sqlSoft, paramsList, null);
@@ -520,6 +521,7 @@ public abstract class SqlDialect
             paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
             preds.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
+        AppendMutationGuards(entity, command.Guards, preds, paramsList);
 
         var sqlHard = $"DELETE FROM {QuoteIdent(entity.TableNameValue)} WHERE {string.Join(" AND ", preds)}";
         return new CompiledQuery(sqlHard, paramsList, null);
@@ -542,10 +544,28 @@ public abstract class SqlDialect
             new Value.I64Value(command.ExpectedVersionValue)
         };
 
+        var predicates = new List<string>
+        {
+            $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(2)}",
+            $"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(3)}"
+        };
+        AppendMutationGuards(entity, command.Guards, predicates, paramsList);
         var sql = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(1)} " +
-                  $"WHERE {QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(2)} AND {QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(3)}";
+                  $"WHERE {string.Join(" AND ", predicates)}";
         
         return new CompiledQuery(sql, paramsList, null);
+    }
+
+    private void AppendMutationGuards(EntityDescriptor entity, Record guards,
+        List<string> predicates, List<Value> parameters)
+    {
+        foreach (var field in guards.Keys.OrderBy(key => key, StringComparer.Ordinal))
+        {
+            var property = entity.Properties.FirstOrDefault(p => p.Name == field)
+                ?? throw SqlCompileException.UnknownField(field);
+            parameters.Add(guards[field]);
+            predicates.Add($"{QuoteIdent(property.ColumnNameString)} = {Placeholder(parameters.Count)}");
+        }
     }
 
     public virtual string ColumnSql(EntityDescriptor entity, string field)

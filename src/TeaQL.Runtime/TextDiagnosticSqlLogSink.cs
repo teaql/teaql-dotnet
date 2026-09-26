@@ -16,7 +16,6 @@ public sealed class TextDiagnosticSqlLogSink : IDiagnosticSqlLogSink
 
     public void Write(ExecutionMetadata metadata)
     {
-        if (string.IsNullOrWhiteSpace(metadata.DebugQuery)) return;
         var elapsed = metadata.EndedAt - metadata.StartedAt;
         var elapsedMicros = (long)(elapsed.TotalMilliseconds * 1_000);
         var summary = metadata.ResultCount is not null
@@ -26,6 +25,24 @@ public sealed class TextDiagnosticSqlLogSink : IDiagnosticSqlLogSink
         {
             _writer.WriteLine($"[TeaQL SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us] {summary}");
             _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)}");
+            _writer.WriteLine($"Parameterized SQL: {metadata.ParameterizedQuery} parameterCount={metadata.ParameterCount}");
+        }
+    }
+}
+
+public sealed class SensitiveDiagnosticSqlLogSink : ISensitiveDiagnosticSqlLogSink
+{
+    private readonly TextWriter _writer;
+    private readonly object _gate = new();
+
+    public SensitiveDiagnosticSqlLogSink(TextWriter? writer = null) => _writer = writer ?? Console.Error;
+
+    public void Write(ExecutionMetadata metadata)
+    {
+        var elapsedMicros = (long)((metadata.EndedAt - metadata.StartedAt).TotalMilliseconds * 1_000);
+        lock (_gate)
+        {
+            _writer.WriteLine($"[TeaQL SENSITIVE SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us]");
             _writer.WriteLine($"Parameterized SQL: {metadata.ParameterizedQuery} params=[{string.Join(", ", metadata.Parameters)}]");
             _writer.WriteLine($"Debug SQL: {metadata.DebugQuery}");
         }

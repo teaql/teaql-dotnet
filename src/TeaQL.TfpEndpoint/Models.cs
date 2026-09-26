@@ -78,6 +78,7 @@ namespace TeaQL.TfpEndpoint
         public required IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> WritableFields { get; init; }
         public required IReadOnlyDictionary<string, ISet<string>> AllowedActions { get; init; }
         public int MaxPageSize { get; init; } = 100;
+        public ulong MaxOffset { get; init; } = 10_000;
     }
 
     public sealed class TfpEndpointException(string code, string message, Exception? inner = null)

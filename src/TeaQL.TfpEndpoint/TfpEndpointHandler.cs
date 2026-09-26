@@ -12,6 +12,13 @@ namespace TeaQL.TfpEndpoint
 {
     public class TfpEndpointHandler
     {
+        private const int MaxSelectItems = 256;
+        private const int MaxOrderItems = 32;
+        private const int MaxGroupItems = 64;
+        private const int MaxPayloadFields = 256;
+        private const int MaxFilterDepth = 16;
+        private const int MaxFilterNodes = 256;
+        private const int MaxInValues = 100;
         private readonly IDataService _dataService;
         private readonly IRuntimeTelemetry _telemetry;
 
@@ -95,18 +102,28 @@ namespace TeaQL.TfpEndpoint
                 throw new TfpEndpointException("TFP_INVALID_REQUEST", "commentText is required");
             if (string.IsNullOrWhiteSpace(tfpQuery.PurposeText))
                 throw new TfpEndpointException("TFP_POLICY_VIOLATION", "purposeText is required");
+            ValidateIntentText(tfpQuery.CommentText);
+            ValidateIntentText(tfpQuery.PurposeText);
+            if (!tfpQuery.LimitValue.HasValue)
+                throw new TfpEndpointException("TFP_POLICY_VIOLATION", "limitValue is required");
+            if ((tfpQuery.SelectItems?.Count ?? 0) > MaxSelectItems
+                || (tfpQuery.OrderItems?.Count ?? 0) > MaxOrderItems
+                || (tfpQuery.GroupByItems?.Count ?? 0) > MaxGroupItems)
+                throw new TfpEndpointException("TFP_INVALID_REQUEST", "Query shape exceeds protocol budget");
 
             var q = new SelectQuery(tfpQuery.Entity);
             
-            if (tfpQuery.LimitValue.HasValue)
-            {
-                if (tfpQuery.LimitValue.Value < 1 || tfpQuery.LimitValue.Value > (ulong)trusted.MaxPageSize)
-                    throw new TfpEndpointException("TFP_POLICY_VIOLATION", "Invalid federation page size");
-                q.Limit(tfpQuery.LimitValue.Value);
-            }
+            if (tfpQuery.LimitValue.Value < 1 || tfpQuery.LimitValue.Value > (ulong)trusted.MaxPageSize)
+                throw new TfpEndpointException("TFP_POLICY_VIOLATION", "Invalid federation page size");
+            q.Limit(tfpQuery.LimitValue.Value);
                 
-            if (tfpQuery.OffsetValue.HasValue)
+            if (tfpQuery.OffsetValue.HasValue) {
+                if (tfpQuery.OffsetValue.Value > trusted.MaxOffset)
+                    throw new TfpEndpointException("TFP_POLICY_VIOLATION", "Offset exceeds federation policy");
                 q.Offset(tfpQuery.OffsetValue.Value);
+            }
+
+            var seen = new HashSet<string>(StringComparer.Ordinal);
 
             if (tfpQuery.OrderItems != null)
             {
@@ -116,23 +133,34 @@ namespace TeaQL.TfpEndpoint
                     if (!string.Equals(o.Direction, "Asc", StringComparison.OrdinalIgnoreCase)
                         && !string.Equals(o.Direction, "Desc", StringComparison.OrdinalIgnoreCase))
                         throw new TfpEndpointException("TFP_INVALID_REQUEST", "Unsupported order direction");
-                    q.OrderBy(Core.OrderBy.New(MapField(fields, o.Field), dir));
+                    var mapped = MapField(fields, o.Field);
+                    if (!seen.Add("order:" + mapped)) throw new TfpEndpointException("TFP_INVALID_REQUEST", "Duplicate mapped order field");
+                    q.OrderBy(Core.OrderBy.New(mapped, dir));
                 }
             }
 
             if (tfpQuery.FilterCondition != null)
-                q.Filter(ParseFilter(JsonSerializer.SerializeToElement(tfpQuery.FilterCondition), fields));
+            {
+                var filterNodes = 0;
+                q.Filter(ParseFilter(JsonSerializer.SerializeToElement(tfpQuery.FilterCondition), fields, 1, ref filterNodes));
+            }
             q.AndFilter(Expr.Eq(trusted.TenantField, trusted.TenantId));
             q.AndFilter(Expr.Gt("version", new Value.I64Value(0)));
 
             if (tfpQuery.SelectItems != null)
-                q.Projects(tfpQuery.SelectItems.Select(field => MapField(fields, field)).ToArray());
+                q.Projects(tfpQuery.SelectItems.Select(field => {
+                    var mapped = MapField(fields, field);
+                    if (!seen.Add("select:" + mapped)) throw new TfpEndpointException("TFP_INVALID_REQUEST", "Duplicate mapped select field");
+                    return mapped;
+                }).ToArray());
 
             if (tfpQuery.GroupByItems != null)
             {
                 foreach (var g in tfpQuery.GroupByItems)
                 {
-                    q.GroupBy(MapField(fields, g));
+                    var mapped = MapField(fields, g);
+                    if (!seen.Add("group:" + mapped)) throw new TfpEndpointException("TFP_INVALID_REQUEST", "Duplicate mapped group field");
+                    q.GroupBy(mapped);
                 }
             }
             if (tfpQuery.AggregateItems is { Count: > 0 })
@@ -145,10 +173,15 @@ namespace TeaQL.TfpEndpoint
             var req = new QueryRequest
             {
                 Query = q,
-                Comment = tfpQuery.CommentText
+                Comment = tfpQuery.CommentText,
+                Purpose = tfpQuery.PurposeText
             };
 
-            var res = await _dataService.QueryAsync(req);
+            QueryResult res;
+            try { res = await _dataService.QueryAsync(req); }
+            catch (Exception error) when (error is not TfpEndpointException) {
+                throw new TfpEndpointException("TFP_EXECUTION_FAILED", "Data service execution failed");
+            }
 
             var rows = new List<Dictionary<string, object?>>();
             foreach (var r in res.Rows)
@@ -202,11 +235,15 @@ namespace TeaQL.TfpEndpoint
             RequireEntity(trusted, tfpMut.Entity);
             if (string.IsNullOrWhiteSpace(tfpMut.Comment))
                 throw new TfpEndpointException("TFP_AUDIT_REASON_REQUIRED", "Mutation audit reason is required");
+            ValidateIntentText(tfpMut.Comment);
             if (!trusted.AllowedActions.TryGetValue(tfpMut.Entity, out var actions)
                 || !actions.Contains(tfpMut.Action))
                 throw new TfpEndpointException("TFP_POLICY_VIOLATION", "Mutation action is not allowed");
             if (!trusted.WritableFields.TryGetValue(tfpMut.Entity, out var writable))
                 throw new TfpEndpointException("TFP_POLICY_VIOLATION", "No writable field policy");
+            if (tfpMut.Payload.Count > MaxPayloadFields)
+                throw new TfpEndpointException("TFP_INVALID_REQUEST", "Mutation payload exceeds protocol budget");
+            ValidateMutationLifecycle(tfpMut);
 
             var trace = new List<TraceNode> { new TraceNode(tfpMut.Entity, null, tfpMut.Comment ?? "") };
 
@@ -222,20 +259,28 @@ namespace TeaQL.TfpEndpoint
             }
             record[trusted.TenantField] = trusted.TenantId;
 
-            Value idVal = MapToValue(tfpMut.Id);
+            Value idVal = MapToValue(NormalizeMutationId(tfpMut.Id));
 
             long? expectedVersion = tfpMut.ExpectedVersion;
 
             MutationRequest mutReq = tfpMut.Action switch
             {
                 "Create" => new InsertMutationRequest(new InsertCommand { Entity = tfpMut.Entity, Values = record, TraceChain = trace }),
-                "Update" => new UpdateMutationRequest(new UpdateCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, Values = record, TraceChain = trace }),
-                "Delete" => new DeleteMutationRequest(new DeleteCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, SoftDelete = true, TraceChain = trace }),
-                "Recover" => new RecoverMutationRequest(new RecoverCommand { Entity = tfpMut.Entity, Id = idVal, TraceChain = trace }),
-                _ => throw new ArgumentException($"Unknown mutation action: {tfpMut.Action}")
+                "Update" => new UpdateMutationRequest(new UpdateCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, Values = record, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }),
+                "Delete" => new DeleteMutationRequest(new DeleteCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, SoftDelete = true, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }),
+                "Recover" => new RecoverMutationRequest(new RecoverCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion!.Value, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }),
+                _ => throw new TfpEndpointException("TFP_INVALID_REQUEST", "Unknown mutation action")
             };
 
-            var res = await _dataService.MutateAsync(mutReq);
+            MutationResult res;
+            try { res = await _dataService.MutateAsync(mutReq); }
+            catch (Exception error) when (error is not TfpEndpointException) {
+                throw new TfpEndpointException("TFP_EXECUTION_FAILED", "Data service execution failed");
+            }
+            if (tfpMut.Action == "Create" && res.AffectedRows != 1)
+                throw new TfpEndpointException("TFP_EXECUTION_FAILED", "Data service execution failed");
+            if (tfpMut.Action != "Create" && res.AffectedRows != 1)
+                throw new TfpEndpointException("TFP_UNAVAILABLE", "Mutation target is unavailable");
 
             var dataArr = new List<Dictionary<string, object?>>();
             if (res.GeneratedValues != null && res.GeneratedValues.Count > 0)
@@ -272,8 +317,11 @@ namespace TeaQL.TfpEndpoint
 
         private Value JsonValue(JsonElement element) => MapJsonElementToValue(element);
 
-        private Expr ParseFilter(JsonElement node, IReadOnlyDictionary<string, string> fields)
+        private Expr ParseFilter(JsonElement node, IReadOnlyDictionary<string, string> fields, int depth, ref int nodes)
         {
+            nodes++;
+            if (depth > MaxFilterDepth || nodes > MaxFilterNodes)
+                throw new TfpEndpointException("TFP_INVALID_REQUEST", "Filter complexity exceeds protocol budget");
             if (node.ValueKind != JsonValueKind.Object || node.EnumerateObject().Count() != 1)
                 throw new TfpEndpointException("TFP_INVALID_REQUEST", "Filter must contain one expression");
             var item = node.EnumerateObject().Single();
@@ -281,7 +329,8 @@ namespace TeaQL.TfpEndpoint
             {
                 if (item.Value.ValueKind != JsonValueKind.Array)
                     throw new TfpEndpointException("TFP_INVALID_REQUEST", "Logical filter requires an array");
-                var parts = item.Value.EnumerateArray().Select(child => ParseFilter(child, fields)).ToList();
+                var parts = new List<Expr>();
+                foreach (var child in item.Value.EnumerateArray()) parts.Add(ParseFilter(child, fields, depth + 1, ref nodes));
                 if (parts.Count == 0) throw new TfpEndpointException("TFP_INVALID_REQUEST", "Logical filter requires operands");
                 return item.Name == "$and" ? Expr.And(parts.ToArray()) : Expr.Or(parts.ToArray());
             }
@@ -294,7 +343,7 @@ namespace TeaQL.TfpEndpoint
                 "$eq" => Expr.Eq(field, JsonValue(operation.Value)),
                 "$gte" => Expr.Gte(field, JsonValue(operation.Value)),
                 "$lte" => Expr.Lte(field, JsonValue(operation.Value)),
-                "$in" when operation.Value.ValueKind == JsonValueKind.Array =>
+                "$in" when operation.Value.ValueKind == JsonValueKind.Array && operation.Value.GetArrayLength() <= MaxInValues =>
                     Expr.InList(field, operation.Value.EnumerateArray().Select(JsonValue)),
                 _ => throw new TfpEndpointException("TFP_INVALID_REQUEST", "Unsupported predicate operator")
             };
@@ -310,6 +359,7 @@ namespace TeaQL.TfpEndpoint
                 "tenant", "tenantId", "merchant", "merchantId", "user", "userId",
                 "permissions", "requestPolicy", "purposePolicy", "trustedContext",
                 "hardLimit", "hard_limit", "hardLimitValue", "hard_limit_value"
+                , "continuousPageFetch", "idSetPagination", "id_set_pagination", "paginationWithIdSet"
             };
             void Visit(JsonElement value)
             {
@@ -323,6 +373,60 @@ namespace TeaQL.TfpEndpoint
                     foreach (var child in value.EnumerateArray()) Visit(child);
             }
             Visit(document.RootElement);
+        }
+
+        private static bool ValidMutationId(object? value)
+        {
+            if (value is string text) return !string.IsNullOrWhiteSpace(text);
+            if (value is JsonElement json)
+            {
+                if (json.ValueKind == JsonValueKind.Object)
+                {
+                    var properties = json.EnumerateObject().ToArray();
+                    return properties.Length == 1 && properties[0].Name == "id" && ValidMutationId(properties[0].Value);
+                }
+                return (json.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(json.GetString()))
+                    || (json.ValueKind == JsonValueKind.Number && json.TryGetInt64(out var id) && id > 0);
+            }
+            return value is int i && i > 0 || value is long l && l > 0 || value is uint ui && ui > 0 || value is ulong ul && ul > 0;
+        }
+
+        private static object? NormalizeMutationId(object? value)
+        {
+            if (value is JsonElement { ValueKind: JsonValueKind.Object } json)
+            {
+                var properties = json.EnumerateObject().ToArray();
+                if (properties.Length == 1 && properties[0].Name == "id") return properties[0].Value;
+            }
+            return value;
+        }
+
+        private static void ValidateIntentText(string value)
+        {
+            if (System.Text.Encoding.UTF8.GetByteCount(value) > 1024)
+                throw new TfpEndpointException("TFP_INVALID_REQUEST", "Intent text exceeds 1024 UTF-8 bytes");
+            if (value.Any(character => char.IsControl(character)))
+                throw new TfpEndpointException("TFP_INVALID_REQUEST", "Intent text contains control characters");
+        }
+
+        private static void ValidateMutationLifecycle(TfpMutationQuery mutation)
+        {
+            var empty = mutation.Payload.Count == 0;
+            switch (mutation.Action)
+            {
+                case "Create" when mutation.Id != null || mutation.ExpectedVersion.HasValue:
+                    throw new TfpEndpointException("TFP_INVALID_REQUEST", "Create cannot provide id or expectedVersion");
+                case "Update" when !ValidMutationId(mutation.Id) || mutation.ExpectedVersion is null or <= 0:
+                    throw new TfpEndpointException("TFP_INVALID_REQUEST", "Update requires id and positive expectedVersion");
+                case "Delete" when !ValidMutationId(mutation.Id) || mutation.ExpectedVersion is null or <= 0 || !empty:
+                    throw new TfpEndpointException("TFP_INVALID_REQUEST", "Delete requires id, positive expectedVersion and empty payload");
+                case "Recover" when !ValidMutationId(mutation.Id) || mutation.ExpectedVersion is null or >= 0 || !empty:
+                    throw new TfpEndpointException("TFP_INVALID_REQUEST", "Recover requires id, negative expectedVersion and empty payload");
+                case "Create" or "Update" or "Delete" or "Recover":
+                    return;
+                default:
+                    throw new TfpEndpointException("TFP_INVALID_REQUEST", "Unknown mutation action");
+            }
         }
     }
 }
