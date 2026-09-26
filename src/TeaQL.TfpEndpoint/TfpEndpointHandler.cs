@@ -351,7 +351,11 @@ namespace TeaQL.TfpEndpoint
 
         private static void RejectPrivilegedInput(string payload, ISet<string> allowedTopLevel)
         {
-            using var document = JsonDocument.Parse(payload);
+            JsonDocument document;
+            try { document = JsonDocument.Parse(payload); }
+            catch (JsonException) { throw new TfpEndpointException("TFP_INVALID_REQUEST", "Invalid JSON"); }
+            using (document)
+            {
             foreach (var property in document.RootElement.EnumerateObject())
                 if (!allowedTopLevel.Contains(property.Name))
                     throw new TfpEndpointException("TFP_INVALID_REQUEST", $"Unknown TFP field: {property.Name}");
@@ -373,6 +377,7 @@ namespace TeaQL.TfpEndpoint
                     foreach (var child in value.EnumerateArray()) Visit(child);
             }
             Visit(document.RootElement);
+            }
         }
 
         private static bool ValidMutationId(object? value)

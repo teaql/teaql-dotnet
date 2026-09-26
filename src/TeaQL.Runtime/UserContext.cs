@@ -158,6 +158,8 @@ public class UserContext
     {
         if (EntityReferenceCodec != null) return EntityReferenceCodec.Encode(entityType, id, version, purpose, lifetime);
         if (!DevelopmentRawEntityReferenceCodec.Enabled) throw new EntityReferenceTokenException("ENTITY_REFERENCE_CODEC_REQUIRED");
+        if (string.IsNullOrWhiteSpace(entityType) || id == 0 || lifetime <= TimeSpan.Zero)
+            throw new EntityReferenceTokenException("ENTITY_REFERENCE_INVALID");
         var now = DateTimeOffset.UtcNow;
         return DevelopmentRawEntityReferenceCodec.Encode(new EntityReferenceClaims(entityType, id, version, now, now.Add(lifetime), purpose));
     }
@@ -167,7 +169,8 @@ public class UserContext
         if (EntityReferenceCodec != null) return EntityReferenceCodec.Decode(token, expectedEntityType, purpose);
         if (!DevelopmentRawEntityReferenceCodec.Enabled) throw new EntityReferenceTokenException("ENTITY_REFERENCE_CODEC_REQUIRED");
         var claims = DevelopmentRawEntityReferenceCodec.Decode(token);
-        if (claims.ExpiresAt <= DateTimeOffset.UtcNow
+        var now = DateTimeOffset.UtcNow;
+        if (claims.ExpiresAt <= now || claims.IssuedAt > now.AddMinutes(1)
             || !string.Equals(claims.EntityType, expectedEntityType, StringComparison.Ordinal)
             || !string.Equals(claims.Purpose, purpose, StringComparison.Ordinal))
             throw new EntityReferenceTokenException("ENTITY_REFERENCE_INVALID");
