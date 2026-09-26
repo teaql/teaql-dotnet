@@ -135,9 +135,16 @@ public class RuntimeTelemetryTests
         context.WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(output));
         await context.RequireResource<IDataService>().QueryAsync(
             new QueryRequest { Query = new SelectQuery("School") });
-        Assert.Contains("SELECT * FROM school_data WHERE name = 'O''Brien 学校'", output.ToString());
         Assert.Contains("Parameterized SQL:", output.ToString());
-        Assert.Contains("Debug SQL:", output.ToString());
+        Assert.DoesNotContain("O''Brien", output.ToString());
+        Assert.DoesNotContain("Debug SQL:", output.ToString());
+
+        var sensitive = new StringWriter();
+        context.WithSensitiveDiagnosticSqlLogSink(new SensitiveDiagnosticSqlLogSink(sensitive));
+        await context.RequireResource<IDataService>().QueryAsync(
+            new QueryRequest { Query = new SelectQuery("School") });
+        Assert.Contains("SELECT * FROM school_data WHERE name = 'O''Brien 学校'", sensitive.ToString());
+        Assert.Contains("Debug SQL:", sensitive.ToString());
 
         var before = output.ToString();
         context.DisableQuerySqlLog();

@@ -39,10 +39,11 @@ public class TfpEndpointTelemetryTests
 
         var original = new InvalidOperationException("provider failed");
         dataService.Error = original;
-        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        var thrown = await Assert.ThrowsAsync<TfpEndpointException>(() =>
             handler.HandleQueryAsync(Trusted(), QueryPayload()));
-        Assert.Same(original, thrown);
-        Assert.Same(original, telemetry.Events[^1].Error);
+        Assert.Equal("TFP_EXECUTION_FAILED", thrown.Code);
+        Assert.DoesNotContain("provider", thrown.Message);
+        Assert.Same(thrown, telemetry.Events[^1].Error);
     }
 
     [Fact]
@@ -78,7 +79,7 @@ public class TfpEndpointTelemetryTests
 
         var forbidden = await Assert.ThrowsAsync<TfpEndpointException>(() =>
             handler.HandleQueryAsync(Trusted(),
-                "{\"entity\":\"Probe\",\"filterCondition\":{\"secret\":{\"$eq\":1}},\"commentText\":\"x\",\"purposeText\":\"x\"}"));
+                "{\"entity\":\"Probe\",\"filterCondition\":{\"secret\":{\"$eq\":1}},\"limitValue\":10,\"commentText\":\"x\",\"purposeText\":\"x\"}"));
         Assert.Equal("TFP_FORBIDDEN_FIELD", forbidden.Code);
 
         var audit = await Assert.ThrowsAsync<TfpEndpointException>(() =>
@@ -99,6 +100,42 @@ public class TfpEndpointTelemetryTests
         Assert.Contains("idSetPagination", error.Message);
     }
 
+    [Fact]
+    public async Task EnforcesBudgetsLifecycleTenantGuardAndNonDisclosingErrors()
+    {
+        var service = new StubDataService();
+        var handler = new TfpEndpointHandler(service);
+        var badQueries = new[] {
+            "{\"entity\":\"Probe\",\"commentText\":\"x\",\"purposeText\":\"x\"}",
+            "{\"entity\":\"Probe\",\"limitValue\":10,\"offsetValue\":10001,\"commentText\":\"x\",\"purposeText\":\"x\"}",
+            "{\"entity\":\"Probe\",\"limitValue\":10,\"selectItems\":[\"id\",\"id\"],\"commentText\":\"x\",\"purposeText\":\"x\"}",
+            "{\"entity\":\"Probe\",\"limitValue\":10,\"rawSql\":\"select 1\",\"commentText\":\"x\",\"purposeText\":\"x\"}",
+            "{\"entity\":\"Probe\",\"limitValue\":10,\"tenantId\":99,\"commentText\":\"x\",\"purposeText\":\"x\"}"
+        };
+        foreach (var payload in badQueries)
+            await Assert.ThrowsAsync<TfpEndpointException>(() => handler.HandleQueryAsync(Trusted(), payload));
+
+        var badMutations = new[] {
+            "{\"entity\":\"Probe\",\"action\":\"Create\",\"id\":1,\"payload\":{},\"comment\":\"x\"}",
+            "{\"entity\":\"Probe\",\"action\":\"Update\",\"id\":1,\"payload\":{},\"comment\":\"x\"}",
+            "{\"entity\":\"Probe\",\"action\":\"Delete\",\"id\":1,\"expectedVersion\":1,\"payload\":{\"name\":\"x\"},\"comment\":\"x\"}",
+            "{\"entity\":\"Probe\",\"action\":\"Recover\",\"id\":1,\"expectedVersion\":1,\"payload\":{},\"comment\":\"x\"}"
+        };
+        foreach (var payload in badMutations)
+            await Assert.ThrowsAsync<TfpEndpointException>(() => handler.HandleMutationAsync(Trusted(), payload));
+
+        await handler.HandleMutationAsync(Trusted(),
+            "{\"entity\":\"Probe\",\"action\":\"Update\",\"id\":1,\"expectedVersion\":1,\"payload\":{},\"comment\":\"x\"}");
+        var update = Assert.IsType<UpdateMutationRequest>(service.LastMutation).Command;
+        Assert.Equal(new Value.I64Value(7), update.Guards["tenant_id"]);
+
+        service.Error = new InvalidOperationException("password=secret SQLSTATE 42P01");
+        var error = await Assert.ThrowsAsync<TfpEndpointException>(() => handler.HandleQueryAsync(Trusted(), QueryPayload()));
+        Assert.Equal("TFP_EXECUTION_FAILED", error.Code);
+        Assert.DoesNotContain("secret", error.Message);
+        Assert.DoesNotContain("42P01", error.Message);
+    }
+
     private static string QueryPayload() =>
         "{\"entity\":\"Probe\",\"limitValue\":10,\"commentText\":\"test query\",\"purposeText\":\"test\"}";
 
@@ -113,10 +150,10 @@ public class TfpEndpointTelemetryTests
             ["Probe"] = new Dictionary<string, string> { ["id"] = "id" }
         },
         WritableFields = new Dictionary<string, IReadOnlyDictionary<string, string>> {
-            ["Probe"] = new Dictionary<string, string>()
+            ["Probe"] = new Dictionary<string, string> { ["name"] = "name" }
         },
         AllowedActions = new Dictionary<string, ISet<string>> {
-            ["Probe"] = new HashSet<string> { "Create" }
+            ["Probe"] = new HashSet<string> { "Create", "Update", "Delete", "Recover" }
         },
         MaxPageSize = 100
     };
@@ -124,13 +161,15 @@ public class TfpEndpointTelemetryTests
     private sealed class StubDataService : IDataService
     {
         public Exception? Error { get; set; }
+        public MutationRequest? LastMutation { get; private set; }
         public DataServiceCapabilities Capabilities { get; } = new() { Query = true, Mutation = true };
         public Task<QueryResult> QueryAsync(QueryRequest request) => Error is null
             ? Task.FromResult(new QueryResult())
             : Task.FromException<QueryResult>(Error);
-        public Task<MutationResult> MutateAsync(MutationRequest request) => Error is null
-            ? Task.FromResult(new MutationResult { AffectedRows = 1 })
-            : Task.FromException<MutationResult>(Error);
+        public Task<MutationResult> MutateAsync(MutationRequest request) {
+            LastMutation = request;
+            return Error is null ? Task.FromResult(new MutationResult { AffectedRows = 1 }) : Task.FromException<MutationResult>(Error);
+        }
     }
 
     private sealed class RecordingTelemetry : IRuntimeTelemetry

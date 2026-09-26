@@ -34,6 +34,7 @@ public record UpdateCommand
     public Record Values { get; set; } = new();
     public List<TraceNode> TraceChain { get; init; } = new();
     public Record? OldValues { get; init; }
+    public Record Guards { get; init; } = new();
 
     public UpdateCommand() { }
 
@@ -56,6 +57,8 @@ public record UpdateCommand
     }
 
     public UpdateCommand Value(string field, object? value) => Value(field, Core.Value.FromObject(value));
+
+    public UpdateCommand Guard(string field, Value value) { Guards[field] = value; return this; }
 }
 
 public record BatchInsertCommand
@@ -88,6 +91,7 @@ public record DeleteCommand
     }
     public bool SoftDelete { get; set; } = true;
     public List<TraceNode> TraceChain { get; init; } = new();
+    public Record Guards { get; init; } = new();
 
     public DeleteCommand() { }
 
@@ -108,6 +112,8 @@ public record DeleteCommand
         SoftDelete = false;
         return this;
     }
+
+    public DeleteCommand Guard(string field, Value value) { Guards[field] = value; return this; }
 }
 
 public record RecoverCommand
@@ -116,4 +122,7 @@ public record RecoverCommand
     public Value Id { get; init; } = new Value.NullValue();
     public long ExpectedVersionValue { get; init; }
     public List<TraceNode> TraceChain { get; init; } = new();
+    public Record Guards { get; init; } = new();
+
+    public RecoverCommand Guard(string field, Value value) { Guards[field] = value; return this; }
 }

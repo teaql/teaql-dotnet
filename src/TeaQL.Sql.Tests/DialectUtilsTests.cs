@@ -152,6 +152,21 @@ namespace TeaQL.Sql.Tests
         }
 
         [Fact]
+        public void CompileUpdate_IncludesMutationGuardInSameStatement()
+        {
+            var entity = EntityDescriptor.New("Order").TableName("orders")
+                .Property(PropertyDescriptor.New("id", DataType.U64).Id())
+                .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+                .Property(PropertyDescriptor.New("name", DataType.Text))
+                .Property(PropertyDescriptor.New("tenant_id", DataType.I64).ColumnName("tenant_id"));
+            var cmd = new UpdateCommand("Order", new Value.U64Value(1))
+                .ExpectedVersion(3).Value("name", new Value.TextValue("B")).Guard("tenant_id", new Value.I64Value(7));
+            var compiled = _dialect.CompileUpdate(entity, cmd);
+            Assert.Contains("\"tenant_id\" = $5", compiled.Sql);
+            Assert.Equal(new Value.I64Value(7), compiled.Params[4]);
+        }
+
+        [Fact]
         public void CompileDelete_ReturnsExpected()
         {
             var entity = new EntityDescriptor { TableNameValue = "users" };
