@@ -101,6 +101,20 @@ public class CheckerTests
     }
 
     [Fact]
+    public async Task AuditReasonCannotReintroduceMutationPayload()
+    {
+        var provider = new CountingDataService { Result = new MutationResult { AffectedRows = 1 } };
+        var sink = new CapturingAuditSink();
+        var context = new UserContext().WithDataService(provider).WithAppAuditEventSink(sink);
+        var command = new UpdateCommand("SchoolType", new Value.I64Value(1001))
+            .Value("name", new Value.TextValue("PRIVATE-NAME-CANARY"));
+        command.TraceChain.Add(new TraceNode("SchoolType", 1001, "rename PRIVATE-NAME-CANARY"));
+        await context.RequireResource<IDataService>().MutateAsync(new UpdateMutationRequest(command));
+        Assert.Equal("rename [REDACTED]", Assert.Single(sink.Events)["reason"]);
+        Assert.Equal("PRIVATE-NAME-CANARY", command.Values["name"].TryText());
+    }
+
+    [Fact]
     public async Task SuccessfulMutationWithoutAuditSinkIsNoOp()
     {
         var provider = new CountingDataService();

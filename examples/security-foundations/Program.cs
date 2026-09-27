@@ -31,8 +31,8 @@ static async Task VerifyLogBoundaryAsync()
         "ordinary SQL log leaked a value");
     Require(ordinary.ToString().Contains("parameterCount=1", StringComparison.Ordinal),
         "ordinary SQL log lost parameter count");
-    Require(sensitive.ToString().Contains(ExampleDataService.DebugSql, StringComparison.Ordinal),
-        "explicit sensitive sink did not receive copy-paste SQL");
+    Require(!sensitive.ToString().Contains(ExampleDataService.Secret, StringComparison.Ordinal),
+        "sensitive sink bypassed plaintext acknowledgement gate");
 }
 
 static async Task VerifyTrustedTfpAsync()

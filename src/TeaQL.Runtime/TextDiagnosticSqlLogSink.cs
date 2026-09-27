@@ -16,6 +16,7 @@ public sealed class TextDiagnosticSqlLogSink : IDiagnosticSqlLogSink
 
     public void Write(ExecutionMetadata metadata)
     {
+        metadata = LogPrivacy.Project(metadata);
         var elapsed = metadata.EndedAt - metadata.StartedAt;
         var elapsedMicros = (long)(elapsed.TotalMilliseconds * 1_000);
         var summary = metadata.ResultCount is not null
@@ -39,6 +40,7 @@ public sealed class SensitiveDiagnosticSqlLogSink : ISensitiveDiagnosticSqlLogSi
 
     public void Write(ExecutionMetadata metadata)
     {
+        metadata = LogPrivacy.Project(metadata, LogPrivacy.PlaintextEnabled());
         var elapsedMicros = (long)((metadata.EndedAt - metadata.StartedAt).TotalMilliseconds * 1_000);
         lock (_gate)
         {

@@ -115,28 +115,9 @@ public class UserContext
         if (metadata == null) return;
         var query = metadata.Operation == DataServiceOperation.Query;
         if ((query && !QuerySqlLogEnabled) || (!query && !MutationSqlLogEnabled)) return;
-        SensitiveDiagnosticSqlLogSink?.Write(metadata);
-        DiagnosticSqlLogSink?.Write(RedactExecutionMetadata(metadata));
+        SensitiveDiagnosticSqlLogSink?.Write(LogPrivacy.Project(metadata, LogPrivacy.PlaintextEnabled()));
+        DiagnosticSqlLogSink?.Write(LogPrivacy.Project(metadata));
     }
-
-    private static ExecutionMetadata RedactExecutionMetadata(ExecutionMetadata source) => new()
-    {
-        Backend = source.Backend,
-        Operation = source.Operation,
-        StartedAt = source.StartedAt,
-        EndedAt = source.EndedAt,
-        AffectedRows = source.AffectedRows,
-        ResultCount = source.ResultCount,
-        TraceChain = new List<TraceNode>(source.TraceChain),
-        Comment = source.Comment,
-        Purpose = source.Purpose,
-        AuditReason = source.AuditReason,
-        BackendRequestId = source.BackendRequestId,
-        ParameterizedQuery = source.ParameterizedQuery,
-        ParameterCount = source.Parameters.Count,
-        Parameters = Array.Empty<Value>(),
-        DebugQuery = null
-    };
 
     public UserContext WithDataService(IDataService provider)
     {
