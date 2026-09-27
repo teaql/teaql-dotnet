@@ -194,7 +194,7 @@ public sealed class RuntimeDataService : IDataService
         {
             ["actor"] = _context.UserIdentifier,
             ["category"] = _context.GetNamedResource<string>("bootstrapCategory") ?? "mutation",
-            ["reason"] = request.Comment,
+            ["reason"] = LogPrivacy.ScrubAuditText(request.Comment, MutationValues(request)),
             ["entityType"] = EntityName(request),
             ["entityId"] = EntityId(request, result),
             ["mutationKind"] = MutationKind(request),
@@ -206,6 +206,14 @@ public sealed class RuntimeDataService : IDataService
         await _context.PublishAppAuditEventAsync(
             EntityName(request), MutationKind(request), changedFields.Length, safeEvent).ConfigureAwait(false);
     }
+
+    private static IEnumerable<Value> MutationValues(MutationRequest request) => request switch
+    {
+        InsertMutationRequest insert => insert.Command.Values.Values,
+        UpdateMutationRequest update => update.Command.Values.Values,
+        BatchMutationRequest batch => batch.Requests.SelectMany(MutationValues),
+        _ => []
+    };
 
     private static IEnumerable<string> ChangedFields(MutationRequest request) => request switch
     {

@@ -143,7 +143,8 @@ public class RuntimeTelemetryTests
         context.WithSensitiveDiagnosticSqlLogSink(new SensitiveDiagnosticSqlLogSink(sensitive));
         await context.RequireResource<IDataService>().QueryAsync(
             new QueryRequest { Query = new SelectQuery("School") });
-        Assert.Contains("SELECT * FROM school_data WHERE name = 'O''Brien 学校'", sensitive.ToString());
+        Assert.DoesNotContain("O''Brien", sensitive.ToString());
+        Assert.DoesNotContain("O'Brien", sensitive.ToString());
         Assert.Contains("Debug SQL:", sensitive.ToString());
 
         var before = output.ToString();

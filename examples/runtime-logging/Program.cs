@@ -22,7 +22,14 @@ var student = EntityDescriptor.New("Student").TableName("student_data")
 var module = new RuntimeModule().Entity(school).Entity(student);
 var executor = new SqlDataServiceExecutor(
     new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
-var context = module.IntoContext().WithDataService(executor);
+// Retain a real file endpoint and a custom sink to prove projection happens
+// before either destination, without changing database execution values.
+var logPath = Path.Combine(Path.GetTempPath(), $"teaql-privacy-{Guid.NewGuid()}.log");
+using var logWriter = new StreamWriter(logPath) { AutoFlush = true };
+var captured = new PrivacyEvidenceSink();
+var context = module.IntoContext().WithDataService(executor)
+    .WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(logWriter))
+    .WithSensitiveDiagnosticSqlLogSink(captured);
 await context.EnsureSchemaAsync();
 var service = context.RequireResource<IDataService>();
 
@@ -59,6 +66,58 @@ if (result.Rows.Count != 1 || result.Rows[0]["students"] is not Value.ListValue 
     throw new InvalidOperationException("relation hydration did not return the retained fixture");
 
 Console.WriteLine("PASS .NET runtime-source logging example");
+
+var markers = new[] { "PRIVATE-CREATE-CANARY", "PRIVATE-UPDATE-CANARY", "PRIVATE-FAILURE-CANARY" };
+InsertMutationRequest PrivacyInsert(string name)
+{
+    var command = new InsertCommand("School").Value("id", 99L).Value("name", name).Value("version", 1L);
+    command.TraceChain.Add(new TraceNode("School", null, "why: verify privacy persistence")
+        { Kind = "auditReason", Name = "School" });
+    return new InsertMutationRequest(command);
+}
+async Task VerifyPrivacyRow(string? name)
+{
+    var rows = (await service.QueryAsync(new QueryRequest
+    {
+        Query = new SelectQuery("School").Filter(Expr.Eq("id", new Value.I64Value(99))).Limit(1),
+        Comment = "what: read privacy fixture", Purpose = "why: verify original values"
+    })).Rows;
+    if (name is null ? rows.Count != 0 : rows.Count != 1 || rows[0]["name"] != new Value.TextValue(name))
+        throw new InvalidOperationException("privacy projection changed persistence");
+}
+await service.MutateAsync(PrivacyInsert(markers[0]));
+await VerifyPrivacyRow(markers[0]);
+var privacyUpdate = new UpdateCommand("School", new Value.I64Value(99)).ExpectedVersion(1).Value("name", markers[1]);
+privacyUpdate.TraceChain.Add(new TraceNode("School", null, "why: update privacy fixture") { Kind = "auditReason", Name = "School" });
+await service.MutateAsync(new UpdateMutationRequest(privacyUpdate));
+await VerifyPrivacyRow(markers[1]);
+try
+{
+    await service.MutateAsync(PrivacyInsert(markers[2]));
+    throw new InvalidOperationException("duplicate key unexpectedly succeeded");
+}
+catch (SqlExecutorException error) when (error.InnerException is SqliteException { SqliteErrorCode: 19 }) { }
+await VerifyPrivacyRow(markers[1]);
+var privacyDelete = new DeleteCommand("School", new Value.I64Value(99)).ExpectedVersion(2).HardDelete();
+privacyDelete.TraceChain.Add(new TraceNode("School", null, "why: delete privacy fixture") { Kind = "auditReason", Name = "School" });
+await service.MutateAsync(new DeleteMutationRequest(privacyDelete));
+await VerifyPrivacyRow(null);
+var privacyLog = File.ReadAllText(logPath) + captured.Text;
+if (captured.Count < 7 || privacyLog.Length == 0 || markers.Any(privacyLog.Contains))
+    throw new InvalidOperationException("missing or unsafe privacy log evidence");
+Console.WriteLine("PASS .NET database-backed CRUD/failure log privacy");
+
+sealed class PrivacyEvidenceSink : ISensitiveDiagnosticSqlLogSink
+{
+    public int Count { get; private set; }
+    public string Text { get; private set; } = "";
+    public void Write(ExecutionMetadata metadata)
+    {
+        Count++;
+        Text += System.Text.Json.JsonSerializer.Serialize(metadata);
+        Text += string.Join(",", metadata.Parameters);
+    }
+}
 
 sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
 {
