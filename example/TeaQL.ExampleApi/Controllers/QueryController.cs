@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using TeaQL.Core;
+using TeaQL.DataService;
 using TeaQL.Provider.PostgreSql;
+using TeaQL.Runtime;
 using TeaQL.Sql;
 using System.Collections.Generic;
 
@@ -42,11 +44,23 @@ public class QueryController : ControllerBase
         var dialect = new PostgreSqlDialect();
         var compiled = dialect.CompileSelect(entityDesc, query);
         
-        // Print to backend console
-        System.Console.WriteLine($"\n=== TEAQL GENERATED SQL ===");
-        System.Console.WriteLine($"SQL:\n{compiled.Sql}");
-        System.Console.WriteLine($"Params:\n" + string.Join(", ", compiled.Params.ConvertAll(p => p.ToJsonValue()?.ToString() ?? "null")));
-        System.Console.WriteLine($"===========================\n");
+        // Compilation is not execution. Still use the governed projection so
+        // this example never becomes a second, plaintext SQL logging path.
+        var now = DateTimeOffset.UtcNow;
+        new TextDiagnosticSqlLogSink().Write(new ExecutionMetadata
+        {
+            Backend = "postgresql",
+            Operation = DataServiceOperation.Query,
+            ExecutionOutcome = "compiled-not-executed",
+            StartedAt = now,
+            EndedAt = now,
+            ParameterizedQuery = compiled.Sql,
+            Parameters = compiled.Params,
+            ParameterLogPolicies = compiled.ParameterLogPolicies,
+            GeneratedSql = compiled.GeneratedSql,
+            Comment = "what: compile example query",
+            Purpose = "why: demonstrate query compilation without execution"
+        });
         
         return Ok(new[] { new { id = 1, status = "active", test_success = true, parsedEntity = entityName, generatedSql = compiled.Sql } });
     }
