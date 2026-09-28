@@ -223,7 +223,12 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     private static IEnumerable<Value> MutationValues(MutationRequest request) => request switch
     {
         InsertMutationRequest insert => insert.Command.Values.Values,
-        UpdateMutationRequest update => update.Command.Values.Values,
+        UpdateMutationRequest update => update.Command.Values.Values
+            .Concat(update.Command.Guards.Values)
+            .Concat(update.Command.OldValues?.Values ?? Enumerable.Empty<Value>())
+            .Append(update.Command.Id),
+        DeleteMutationRequest delete => delete.Command.Guards.Values.Append(delete.Command.Id),
+        RecoverMutationRequest recover => recover.Command.Guards.Values.Append(recover.Command.Id),
         BatchMutationRequest batch => batch.Requests.SelectMany(MutationValues),
         _ => []
     };
