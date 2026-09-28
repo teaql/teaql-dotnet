@@ -53,6 +53,9 @@ public static class DialectUtils
     }
 }
 
+public sealed record SchemaIndexColumn(string Name, bool Descending = false);
+public sealed record SchemaIndexSpec(string Name, string Table, IReadOnlyList<SchemaIndexColumn> Columns, bool Unique = false);
+
 public abstract class SqlDialect
 {
     public virtual string RelationTopNPolicy => "window";
@@ -90,18 +93,18 @@ public abstract class SqlDialect
         return $"CREATE TABLE IF NOT EXISTS {QuoteIdent(entity.TableNameValue)} ({columns})";
     }
 
-    public virtual List<string> SchemaIndexesSqls(EntityDescriptor entity)
+    public virtual List<SchemaIndexSpec> SchemaIndexSpecs(EntityDescriptor entity)
     {
-        var sqls = new List<string>();
+        var specs = new List<SchemaIndexSpec>();
         var tableNameUpper = entity.TableNameValue.ToUpperInvariant();
-        var quotedTable = QuoteIdent(entity.TableNameValue);
 
         var versionCol = entity.Properties.FirstOrDefault(p => p.IsVersion);
         if (versionCol != null)
         {
             var idCol = entity.Properties.FirstOrDefault(p => p.IsId)?.ColumnNameString ?? "id";
             var idxName = $"PK_{tableNameUpper}_ID_VERSION";
-            sqls.Add($"CREATE UNIQUE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(idCol)}, {QuoteIdent(versionCol.ColumnNameString)})");
+            specs.Add(new SchemaIndexSpec(idxName, entity.TableNameValue,
+                new[] { new SchemaIndexColumn(idCol), new SchemaIndexColumn(versionCol.ColumnNameString) }, true));
         }
 
         foreach (var p in entity.Properties)
@@ -110,16 +113,26 @@ public abstract class SqlDialect
             {
                 var idxName = $"IDX_{tableNameUpper}_{p.ColumnNameString.ToUpperInvariant()}_ID_DESC";
                 var idCol = entity.Properties.FirstOrDefault(candidate => candidate.IsId)?.ColumnNameString ?? "id";
-                sqls.Add($"CREATE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(p.ColumnNameString)}, {QuoteIdent(idCol)} DESC)");
+                specs.Add(new SchemaIndexSpec(idxName, entity.TableNameValue,
+                    new[] { new SchemaIndexColumn(p.ColumnNameString), new SchemaIndexColumn(idCol, true) }));
             }
             else if (p.Name.EndsWith("Time") || p.Name.EndsWith("_time") ||
                 p.Name == "create_time" || p.Name == "update_time")
             {
                 var idxName = $"IDX_{tableNameUpper}_{p.ColumnNameString.ToUpperInvariant()}";
-                sqls.Add($"CREATE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(p.ColumnNameString)})");
+                specs.Add(new SchemaIndexSpec(idxName, entity.TableNameValue,
+                    new[] { new SchemaIndexColumn(p.ColumnNameString) }));
             }
         }
-        return sqls;
+        return specs;
+    }
+
+    public virtual List<string> SchemaIndexesSqls(EntityDescriptor entity)
+    {
+        return SchemaIndexSpecs(entity).Select(spec =>
+            $"CREATE {(spec.Unique ? "UNIQUE " : "")}INDEX IF NOT EXISTS {QuoteIdent(spec.Name)} " +
+            $"ON {QuoteIdent(spec.Table)} ({string.Join(", ", spec.Columns.Select(column =>
+                QuoteIdent(column.Name) + (column.Descending ? " DESC" : "")))})").ToList();
     }
 
     public virtual string FallbackDefaultValueSql(DataType dataType)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 using TeaQL.Core;
 
 namespace TeaQL.Sql;
@@ -66,4 +67,10 @@ public class SqlCompileException : Exception
 public interface ISchemaProvider
 {
     EntityDescriptor? GetEntity(string name);
+}
+
+/// <summary>Provider-specific idempotent index installation for dialects without CREATE INDEX IF NOT EXISTS.</summary>
+public interface ISchemaIndexInstaller
+{
+    Task EnsureSchemaIndexesAsync(SqlDialect dialect, EntityDescriptor entity);
 }
