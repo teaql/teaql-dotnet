@@ -20,7 +20,10 @@ var student = EntityDescriptor.New("Student").TableName("student_data")
     .Property(PropertyDescriptor.New("schoolId", DataType.I64).ColumnName("school_id"))
     .Property(PropertyDescriptor.New("name", DataType.Text))
     .Property(PropertyDescriptor.New("password", DataType.Text))
-    .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+    .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+    // Explicitly declare the generated-era policy. Absent metadata must stay
+    // fail-closed; this example intentionally leaves ordinary fields visible.
+    .AuditMaskFields(new());
 var module = new RuntimeModule().Entity(school).Entity(student);
 var executor = new SqlDataServiceExecutor(
     new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
