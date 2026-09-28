@@ -112,6 +112,7 @@ public class UserContext
 
     internal void RecordExecutionMetadata(ExecutionMetadata? metadata)
     {
+        if (metadata?.Statements.Count > 0) { foreach (var child in metadata.Statements) RecordExecutionMetadata(child); return; }
         if (metadata == null) return;
         var query = metadata.Operation == DataServiceOperation.Query;
         if ((query && !QuerySqlLogEnabled) || (!query && !MutationSqlLogEnabled)) return;

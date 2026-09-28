@@ -21,7 +21,9 @@ try
     var module = GeneratedRuntimeModule.Module;
     var service = new SqlDataServiceExecutor(
         new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
-    var context = module.IntoContext().WithDataService(service);
+    using var queryLogs = new StringWriter();
+    var context = module.IntoContext().WithDataService(service)
+        .WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(queryLogs));
 
     await context.EnsureSchemaAsync();
     await context.EnsureSchemaAsync();
@@ -104,7 +106,10 @@ try
     Require(projected.Count == 1 && projected[0].Name == "Riverside Primary School",
         "projection/order query did not preserve typed School result");
 
-    Console.WriteLine("PASS .NET School bootstrap and portable Query parity");
+    Require(queryLogs.ToString().Contains("comment=Query parity: typed forward relations")
+            && queryLogs.ToString().Contains("purpose=Execute the shared School Query conformance case"),
+        "Generated Q request lost its comment/purpose before SQL logging");
+    Console.WriteLine("PASS .NET School bootstrap and portable Query parity with logged intent");
 }
 finally
 {

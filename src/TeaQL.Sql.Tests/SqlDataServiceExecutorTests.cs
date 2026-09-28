@@ -70,6 +70,10 @@ namespace TeaQL.Sql.Tests
             Assert.DoesNotContain("secret-customer-value", result.Metadata.ParameterizedQuery);
             Assert.Single(result.Metadata.Parameters);
             Assert.Equal(1, result.Metadata.ParameterCount);
+            // Do not construct plaintext expanded SQL before the runtime projects it.
+            Assert.Null(result.Metadata.DebugQuery);
+            Assert.Equal(compiled.ParameterLogPolicies, result.Metadata.ParameterLogPolicies);
+            Assert.Equal(compiled.GeneratedSql, result.Metadata.GeneratedSql);
             Assert.Equal(req.Comment, result.Metadata.Comment);
             Assert.Equal(req.Purpose, result.Metadata.Purpose);
             Assert.Equal(new[] { "operation", "request", "relation", "relation", "relation", "provider", "sql" },

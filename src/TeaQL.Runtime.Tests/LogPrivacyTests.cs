@@ -27,6 +27,7 @@ public class LogPrivacyTests
         {
             Environment.SetEnvironmentVariable(Flag, setting);
             var metadata = Entry("name", "PRIVATE-CUSTOMER-CANARY");
+            metadata.ParameterLogPolicies = new[] { SqlParameterLogPolicy.Masked };
             using (var writer = new StreamWriter(path))
             {
                 new SensitiveDiagnosticSqlLogSink(writer).Write(metadata);

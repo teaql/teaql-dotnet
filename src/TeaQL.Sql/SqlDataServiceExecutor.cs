@@ -79,9 +79,11 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         }
         catch (Exception ex)
         {
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
-        await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request);
+        await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
         var end = DateTimeOffset.UtcNow;
 
         var metadata = new ExecutionMetadata
@@ -92,13 +94,16 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             EndedAt = end,
             AffectedRows = null,
             ResultCount = rows.Count,
+            ExecutionOutcome = "success",
             TraceChain = SqlDataServiceTransaction.QueryTracePath(request, Dialect.Kind.ToString()),
             Comment = request.Comment,
             Purpose = request.Purpose,
+            IntentSource = request.IntentSource,
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
-            DebugQuery = compiled.DebugSql(Dialect.Kind)
+            ParameterLogPolicies = compiled.ParameterLogPolicies,
+            GeneratedSql = compiled.GeneratedSql
         };
 
         return new QueryResult { Rows = rows, Metadata = metadata };
@@ -124,46 +129,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         }
 
         if (request is BatchMutationRequest batchReq)
-        {
-            ulong totalAffected = 0;
-            var parameterizedQueries = new List<string>();
-            var parameters = new List<Value>();
-            var debugQueries = new List<string>();
-            var batchStart = DateTimeOffset.UtcNow;
-            foreach (var req in batchReq.Requests)
-            {
-                var res = await MutateAsync(req);
-                totalAffected += res.AffectedRows;
-                if (!string.IsNullOrWhiteSpace(res.Metadata.ParameterizedQuery))
-                    parameterizedQueries.Add(res.Metadata.ParameterizedQuery);
-                parameters.AddRange(res.Metadata.Parameters);
-                if (!string.IsNullOrWhiteSpace(res.Metadata.DebugQuery))
-                    debugQueries.Add(res.Metadata.DebugQuery);
-            }
-            var batchEnd = DateTimeOffset.UtcNow;
-
-            return new MutationResult
-            {
-                AffectedRows = totalAffected,
-                GeneratedValues = new Record(),
-                Metadata = new ExecutionMetadata
-                {
-                    Backend = Dialect.Kind.ToString().ToLowerInvariant(),
-                    Operation = DataServiceOperation.Batch,
-                    StartedAt = batchStart,
-                    EndedAt = batchEnd,
-                    AffectedRows = totalAffected,
-                    ResultCount = null,
-                    TraceChain = new List<TraceNode>(),
-                    Comment = null,
-                    BackendRequestId = null,
-                    ParameterizedQuery = parameterizedQueries.Count == 0
-                        ? null : string.Join("; ", parameterizedQueries),
-                    Parameters = parameters,
-                    DebugQuery = debugQueries.Count == 0 ? null : string.Join("; ", debugQueries)
-                }
-            };
-        }
+            return await SqlMutationBatch.ExecuteAsync(Dialect, batchReq, MutateAsync);
 
         string entityName = request switch
         {
@@ -213,6 +179,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         }
         catch (Exception ex)
         {
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
         var end = DateTimeOffset.UtcNow;
@@ -233,6 +201,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             StartedAt = start,
             EndedAt = end,
             AffectedRows = affectedRows,
+            ExecutionOutcome = "success",
             ResultCount = null,
             TraceChain = SqlDataServiceTransaction.MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
             Comment = request.Comment,
@@ -240,7 +209,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
-            DebugQuery = compiled.DebugSql(Dialect.Kind)
+            ParameterLogPolicies = compiled.ParameterLogPolicies,
+            GeneratedSql = compiled.GeneratedSql
         };
 
         return new MutationResult
@@ -277,41 +247,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
     public Task EnsureIdFloorAsync(string entity, ulong floor) =>
         OptimisticIdSpace.EnsureFloorAsync(Transport, Dialect, entity, floor);
 
-    public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
-        if (request.Query.RelationLoads.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
-            throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
-        if (Transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
-        var entityDesc = SchemaProvider.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
-        var compiled = Dialect.CompileSelect(entityDesc, request.Query);
-        var currentChunk = new List<Record>();
-        List<Record>? pendingChunk = null;
-        int chunkIndex = 0;
-        await foreach (var row in streaming.StreamSqlAsync(compiled, cancellationToken).WithCancellation(cancellationToken))
-        {
-            currentChunk.Add(row);
-            if (currentChunk.Count >= chunkSize)
-            {
-                if (pendingChunk != null)
-                {
-                    yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
-                }
-                pendingChunk = currentChunk;
-                currentChunk = new List<Record>();
-            }
-        }
-
-        if (currentChunk.Count > 0)
-        {
-            if (pendingChunk != null) yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
-            yield return new StreamChunk { Rows = currentChunk, ChunkIndex = chunkIndex, IsLast = true };
-        }
-        else if (pendingChunk != null)
-        {
-            yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex, IsLast = true };
-        }
-    }
+    public IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, CancellationToken cancellationToken = default)
+        => SqlStatementDiagnostics.Stream(Dialect, Transport, SchemaProvider, request, chunkSize, cancellationToken);
 }
 
 internal static class RelationQueryLoader
@@ -321,14 +258,16 @@ internal static class RelationQueryLoader
         ISchemaProvider schemaProvider,
         Func<QueryRequest, Task<QueryResult>> queryAsync,
         List<Record> parents,
-        QueryRequest request)
+        QueryRequest request,
+        CompiledQuery compiled)
     {
-        if (parents.Count == 0)
+        if (parents.Count == 0 || (request.Query.RelationLoads.Count == 0 && request.Query.RelationAggregates.Count == 0))
         {
             return;
         }
         var parentDescriptor = schemaProvider.GetEntity(request.Query.Entity)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {request.Query.Entity}");
+        var inheritedIntent = SqlStatementDiagnostics.InheritedIntent(request, compiled);
         foreach (var load in request.Query.RelationLoads)
         {
             var relation = parentDescriptor.RelationByName(load.Name)
@@ -387,7 +326,9 @@ internal static class RelationQueryLoader
                         }).ToList(),
                         Comment = request.Comment,
                         Purpose = request.Purpose,
-                        RelationLoadObserver = request.RelationLoadObserver
+                        IntentSource = inheritedIntent,
+                        RelationLoadObserver = request.RelationLoadObserver,
+                        DiagnosticObserver = request.DiagnosticObserver
                     });
                     childRows.AddRange(childResult.Rows);
                 }
@@ -410,7 +351,7 @@ internal static class RelationQueryLoader
             else
                 await LoadAndAttach();
         }
-        await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor);
+        await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor, inheritedIntent);
     }
 
     private static async Task EnhanceAggregatesAsync(
@@ -418,7 +359,8 @@ internal static class RelationQueryLoader
         Func<QueryRequest, Task<QueryResult>> queryAsync,
         List<Record> parents,
         QueryRequest request,
-        EntityDescriptor parentDescriptor)
+        EntityDescriptor parentDescriptor,
+        ExecutionMetadata inheritedIntent)
     {
         foreach (var aggregate in request.Query.RelationAggregates)
         {
@@ -457,7 +399,9 @@ internal static class RelationQueryLoader
                 }).ToList(),
                 Comment = request.Comment,
                 Purpose = request.Purpose,
-                RelationLoadObserver = request.RelationLoadObserver
+                IntentSource = inheritedIntent,
+                RelationLoadObserver = request.RelationLoadObserver,
+                DiagnosticObserver = request.DiagnosticObserver
             });
             var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity);
             var foreignProperty = childDescriptor?.PropertyByName(relation.ForeignKeyValue);
@@ -606,9 +550,11 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         }
         catch (Exception ex)
         {
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
-        await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request);
+        await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
         var end = DateTimeOffset.UtcNow;
 
         var metadata = new ExecutionMetadata
@@ -619,13 +565,16 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             EndedAt = end,
             AffectedRows = null,
             ResultCount = rows.Count,
+            ExecutionOutcome = "success",
             TraceChain = QueryTracePath(request, Dialect.Kind.ToString()),
             Comment = request.Comment,
             Purpose = request.Purpose,
+            IntentSource = request.IntentSource,
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
-            DebugQuery = compiled.DebugSql(Dialect.Kind)
+            ParameterLogPolicies = compiled.ParameterLogPolicies,
+            GeneratedSql = compiled.GeneratedSql
         };
 
         return new QueryResult { Rows = rows, Metadata = metadata };
@@ -634,46 +583,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
         if (request is BatchMutationRequest batchReq)
-        {
-            ulong totalAffected = 0;
-            var parameterizedQueries = new List<string>();
-            var parameters = new List<Value>();
-            var debugQueries = new List<string>();
-            var batchStart = DateTimeOffset.UtcNow;
-            foreach (var req in batchReq.Requests)
-            {
-                var res = await MutateAsync(req);
-                totalAffected += res.AffectedRows;
-                if (!string.IsNullOrWhiteSpace(res.Metadata.ParameterizedQuery))
-                    parameterizedQueries.Add(res.Metadata.ParameterizedQuery);
-                parameters.AddRange(res.Metadata.Parameters);
-                if (!string.IsNullOrWhiteSpace(res.Metadata.DebugQuery))
-                    debugQueries.Add(res.Metadata.DebugQuery);
-            }
-            var batchEnd = DateTimeOffset.UtcNow;
-
-            return new MutationResult
-            {
-                AffectedRows = totalAffected,
-                GeneratedValues = new Record(),
-                Metadata = new ExecutionMetadata
-                {
-                    Backend = Dialect.Kind.ToString().ToLowerInvariant(),
-                    Operation = DataServiceOperation.Batch,
-                    StartedAt = batchStart,
-                    EndedAt = batchEnd,
-                    AffectedRows = totalAffected,
-                    ResultCount = null,
-                    TraceChain = new List<TraceNode>(),
-                    Comment = null,
-                    BackendRequestId = null,
-                    ParameterizedQuery = parameterizedQueries.Count == 0
-                        ? null : string.Join("; ", parameterizedQueries),
-                    Parameters = parameters,
-                    DebugQuery = debugQueries.Count == 0 ? null : string.Join("; ", debugQueries)
-                }
-            };
-        }
+            return await SqlMutationBatch.ExecuteAsync(Dialect, batchReq, MutateAsync);
 
         string entityName = request switch
         {
@@ -723,6 +633,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         }
         catch (Exception ex)
         {
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
         var end = DateTimeOffset.UtcNow;
@@ -743,6 +655,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             StartedAt = start,
             EndedAt = end,
             AffectedRows = affectedRows,
+            ExecutionOutcome = "success",
             ResultCount = null,
             TraceChain = MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
             Comment = request.Comment,
@@ -750,7 +663,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             BackendRequestId = null,
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
-            DebugQuery = compiled.DebugSql(Dialect.Kind)
+            ParameterLogPolicies = compiled.ParameterLogPolicies,
+            GeneratedSql = compiled.GeneratedSql
         };
 
         Record? persistedRecord = null;
@@ -766,10 +680,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         };
         if (affectedRows > 0 && !physicallyDeleted && entityId != null && entityDesc.IdProperty() is { } id)
         {
-            var refresh = new SelectQuery(entityName).Filter(Expr.Eq(id.Name, entityId));
-            var rows = await Transport.FetchAllSqlAsync(Dialect.CompileSelect(entityDesc, refresh));
-            persistedRecord = rows.SingleOrDefault()
-                ?? throw new SqlExecutorException($"Authoritative persisted row not found for {entityName}");
+            persistedRecord = await SqlMutationReadback.ExecuteAsync(Dialect, Transport, entityDesc,
+                new SelectQuery(entityName).Filter(Expr.Eq(id.Name, entityId)), request, metadata);
         }
 
         return new MutationResult
@@ -841,40 +753,6 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         Transport.Dispose();
     }
 
-    public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
-        if (request.Query.RelationLoads.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
-            throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
-        if (Transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
-        var entityDesc = SchemaProvider.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
-        var compiled = Dialect.CompileSelect(entityDesc, request.Query);
-        var currentChunk = new List<Record>();
-        List<Record>? pendingChunk = null;
-        int chunkIndex = 0;
-
-        await foreach (var row in streaming.StreamSqlAsync(compiled, cancellationToken).WithCancellation(cancellationToken))
-        {
-            currentChunk.Add(row);
-            if (currentChunk.Count >= chunkSize)
-            {
-                if (pendingChunk != null)
-                {
-                    yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
-                }
-                pendingChunk = currentChunk;
-                currentChunk = new List<Record>();
-            }
-        }
-
-        if (currentChunk.Count > 0)
-        {
-            if (pendingChunk != null) yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex++, IsLast = false };
-            yield return new StreamChunk { Rows = currentChunk, ChunkIndex = chunkIndex, IsLast = true };
-        }
-        else if (pendingChunk != null)
-        {
-            yield return new StreamChunk { Rows = pendingChunk, ChunkIndex = chunkIndex, IsLast = true };
-        }
-    }
+    public IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize, CancellationToken cancellationToken = default)
+        => SqlStatementDiagnostics.Stream(Dialect, Transport, SchemaProvider, request, chunkSize, cancellationToken);
 }

@@ -21,10 +21,19 @@ public class DataServiceCapabilities
 
 public class QueryRequest
 {
+    // Execution-local callback, never part of a serialized request.
+    internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
+    // Bind provenance for inherited intent on derived queries, not shared context state.
+    internal ExecutionMetadata? IntentSource { get; set; }
     public SelectQuery Query { get; set; } = new();
     public List<TraceNode> TraceChain { get; set; } = new();
-    public string? Comment { get; set; }
-    public string? Purpose { get; set; }
+    private string? _comment;
+    private string? _purpose;
+    // Generated requests carry intent on SelectQuery. Preserve it for both
+    // constructors and object initializers, with explicit request overrides.
+    // RuntimeDataService snapshots these values when preparing execution.
+    public string? Comment { get => _comment ?? Query.CommentText; set => _comment = value; }
+    public string? Purpose { get => _purpose ?? Query.PurposeText; set => _purpose = value; }
     /// <summary>Runtime-only observer; providers must not serialize it.</summary>
     public IRelationLoadObserver? RelationLoadObserver { get; set; }
     public QueryRequest() { }
@@ -46,6 +55,7 @@ public class QueryResult
 
 public abstract class MutationRequest
 {
+    internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
     public EntityKey? LedgerKey { get; init; }
     public EntityRoot? LedgerRoot { get; init; }
     public abstract IReadOnlyList<TraceNode> TraceChain { get; }
@@ -162,6 +172,10 @@ public enum DataServiceOperation
 
 public class ExecutionMetadata
 {
+    // Internal provenance for inherited intent only; never exposed to sinks or wire serialization.
+    internal ExecutionMetadata? IntentSource { get; set; }
+    /// <summary>Statement/cursor termination, not transaction commit.</summary>
+    public string? ExecutionOutcome { get; set; }
     public string Backend { get; set; } = string.Empty;
     public DataServiceOperation Operation { get; set; }
     public DateTimeOffset StartedAt { get; set; }
@@ -180,6 +194,12 @@ public class ExecutionMetadata
     private int? _parameterCount;
     public int ParameterCount { get => _parameterCount ?? Parameters.Count; set => _parameterCount = value; }
     public string? DebugQuery { get; set; }
+    public IReadOnlyList<SqlParameterLogPolicy> ParameterLogPolicies { get; set; } = Array.Empty<SqlParameterLogPolicy>();
+    public IReadOnlyList<bool> MaskedParameters { get; set; } = Array.Empty<bool>();
+    public bool GeneratedSql { get; set; }
+    public string? LogMode { get; set; }
+    public string? SqlOmissionReason { get; set; }
+    public IReadOnlyList<ExecutionMetadata> Statements { get; set; } = Array.Empty<ExecutionMetadata>();
 }
 
 public interface IDataService

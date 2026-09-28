@@ -135,7 +135,9 @@ public class RuntimeTelemetryTests
         context.WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(output));
         await context.RequireResource<IDataService>().QueryAsync(
             new QueryRequest { Query = new SelectQuery("School") });
-        Assert.Contains("Parameterized SQL:", output.ToString());
+        Assert.DoesNotContain("Parameterized SQL:", output.ToString());
+        Assert.Contains("SQL: -- TeaQL SAFE", output.ToString());
+        Assert.Contains("name = '[REDACTED]' /* masked */", output.ToString());
         Assert.DoesNotContain("O''Brien", output.ToString());
         Assert.DoesNotContain("Debug SQL:", output.ToString());
 
@@ -219,6 +221,7 @@ public class RuntimeTelemetryTests
                     EndedAt = DateTimeOffset.UnixEpoch.AddMilliseconds(1),
                     ResultCount = 1,
                     ParameterizedQuery = "SELECT * FROM school_data WHERE name = ?",
+                    Parameters = new Value[] { new Value.TextValue("O'Brien 学校") },
                     DebugQuery = "SELECT * FROM school_data WHERE name = 'O''Brien 学校'"
                 }
             };

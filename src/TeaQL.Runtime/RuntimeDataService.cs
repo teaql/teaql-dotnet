@@ -14,7 +14,7 @@ namespace TeaQL.Runtime;
 /// internals remain independently instrumentable and become children through
 /// the active OpenTelemetry context.
 /// </summary>
-public sealed class RuntimeDataService : IDataService
+public sealed class RuntimeDataService : IStreamQueryExecutor
 {
     private readonly IDataService _provider;
     private readonly UserContext _context;
@@ -26,6 +26,18 @@ public sealed class RuntimeDataService : IDataService
     }
 
     public DataServiceCapabilities Capabilities => _provider.Capabilities;
+
+    public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] System.Threading.CancellationToken cancellationToken = default)
+    {
+        if (_provider is not IStreamQueryExecutor streaming)
+            throw new NotSupportedException("The installed provider does not support streaming queries");
+        var execution = CopyRequest(request, request.Query.CloneForExecution());
+        execution.DiagnosticObserver = _context.RecordExecutionMetadata;
+        await foreach (var chunk in streaming.QueryStreamAsync(execution, chunkSize, cancellationToken)
+            .WithCancellation(cancellationToken).ConfigureAwait(false))
+            yield return chunk;
+    }
 
     public Task<QueryResult> QueryAsync(QueryRequest request)
     {
@@ -143,6 +155,7 @@ public sealed class RuntimeDataService : IDataService
         TraceChain = new List<TraceNode>(source.TraceChain),
         Comment = source.Comment,
         Purpose = source.Purpose,
+        IntentSource = source.IntentSource,
         RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry)
     };
 
@@ -255,6 +268,7 @@ public sealed class RuntimeDataService : IDataService
 
     private async Task<QueryResult> ObserveProviderQueryAsync(QueryRequest request)
     {
+        request.DiagnosticObserver = _context.RecordExecutionMetadata;
         var result = await _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("provider", "data-service.query",
                 new Dictionary<string, object>
@@ -273,6 +287,10 @@ public sealed class RuntimeDataService : IDataService
 
     private async Task<MutationResult> ObserveProviderMutationAsync(MutationRequest request)
     {
+        var previous = request.DiagnosticObserver;
+        request.DiagnosticObserver = _context.RecordExecutionMetadata;
+        try
+        {
         var result = await _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("provider", "data-service.mutate",
                 new Dictionary<string, object>
@@ -287,6 +305,8 @@ public sealed class RuntimeDataService : IDataService
             }).ConfigureAwait(false);
         _context.RecordExecutionMetadata(result.Metadata);
         return result;
+        }
+        finally { request.DiagnosticObserver = previous; }
     }
 
     private static string EntityName(MutationRequest request) => request switch
