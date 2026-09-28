@@ -217,6 +217,45 @@ public class RuntimeTelemetryTests
             tag.Key == "teaql.relation.name" && Equals(tag.Value, "students"));
     }
 
+    [Fact]
+    public async Task BrokenSqlDiagnosticSinkDoesNotFailSuccessfulQueryOrSkipOtherSink()
+    {
+        var ordinary = new CountingDiagnosticSink();
+        var context = new UserContext()
+            .WithDataService(new StubDataService())
+            .WithSensitiveDiagnosticSqlLogSink(new ThrowingSensitiveDiagnosticSink())
+            .WithDiagnosticSqlLogSink(ordinary);
+
+        var result = await context.RequireResource<IDataService>().QueryAsync(
+            new QueryRequest { Query = new SelectQuery("School") });
+
+        Assert.Single(result.Rows);
+        Assert.Equal(1, ordinary.Count);
+
+        context.WithDiagnosticSqlLogSink(new ThrowingDiagnosticSink());
+        result = await context.RequireResource<IDataService>().QueryAsync(
+            new QueryRequest { Query = new SelectQuery("School") });
+        Assert.Single(result.Rows);
+    }
+
+    private sealed class CountingDiagnosticSink : IDiagnosticSqlLogSink
+    {
+        public int Count { get; private set; }
+        public void Write(ExecutionMetadata metadata) => Count++;
+    }
+
+    private sealed class ThrowingDiagnosticSink : IDiagnosticSqlLogSink
+    {
+        public void Write(ExecutionMetadata metadata) =>
+            throw new InvalidOperationException("DIAGNOSTIC-SINK-FAILURE");
+    }
+
+    private sealed class ThrowingSensitiveDiagnosticSink : ISensitiveDiagnosticSqlLogSink
+    {
+        public void Write(ExecutionMetadata metadata) =>
+            throw new InvalidOperationException("SENSITIVE-SINK-FAILURE");
+    }
+
     private sealed class RecordingTelemetry(List<string> events) : IRuntimeTelemetry
     {
         public RuntimeOperation? Operation { get; private set; }
