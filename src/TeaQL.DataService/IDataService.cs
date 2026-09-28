@@ -174,6 +174,8 @@ public class ExecutionMetadata
 {
     // Internal provenance for inherited intent only; never exposed to sinks or wire serialization.
     internal ExecutionMetadata? IntentSource { get; set; }
+    // Mutation target identifiers redact prose, never SQL bind values or structured counts.
+    internal IReadOnlyList<Value> IntentValues { get; set; } = Array.Empty<Value>();
     /// <summary>Statement/cursor termination, not transaction commit.</summary>
     public string? ExecutionOutcome { get; set; }
     public string Backend { get; set; } = string.Empty;

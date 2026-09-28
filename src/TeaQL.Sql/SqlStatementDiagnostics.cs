@@ -30,7 +30,7 @@ internal static class SqlStatementDiagnostics
     }
 
     internal static ExecutionMetadata Metadata(SqlDialect dialect, object request, CompiledQuery compiled,
-        DateTimeOffset start, string outcome, int? count = null)
+        DateTimeOffset start, string outcome, int? count = null, EntityDescriptor? descriptor = null)
     {
         var query = request as QueryRequest;
         var mutation = request as MutationRequest;
@@ -56,10 +56,24 @@ internal static class SqlStatementDiagnostics
             ResultCount = count, ParameterizedQuery = compiled.Sql, Parameters = compiled.Params.ToList(),
             ParameterLogPolicies = compiled.ParameterLogPolicies, GeneratedSql = compiled.GeneratedSql,
             IntentSource = query?.IntentSource,
+            IntentValues = mutation == null ? Array.Empty<Value>() : MutationTargetIds(mutation, descriptor),
             Comment = query?.Comment ?? mutation?.Comment, Purpose = query?.Purpose, AuditReason = mutation?.Comment,
             TraceChain = query != null ? SqlDataServiceTransaction.QueryTracePath(query, dialect.Kind.ToString())
                 : SqlDataServiceTransaction.MutationTracePath(mutation!, entity, operation, dialect.Kind.ToString())
         };
+    }
+
+    internal static IReadOnlyList<Value> MutationTargetIds(MutationRequest request, EntityDescriptor? descriptor)
+    {
+        Value? target = request switch {
+            InsertMutationRequest insert when descriptor?.IdProperty() is { } id
+                && insert.Command.Values.TryGetValue(id.Name, out var value) => value,
+            UpdateMutationRequest update => update.Command.Id,
+            DeleteMutationRequest delete => delete.Command.Id,
+            RecoverMutationRequest recover => recover.Command.Id,
+            _ => null
+        };
+        return target == null || target is Value.NullValue or Value.TypedNullValue ? Array.Empty<Value>() : [target];
     }
 
     private static void Record(object request, ExecutionMetadata metadata)
@@ -72,8 +86,8 @@ internal static class SqlStatementDiagnostics
     }
 
     internal static void Failure(SqlDialect dialect, object request, CompiledQuery compiled,
-        DateTimeOffset start, Exception error) => Record(request, Metadata(dialect, request, compiled, start,
-            error is OperationCanceledException ? "cancelled" : "failure"));
+        DateTimeOffset start, Exception error, EntityDescriptor? descriptor = null) => Record(request, Metadata(dialect, request, compiled, start,
+            error is OperationCanceledException ? "cancelled" : "failure", descriptor: descriptor));
 
     internal static async IAsyncEnumerable<StreamChunk> Stream(SqlDialect dialect, ISqlTransport transport,
         ISchemaProvider schema, QueryRequest request, int chunkSize,

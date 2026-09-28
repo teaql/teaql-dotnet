@@ -16,13 +16,23 @@ public class SqlReadbackDiagnosticTests
     private sealed class Transport : ISqlTransaction
     {
         public Exception? ReadFailure;
+        public Exception? WriteFailure;
         public List<Record> Rows = new();
         public List<CompiledQuery> Writes = new();
+        public long? IdSpaceLevel;
         public int Reads;
-        public Task<ulong> ExecuteSqlAsync(CompiledQuery query) { Writes.Add(query); return Task.FromResult(1UL); }
+        public Task<ulong> ExecuteSqlAsync(CompiledQuery query)
+        {
+            Writes.Add(query);
+            if (WriteFailure != null && !query.Sql.Contains("teaql_id_space", StringComparison.Ordinal))
+                return Task.FromException<ulong>(WriteFailure);
+            return Task.FromResult(1UL);
+        }
         public Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
         {
             Reads++;
+            if (IdSpaceLevel is long level && query.Sql.Contains("teaql_id_space", StringComparison.Ordinal))
+                return Task.FromResult(new List<Record> { new() { ["current_level"] = new Value.I64Value(level) } });
             return ReadFailure == null ? Task.FromResult(Rows) : Task.FromException<List<Record>>(ReadFailure);
         }
         public Task CommitSqlAsync() => Task.CompletedTask;
@@ -102,6 +112,69 @@ public class SqlReadbackDiagnosticTests
     }
 
     private static Record Row() => new() { ["id"] = Value.FromObject(1L), ["name"] = Value.FromObject("Riverside") };
+
+    [Theory]
+    [InlineData(false)][InlineData(true)]
+    public async Task CreateTargetIdMasksIntentButRemainsPlainInCompiledSql(bool failure)
+    {
+        var transport = new Transport { IdSpaceLevel = 1001,
+            WriteFailure = failure ? new InvalidOperationException("driver failed") : null,
+            Rows = new() { new Record { ["id"] = new Value.I64Value(1001), ["name"] = new Value.TextValue("Riverside") } } };
+        var sink = new Sink();
+        var command = new InsertCommand("Customer").Value("id", new Value.I64Value(1001))
+            .Value("name", "Riverside");
+        command.TraceChain.Add(new TraceNode("Customer", 1001, "what: create customer 1001"));
+        var service = Service(transport, sink);
+        if (failure) await Assert.ThrowsAsync<SqlExecutorException>(() => service.MutateAsync(new InsertMutationRequest(command)));
+        else Assert.Equal(1UL, (await service.MutateAsync(new InsertMutationRequest(command))).AffectedRows);
+        var entry = Assert.Single(sink.Entries);
+        Assert.Equal(failure ? "failure" : "success", entry.ExecutionOutcome);
+        Assert.Equal("what: create customer [REDACTED]", entry.AuditReason);
+        Assert.DoesNotContain("customer 1001", sink.Text.ToString());
+        Assert.Contains("1001", sink.Text.ToString());
+        Assert.Contains(transport.Writes.Last().Params, value => value.TryI64() == 1001);
+        Assert.Equal("what: create customer 1001", command.TraceChain.Last().Comment);
+    }
+
+    [Fact]
+    public async Task UpdateTargetIdMasksIntentButRemainsPlainInCompiledSql()
+    {
+        var transport = new Transport { Rows = new() {
+            new Record { ["id"] = new Value.I64Value(1001), ["name"] = new Value.TextValue("Riverside") } } };
+        var sink = new Sink();
+        var command = new UpdateCommand("Customer", new Value.I64Value(1001)).Value("name", "Riverside");
+        command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001"));
+        var result = await Service(transport, sink).MutateAsync(new UpdateMutationRequest(command));
+        Assert.Equal(1UL, result.AffectedRows);
+        var entry = Assert.Single(sink.Entries);
+        Assert.Equal("what: update customer [REDACTED]", entry.AuditReason);
+        Assert.DoesNotContain("customer 1001", sink.Text.ToString());
+        Assert.Contains("1001", sink.Text.ToString());
+        Assert.Contains(transport.Writes.Last().Params, value => value.TryI64() == 1001);
+        Assert.Equal("what: update customer 1001", command.TraceChain.Last().Comment);
+    }
+
+    [Fact]
+    public async Task ExplicitSqlDebugStillHidesTargetIdFromIntent()
+    {
+        const string flag = "TEAQL_ALLOW_SENSITIVE_PLAINTEXT_LOGS";
+        var previous = Environment.GetEnvironmentVariable(flag);
+        try
+        {
+            Environment.SetEnvironmentVariable(flag, "I_UNDERSTAND_SENSITIVE_DATA_MAY_BE_WRITTEN_TO_DISK");
+            var transport = new Transport { Rows = new() {
+                new Record { ["id"] = new Value.I64Value(1001), ["name"] = new Value.TextValue("Riverside") } } };
+            var sensitive = new SensitiveSink();
+            var command = new UpdateCommand("Customer", new Value.I64Value(1001)).Value("name", "Riverside");
+            command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001"));
+            await Service(transport, new Sink(), sensitiveSink: sensitive).MutateAsync(new UpdateMutationRequest(command));
+            var entry = Assert.Single(sensitive.Entries);
+            Assert.Equal("what: update customer [REDACTED]", entry.AuditReason);
+            Assert.Contains("1001", entry.DebugQuery);
+            Assert.DoesNotContain("IntentValues", System.Text.Json.JsonSerializer.Serialize(entry));
+        }
+        finally { Environment.SetEnvironmentVariable(flag, previous); }
+    }
 
     [Theory]
     [InlineData("error", false)][InlineData("error", true)]

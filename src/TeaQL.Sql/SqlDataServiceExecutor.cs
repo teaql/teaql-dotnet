@@ -182,7 +182,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         }
         catch (Exception ex)
         {
-            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc);
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
@@ -213,7 +213,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
             ParameterLogPolicies = compiled.ParameterLogPolicies,
-            GeneratedSql = compiled.GeneratedSql
+            GeneratedSql = compiled.GeneratedSql,
+            IntentValues = SqlStatementDiagnostics.MutationTargetIds(request, entityDesc)
         };
 
         return new MutationResult
@@ -636,7 +637,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         }
         catch (Exception ex)
         {
-            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc);
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
@@ -667,7 +668,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             ParameterizedQuery = compiled.Sql,
             Parameters = compiled.Params.ToList(),
             ParameterLogPolicies = compiled.ParameterLogPolicies,
-            GeneratedSql = compiled.GeneratedSql
+            GeneratedSql = compiled.GeneratedSql,
+            IntentValues = SqlStatementDiagnostics.MutationTargetIds(request, entityDesc)
         };
 
         Record? persistedRecord = null;

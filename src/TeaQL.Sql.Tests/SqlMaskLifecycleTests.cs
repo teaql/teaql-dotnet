@@ -65,6 +65,7 @@ public class SqlMaskLifecycleTests
         dialect.Setup(d => d.CompileInsert(entity, It.IsAny<InsertCommand>())).Returns(compiled);
         dialect.Setup(d => d.CompileUpdate(entity, It.IsAny<UpdateCommand>())).Returns(compiled);
         dialect.Setup(d => d.CompileDelete(entity, It.IsAny<DeleteCommand>())).Returns(compiled);
+        dialect.Setup(d => d.CompileRecover(entity, It.IsAny<RecoverCommand>())).Returns(compiled);
         IDataService provider = transaction
             ? new SqlDataServiceTransaction(dialect.Object, transport, schema.Object)
             : new SqlDataServiceExecutor(dialect.Object, transport, schema.Object);
@@ -77,6 +78,32 @@ public class SqlMaskLifecycleTests
     private static QueryRequest Request() => new(new SelectQuery("Customer").Limit(5)) {
         Comment = "what: inspect customers", Purpose = "why: lifecycle regression"
     };
+
+    [Theory]
+    [InlineData(false, "update")][InlineData(true, "update")]
+    [InlineData(false, "delete")][InlineData(true, "delete")]
+    [InlineData(false, "recover")][InlineData(true, "recover")]
+    public async Task MutationTargetIdIsPrivateSqlIntentButDoesNotChangeBindings(bool failure, string operation)
+    {
+        var transport = new Transport { AffectedRows = 0,
+            Failure = failure ? new InvalidOperationException("driver failed") : null };
+        var (service, log) = Fixture(false, transport);
+        MutationRequest request = operation switch {
+            "update" => new UpdateMutationRequest(new UpdateCommand("Customer", new Value.I64Value(1001))),
+            "delete" => new DeleteMutationRequest(new DeleteCommand("Customer", new Value.I64Value(1001))),
+            _ => new RecoverMutationRequest(new RecoverCommand { Entity = "Customer", Id = new Value.I64Value(1001), ExpectedVersionValue = -3 })
+        };
+        switch (request) {
+            case UpdateMutationRequest update: update.Command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001")); break;
+            case DeleteMutationRequest delete: delete.Command.TraceChain.Add(new TraceNode("Customer", 1001, "what: delete customer 1001")); break;
+            case RecoverMutationRequest recover: recover.Command.TraceChain.Add(new TraceNode("Customer", 1001, "what: recover customer 1001")); break;
+        }
+        if (failure) await Assert.ThrowsAsync<SqlExecutorException>(() => service.MutateAsync(request));
+        else await service.MutateAsync(request);
+        Assert.Contains("customer [REDACTED]", log.ToString());
+        Assert.DoesNotContain("customer 1001", log.ToString());
+        Assert.Contains("1 Runtime Road", log.ToString());
+    }
 
     [Fact]
     public async Task LegacyGeneratedLibraryMasksAllParametersInDefaultSqlLog()

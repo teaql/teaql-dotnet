@@ -113,7 +113,9 @@ internal static class LogPrivacy
             var safeIntent = Project(intentSource, allowPlaintext);
             for (int i = 0; i < intentSource.Parameters.Count; i++)
                 if (safeIntent.MaskedParameters[i]) sensitive.AddRange(Strings(intentSource.Parameters[i].ToJsonValue()));
+            sensitive.AddRange(intentSource.IntentValues.SelectMany(value => Strings(value.ToJsonValue())));
         }
+        sensitive.AddRange(source.IntentValues.SelectMany(value => Strings(value.ToJsonValue())));
         var secrets = sensitive.Where(s => s.Length > 0).Distinct().OrderByDescending(s => s.Length).ToArray();
         string? Scrub(string? text)
         {
