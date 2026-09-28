@@ -16,6 +16,39 @@ public class SqlMaskingBindingsTests
         .AuditMaskFields(new() { "display_name" });
 
     [Fact]
+    public void LegacyDescriptorWithoutMaskMetadataFailsClosed()
+    {
+        var legacy = EntityDescriptor.New("Customer")
+            .Property(PropertyDescriptor.New("display_name", DataType.Text))
+            .Property(PropertyDescriptor.New("password", DataType.Text));
+        var compiled = _dialect.CompileSelect(legacy, new SelectQuery("Customer")
+            .Filter(Expr.And(new List<Expr> {
+                Expr.Eq("display_name", "CUSTOMER-CANARY"),
+                Expr.Eq("password", "PASSWORD-CANARY")
+            })).Limit(1));
+        Assert.Equal(new[] { SqlParameterLogPolicy.Unknown, SqlParameterLogPolicy.Credential },
+            compiled.ParameterLogPolicies);
+        Assert.True(compiled.GeneratedSql);
+        Assert.Equal("CUSTOMER-CANARY", compiled.Params[0].TryText());
+    }
+
+    [Fact]
+    public void ExplicitEmptyMaskMetadataAllowsOnlyOrdinaryFields()
+    {
+        var entity = EntityDescriptor.New("Customer")
+            .Property(PropertyDescriptor.New("display_name", DataType.Text))
+            .Property(PropertyDescriptor.New("password", DataType.Text))
+            .AuditMaskFields(new());
+        var compiled = _dialect.CompileSelect(entity, new SelectQuery("Customer")
+            .Filter(Expr.And(new List<Expr> {
+                Expr.Eq("display_name", "CUSTOMER-CANARY"),
+                Expr.Eq("password", "PASSWORD-CANARY")
+            })).Limit(1));
+        Assert.Equal(new[] { SqlParameterLogPolicy.Plain, SqlParameterLogPolicy.Credential },
+            compiled.ParameterLogPolicies);
+    }
+
+    [Fact]
     public void CompilerPropagatesCanonicalFieldPolicyThroughPredicates()
     {
         var entity = Entity();
@@ -70,7 +103,7 @@ public class SqlMaskingBindingsTests
         var expr = new Expr.SubQueryExpr(Expr.Column("display_name"), BinaryOp.In, inner,
             new SelectQuery("Status").Filter(Expr.Eq("name", "PUBLIC-STATUS")).Limit(1));
         var compiled = _dialect.CompileSelect(Entity(), new SelectQuery("Customer").Filter(expr).Limit(10));
-        Assert.Equal(new[] { SqlParameterLogPolicy.Plain }, compiled.ParameterLogPolicies);
+        Assert.Equal(new[] { SqlParameterLogPolicy.Unknown }, compiled.ParameterLogPolicies);
     }
 
     [Fact]

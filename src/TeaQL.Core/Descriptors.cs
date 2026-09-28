@@ -57,6 +57,9 @@ public record EntityDescriptor
     public List<PropertyDescriptor> Properties { get; init; } = new();
     public List<RelationDescriptor> Relations { get; init; } = new();
     public List<string> AuditMaskFieldList { get; init; } = new();
+    // Old generated libraries do not declare a complete SQL log field policy.
+    // An explicitly empty list is different: it means all ordinary fields are public.
+    public bool HasExplicitSqlLogPolicyMetadata { get; init; }
     public int? AuditValueMaxLenValue { get; init; }
 
     public static EntityDescriptor New(string name)
@@ -80,7 +83,11 @@ public record EntityDescriptor
         Relations.Add(relation);
         return this;
     }
-    public EntityDescriptor AuditMaskFields(List<string> fields) => this with { AuditMaskFieldList = fields };
+    public EntityDescriptor AuditMaskFields(List<string> fields) => this with
+    {
+        AuditMaskFieldList = fields,
+        HasExplicitSqlLogPolicyMetadata = true
+    };
     public EntityDescriptor AuditValueMaxLen(int? maxLen) => this with { AuditValueMaxLenValue = maxLen };
 
     public PropertyDescriptor? PropertyByName(string name) => Properties.FirstOrDefault(p => p.Name == name);

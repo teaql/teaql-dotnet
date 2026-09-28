@@ -38,7 +38,7 @@ public class QueryController : ControllerBase
                 new PropertyDescriptor("status", DataType.Text, false, "status_col", true, false),
                 new PropertyDescriptor("createdAt", DataType.Timestamp, false, "created_at", true, false)
             }
-        };
+        }.AuditMaskFields(new()); // This hand-written example explicitly classifies both demo fields as public.
         
         // Instantiate the Dialect and compile
         var dialect = new PostgreSqlDialect();

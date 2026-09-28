@@ -42,6 +42,8 @@ public static class SqlLogBindings
         if (property == null) return SqlParameterLogPolicy.Unknown;
         if (SensitiveLogNames.IsCredential(property.Name) || SensitiveLogNames.IsCredential(property.ColumnNameString))
             return SqlParameterLogPolicy.Credential;
+        if (!entity.HasExplicitSqlLogPolicyMetadata)
+            return SqlParameterLogPolicy.Unknown;
         return entity.AuditMaskFieldList.Contains(property.Name) ? SqlParameterLogPolicy.Masked : SqlParameterLogPolicy.Plain;
     }
     private static SqlParameterLogPolicy? Combine(SqlParameterLogPolicy? left, SqlParameterLogPolicy? right)

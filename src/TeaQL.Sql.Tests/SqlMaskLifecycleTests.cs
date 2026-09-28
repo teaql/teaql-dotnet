@@ -47,13 +47,13 @@ public class SqlMaskLifecycleTests
     }
 
     private static (RuntimeDataService Service, StringWriter Log) Fixture(bool transaction, Transport transport,
-        Action<UserContext>? configure = null)
+        Action<UserContext>? configure = null, bool legacy = false)
     {
         var entity = EntityDescriptor.New("Customer") // Compiled fixture bypasses allocator.
             .Property(PropertyDescriptor.New("name", DataType.Text))
             .Property(PropertyDescriptor.New("address", DataType.Text))
-            .Property(PropertyDescriptor.New("password", DataType.Text))
-            .AuditMaskFields(new() { "name" });
+            .Property(PropertyDescriptor.New("password", DataType.Text));
+        if (!legacy) entity = entity.AuditMaskFields(new() { "name" });
         var schema = new Mock<ISchemaProvider>();
         schema.Setup(s => s.GetEntity("Customer")).Returns(entity);
         var dialect = new Mock<SqlDialect>();
@@ -77,6 +77,21 @@ public class SqlMaskLifecycleTests
     private static QueryRequest Request() => new(new SelectQuery("Customer").Limit(5)) {
         Comment = "what: inspect customers", Purpose = "why: lifecycle regression"
     };
+
+    [Fact]
+    public async Task LegacyGeneratedLibraryMasksAllParametersInDefaultSqlLog()
+    {
+        var (service, log) = Fixture(false, new Transport(), legacy: true);
+        await service.QueryAsync(Request());
+        var output = log.ToString();
+        Assert.Contains("MASKED; NOT REPLAYABLE", output);
+        Assert.Contains("[REDACTED]", output);
+        Assert.DoesNotContain("Riverside", output);
+        Assert.DoesNotContain("1 Runtime Road", output);
+        Assert.DoesNotContain("PASSWORD-CANARY", output);
+        Assert.Contains("comment=what: inspect customers", output);
+        Assert.Contains("purpose=why: lifecycle regression", output);
+    }
     private static void AssertLog(StringWriter log, string outcome)
     {
         var text = log.ToString();
