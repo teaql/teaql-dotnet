@@ -102,6 +102,40 @@ public class RuntimeTelemetryTests
     }
 
     [Fact]
+    public void OfficialSdkFailureDoesNotExportDriverErrorMessages()
+    {
+        var spans = new List<Activity>();
+        var logs = new List<LogRecord>();
+        using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+            .AddSource("io.teaql.runtime")
+            .AddInMemoryExporter(spans)
+            .Build();
+        using var loggerFactory = LoggerFactory.Create(builder => builder.AddOpenTelemetry(
+            options => options.AddInMemoryExporter(logs)));
+        using var telemetry = new OpenTelemetryRuntimeTelemetry(
+            logger: loggerFactory.CreateLogger("TeaQL.Runtime"));
+
+        var scope = telemetry.StartSafely(RuntimeOperation.Create("provider", "sqlite.query"));
+        scope.Failure(new InvalidOperationException(
+            "SQL failed for password=OTEL-FAILURE-CANARY"));
+        tracerProvider.ForceFlush();
+
+        var span = Assert.Single(spans);
+        var log = Assert.Single(logs);
+        Assert.Contains(span.Tags, tag =>
+            tag.Key == "teaql.error.type" && tag.Value == "InvalidOperationException");
+        Assert.Contains(log.Attributes ?? [], attribute =>
+            attribute.Key == "teaql.operation.outcome" && Equals(attribute.Value, "failure"));
+        Assert.DoesNotContain("OTEL-FAILURE-CANARY", string.Join(" ",
+            span.TagObjects.Select(tag => $"{tag.Key}={tag.Value}")));
+        Assert.DoesNotContain("OTEL-FAILURE-CANARY", span.StatusDescription ?? "");
+        Assert.DoesNotContain("OTEL-FAILURE-CANARY", string.Join(" ", span.Events));
+        Assert.DoesNotContain("OTEL-FAILURE-CANARY", log.FormattedMessage ?? "");
+        Assert.DoesNotContain("OTEL-FAILURE-CANARY", string.Join(" ",
+            (log.Attributes ?? []).Select(attribute => $"{attribute.Key}={attribute.Value}")));
+    }
+
+    [Fact]
     public async Task RuntimeDataServiceProducesQueryAndNestedProviderSpans()
     {
         var spans = new List<Activity>();
