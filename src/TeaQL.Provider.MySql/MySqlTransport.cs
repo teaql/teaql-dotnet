@@ -10,10 +10,11 @@ using TeaQL.Sql;
 
 namespace TeaQL.Provider.MySql;
 
-public class MySqlTransport : IStreamingSqlTransport, ISchemaIndexInstaller, IDisposable
+public class MySqlTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport, ISchemaIndexInstaller, IDisposable
 {
     private readonly MySqlConnection _connection;
     private readonly bool _ownsConnection;
+    private readonly string _connectionString;
 
     public MySqlTransport(string connectionString)
     {
@@ -22,12 +23,14 @@ public class MySqlTransport : IStreamingSqlTransport, ISchemaIndexInstaller, IDi
             DateTimeKind = MySqlDateTimeKind.Utc
         };
         _connection = new MySqlConnection(builder.ConnectionString);
+        _connectionString = builder.ConnectionString;
         _ownsConnection = true;
     }
 
     public MySqlTransport(MySqlConnection connection, bool ownsConnection = false)
     {
         _connection = connection;
+        _connectionString = connection.ConnectionString;
         _ownsConnection = ownsConnection;
     }
 
@@ -108,6 +111,85 @@ public class MySqlTransport : IStreamingSqlTransport, ISchemaIndexInstaller, IDi
 
         var affectedRows = await cmd.ExecuteNonQueryAsync();
         return (ulong)Math.Max(0, affectedRows);
+    }
+
+    public async Task<ISqlTransaction> BeginSqlAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_connectionString))
+            throw new NotSupportedException("MySQL transactions require a reusable connection string");
+
+        // A graph mutation owns its connection so concurrent contexts cannot
+        // accidentally execute on another context's transaction.
+        var connection = new MySqlConnection(_connectionString);
+        try
+        {
+            await connection.OpenAsync();
+            var transaction = await connection.BeginTransactionAsync();
+            return new Transaction(connection, transaction, this);
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
+    }
+
+    private sealed class Transaction : ISqlTransaction
+    {
+        private readonly MySqlConnection _connection;
+        private readonly MySqlTransaction _transaction;
+        private readonly MySqlTransport _owner;
+
+        public Transaction(MySqlConnection connection, MySqlTransaction transaction, MySqlTransport owner)
+        {
+            _connection = connection;
+            _transaction = transaction;
+            _owner = owner;
+        }
+
+        public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
+        {
+            using var command = CreateCommand(query);
+            using var reader = await command.ExecuteReaderAsync();
+            var records = new List<Record>();
+            while (await reader.ReadAsync())
+            {
+                var record = new Record();
+                for (var index = 0; index < reader.FieldCount; index++)
+                    record[reader.GetName(index)] = _owner.ConvertFromDbValue(reader.GetValue(index));
+                records.Add(record);
+            }
+            return records;
+        }
+
+        public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
+        {
+            using var command = CreateCommand(query);
+            return (ulong)Math.Max(0, await command.ExecuteNonQueryAsync());
+        }
+
+        private MySqlCommand CreateCommand(CompiledQuery query)
+        {
+            var command = _connection.CreateCommand();
+            command.Transaction = _transaction;
+            command.CommandText = query.SqlWithComment();
+            foreach (var value in query.Params)
+            {
+                var parameter = command.CreateParameter();
+                parameter.Value = _owner.ConvertValue(value);
+                command.Parameters.Add(parameter);
+            }
+            return command;
+        }
+
+        public Task CommitSqlAsync() => _transaction.CommitAsync();
+        public Task RollbackSqlAsync() => _transaction.RollbackAsync();
+
+        public void Dispose()
+        {
+            _transaction.Dispose();
+            _connection.Dispose();
+        }
     }
 
     public async Task EnsureSchemaIndexesAsync(SqlDialect dialect, EntityDescriptor entity)

@@ -30,6 +30,24 @@ public class ProviderMaskingTests
     }
 
     [Fact]
+    public async Task PostgreSqlTransactionCommitsAndRollsBackWhenConfigured()
+    {
+        var url = LiveUrl("TEAQL_TEST_POSTGRES_URL");
+        if (url is null) return;
+        await using var dataSource = NpgsqlDataSource.Create(url);
+        await VerifyTransactionAsync(new PostgreSqlDialect(), new PostgreSqlTransport(dataSource));
+    }
+
+    [Fact]
+    public async Task MySqlTransactionCommitsAndRollsBackWhenConfigured()
+    {
+        var url = LiveUrl("TEAQL_TEST_MYSQL_URL");
+        if (url is null) return;
+        using var transport = new MySqlTransport(url);
+        await VerifyTransactionAsync(new MySqlDialect(), transport);
+    }
+
+    [Fact]
     public async Task MySqlEnsureSchemaRejectsSameNameWrongShapeIndexWhenConfigured()
     {
         var url = LiveUrl("TEAQL_TEST_MYSQL_URL");
@@ -127,6 +145,41 @@ public class ProviderMaskingTests
         {
             await transport.ExecuteSqlAsync(new CompiledQuery(
                 "DROP TABLE IF EXISTS " + dialect.QuoteIdent(table), new List<Value>()));
+        }
+    }
+
+    private static async Task VerifyTransactionAsync(SqlDialect dialect, ISqlTransport transport)
+    {
+        var transactional = Assert.IsAssignableFrom<ISqlTransactionTransport>(transport);
+        var table = "teaql_tx_" + Guid.NewGuid().ToString("N")[..12];
+        var quoted = dialect.QuoteIdent(table);
+        await transport.ExecuteSqlAsync(new CompiledQuery(
+            $"CREATE TABLE {quoted} (id BIGINT PRIMARY KEY, display_name VARCHAR(100))", new List<Value>()));
+        try
+        {
+            using (var transaction = await transactional.BeginSqlAsync())
+            {
+                await transaction.ExecuteSqlAsync(new CompiledQuery(
+                    $"INSERT INTO {quoted} (id, display_name) VALUES (1, 'rolled back')", new List<Value>()));
+                Assert.Single(await transaction.FetchAllSqlAsync(new CompiledQuery(
+                    $"SELECT id FROM {quoted}", new List<Value>())));
+                await transaction.RollbackSqlAsync();
+            }
+            Assert.Empty(await transport.FetchAllSqlAsync(new CompiledQuery(
+                $"SELECT id FROM {quoted}", new List<Value>())));
+
+            using (var transaction = await transactional.BeginSqlAsync())
+            {
+                await transaction.ExecuteSqlAsync(new CompiledQuery(
+                    $"INSERT INTO {quoted} (id, display_name) VALUES (2, 'committed')", new List<Value>()));
+                await transaction.CommitSqlAsync();
+            }
+            Assert.Single(await transport.FetchAllSqlAsync(new CompiledQuery(
+                $"SELECT id FROM {quoted}", new List<Value>())));
+        }
+        finally
+        {
+            await transport.ExecuteSqlAsync(new CompiledQuery($"DROP TABLE IF EXISTS {quoted}", new List<Value>()));
         }
     }
 }
