@@ -10,10 +10,11 @@ using TeaQL.Sql;
 
 namespace TeaQL.Provider.MySql;
 
-public class MySqlTransport : IStreamingSqlTransport, IDisposable
+public class MySqlTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport, ISchemaIndexInstaller, IDisposable
 {
     private readonly MySqlConnection _connection;
     private readonly bool _ownsConnection;
+    private readonly string _connectionString;
 
     public MySqlTransport(string connectionString)
     {
@@ -22,12 +23,14 @@ public class MySqlTransport : IStreamingSqlTransport, IDisposable
             DateTimeKind = MySqlDateTimeKind.Utc
         };
         _connection = new MySqlConnection(builder.ConnectionString);
+        _connectionString = builder.ConnectionString;
         _ownsConnection = true;
     }
 
     public MySqlTransport(MySqlConnection connection, bool ownsConnection = false)
     {
         _connection = connection;
+        _connectionString = connection.ConnectionString;
         _ownsConnection = ownsConnection;
     }
 
@@ -108,6 +111,146 @@ public class MySqlTransport : IStreamingSqlTransport, IDisposable
 
         var affectedRows = await cmd.ExecuteNonQueryAsync();
         return (ulong)Math.Max(0, affectedRows);
+    }
+
+    public async Task<ISqlTransaction> BeginSqlAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_connectionString))
+            throw new NotSupportedException("MySQL transactions require a reusable connection string");
+
+        // A graph mutation owns its connection so concurrent contexts cannot
+        // accidentally execute on another context's transaction.
+        var connection = new MySqlConnection(_connectionString);
+        try
+        {
+            await connection.OpenAsync();
+            var transaction = await connection.BeginTransactionAsync();
+            return new Transaction(connection, transaction, this);
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
+    }
+
+    private sealed class Transaction : ISqlTransaction
+    {
+        private readonly MySqlConnection _connection;
+        private readonly MySqlTransaction _transaction;
+        private readonly MySqlTransport _owner;
+
+        public Transaction(MySqlConnection connection, MySqlTransaction transaction, MySqlTransport owner)
+        {
+            _connection = connection;
+            _transaction = transaction;
+            _owner = owner;
+        }
+
+        public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
+        {
+            using var command = CreateCommand(query);
+            using var reader = await command.ExecuteReaderAsync();
+            var records = new List<Record>();
+            while (await reader.ReadAsync())
+            {
+                var record = new Record();
+                for (var index = 0; index < reader.FieldCount; index++)
+                    record[reader.GetName(index)] = _owner.ConvertFromDbValue(reader.GetValue(index));
+                records.Add(record);
+            }
+            return records;
+        }
+
+        public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
+        {
+            using var command = CreateCommand(query);
+            return (ulong)Math.Max(0, await command.ExecuteNonQueryAsync());
+        }
+
+        private MySqlCommand CreateCommand(CompiledQuery query)
+        {
+            var command = _connection.CreateCommand();
+            command.Transaction = _transaction;
+            command.CommandText = query.SqlWithComment();
+            foreach (var value in query.Params)
+            {
+                var parameter = command.CreateParameter();
+                parameter.Value = _owner.ConvertValue(value);
+                command.Parameters.Add(parameter);
+            }
+            return command;
+        }
+
+        public Task CommitSqlAsync() => _transaction.CommitAsync();
+        public Task RollbackSqlAsync() => _transaction.RollbackAsync();
+
+        public void Dispose()
+        {
+            _transaction.Dispose();
+            _connection.Dispose();
+        }
+    }
+
+    public async Task EnsureSchemaIndexesAsync(SqlDialect dialect, EntityDescriptor entity)
+    {
+        if (dialect.Kind != DatabaseKind.MySql)
+            throw new ArgumentException("MySQL index installer requires a MySQL dialect", nameof(dialect));
+
+        var specs = dialect.SchemaIndexSpecs(entity);
+        // MySQL has no CREATE INDEX IF NOT EXISTS. Check every existing shape
+        // before making any non-transactional DDL change.
+        var missing = new List<SchemaIndexSpec>();
+        foreach (var spec in specs)
+        {
+            var existing = await IndexShapeAsync(spec);
+            if (existing == null) missing.Add(spec);
+            else if (!existing.Value)
+                throw new InvalidOperationException($"Existing MySQL index {spec.Name} on {spec.Table} has an incompatible shape");
+        }
+
+        foreach (var spec in missing)
+        {
+            var columns = string.Join(", ", spec.Columns.Select(column =>
+                dialect.QuoteIdent(column.Name) + (column.Descending ? " DESC" : "")));
+            var sql = $"CREATE {(spec.Unique ? "UNIQUE " : "")}INDEX {dialect.QuoteIdent(spec.Name)} " +
+                $"ON {dialect.QuoteIdent(spec.Table)} ({columns})";
+            try
+            {
+                await ExecuteSqlAsync(new CompiledQuery(sql, new List<Value>()));
+            }
+            catch (MySqlException ex) when (ex.Number == 1061)
+            {
+                if (await IndexShapeAsync(spec) != true)
+                    throw new InvalidOperationException($"Concurrent MySQL index {spec.Name} has an incompatible shape", ex);
+            }
+        }
+    }
+
+    // null = missing; false = same name but incompatible columns/uniqueness/order.
+    private async Task<bool?> IndexShapeAsync(SchemaIndexSpec spec)
+    {
+        await EnsureConnectionOpenAsync();
+        using var cmd = _connection.CreateCommand();
+        cmd.CommandText = "SELECT NON_UNIQUE, COLUMN_NAME, COLLATION, SUB_PART, INDEX_TYPE " +
+            "FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() " +
+            "AND TABLE_NAME = @table AND INDEX_NAME = @index ORDER BY SEQ_IN_INDEX";
+        cmd.Parameters.AddWithValue("@table", spec.Table);
+        cmd.Parameters.AddWithValue("@index", spec.Name);
+        using var reader = await cmd.ExecuteReaderAsync();
+        var position = 0;
+        var matches = true;
+        while (await reader.ReadAsync())
+        {
+            if (position >= spec.Columns.Count) { matches = false; position++; continue; }
+            var column = spec.Columns[position++];
+            matches &= Convert.ToInt32(reader.GetValue(0)) == (spec.Unique ? 0 : 1)
+                && !reader.IsDBNull(1) && string.Equals(reader.GetString(1), column.Name, StringComparison.OrdinalIgnoreCase)
+                && !reader.IsDBNull(2) && reader.GetString(2) == (column.Descending ? "D" : "A")
+                && reader.IsDBNull(3)
+                && string.Equals(reader.GetString(4), "BTREE", StringComparison.OrdinalIgnoreCase);
+        }
+        return position == 0 ? null : matches && position == spec.Columns.Count;
     }
 
     private object ConvertValue(Value value)

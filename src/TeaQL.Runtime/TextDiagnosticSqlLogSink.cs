@@ -16,6 +16,7 @@ public sealed class TextDiagnosticSqlLogSink : IDiagnosticSqlLogSink
 
     public void Write(ExecutionMetadata metadata)
     {
+        if (metadata.Statements.Count > 0) { foreach (var child in metadata.Statements) Write(child); return; }
         metadata = LogPrivacy.Project(metadata);
         var elapsed = metadata.EndedAt - metadata.StartedAt;
         var elapsedMicros = (long)(elapsed.TotalMilliseconds * 1_000);
@@ -24,9 +25,9 @@ public sealed class TextDiagnosticSqlLogSink : IDiagnosticSqlLogSink
             : metadata.AffectedRows is not null ? $"{metadata.AffectedRows} rows affected" : "";
         lock (_gate)
         {
-            _writer.WriteLine($"[TeaQL SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us] {summary}");
+            _writer.WriteLine($"[TeaQL SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us] {summary} outcome={metadata.ExecutionOutcome ?? "unknown"} parameterCount={metadata.ParameterCount}");
             _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)}");
-            _writer.WriteLine($"Parameterized SQL: {metadata.ParameterizedQuery} parameterCount={metadata.ParameterCount}");
+            _writer.WriteLine($"SQL: {metadata.DebugQuery}");
         }
     }
 }
@@ -40,12 +41,13 @@ public sealed class SensitiveDiagnosticSqlLogSink : ISensitiveDiagnosticSqlLogSi
 
     public void Write(ExecutionMetadata metadata)
     {
+        if (metadata.Statements.Count > 0) { foreach (var child in metadata.Statements) Write(child); return; }
         metadata = LogPrivacy.Project(metadata, LogPrivacy.PlaintextEnabled());
         var elapsedMicros = (long)((metadata.EndedAt - metadata.StartedAt).TotalMilliseconds * 1_000);
         lock (_gate)
         {
-            _writer.WriteLine($"[TeaQL SENSITIVE SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us]");
-            _writer.WriteLine($"Parameterized SQL: {metadata.ParameterizedQuery} params=[{string.Join(", ", metadata.Parameters)}]");
+            _writer.WriteLine($"[TeaQL SENSITIVE SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us] outcome={metadata.ExecutionOutcome ?? "unknown"} parameterCount={metadata.ParameterCount}");
+            _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)}");
             _writer.WriteLine($"Debug SQL: {metadata.DebugQuery}");
         }
     }

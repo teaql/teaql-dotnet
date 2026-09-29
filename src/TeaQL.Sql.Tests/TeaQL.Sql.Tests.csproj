@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeaQL.Sql\TeaQL.Sql.csproj" />
+    <ProjectReference Include="..\TeaQL.Runtime\TeaQL.Runtime.csproj" />
   </ItemGroup>
 
 </Project>

@@ -173,6 +173,6 @@ public static class DynamicSearch
     {
         foreach (var warning in warnings)
             if (warn != null) warn(warning);
-            else Console.Error.WriteLine(JsonSerializer.Serialize(warning));
+            else Console.Error.WriteLine(JsonSerializer.Serialize(warning with { FieldPath = "<omitted>" }));
     }
 }

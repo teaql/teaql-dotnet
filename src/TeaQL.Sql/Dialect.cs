@@ -53,6 +53,9 @@ public static class DialectUtils
     }
 }
 
+public sealed record SchemaIndexColumn(string Name, bool Descending = false);
+public sealed record SchemaIndexSpec(string Name, string Table, IReadOnlyList<SchemaIndexColumn> Columns, bool Unique = false);
+
 public abstract class SqlDialect
 {
     public virtual string RelationTopNPolicy => "window";
@@ -90,18 +93,18 @@ public abstract class SqlDialect
         return $"CREATE TABLE IF NOT EXISTS {QuoteIdent(entity.TableNameValue)} ({columns})";
     }
 
-    public virtual List<string> SchemaIndexesSqls(EntityDescriptor entity)
+    public virtual List<SchemaIndexSpec> SchemaIndexSpecs(EntityDescriptor entity)
     {
-        var sqls = new List<string>();
+        var specs = new List<SchemaIndexSpec>();
         var tableNameUpper = entity.TableNameValue.ToUpperInvariant();
-        var quotedTable = QuoteIdent(entity.TableNameValue);
 
         var versionCol = entity.Properties.FirstOrDefault(p => p.IsVersion);
         if (versionCol != null)
         {
             var idCol = entity.Properties.FirstOrDefault(p => p.IsId)?.ColumnNameString ?? "id";
             var idxName = $"PK_{tableNameUpper}_ID_VERSION";
-            sqls.Add($"CREATE UNIQUE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(idCol)}, {QuoteIdent(versionCol.ColumnNameString)})");
+            specs.Add(new SchemaIndexSpec(idxName, entity.TableNameValue,
+                new[] { new SchemaIndexColumn(idCol), new SchemaIndexColumn(versionCol.ColumnNameString) }, true));
         }
 
         foreach (var p in entity.Properties)
@@ -110,16 +113,26 @@ public abstract class SqlDialect
             {
                 var idxName = $"IDX_{tableNameUpper}_{p.ColumnNameString.ToUpperInvariant()}_ID_DESC";
                 var idCol = entity.Properties.FirstOrDefault(candidate => candidate.IsId)?.ColumnNameString ?? "id";
-                sqls.Add($"CREATE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(p.ColumnNameString)}, {QuoteIdent(idCol)} DESC)");
+                specs.Add(new SchemaIndexSpec(idxName, entity.TableNameValue,
+                    new[] { new SchemaIndexColumn(p.ColumnNameString), new SchemaIndexColumn(idCol, true) }));
             }
             else if (p.Name.EndsWith("Time") || p.Name.EndsWith("_time") ||
                 p.Name == "create_time" || p.Name == "update_time")
             {
                 var idxName = $"IDX_{tableNameUpper}_{p.ColumnNameString.ToUpperInvariant()}";
-                sqls.Add($"CREATE INDEX IF NOT EXISTS {QuoteIdent(idxName)} ON {quotedTable} ({QuoteIdent(p.ColumnNameString)})");
+                specs.Add(new SchemaIndexSpec(idxName, entity.TableNameValue,
+                    new[] { new SchemaIndexColumn(p.ColumnNameString) }));
             }
         }
-        return sqls;
+        return specs;
+    }
+
+    public virtual List<string> SchemaIndexesSqls(EntityDescriptor entity)
+    {
+        return SchemaIndexSpecs(entity).Select(spec =>
+            $"CREATE {(spec.Unique ? "UNIQUE " : "")}INDEX IF NOT EXISTS {QuoteIdent(spec.Name)} " +
+            $"ON {QuoteIdent(spec.Table)} ({string.Join(", ", spec.Columns.Select(column =>
+                QuoteIdent(column.Name) + (column.Descending ? " DESC" : "")))})").ToList();
     }
 
     public virtual string FallbackDefaultValueSql(DataType dataType)
@@ -148,7 +161,7 @@ public abstract class SqlDialect
 
     public virtual CompiledQuery CompileSelect(EntityDescriptor entity, SelectQuery query)
     {
-        var paramsList = new List<Value>();
+        var paramsList = SqlLogBindings.Create();
         var sql = CompileSelectSql(entity, query, paramsList);
         return new CompiledQuery(sql, paramsList, query.CommentText);
     }
@@ -157,6 +170,7 @@ public abstract class SqlDialect
     {
         if (!string.IsNullOrEmpty(query.RawSqlText))
         {
+            SqlLogBindings.MarkUntrusted(paramsList);
             return query.RawSqlText;
         }
         var projection = CompileProjection(entity, query, paramsList);
@@ -186,7 +200,7 @@ public abstract class SqlDialect
             {
                 if (property.DataType == DataType.Text || property.DataType == DataType.LargeText)
                 {
-                    paramsList.Add(new Value.TextValue(likeValue));
+                    SqlLogBindings.AddField(paramsList, entity, property, new Value.TextValue(likeValue));
                     orParts.Add($"{QuoteIdent(property.ColumnNameString)} LIKE {Placeholder(paramsList.Count)}");
                 }
             }
@@ -198,6 +212,7 @@ public abstract class SqlDialect
 
         if (query.RawSqlSearchCriteriaItems != null && query.RawSqlSearchCriteriaItems.Count > 0)
         {
+            SqlLogBindings.MarkUntrusted(paramsList);
             whereParts.AddRange(query.RawSqlSearchCriteriaItems);
         }
 
@@ -254,7 +269,7 @@ public abstract class SqlDialect
     {
         var columns = new List<string>();
         var placeholders = new List<string>();
-        var paramsList = new List<Value>();
+        var paramsList = SqlLogBindings.Create();
 
         foreach (var property in entity.Properties)
         {
@@ -265,7 +280,7 @@ public abstract class SqlDialect
                 {
                     value = new Value.TypedNullValue(property.DataType);
                 }
-                paramsList.Add(value);
+                SqlLogBindings.AddField(paramsList, entity, property, value);
                 placeholders.Add(Placeholder(paramsList.Count));
             }
         }
@@ -297,7 +312,7 @@ public abstract class SqlDialect
             throw SqlCompileException.EmptyMutation("batch_insert");
 
         var columnNames = columns.Select(p => QuoteIdent(p.ColumnNameString)).ToList();
-        var paramsList = new List<Value>();
+        var paramsList = SqlLogBindings.Create();
         var valuesClauses = new List<string>();
 
         foreach (var record in command.BatchValues)
@@ -313,7 +328,7 @@ public abstract class SqlDialect
                 {
                     value = new Value.TypedNullValue(property.DataType);
                 }
-                paramsList.Add(value);
+                SqlLogBindings.AddField(paramsList, entity, property, value);
                 rowPlaceholders.Add(Placeholder(paramsList.Count));
             }
             valuesClauses.Add($"({string.Join(", ", rowPlaceholders)})");
@@ -329,7 +344,7 @@ public abstract class SqlDialect
             ?? throw SqlCompileException.MissingIdProperty(entity.Name);
 
         var assignments = new List<string>();
-        var paramsList = new List<Value>();
+        var paramsList = SqlLogBindings.Create();
 
         foreach (var property in entity.Properties)
         {
@@ -342,7 +357,7 @@ public abstract class SqlDialect
                 {
                     value = new Value.TypedNullValue(property.DataType);
                 }
-                paramsList.Add(value);
+                SqlLogBindings.AddField(paramsList, entity, property, value);
                 assignments.Add($"{QuoteIdent(property.ColumnNameString)} = {Placeholder(paramsList.Count)}");
             }
         }
@@ -351,20 +366,20 @@ public abstract class SqlDialect
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
-            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value + 1));
+            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.Value + 1));
             assignments.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
         if (assignments.Count == 0)
             throw SqlCompileException.EmptyMutation("update");
 
-        paramsList.Add(command.Id);
+        SqlLogBindings.AddField(paramsList, entity, idProperty, command.Id);
         var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}" };
 
         if (command.ExpectedVersionValue.HasValue)
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
-            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
+            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.Value));
             predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
         AppendMutationGuards(entity, command.Guards, predicates, paramsList);
@@ -381,7 +396,7 @@ public abstract class SqlDialect
         var idProperty = entity.Properties.FirstOrDefault(p => p.IsId)
             ?? throw SqlCompileException.MissingIdProperty(entity.Name);
 
-        var paramsList = new List<Value>();
+        var paramsList = SqlLogBindings.Create();
         var setClauses = new List<string>();
 
         foreach (var fieldName in command.UpdateFields)
@@ -399,10 +414,10 @@ public abstract class SqlDialect
                 if (val is Value.NullValue)
                     val = new Value.TypedNullValue(property.DataType);
 
-                paramsList.Add(id);
+                SqlLogBindings.AddField(paramsList, entity, idProperty, id);
                 var idPh = Placeholder(paramsList.Count);
 
-                paramsList.Add(val);
+                SqlLogBindings.AddField(paramsList, entity, property, val);
                 var valPh = Placeholder(paramsList.Count);
 
                 caseParts.Add($"WHEN {idPh} THEN {valPh}");
@@ -426,10 +441,10 @@ public abstract class SqlDialect
                     hasVersions = true;
                     var id = command.BatchIds[i];
 
-                    paramsList.Add(id);
+                    SqlLogBindings.AddField(paramsList, entity, idProperty, id);
                     var idPh = Placeholder(paramsList.Count);
 
-                    paramsList.Add(new Value.I64Value(expVerOpt.Value + 1));
+                    SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(expVerOpt.Value + 1));
                     var valPh = Placeholder(paramsList.Count);
 
                     caseParts.Add($"WHEN {idPh} THEN {valPh}");
@@ -449,7 +464,7 @@ public abstract class SqlDialect
         var inPlaceholders = new List<string>();
         foreach (var id in command.BatchIds)
         {
-            paramsList.Add(id);
+            SqlLogBindings.AddField(paramsList, entity, idProperty, id);
             inPlaceholders.Add(Placeholder(paramsList.Count));
         }
 
@@ -466,10 +481,10 @@ public abstract class SqlDialect
                 {
                     var id = command.BatchIds[i];
 
-                    paramsList.Add(id);
+                    SqlLogBindings.AddField(paramsList, entity, idProperty, id);
                     var idPh = Placeholder(paramsList.Count);
 
-                    paramsList.Add(new Value.I64Value(expVerOpt.Value));
+                    SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(expVerOpt.Value));
                     var valPh = Placeholder(paramsList.Count);
 
                     caseParts.Add($"WHEN {idPh} THEN {valPh}");
@@ -488,21 +503,21 @@ public abstract class SqlDialect
     {
         var idProperty = entity.Properties.FirstOrDefault(p => p.IsId)
             ?? throw SqlCompileException.MissingIdProperty(entity.Name);
-        var paramsList = new List<Value>();
+        var paramsList = SqlLogBindings.Create();
 
         if (command.SoftDelete)
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
 
-            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.HasValue ? -(command.ExpectedVersionValue.Value + 1) : -1));
-            paramsList.Add(command.Id);
+            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.HasValue ? -(command.ExpectedVersionValue.Value + 1) : -1));
+            SqlLogBindings.AddField(paramsList, entity, idProperty, command.Id);
 
             var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}" };
 
             if (command.ExpectedVersionValue.HasValue)
             {
-                paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
+                SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.Value));
                 predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
             }
             AppendMutationGuards(entity, command.Guards, predicates, paramsList);
@@ -511,14 +526,14 @@ public abstract class SqlDialect
             return new CompiledQuery(sqlSoft, paramsList, null);
         }
 
-        paramsList.Add(command.Id);
+        SqlLogBindings.AddField(paramsList, entity, idProperty, command.Id);
         var preds = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}" };
 
         if (command.ExpectedVersionValue.HasValue)
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
-            paramsList.Add(new Value.I64Value(command.ExpectedVersionValue.Value));
+            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.Value));
             preds.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
         AppendMutationGuards(entity, command.Guards, preds, paramsList);
@@ -537,12 +552,10 @@ public abstract class SqlDialect
         var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
             ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
 
-        var paramsList = new List<Value>
-        {
-            new Value.I64Value(-command.ExpectedVersionValue + 1),
-            command.Id,
-            new Value.I64Value(command.ExpectedVersionValue)
-        };
+        var paramsList = SqlLogBindings.Create();
+        SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(-command.ExpectedVersionValue + 1));
+        SqlLogBindings.AddField(paramsList, entity, idProperty, command.Id);
+        SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue));
 
         var predicates = new List<string>
         {
@@ -563,7 +576,7 @@ public abstract class SqlDialect
         {
             var property = entity.Properties.FirstOrDefault(p => p.Name == field)
                 ?? throw SqlCompileException.UnknownField(field);
-            parameters.Add(guards[field]);
+            SqlLogBindings.AddField(parameters, entity, property, guards[field]);
             predicates.Add($"{QuoteIdent(property.ColumnNameString)} = {Placeholder(parameters.Count)}");
         }
     }
@@ -618,6 +631,7 @@ public abstract class SqlDialect
             .Concat(query.DynamicProperties ?? Enumerable.Empty<RawSqlProjection>());
         foreach (var projection in rawAndDyn)
         {
+            SqlLogBindings.MarkUntrusted(paramsList);
             parts.Add($"{projection.RawSqlSegment} AS {QuoteIdent(projection.PropertyName)}");
         }
 
@@ -651,6 +665,7 @@ public abstract class SqlDialect
             .Concat(query.DynamicProperties ?? Enumerable.Empty<RawSqlProjection>());
         foreach (var projection in rawAndDyn)
         {
+            SqlLogBindings.MarkUntrusted(paramsList);
             var aliased = $"{projection.RawSqlSegment} AS {QuoteIdent(projection.PropertyName)}";
             if (!parts.Contains(aliased)) parts.Add(aliased);
         }
@@ -696,12 +711,13 @@ public abstract class SqlDialect
 
     public virtual string CompileExpr(EntityDescriptor entity, Expr expr, List<Value> paramsList)
     {
+        using var logScope = SqlLogBindings.EnterExpression(paramsList, entity, expr);
         switch (expr)
         {
             case Expr.ColumnExpr col:
                 return ColumnSql(entity, col.Name);
             case Expr.ValueExpr val:
-                paramsList.Add(val.NodeValue);
+                SqlLogBindings.Add(paramsList, val.NodeValue);
                 return Placeholder(paramsList.Count);
             case Expr.FunctionExpr func:
                 return CompileFunction(entity, func.Fn, func.Args, paramsList);
@@ -810,6 +826,7 @@ public abstract class SqlDialect
             BinaryOp.NotIn or BinaryOp.NotInLarge => "NOT IN",
             _ => throw SqlCompileException.InvalidSubQueryOperator(op.ToString())
         };
+        using var logScope = SqlLogBindings.EnterSubquery(paramsList);
         var subquery = CompileSelectSql(subEntity, query, paramsList);
         return $"({lhs} {operatorSql} ({subquery}))";
     }
@@ -839,7 +856,7 @@ public abstract class SqlDialect
             var placeholders = new List<string>(listVal.Values.Count);
             foreach (var value in listVal.Values)
             {
-                paramsList.Add(value);
+                SqlLogBindings.Add(paramsList, value);
                 placeholders.Add(Placeholder(paramsList.Count));
             }
             return $"({lhs} {operatorSql} ({string.Join(", ", placeholders)}))";

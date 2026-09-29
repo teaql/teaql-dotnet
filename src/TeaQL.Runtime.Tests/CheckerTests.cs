@@ -115,6 +115,62 @@ public class CheckerTests
     }
 
     [Fact]
+    public async Task UpdateAuditReasonScrubsTargetIdGuardsAndOldValues()
+    {
+        var provider = new CountingDataService();
+        var sink = new CapturingAuditSink();
+        var context = new UserContext().WithDataService(provider).WithAppAuditEventSink(sink);
+        var command = new UpdateCommand("SchoolType", new Value.I64Value(1001))
+        {
+            OldValues = new Record { ["name"] = new Value.TextValue("OLD-VALUE-CANARY") }
+        };
+        command.Value("name", "NEW-VALUE-CANARY").Guard("code", new Value.TextValue("GUARD-VALUE-CANARY"));
+        command.TraceChain.Add(new TraceNode("SchoolType", 1001,
+            "update 1001 OLD-VALUE-CANARY NEW-VALUE-CANARY GUARD-VALUE-CANARY"));
+
+        await context.RequireResource<IDataService>().MutateAsync(new UpdateMutationRequest(command));
+
+        var audit = Assert.Single(sink.Events);
+        Assert.Equal(1001L, audit["entityId"]);
+        Assert.Equal("update [REDACTED] [REDACTED] [REDACTED] [REDACTED]", audit["reason"]);
+        Assert.Equal("OLD-VALUE-CANARY", command.OldValues["name"].TryText());
+        Assert.Equal("NEW-VALUE-CANARY", command.Values["name"].TryText());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DeleteAndRecoverAuditReasonsScrubTargetIdAndGuards(bool recover)
+    {
+        var provider = new CountingDataService();
+        var sink = new CapturingAuditSink();
+        var context = new UserContext().WithDataService(provider).WithAppAuditEventSink(sink);
+        MutationRequest request;
+        if (recover)
+        {
+            var command = new RecoverCommand
+            {
+                Entity = "SchoolType", Id = new Value.I64Value(1001), ExpectedVersionValue = 2
+            }.Guard("code", new Value.TextValue("GUARD-VALUE-CANARY"));
+            command.TraceChain.Add(new TraceNode("SchoolType", 1001, "recover 1001 GUARD-VALUE-CANARY"));
+            request = new RecoverMutationRequest(command);
+        }
+        else
+        {
+            var command = new DeleteCommand("SchoolType", new Value.I64Value(1001))
+                .Guard("code", new Value.TextValue("GUARD-VALUE-CANARY"));
+            command.TraceChain.Add(new TraceNode("SchoolType", 1001, "delete 1001 GUARD-VALUE-CANARY"));
+            request = new DeleteMutationRequest(command);
+        }
+
+        await context.RequireResource<IDataService>().MutateAsync(request);
+
+        var audit = Assert.Single(sink.Events);
+        Assert.Equal(1001L, audit["entityId"]);
+        Assert.Equal(recover ? "recover [REDACTED] [REDACTED]" : "delete [REDACTED] [REDACTED]", audit["reason"]);
+    }
+
+    [Fact]
     public async Task SuccessfulMutationWithoutAuditSinkIsNoOp()
     {
         var provider = new CountingDataService();

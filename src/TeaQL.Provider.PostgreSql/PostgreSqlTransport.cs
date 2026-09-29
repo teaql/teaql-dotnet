@@ -13,7 +13,7 @@ using TeaQL.Sql;
 
 namespace TeaQL.Provider.PostgreSql;
 
-public class PostgreSqlTransport : IStreamingSqlTransport
+public class PostgreSqlTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport
 {
     private readonly NpgsqlDataSource _dataSource;
 
@@ -80,6 +80,76 @@ public class PostgreSqlTransport : IStreamingSqlTransport
         
         var rowsAffected = await cmd.ExecuteNonQueryAsync();
         return (ulong)Math.Max(0, rowsAffected);
+    }
+
+    public async Task<ISqlTransaction> BeginSqlAsync()
+    {
+        var connection = await _dataSource.OpenConnectionAsync();
+        try
+        {
+            var transaction = await connection.BeginTransactionAsync();
+            return new Transaction(connection, transaction, this);
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
+    }
+
+    private sealed class Transaction : ISqlTransaction
+    {
+        private readonly NpgsqlConnection _connection;
+        private readonly NpgsqlTransaction _transaction;
+        private readonly PostgreSqlTransport _owner;
+
+        public Transaction(NpgsqlConnection connection, NpgsqlTransaction transaction, PostgreSqlTransport owner)
+        {
+            _connection = connection;
+            _transaction = transaction;
+            _owner = owner;
+        }
+
+        public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
+        {
+            await using var command = CreateCommand(query);
+            await using var reader = await command.ExecuteReaderAsync();
+            var records = new List<Record>();
+            while (await reader.ReadAsync())
+            {
+                var record = new Record();
+                for (var index = 0; index < reader.FieldCount; index++)
+                    record[reader.GetName(index)] = reader.IsDBNull(index)
+                        ? new Value.NullValue()
+                        : _owner.MapToValue(reader.GetValue(index));
+                records.Add(record);
+            }
+            return records;
+        }
+
+        public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
+        {
+            await using var command = CreateCommand(query);
+            return (ulong)Math.Max(0, await command.ExecuteNonQueryAsync());
+        }
+
+        private NpgsqlCommand CreateCommand(CompiledQuery query)
+        {
+            var command = _connection.CreateCommand();
+            command.Transaction = _transaction;
+            command.CommandText = query.SqlWithComment();
+            _owner.SetParameters(command, query.Params);
+            return command;
+        }
+
+        public Task CommitSqlAsync() => _transaction.CommitAsync();
+        public Task RollbackSqlAsync() => _transaction.RollbackAsync();
+
+        public void Dispose()
+        {
+            _transaction.Dispose();
+            _connection.Dispose();
+        }
     }
 
     private void SetParameters(NpgsqlCommand cmd, List<Value> parameters)

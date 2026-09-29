@@ -33,6 +33,30 @@ public class DynamicSearchTests
         Assert.Contains("\"fieldPath\"", json);
     }
 
+    [Fact]
+    public void DefaultWarningLogOmitsUntrustedPathButRetainsStructuredWarning()
+    {
+        const string path = "CLIENT_SECRET_FIELD_PATH_91";
+        var previous = Console.Error;
+        using var output = new StringWriter();
+        try
+        {
+            Console.SetError(output);
+            var result = DynamicSearch.Normalize(
+                "{\"filter\":{\"" + path + "\":\"SECRET_VALUE_99\"}}", "School", Models);
+            Assert.Equal(path, Assert.Single(result.Warnings).FieldPath);
+        }
+        finally
+        {
+            Console.SetError(previous);
+        }
+        Assert.Contains("DYNAMIC_SEARCH_UNKNOWN_FIELD", output.ToString());
+        using var logged = JsonDocument.Parse(output.ToString());
+        Assert.Equal("<omitted>", logged.RootElement.GetProperty("fieldPath").GetString());
+        Assert.DoesNotContain(path, output.ToString());
+        Assert.DoesNotContain("SECRET_VALUE_99", output.ToString());
+    }
+
     [Theory]
     [InlineData("[]")]
     [InlineData("{} {}")]

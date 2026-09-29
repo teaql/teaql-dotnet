@@ -112,11 +112,16 @@ public class UserContext
 
     internal void RecordExecutionMetadata(ExecutionMetadata? metadata)
     {
+        if (metadata?.Statements.Count > 0) { foreach (var child in metadata.Statements) RecordExecutionMetadata(child); return; }
         if (metadata == null) return;
         var query = metadata.Operation == DataServiceOperation.Query;
         if ((query && !QuerySqlLogEnabled) || (!query && !MutationSqlLogEnabled)) return;
-        SensitiveDiagnosticSqlLogSink?.Write(LogPrivacy.Project(metadata, LogPrivacy.PlaintextEnabled()));
-        DiagnosticSqlLogSink?.Write(LogPrivacy.Project(metadata));
+        // Diagnostic projection and application-owned sinks are fail-open.
+        // Never log the exception itself: it may contain unmasked SQL values.
+        try { SensitiveDiagnosticSqlLogSink?.Write(LogPrivacy.Project(metadata, LogPrivacy.PlaintextEnabled())); }
+        catch (Exception error) when (error is not OutOfMemoryException) { }
+        try { DiagnosticSqlLogSink?.Write(LogPrivacy.Project(metadata)); }
+        catch (Exception error) when (error is not OutOfMemoryException) { }
     }
 
     public UserContext WithDataService(IDataService provider)
