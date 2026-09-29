@@ -62,6 +62,7 @@ To ensure high extensibility and dependency isolation, this project adopts a mul
 *   **Core Architecture**: Provides a strong-typing system mapping mechanism based on the `Value` wrapper type, completely eliminating boxing/unboxing overheads and cross-database NULL handling issues, alongside a robust Entity Descriptor modeling system.
 *   **SQL Dialect Generator**: Highly secure SQL AST construction that dynamically translates into native parameterized SQL queries/commands for Sqlite, Postgres, and MySQL, inherently preventing SQL injection.
 *   **Unified Runtime Context**: A centralized `UserContext` runtime that natively supports chained storage propagation and dependency injection, ensuring environment variables seamlessly pass through various services alongside the request.
+*   **Governed Mutation Policy**: Customer policy reviews one immutable whole-graph mutation plan before the first provider write. Exact policy approval, warning codes, operation summaries, and policy identity are retained in application-audit evidence; policy denial is fail-closed while warning delivery is fail-open.
 *   **ASP.NET Core Web Endpoint**: Integrates instantly with `Microsoft.AspNetCore.Builder`, exposing underlying abstract data services as RESTful endpoints with just a few lines of code.
 *   **Redis Cache Decorator**: The `RedisDataServiceDecorator` enables transparent, underlying distributed caching for data interactions out-of-the-box.
 
@@ -131,4 +132,10 @@ The solution is natively built for .NET 8. You can build and test using the .NET
 ```bash
 dotnet build TeaQL.sln
 dotnet test src/TeaQL.Core.Tests/TeaQL.Core.Tests.csproj
+```
+
+Run the focused Mutation Policy example:
+
+```bash
+dotnet run --project examples/mutation-policy/mutation-policy.csproj
 ```

@@ -28,6 +28,7 @@ public class UserContext
     private readonly ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
     private readonly ConcurrentBag<object> _managedEntities = new();
     private readonly ConcurrentDictionary<string, IEntityChecker> _checkers = new();
+    private readonly MutationPolicyRuntimeState _mutationPolicy = new();
     private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
     private sealed class GraphSaveSession { }
     private readonly AsyncLocal<GraphSaveSession?> _ambientGraphSave = new();
@@ -177,6 +178,7 @@ public class UserContext
                 .BeginTransactionAsync().ConfigureAwait(false);
             _activeGraphSave = session;
             _ambientGraphSave.Value = session;
+            _mutationPolicy.BeginGraph();
             _graphFixTime = DateTimeOffset.UtcNow;
             _currentFixEvidence = new List<FixEvidence>();
             _graphCommitActions = new List<Action>();
@@ -207,6 +209,7 @@ public class UserContext
             InsertResource<IDataService>(original);
             _ambientGraphSave.Value = null;
             _activeGraphSave = null;
+            _mutationPolicy.EndGraph();
             _graphFixTime = null;
             _graphCommitActions = new List<Action>();
             _graphRollbackActions = new List<Action>();
@@ -270,6 +273,29 @@ public class UserContext
         InsertResource(sink);
         return this;
     }
+
+    public UserContext WithMutationPolicyRegistry(IMutationPolicyRegistry registry)
+    {
+        _mutationPolicy.Registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        return this;
+    }
+
+    public UserContext WithMutationPolicyApprovalProvider(IMutationPolicyApprovalProvider provider)
+    {
+        _mutationPolicy.ApprovalProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+        return this;
+    }
+
+    public UserContext WithMutationGovernanceSink(IMutationGovernanceSink sink)
+    {
+        _mutationPolicy.WarningSink = sink ?? throw new ArgumentNullException(nameof(sink));
+        return this;
+    }
+
+    public MutationGovernanceSnapshot? CurrentMutationGovernance => _mutationPolicy.Current;
+
+    public MutationGovernanceSnapshot ReviewMutationPlan(MutationPlan plan) =>
+        _mutationPolicy.Review(this, plan ?? throw new ArgumentNullException(nameof(plan)));
 
     public UserContext WithTrustedTenant(string tenant)
     {
@@ -408,7 +434,14 @@ public class UserContext
     }
 
     /// <summary>Generated graph infrastructure validates/fixes every node before its first provider mutation.</summary>
-    public void PreflightMutation(MutationRequest request) => CheckAndFix(request);
+    public void PreflightMutation(MutationRequest request)
+    {
+        CheckAndFix(request);
+        _mutationPolicy.RecordPreflight(request);
+    }
+
+    internal IDisposable EnterMutationPolicyExecution(MutationRequest request) =>
+        _mutationPolicy.EnterMutation(this, request);
 
     public UserContext RegisterEntityInitializer(string entityName, Action<UserContext, object> initializer)
     {
