@@ -369,8 +369,67 @@ public class UserContext
         public void Dispose() => Interlocked.Exchange(ref _dispose, null)?.Invoke();
     }
 
-    public SelectQuery ApplyRequestPolicy(SelectQuery query) =>
-        RequireResource<IRequestPolicy>().Apply(query);
+    /// <summary>
+    /// Clones a complete query graph and applies the trusted policy once to
+    /// every entity query before any provider can observe it.
+    /// </summary>
+    public SelectQuery ApplyRequestPolicy(SelectQuery query)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        var policy = GetResource<IRequestPolicy>();
+        var clone = CloneQueryTree(query,
+            new Dictionary<SelectQuery, SelectQuery>(ReferenceEqualityComparer.Instance));
+        return policy == null ? clone : ApplyRequestPolicyTree(clone, policy,
+            new Dictionary<SelectQuery, SelectQuery>(ReferenceEqualityComparer.Instance));
+    }
+
+    private static SelectQuery ApplyRequestPolicyTree(SelectQuery query, IRequestPolicy policy,
+        IDictionary<SelectQuery, SelectQuery> prepared)
+    {
+        if (prepared.TryGetValue(query, out var existing)) return existing;
+        var authorized = policy.Apply(query)
+            ?? throw new InvalidOperationException("Request policy returned a null query");
+        prepared[query] = authorized;
+        prepared[authorized] = authorized;
+        authorized.RelationLoads = authorized.RelationLoads
+            .Select(load => new RelationLoad(load.Name,
+                load.Query == null ? null : ApplyRequestPolicyTree(load.Query, policy, prepared))).ToList();
+        authorized.RelationAggregates = authorized.RelationAggregates
+            .Select(aggregate => new RelationAggregate(aggregate.RelationName, aggregate.Alias,
+                ApplyRequestPolicyTree(aggregate.Query, policy, prepared), aggregate.SingleResult)).ToList();
+        authorized.ObjectGroupBys = authorized.ObjectGroupBys
+            .Select(group => new ObjectGroupBy(group.PropertyName, group.StorageField,
+                ApplyRequestPolicyTree(group.Query, policy, prepared))).ToList();
+        authorized.ChildEnhancements = authorized.ChildEnhancements
+            .Select(child => ApplyRequestPolicyTree(child, policy, prepared)).ToList();
+        authorized.Facets = authorized.Facets
+            .Select(facet => new FacetRequest(facet.FacetName, facet.RelationName,
+                ApplyRequestPolicyTree(facet.Query, policy, prepared), facet.IncludeAllFacets)).ToList();
+        return authorized;
+    }
+
+    private static SelectQuery CloneQueryTree(SelectQuery source,
+        IDictionary<SelectQuery, SelectQuery> clones)
+    {
+        if (clones.TryGetValue(source, out var existing)) return existing;
+        var clone = source.CloneForExecution();
+        clones[source] = clone;
+        clone.RelationLoads = source.RelationLoads
+            .Select(load => new RelationLoad(load.Name,
+                load.Query == null ? null : CloneQueryTree(load.Query, clones))).ToList();
+        clone.RelationAggregates = source.RelationAggregates
+            .Select(aggregate => new RelationAggregate(aggregate.RelationName, aggregate.Alias,
+                CloneQueryTree(aggregate.Query, clones), aggregate.SingleResult)).ToList();
+        clone.ObjectGroupBys = source.ObjectGroupBys
+            .Select(group => new ObjectGroupBy(group.PropertyName, group.StorageField,
+                CloneQueryTree(group.Query, clones))).ToList();
+        clone.ChildEnhancements = source.ChildEnhancements
+            .Select(child => CloneQueryTree(child, clones)).ToList();
+        clone.Facets = source.Facets
+            .Select(facet => new FacetRequest(facet.FacetName, facet.RelationName,
+                CloneQueryTree(facet.Query, clones), facet.IncludeAllFacets)).ToList();
+        return clone;
+    }
 
     public Task PublishAppAuditEventAsync(IReadOnlyDictionary<string, object?> safeEvent,
         CancellationToken cancellationToken = default) => PublishAppAuditEventAsync(

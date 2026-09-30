@@ -134,10 +134,30 @@ static void VerifyBusinessClock()
         "business date did not derive from the context-owned clock");
 }
 
+static void VerifyQueryPolicy()
+{
+    var policy = new ExampleQueryPolicy();
+    var context = new UserContext().WithRequestPolicy(policy);
+    var child = new SelectQuery("OrderLine");
+    var original = new SelectQuery("Order");
+    original.RelationLoads.Add(new RelationLoad("lines", child));
+
+    var authorized = context.ApplyRequestPolicy(original);
+    Require(!ReferenceEquals(authorized, original), "query policy did not receive an execution snapshot");
+    Require(original.FilterCondition == null && child.FilterCondition == null,
+        "query policy mutated the caller-owned graph");
+    Require(authorized.FilterCondition != null
+            && authorized.RelationLoads[0].Query?.FilterCondition != null,
+        "query policy did not govern the complete query graph");
+    Require(policy.Entities.SequenceEqual(new[] { "Order", "OrderLine" }),
+        "query policy was not applied exactly once per query node");
+}
+
 await VerifyLogBoundaryAsync();
 await VerifyTrustedTfpAsync();
 VerifyOpaqueReference();
 VerifyBusinessClock();
+VerifyQueryPolicy();
 Console.WriteLine("PASS .NET security foundations example");
 
 sealed class ExampleDataService : IDataService
@@ -172,5 +192,17 @@ sealed class ExampleDataService : IDataService
     {
         LastMutation = request;
         return Task.FromResult(new MutationResult { AffectedRows = 1 });
+    }
+}
+
+sealed class ExampleQueryPolicy : IRequestPolicy
+{
+    public List<string> Entities { get; } = new();
+
+    public SelectQuery Apply(SelectQuery query)
+    {
+        Entities.Add(query.Entity);
+        query.AndFilter(Expr.Eq("tenant_id", 7));
+        return query;
     }
 }
