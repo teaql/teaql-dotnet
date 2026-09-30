@@ -65,6 +65,9 @@ public class UserContext
     public I18nCatalog I18nCatalog { get; private set; } = I18nCatalog.Builtin;
     public IIdSetStore IdSetStore { get; private set; } = DefaultIdSetStore;
     public IEntityReferenceCodec? EntityReferenceCodec { get; private set; }
+    public IBusinessIdProfileFactory? BusinessIdProfileFactory { get; private set; }
+    public IBusinessIdKeyProvider? BusinessIdKeyProvider { get; private set; }
+    public IBusinessIdService? BusinessIdService { get; private set; }
     public string IdSetPlan { get; private set; } = "ID_SET_DISABLED";
     public ulong IdSetCount { get; private set; }
     public string IdSetCountAccuracy { get; private set; } = "UNKNOWN";
@@ -107,6 +110,30 @@ public class UserContext
 
     /// <summary>Derives the business date from the same context-owned clock.</summary>
     public DateOnly BusinessDate => DateOnly.FromDateTime(BusinessTime.Date);
+
+    public UserContext WithBusinessIdProfileFactory(IBusinessIdProfileFactory factory)
+    {
+        BusinessIdProfileFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+        return this;
+    }
+
+    public UserContext WithBusinessIdKeyProvider(IBusinessIdKeyProvider provider)
+    {
+        BusinessIdKeyProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+        return this;
+    }
+
+    public UserContext WithBusinessIdService(IBusinessIdService service)
+    {
+        BusinessIdService = service ?? throw new ArgumentNullException(nameof(service));
+        return this;
+    }
+
+    public Task<BusinessIdValue> EnsureBusinessIdAsync(BusinessIdDefinition definition,
+        string domainRootKey, string aggregateType, IBusinessIdSlot slot) =>
+        (BusinessIdService ?? throw new InvalidOperationException(
+            "Business ID service is not configured"))
+        .EnsureAsync(this, definition, domainRootKey, aggregateType, slot);
 
     public UserContext WithDiagnosticSqlLogSink(IDiagnosticSqlLogSink? sink)
     {
