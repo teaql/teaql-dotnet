@@ -125,9 +125,19 @@ static void VerifyOpaqueReference()
     }
 }
 
+static void VerifyBusinessClock()
+{
+    var expected = new DateTimeOffset(2026, 10, 1, 14, 20, 0, TimeSpan.FromHours(8));
+    var context = new UserContext().WithBusinessClock(new FixedBusinessClock(expected));
+    Require(context.BusinessTime == expected, "context ignored the fixed business clock");
+    Require(context.BusinessDate == new DateOnly(2026, 10, 1),
+        "business date did not derive from the context-owned clock");
+}
+
 await VerifyLogBoundaryAsync();
 await VerifyTrustedTfpAsync();
 VerifyOpaqueReference();
+VerifyBusinessClock();
 Console.WriteLine("PASS .NET security foundations example");
 
 sealed class ExampleDataService : IDataService

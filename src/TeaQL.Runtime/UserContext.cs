@@ -36,6 +36,7 @@ public class UserContext
     private List<Action> _graphCommitActions = new();
     private List<Action> _graphRollbackActions = new();
     private DateTimeOffset? _graphFixTime;
+    private IBusinessClock _businessClock = SystemBusinessClock.Instance;
     private List<FixEvidence> _currentFixEvidence = new();
     private IReadOnlyList<FixEvidence> _lastFixEvidence = Array.Empty<FixEvidence>();
     public IReadOnlyList<FixEvidence> LastFixEvidence => _lastFixEvidence;
@@ -93,6 +94,19 @@ public class UserContext
         RuntimeTelemetry = telemetry ?? NoopRuntimeTelemetry.Instance;
         return this;
     }
+
+    /// <summary>Installs a clock scoped to this context; no global clock is mutated.</summary>
+    public UserContext WithBusinessClock(IBusinessClock clock)
+    {
+        _businessClock = clock ?? throw new ArgumentNullException(nameof(clock));
+        return this;
+    }
+
+    /// <summary>Returns the date-time used by business logic.</summary>
+    public DateTimeOffset BusinessTime => _businessClock.Now;
+
+    /// <summary>Derives the business date from the same context-owned clock.</summary>
+    public DateOnly BusinessDate => DateOnly.FromDateTime(BusinessTime.Date);
 
     public UserContext WithDiagnosticSqlLogSink(IDiagnosticSqlLogSink? sink)
     {
@@ -179,7 +193,7 @@ public class UserContext
             _activeGraphSave = session;
             _ambientGraphSave.Value = session;
             _mutationPolicy.BeginGraph();
-            _graphFixTime = DateTimeOffset.UtcNow;
+            _graphFixTime = BusinessTime;
             _currentFixEvidence = new List<FixEvidence>();
             _graphCommitActions = new List<Action>();
             _graphRollbackActions = new List<Action>();
@@ -428,7 +442,7 @@ public class UserContext
             _ => ""
         };
         if (!_checkers.TryGetValue(entity, out var checker)) return;
-        var violations = checker.CheckAndFix(this, request, _graphFixTime ?? DateTimeOffset.UtcNow).ToList();
+        var violations = checker.CheckAndFix(this, request, _graphFixTime ?? BusinessTime).ToList();
         TranslateCheckResults(violations);
         if (violations.Count != 0) throw new CheckException(violations);
     }
