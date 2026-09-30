@@ -32,4 +32,10 @@
     <ProjectReference Include="..\..\example\TeaQL.ExampleApi\TeaQL.ExampleApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\test-vectors\business-id-permutation-v1.csv"
+                      Link="business-id-permutation-v1.csv"
+                      LogicalName="business-id-permutation-v1.csv" />
+  </ItemGroup>
+
 </Project>
