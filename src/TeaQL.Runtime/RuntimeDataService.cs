@@ -182,6 +182,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
         _context.CheckAndFix(request);
+        using var mutationGovernance = _context.EnterMutationPolicyExecution(request);
         var entity = EntityName(request);
         var result = await _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("mutation", $"{entity}.mutate",
@@ -216,6 +217,8 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
             ["resultVersion"] = PersistedValue(result, "version"),
             ["affectedRows"] = result.AffectedRows
         };
+        if (_context.CurrentMutationGovernance is { } governance)
+            safeEvent["mutationGovernance"] = GovernanceEvidence(governance);
         await _context.PublishAppAuditEventAsync(
             EntityName(request), MutationKind(request), changedFields.Length, safeEvent).ConfigureAwait(false);
     }
@@ -231,6 +234,20 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         RecoverMutationRequest recover => recover.Command.Guards.Values.Append(recover.Command.Id),
         BatchMutationRequest batch => batch.Requests.SelectMany(MutationValues),
         _ => []
+    };
+
+    private static IReadOnlyDictionary<string, object?> GovernanceEvidence(
+        MutationGovernanceSnapshot governance) => new Dictionary<string, object?>
+    {
+        ["executionId"] = governance.ExecutionId,
+        ["requestKey"] = governance.RequestKey,
+        ["source"] = governance.Source.ToString(),
+        ["policyId"] = governance.Policy?.Id,
+        ["policyVersion"] = governance.Policy?.Version,
+        ["policyFingerprint"] = governance.Policy?.Fingerprint,
+        ["approvalStatus"] = governance.ApprovalStatus.ToString(),
+        ["warningCodes"] = governance.WarningCodes.ToArray(),
+        ["operationCount"] = governance.Operations.Count
     };
 
     private static IEnumerable<string> ChangedFields(MutationRequest request) => request switch
