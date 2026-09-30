@@ -10,7 +10,9 @@ and fails closed if any of these backend security contracts regress:
 3. a `UserContext` opaque entity reference matches the shared Go/.NET
    AES-256-GCM golden vector and rejects a wrong purpose; and
 4. a fixed, context-owned Business Clock drives both business time and business
-   date without changing any process-global clock.
+   date without changing any process-global clock; and
+5. Query Policy governs a cloned root-and-relation query graph exactly once,
+   leaving the caller-owned request reusable.
 
 Run it from the repository root:
 
