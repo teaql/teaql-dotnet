@@ -63,7 +63,7 @@ To ensure high extensibility and dependency isolation, this project adopts a mul
 *   **SQL Dialect Generator**: Highly secure SQL AST construction that dynamically translates into native parameterized SQL queries/commands for Sqlite, Postgres, and MySQL, inherently preventing SQL injection.
 *   **Unified Runtime Context**: A centralized `UserContext` runtime that natively supports chained storage propagation and dependency injection, ensuring environment variables seamlessly pass through various services alongside the request.
 *   **Governed Mutation Policy**: Customer policy reviews one immutable whole-graph mutation plan before the first provider write. Exact policy approval, warning codes, operation summaries, and policy identity are retained in application-audit evidence; policy denial is fail-closed while warning delivery is fail-open.
-*   **Portable Business ID Encoding**: Core scope/key types and the runtime `daily-permuted-v1` encoder execute the canonical cross-language golden vectors without exposing the internal sequence.
+*   **Governed Business ID Lifecycle**: Core model contracts, a context-owned profile/key/service boundary, retry-safe assignment, an in-memory allocator, and explicit-schema durable SQLite allocation extend the portable `daily-permuted-v1` encoder without exposing its internal sequence.
 *   **ASP.NET Core Web Endpoint**: Integrates instantly with `Microsoft.AspNetCore.Builder`, exposing underlying abstract data services as RESTful endpoints with just a few lines of code.
 *   **Redis Cache Decorator**: The `RedisDataServiceDecorator` enables transparent, underlying distributed caching for data interactions out-of-the-box.
 
@@ -110,9 +110,10 @@ var key = new BusinessIdEncodingKey(1, keyFromSecretManager);
 var code = BusinessIdPermutationV1.Encode(0, scope, key);
 ```
 
-This is the portable pure encoder, not a complete distributed generator.
-Durable allocation, command-retry reuse, and typed external lookup remain
-separate lifecycle capabilities. Keys belong to an application-owned secret
+The retained [`examples/business-id`](examples/business-id) flow proves
+explicit schema installation, durable concurrent allocation infrastructure and
+command-retry reuse. Generated strongly typed fields and external lookup remain
+a separate generator capability. Keys belong to an application-owned secret
 provider and never to KSML or generated source.
 
 ## Quick Start

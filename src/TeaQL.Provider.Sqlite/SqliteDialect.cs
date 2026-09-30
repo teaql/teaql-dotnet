@@ -19,6 +19,9 @@ public class SqliteDialect : SqlDialect
         return $"@p{index - 1}";
     }
 
+    public override string[] SchemaSetupSqls() =>
+        [OptimisticBusinessIdAllocator.SqliteSchemaSql];
+
     public override string SchemaTypeSql(DataType dataType, PropertyDescriptor property)
     {
         return dataType switch
