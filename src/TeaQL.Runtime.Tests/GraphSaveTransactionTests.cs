@@ -79,7 +79,9 @@ public class GraphSaveTransactionTests
     {
         var provider = new RecordingTransactionExecutor();
         var checker = new ClockChecker();
+        var expected = new DateTimeOffset(2026, 10, 1, 9, 30, 15, TimeSpan.FromHours(8));
         var context = new UserContext()
+            .WithBusinessClock(new FixedBusinessClock(expected))
             .Install(new RuntimeModule().Checker("Task", checker))
             .WithDataService(provider);
 
@@ -93,6 +95,7 @@ public class GraphSaveTransactionTests
         });
 
         Assert.Equal(2, checker.Times.Count);
+        Assert.Equal(expected, checker.Times[0]);
         Assert.Equal(checker.Times[0], checker.Times[1]);
     }
 
