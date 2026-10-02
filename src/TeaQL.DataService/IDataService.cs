@@ -82,6 +82,8 @@ public class QueryResult
 
 public abstract class MutationRequest
 {
+    internal object? GraphOwner { get; set; }
+    internal MutationTraceScope? GraphScope { get; set; }
     internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
     // Execution-local prose redaction provenance for inherited graph intent.
     // Never serialized, never used as SQL bindings or application payload.
@@ -101,6 +103,9 @@ public abstract class MutationRequest
     /// <summary>Snapshot of request and item reasons, separate from physical SQL.</summary>
     internal IReadOnlyList<TraceNode> AuditLineage(string entity)
     {
+        if (LedgerKey != null && LedgerRoot?.TraceChain(LedgerKey) is { Count: > 0 } complete)
+            return complete;
+        if (GraphScope != null) return GraphScope.Recover();
         var nodes = new List<TraceNode> { new(entity, LedgerKey?.Id.TryU64(), "") {
             Kind = "auditReason", Detail = Comment } };
         foreach (var node in TraceChain)
@@ -127,6 +132,8 @@ public abstract class MutationRequest
         };
         request.DiagnosticObserver = DiagnosticObserver;
         request.InheritedIntentValues = InheritedIntentValues;
+        request.GraphOwner = GraphOwner;
+        request.GraphScope = GraphScope;
         return request;
     }
 

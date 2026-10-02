@@ -61,11 +61,11 @@ public class MutationPolicyTests
             .WithDataService(provider);
 
         var error = await Assert.ThrowsAsync<MutationPolicyException>(() =>
-            context.ExecuteGraphSaveAsync("submit denied order graph", async () =>
+            context.ExecuteGraphSaveAsync("submit denied order graph", async graph =>
             {
-                context.PreflightMutation(OrderInsert());
-                context.PreflightMutation(LineInsert());
-                return await context.RequireResource<IDataService>().MutateAsync(OrderInsert());
+                graph.Preflight(OrderInsert());
+                graph.Preflight(LineInsert());
+                return await graph.MutateAsync(OrderInsert());
             }));
 
         Assert.Contains("ORDER_DENIED", error.Message);
@@ -86,11 +86,11 @@ public class MutationPolicyTests
             .WithAppAuditEventSink(audit)
             .WithDataService(provider);
 
-        await context.ExecuteGraphSaveAsync("save allowed order graph", async () =>
+        await context.ExecuteGraphSaveAsync("save allowed order graph", async graph =>
         {
             var request = OrderInsert();
-            context.PreflightMutation(request);
-            return await context.RequireResource<IDataService>().MutateAsync(request);
+            graph.Preflight(request);
+            return await graph.MutateAsync(request);
         });
 
         Assert.Equal(1, provider.MutationCount);
@@ -114,8 +114,8 @@ public class MutationPolicyTests
             .WithDataService(provider);
 
         var error = await Assert.ThrowsAsync<MutationPolicyException>(() =>
-            context.ExecuteGraphSaveAsync("save order without preflight", () =>
-                context.RequireResource<IDataService>().MutateAsync(OrderInsert())));
+            context.ExecuteGraphSaveAsync("save order without preflight", graph =>
+                graph.MutateAsync(OrderInsert())));
 
         Assert.Contains("complete graph preflight", error.Message);
         Assert.Equal(0, provider.MutationCount);
@@ -139,13 +139,13 @@ public class MutationPolicyTests
             .WithMutationPolicyRegistry(new DelegatingMutationPolicyRegistry(_ => policy))
             .WithDataService(provider);
 
-        await context.ExecuteGraphSaveAsync("save order from preflight snapshot", async () =>
+        await context.ExecuteGraphSaveAsync("save order from preflight snapshot", async graph =>
         {
             var request = OrderInsert();
             request.Command.Value("state", new Value.TextValue("DRAFT"));
-            context.PreflightMutation(request);
+            graph.Preflight(request);
             request.Command.Value("state", new Value.TextValue("APPROVED"));
-            return await context.RequireResource<IDataService>().MutateAsync(request);
+            return await graph.MutateAsync(request);
         });
 
         Assert.Equal("DRAFT", observedState);

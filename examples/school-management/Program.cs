@@ -37,7 +37,7 @@ await RejectIntent(() => Q.Schools().Comment("verify blank purpose").Purpose("\u
 await RejectIntent(() => new School().SaveAsync(rejectedContext),
     "REQUEST_COMMENT_REQUIRED", "comment", "mutation");
 var callbackCount = 0;
-await RejectIntent(() => rejectedContext.ExecuteGraphSaveAsync("\u2003", () => {
+await RejectIntent(() => rejectedContext.ExecuteGraphSaveAsync("\u2003", graph => {
     callbackCount++;
     return Task.FromResult(0);
 }), "REQUEST_COMMENT_REQUIRED", "comment", "mutation");

@@ -6,17 +6,87 @@ namespace TeaQL.Runtime.Tests;
 public class GraphSaveTransactionTests
 {
     [Fact]
-    public async Task NestedGraphSaveUsesOneTransactionAndDefersCommitCallbacks()
+    public async Task AuditIsNotPublishedBeforeCommitOrAfterRollback()
+    {
+        var provider = new RecordingTransactionExecutor();
+        var audit = new AuditSink();
+        var context = new UserContext().WithDataService(provider).WithAppAuditEventSink(audit);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => context.ExecuteGraphSaveAsync<int>(
+            "save graph that rolls back", async graph =>
+            {
+                await graph.MutateAsync(new InsertMutationRequest(
+                    new InsertCommand("Task").Value("id", Value.FromObject(1L)), "create task"));
+                Assert.Empty(audit.Events);
+                throw new InvalidOperationException("injected graph failure");
+            }));
+        Assert.Empty(audit.Events);
+        Assert.Equal(new[] { "provider-rollback" }, provider.Events);
+    }
+
+    [Fact]
+    public async Task AfterCommitFailureStillRunsRemainingCleanupAndNeverRollsBack()
+    {
+        var provider = new RecordingTransactionExecutor();
+        var context = new UserContext().WithDataService(provider);
+        var cleanup = false;
+        var rollback = false;
+        var error = await Assert.ThrowsAnyAsync<Exception>(() => context.ExecuteGraphSaveAsync(
+            "save committed graph", graph =>
+            {
+                graph.AfterRollback(() => rollback = true);
+                graph.AfterCommit(() => throw new InvalidOperationException("audit unavailable"));
+                graph.AfterCommit(() => cleanup = true);
+                return Task.FromResult(1);
+            }));
+        Assert.True(cleanup);
+        Assert.False(rollback);
+        Assert.Equal(new[] { "provider-commit" }, provider.Events);
+        Assert.True((bool?)error.GetType().GetProperty("Committed")?.GetValue(error));
+    }
+
+    private sealed class AuditSink : IAppAuditEventSink
+    {
+        public List<IReadOnlyDictionary<string, object?>> Events { get; } = new();
+        public Task RecordAsync(IReadOnlyDictionary<string, object?> item, CancellationToken token = default)
+        { Events.Add(item); return Task.CompletedTask; }
+    }
+
+    [Fact]
+    public async Task UntaggedMutationsAndExpiredOrForeignCapabilitiesFailClosed()
+    {
+        var context = new UserContext().WithDataService(new RecordingTransactionExecutor());
+        GraphMutationSession? previous = null;
+        MutationTraceScope? foreign = null;
+        await context.ExecuteGraphSaveAsync("first graph", async graph =>
+        {
+            previous = graph; foreign = graph.Scope("Task", 1, null);
+            var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                context.RequireResource<IDataService>().MutateAsync(
+                    new InsertMutationRequest(new InsertCommand("Task"), "untagged")));
+            Assert.Equal("GRAPH_CAPABILITY_REQUIRED", error.Message);
+            return 1;
+        });
+        Assert.Equal("GRAPH_CAPABILITY_EXPIRED", Assert.Throws<InvalidOperationException>(() =>
+            previous!.Scope("Task", 1, null)).Message);
+        await context.ExecuteGraphSaveAsync("second graph", graph =>
+        {
+            Assert.Equal("GRAPH_SCOPE_OWNER_MISMATCH", Assert.Throws<InvalidOperationException>(() =>
+                graph.Scope("Task", 2, "second local reason", foreign)).Message);
+            return Task.FromResult(2);
+        });
+    }
+    [Fact]
+    public async Task ExplicitGraphCapabilityUsesOneTransactionAndDefersCommitCallbacks()
     {
         var provider = new RecordingTransactionExecutor();
         var context = new UserContext().WithDataService(provider);
         var events = new List<string>();
 
-        var result = await context.ExecuteGraphSaveAsync("save parent graph", async () =>
+        var result = await context.ExecuteGraphSaveAsync("save parent graph", async graph =>
         {
-            context.AfterGraphCommit(() => events.Add("commit-action"));
+            graph.AfterCommit(() => events.Add("commit-action"));
             events.Add("work");
-            return await context.ExecuteGraphSaveAsync("save nested graph", () => Task.FromResult(42));
+            return await Task.FromResult(42);
         });
 
         Assert.Equal(42, result);
@@ -32,10 +102,10 @@ public class GraphSaveTransactionTests
         var context = new UserContext().WithDataService(provider);
         var callbacks = new List<string>();
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => context.ExecuteGraphSaveAsync<int>("save rollback graph", () =>
+        await Assert.ThrowsAsync<InvalidOperationException>(() => context.ExecuteGraphSaveAsync<int>("save rollback graph", graph =>
         {
-            context.AfterGraphRollback(() => callbacks.Add("parent"));
-            context.AfterGraphRollback(() => callbacks.Add("child"));
+            graph.AfterRollback(() => callbacks.Add("parent"));
+            graph.AfterRollback(() => callbacks.Add("child"));
             throw new InvalidOperationException("injected");
         }));
 
@@ -52,7 +122,7 @@ public class GraphSaveTransactionTests
         var releaseFirst = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var secondEntered = false;
 
-        var first = context.ExecuteGraphSaveAsync("save first independent graph", async () =>
+        var first = context.ExecuteGraphSaveAsync("save first independent graph", async graph =>
         {
             firstEntered.SetResult();
             await releaseFirst.Task;
@@ -60,7 +130,7 @@ public class GraphSaveTransactionTests
         });
         await firstEntered.Task;
 
-        var second = context.ExecuteGraphSaveAsync("save second independent graph", () =>
+        var second = context.ExecuteGraphSaveAsync("save second independent graph", graph =>
         {
             secondEntered = true;
             return Task.FromResult(2);
@@ -85,12 +155,11 @@ public class GraphSaveTransactionTests
             .Install(new RuntimeModule().Checker("Task", checker))
             .WithDataService(provider);
 
-        await context.ExecuteGraphSaveAsync("create tasks with one business clock", async () =>
+        await context.ExecuteGraphSaveAsync("create tasks with one business clock", async graph =>
         {
-            var service = context.RequireResource<IDataService>();
-            await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Task"), "create first task"));
+            await graph.MutateAsync(new InsertMutationRequest(new InsertCommand("Task"), "create first task"));
             await Task.Delay(5);
-            await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Task"), "create second task"));
+            await graph.MutateAsync(new InsertMutationRequest(new InsertCommand("Task"), "create second task"));
             return true;
         });
 
@@ -112,7 +181,7 @@ public class GraphSaveTransactionTests
         public List<string> Events { get; } = new();
         public DataServiceCapabilities Capabilities { get; } = new() { Transaction = true };
         public Task<QueryResult> QueryAsync(QueryRequest request) => Task.FromResult(new QueryResult());
-        public Task<MutationResult> MutateAsync(MutationRequest request) => Task.FromResult(new MutationResult());
+        public Task<MutationResult> MutateAsync(MutationRequest request) => Task.FromResult(new MutationResult { AffectedRows = 1 });
         public Task<ITransaction> BeginTransactionAsync()
         {
             BeginCount++;

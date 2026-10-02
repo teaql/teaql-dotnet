@@ -28,4 +28,7 @@
     <None Include="../../tests/fixtures/request-intent-v1.json" Link="request-intent-v1.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="fixtures/graph-mutation-lineage-v1.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

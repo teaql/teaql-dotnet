@@ -18,12 +18,16 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 {
     private readonly IDataService _provider;
     private readonly UserContext _context;
+    private readonly GraphMutationSession? _graph;
 
     public RuntimeDataService(IDataService provider, UserContext context)
     {
         _provider = provider;
         _context = context;
     }
+
+    internal RuntimeDataService(IDataService provider, UserContext context, GraphMutationSession graph)
+        : this(provider, context) => _graph = graph;
 
     public DataServiceCapabilities Capabilities => _provider.Capabilities;
 
@@ -178,6 +182,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
+        _context.ValidateGraphMutation(request, _graph);
         _context.CheckAndFix(request);
         using var mutationGovernance = _context.EnterMutationPolicyExecution(request);
         var entity = EntityName(request);
@@ -214,13 +219,20 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
             ["resultVersion"] = PersistedValue(result, "version"),
             ["affectedRows"] = result.AffectedRows
         };
+        var values = MutationValues(request).Concat(request.InheritedIntentValues).ToArray();
+        safeEvent["traceChain"] = request.AuditLineage(EntityName(request))
+            .Select(node => node with { Comment = "", Detail = LogPrivacy.ScrubAuditText(node.Detail, values) ?? "" })
+            .ToArray();
+        safeEvent["reason"] = LogPrivacy.ScrubAuditText(request.Comment, values);
         if (_context.CurrentMutationGovernance is { } governance)
             safeEvent["mutationGovernance"] = GovernanceEvidence(governance);
-        await _context.PublishAppAuditEventAsync(
-            EntityName(request), MutationKind(request), changedFields.Length, safeEvent).ConfigureAwait(false);
+        Task Publish() => _context.PublishAppAuditEventAsync(
+            EntityName(request), MutationKind(request), changedFields.Length, safeEvent);
+        if (_graph != null) _graph.AfterCommit(Publish);
+        else await Publish().ConfigureAwait(false);
     }
 
-    private static IEnumerable<Value> MutationValues(MutationRequest request) => request switch
+    internal static IEnumerable<Value> MutationValues(MutationRequest request) => request switch
     {
         InsertMutationRequest insert => insert.Command.Values.Values,
         UpdateMutationRequest update => update.Command.Values.Values

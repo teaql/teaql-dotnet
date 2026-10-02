@@ -20,12 +20,34 @@ projects both that lineage and physical paths before sinks; execution values
 and original command trace lists are not changed. Frozen shared vectors and
 real SQLite root/three-level failure tests are separate evidence.
 
-Full graph parent scopes, ledger-specific replacement, assigned-ID graph
-lineage, commit-bound application audit, generated normative/concurrency
-acceptance and internal Registry replay remain open. Do not mistake the native
-request/item carrier for complete graph conformance. Run `dotnet test TeaQL.sln`,
-the separate `TeaQL.Core.Tests` project, and `bash scripts/verify-examples.sh`
-against this checkout before promoting an internal candidate.
+Graph saves explicitly receive an operation-owned `GraphMutationSession`.
+Persistent immutable parent scopes retain sibling and deletion reasons; typed
+ledger traces are complete per-entity replacements. The generated adapter
+allocates IDs through the transaction before constructing a scope. Context does
+not hold a trace stack or implicitly join nested saves. Untagged active-graph
+mutations, expired capabilities and borrowed parent scopes fail closed.
+
+The graph transaction queues safe application audit until commit and discards it
+on rollback. Post-commit errors are `GraphCommittedException` (`Committed=true`);
+remaining cleanup/audits still run and the committed transaction is not rolled
+back. Whole-graph preflight supplies invocation-local sibling redaction values.
+The native SQLite tests exercise allocation, deletion, typed ledger replacement,
+real UNIQUE rollback and two concurrent requests serialized on one Context.
+Shared helper vectors remain separate from that execution proof.
+
+Regenerate dependent libraries: the adapter callback is now
+`ExecuteGraphSaveAsync(comment, async graph => ...)`, with `graph.Preflight`,
+`graph.MutateAsync` and graph-owned completion callbacks. Public generated
+`.AuditAs(...).SaveAsync(context)` is unchanged. School, Conformance and Order
+libraries are regenerated from their retained models, not patched manually.
+
+Generated normative six-entity/Q/E/no-cleanup acceptance, prepared batch/item
+index lineage, detached-child and late low-level allocation, complete
+entry-point/privacy coverage and internal Registry replay remain open. A direct
+legacy transaction wrapper is not proof of commit-bound audit. Run
+`dotnet test TeaQL.sln`, the separate `TeaQL.Core.Tests` project and
+`bash scripts/verify-examples.sh` against this checkout before promoting an
+internal candidate.
 
 ## Sensitive log data
 

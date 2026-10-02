@@ -716,8 +716,10 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         MutationRequest request, string entityName, DataServiceOperation operation, string provider)
     {
         // Per-entity graph lineage is a separate carrier, not a physical route.
-        var source = new[] { new TraceNode(entityName, null, "") {
-            Kind = "auditReason", Detail = request.Comment } };
+        var root = request.AuditLineage(entityName).FirstOrDefault()?.Name ?? entityName;
+        var source = new[] { new TraceNode(root, null, "") {
+            Kind = "auditReason", Detail = request.Comment },
+            new TraceNode(entityName, request.LedgerKey?.Id.TryU64(), "") { Kind = "entity" } };
         return SqlTraceChain.Canonical(source, provider.ToLowerInvariant(), operation.ToString().ToLowerInvariant())
             .TracePath.Select((node, level) => node with { Level = level }).ToList();
     }

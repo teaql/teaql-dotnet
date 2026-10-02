@@ -25,6 +25,13 @@ public sealed class EntityRoot
     private readonly ConcurrentDictionary<EntityKey, long> _originalVersions = new();
     private readonly ConcurrentDictionary<EntityKey, byte> _newKeys = new();
     private readonly ConcurrentDictionary<EntityKey, byte> _deletedKeys = new();
+    private readonly ConcurrentDictionary<EntityKey, IReadOnlyList<TraceNode>> _traces = new();
+
+    /// <summary>Complete per-entity replacement, not a suffix or a Context trace.</summary>
+    public void SetTraceChain(EntityKey key, IEnumerable<TraceNode> chain) =>
+        _traces[key] = Array.AsReadOnly(chain.Select(node => node with { }).ToArray());
+    public IReadOnlyList<TraceNode> TraceChain(EntityKey key) =>
+        _traces.TryGetValue(key, out var chain) ? chain : Array.Empty<TraceNode>();
 
     public void Set(EntityKey key, string field, Value value)
     {
@@ -49,6 +56,7 @@ public sealed class EntityRoot
         foreach (var key in other._newKeys.Keys) MarkAsNew(key);
         foreach (var key in other._deletedKeys.Keys) MarkAsDeleted(key);
         foreach (var (key, version) in other._originalVersions) SetOriginalVersion(key, version);
+        foreach (var (key, trace) in other._traces) SetTraceChain(key, trace);
     }
 
     public void Rekey(EntityKey oldKey, EntityKey newKey)
@@ -59,11 +67,13 @@ public sealed class EntityRoot
         if (_originalVersions.TryRemove(oldKey, out var version)) _originalVersions[newKey] = version;
         if (_newKeys.TryRemove(oldKey, out _)) _newKeys[newKey] = 0;
         if (_deletedKeys.TryRemove(oldKey, out _)) _deletedKeys[newKey] = 0;
+        if (_traces.TryRemove(oldKey, out var trace)) _traces[newKey] = trace;
     }
 
     public void ClearEntity(EntityKey key)
     {
         _changes.TryRemove(key, out _); _newKeys.TryRemove(key, out _); _deletedKeys.TryRemove(key, out _);
+        _traces.TryRemove(key, out _);
     }
 
     public void SetOriginalVersion(EntityKey key, long version) => _originalVersions[key] = version;
@@ -85,5 +95,6 @@ public sealed class EntityRoot
         _changes.Clear();
         _newKeys.Clear();
         _deletedKeys.Clear();
+        _traces.Clear();
     }
 }
