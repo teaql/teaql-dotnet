@@ -312,7 +312,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
             {
                 ["teaql.result.cardinality"] = result.Rows.Count
             }).ConfigureAwait(false);
-        _context.RecordExecutionMetadata(result.Metadata);
+        if (!result.Metadata.DiagnosticReported) _context.RecordExecutionMetadata(result.Metadata);
         return result;
     }
 

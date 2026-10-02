@@ -94,6 +94,22 @@ public abstract class MutationRequest
     public MutationIntent Intent { get; }
     public string Comment => Intent.Comment;
 
+    /// <summary>
+    /// Provider SPI observation of the runtime-derived business lineage. This
+    /// immutable snapshot is separate from physical SQL and is not a wire field.
+    /// It cannot install a scope or change the request's graph capability.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IReadOnlyList<TraceNode> MutationLineage => Array.AsReadOnly(AuditLineage(this switch
+    {
+        InsertMutationRequest insert => insert.Command.Entity,
+        UpdateMutationRequest update => update.Command.Entity,
+        DeleteMutationRequest delete => delete.Command.Entity,
+        RecoverMutationRequest recover => recover.Command.Entity,
+        BatchMutationRequest => "batch",
+        _ => "unknown"
+    }).ToArray());
+
     protected MutationRequest(MutationIntent intent)
     {
         ArgumentNullException.ThrowIfNull(intent);
@@ -243,6 +259,9 @@ public enum DataServiceOperation
 
 public class ExecutionMetadata
 {
+    // Provider success can be observed before relation enhancement completes.
+    // Runtime must not publish that same physical statement a second time.
+    internal bool DiagnosticReported { get; set; }
     // Internal provenance for inherited intent only; never exposed to sinks or wire serialization.
     internal ExecutionMetadata? IntentSource { get; set; }
     // Mutation target identifiers redact prose, never SQL bind values or structured counts.

@@ -6,6 +6,45 @@ namespace TeaQL.Sql;
 
 internal static class SqlStatementDiagnostics
 {
+    // Parent SQL can finish before a descendant does. Capture declared child
+    // bindings/policies before emitting parent prose, without executing a query,
+    // changing caller builders, or sharing provenance through Context.
+    internal static ExecutionMetadata CaptureQueryIntent(SqlDialect dialect, ISchemaProvider schema,
+        QueryRequest request, CompiledQuery compiled)
+    {
+        var current = InheritedIntent(request, compiled);
+        var values = current.Parameters.ToList();
+        var policies = current.ParameterLogPolicies.ToList();
+        var pending = new Stack<(SelectQuery Query, string Entity)>();
+        var seen = new Dictionary<SelectQuery, HashSet<string>>(ReferenceEqualityComparer.Instance);
+        void Children(SelectQuery query, EntityDescriptor entity)
+        {
+            foreach (var load in query.RelationLoads)
+                if (load.Query != null && entity.RelationByName(load.Name) is { } relation)
+                    pending.Push((load.Query, relation.TargetEntity));
+            foreach (var aggregate in query.RelationAggregates)
+                if (entity.RelationByName(aggregate.RelationName) is { } relation)
+                    pending.Push((aggregate.Query, relation.TargetEntity));
+        }
+        if (schema.GetEntity(request.Query.Entity) is { } root) Children(request.Query, root);
+        while (pending.TryPop(out var item))
+        {
+            if (!seen.TryGetValue(item.Query, out var entities)) seen[item.Query] = entities = new();
+            if (!entities.Add(item.Entity)) continue;
+            var entity = schema.GetEntity(item.Entity) ?? throw new SqlExecutorException("Unknown relation entity");
+            var query = item.Query.CloneForExecution(); query.Entity = item.Entity;
+            // This compilation collects binding policies only. Applying execution
+            // limits would mutate nested builders shared by the shallow copy.
+            query.NormalizeGeneratedFilters();
+            var child = dialect.CompileSelect(entity, query);
+            var intent = InheritedIntent(new QueryRequest(query, request.Intent), child);
+            values.AddRange(intent.Parameters); policies.AddRange(intent.ParameterLogPolicies);
+            Children(item.Query, entity);
+        }
+        return new ExecutionMetadata { Parameters = values.ToArray(), ParameterLogPolicies = policies.ToArray(),
+            IntentValues = request.IntentSource?.IntentValues ?? Array.Empty<Value>(), GeneratedSql = true };
+    }
+
     // Flatten only binding provenance, not SQL or free-form intent. A grandchild
     // needs both its parent's and earlier ancestors' policies. No global cache.
     internal static ExecutionMetadata InheritedIntent(QueryRequest request, CompiledQuery compiled)
@@ -82,10 +121,18 @@ internal static class SqlStatementDiagnostics
     private static void Record(object request, ExecutionMetadata metadata)
     {
         var observer = request is QueryRequest q ? q.DiagnosticObserver : ((MutationRequest)request).DiagnosticObserver;
+        if (observer == null) return;
+        metadata.DiagnosticReported = true;
         try { observer?.Invoke(metadata); }
         catch when (metadata.ExecutionOutcome != "success") {
             // A failing sink must not replace an in-flight provider failure/cancellation.
         }
+    }
+
+    internal static void QuerySucceeded(QueryRequest request, ExecutionMetadata metadata)
+    {
+        try { Record(request, metadata); }
+        catch (Exception error) when (error is not OutOfMemoryException) { }
     }
 
     internal static void Failure(SqlDialect dialect, object request, CompiledQuery compiled,

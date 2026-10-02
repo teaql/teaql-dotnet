@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType Condition="Exists('Program.cs')">Exe</OutputType>
+    <OutputType Condition="!Exists('Program.cs')">Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.2.9</TeaQLRuntimeVersion>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TeaQLRuntimeSourceRoot)' == ''">
+    <PackageReference Include="TeaQL.Core" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.DataService" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.Runtime" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.Sql" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.Provider.Sqlite" Version="[$(TeaQLRuntimeVersion)]" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TeaQLRuntimeSourceRoot)' != ''">
+    <ProjectReference Include="$(TeaQLRuntimeSourceRoot)/src/TeaQL.Core/TeaQL.Core.csproj" />
+    <ProjectReference Include="$(TeaQLRuntimeSourceRoot)/src/TeaQL.DataService/TeaQL.DataService.csproj" />
+    <ProjectReference Include="$(TeaQLRuntimeSourceRoot)/src/TeaQL.Runtime/TeaQL.Runtime.csproj" />
+    <ProjectReference Include="$(TeaQLRuntimeSourceRoot)/src/TeaQL.Sql/TeaQL.Sql.csproj" />
+    <ProjectReference Include="$(TeaQLRuntimeSourceRoot)/src/TeaQL.Provider.Sqlite/TeaQL.Provider.Sqlite.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="TeaQL.Core" />
+    <Using Include="TeaQL.DataService" />
+    <Using Include="TeaQL.Runtime" />
+    <Using Include="TeaQL.Sql" />
+    <Using Include="TeaQL.Provider.Sqlite" />
+  </ItemGroup>
+
+</Project>

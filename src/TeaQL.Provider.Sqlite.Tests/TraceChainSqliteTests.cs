@@ -88,7 +88,9 @@ public class TraceChainSqliteTests
             .Comment("load school graph").Purpose("verify inherited failure route");
         await Assert.ThrowsAsync<SqlExecutorException>(() => fixture.Context.RequireResource<IDataService>()
             .QueryAsync(new QueryRequest(query)));
-        var failed = Assert.Single(fixture.Log.Entries);
+        Assert.Equal(4, fixture.Log.Entries.Count);
+        Assert.Equal(3, fixture.Log.Entries.Count(entry => entry.ExecutionOutcome == "success"));
+        var failed = Assert.Single(fixture.Log.Entries.Where(entry => entry.ExecutionOutcome == "failure"));
         Assert.Equal("failure", failed.ExecutionOutcome);
         Assert.Equal(new[] { "School", "School", "platform", "organization", "region", "sqlite", "select" },
             failed.TraceChain.Select(node => node.Name));
@@ -97,5 +99,26 @@ public class TraceChainSqliteTests
             failed.TraceChain.Where(node => node.Kind == "relation").Select(node => node.Detail));
         Assert.Equal("load school graph", failed.Comment);
         Assert.Equal("verify inherited failure route", failed.Purpose);
+    }
+
+    [Fact]
+    public async Task SuccessfulThreeLevelLoadEmitsEveryPhysicalStatementExactlyOnce()
+    {
+        var fixture = await Fixture();
+        await using var connection = fixture.Connection;
+        var query = new SelectQuery("School").Limit(1)
+            .RelationQuery("platform", new SelectQuery("Platform").Project("organizationId").Limit(1)
+                .RelationQuery("organization", new SelectQuery("Organization").Project("regionId").Limit(1)
+                    .RelationQuery("region", new SelectQuery("Region").Limit(1))))
+            .Comment("load school graph").Purpose("observe every physical statement");
+        await fixture.Context.RequireResource<IDataService>().QueryAsync(new QueryRequest(query));
+        Assert.Equal(4, fixture.Log.Entries.Count);
+        Assert.Equal(new[] { 0, 1, 2, 3 }, fixture.Log.Entries.Select(entry => entry.TraceChain.Count(node => node.Kind == "relation")));
+        Assert.All(fixture.Log.Entries, entry => {
+            Assert.Equal("School", entry.TraceChain[0].Name);
+            Assert.Equal("success", entry.ExecutionOutcome);
+            Assert.Equal("load school graph", entry.Comment);
+            Assert.Equal("observe every physical statement", entry.Purpose);
+        });
     }
 }

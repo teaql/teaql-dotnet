@@ -11,6 +11,38 @@ namespace TeaQL.Sql.Tests;
 [Collection("Readback log environment")]
 public class SqlRelationIntentTests
 {
+    [Fact]
+    public async Task LogCaptureDoesNotMutateUnexecutedAggregateChildBuilders()
+    {
+        var customer = EntityDescriptor.New("Customer").TableName("customer_data")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Relation(RelationDescriptor.New("orders", "Order").ForeignKey("customerId").Many());
+        var order = EntityDescriptor.New("Order").TableName("order_data")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("customerId", DataType.I64))
+            .Relation(RelationDescriptor.New("lines", "Line").ForeignKey("orderId").Many());
+        var line = EntityDescriptor.New("Line").TableName("line_data")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("orderId", DataType.I64));
+        var schema = new Mock<ISchemaProvider>();
+        foreach (var entity in new[] { customer, order, line })
+            schema.Setup(value => value.GetEntity(entity.Name)).Returns(entity);
+        var transport = new Mock<ISqlTransport>();
+        transport.Setup(value => value.FetchAllSqlAsync(It.IsAny<CompiledQuery>())).ReturnsAsync(new List<Record>());
+        var sink = new Sink();
+        var context = new UserContext().WithDataService(new SqlDataServiceExecutor(new Dialect(), transport.Object, schema.Object))
+            .WithDiagnosticSqlLogSink(sink);
+        var grandchild = new SelectQuery("Line");
+        var child = new SelectQuery("Order").RelationQuery("lines", grandchild);
+        var query = new SelectQuery("Customer").Limit(1)
+            .RelationAggregate("orders", "Order", "customerId", "count", child, true)
+            .Comment("observe an empty parent result").Purpose("keep unused child builders unchanged");
+        await context.RequireResource<IDataService>().QueryAsync(new QueryRequest(query));
+        Assert.Null(child.Slice); Assert.Null(grandchild.Slice);
+        transport.Verify(value => value.FetchAllSqlAsync(It.IsAny<CompiledQuery>()), Times.Once);
+        Assert.Single(sink.Entries);
+    }
+
     private sealed class Dialect : TestSqlDialect
     {
         public override DatabaseKind Kind => DatabaseKind.PostgreSql;
@@ -95,7 +127,8 @@ public class SqlRelationIntentTests
             else query.RelationQuery("orders", child);
 
             await Assert.ThrowsAsync<SqlExecutorException>(() => service.QueryAsync(new QueryRequest(query)));
-            var safe = Assert.Single(normal.Entries);
+            Assert.Equal(shape == "nested" ? 3 : 2, normal.Entries.Count);
+            var safe = Assert.Single(normal.Entries.Where(entry => entry.ExecutionOutcome == "failure"));
             var safeJson = JsonSerializer.Serialize(safe);
             Assert.DoesNotContain("Riverside", safeJson);
             Assert.DoesNotContain("PASSWORD-CANARY", safeJson);
@@ -106,9 +139,18 @@ public class SqlRelationIntentTests
             Assert.Equal("failure", safe.ExecutionOutcome);
             Assert.Contains(shape == "nested" ? "line_data" : "order_data", safe.DebugQuery);
             Assert.DoesNotContain("IntentSource", safeJson);
-            var debugEntry = Assert.Single(sensitive.Entries);
+            var debugEntry = Assert.Single(sensitive.Entries.Where(entry => entry.ExecutionOutcome == "failure"));
             Assert.Equal(debug, debugEntry.Comment!.Contains("Riverside"));
             Assert.DoesNotContain("PASSWORD-CANARY", JsonSerializer.Serialize(debugEntry));
+            foreach (var entry in normal.Entries)
+            {
+                var json = JsonSerializer.Serialize(entry);
+                Assert.DoesNotContain("Riverside", json);
+                Assert.DoesNotContain("PASSWORD-CANARY", json);
+                if (shape == "nested") Assert.DoesNotContain("Lakeside", json);
+            }
+            foreach (var entry in sensitive.Entries)
+                Assert.DoesNotContain("PASSWORD-CANARY", JsonSerializer.Serialize(entry));
             Assert.Contains(transport.Queries[0].Params, value => value.TryText() == "Riverside");
             Assert.Contains("Riverside", query.CommentText);
 

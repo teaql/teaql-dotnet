@@ -41,8 +41,18 @@ Regenerate dependent libraries: the adapter callback is now
 `.AuditAs(...).SaveAsync(context)` is unchanged. School, Conformance and Order
 libraries are regenerated from their retained models, not patched manually.
 
-Generated normative six-entity/Q/E/no-cleanup acceptance, prepared batch/item
-index lineage, detached-child and late low-level allocation, complete
+The [generated six-entity example](examples/trace-chain) observes actual provider
+commands, safe SQL and committed audit through generated Q/E/Mutation APIs.
+Run `bash scripts/verify-trace-chain-example.sh` for two executions on the same
+database without cleanup and an unchanged library. It covers branch/deletion
+reasons, assigned typed IDs, a three-level query, real UNIQUE rollback,
+successful-write/readback-failure separation and concurrent generated saves.
+The read-only provider SPI `MutationRequest.MutationLineage` is not a wire field.
+Successful relation SQL is now logged at each physical execution boundary;
+parent/descendant binding provenance protects intent before parent logs are
+emitted, and root statements are not reported twice.
+
+Prepared batch/item-index lineage, detached-child and late low-level allocation, complete
 entry-point/privacy coverage and internal Registry replay remain open. A direct
 legacy transaction wrapper is not proof of commit-bound audit. Run
 `dotnet test TeaQL.sln`, the separate `TeaQL.Core.Tests` project and

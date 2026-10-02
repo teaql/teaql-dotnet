@@ -74,6 +74,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
         }
 
+        if (request.DiagnosticObserver != null)
+            request.IntentSource = SqlStatementDiagnostics.CaptureQueryIntent(Dialect, SchemaProvider, request, compiled);
         var start = DateTimeOffset.UtcNow;
         List<Record> rows;
         try
@@ -86,28 +88,9 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
+        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
+        SqlStatementDiagnostics.QuerySucceeded(request, metadata);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
-        var end = DateTimeOffset.UtcNow;
-
-        var metadata = new ExecutionMetadata
-        {
-            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
-            Operation = DataServiceOperation.Query,
-            StartedAt = start,
-            EndedAt = end,
-            AffectedRows = null,
-            ResultCount = rows.Count,
-            ExecutionOutcome = "success",
-            TraceChain = SqlDataServiceTransaction.QueryTracePath(request, Dialect.Kind.ToString()),
-            Comment = request.Comment,
-            Purpose = request.Purpose,
-            IntentSource = request.IntentSource,
-            BackendRequestId = null,
-            ParameterizedQuery = compiled.Sql,
-            Parameters = compiled.Params.ToList(),
-            ParameterLogPolicies = compiled.ParameterLogPolicies,
-            GeneratedSql = compiled.GeneratedSql
-        };
 
         return new QueryResult { Rows = rows, Metadata = metadata };
     }
@@ -523,6 +506,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
         }
 
+        if (request.DiagnosticObserver != null)
+            request.IntentSource = SqlStatementDiagnostics.CaptureQueryIntent(Dialect, SchemaProvider, request, compiled);
         var start = DateTimeOffset.UtcNow;
         List<Record> rows;
         try
@@ -535,28 +520,9 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
+        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
+        SqlStatementDiagnostics.QuerySucceeded(request, metadata);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
-        var end = DateTimeOffset.UtcNow;
-
-        var metadata = new ExecutionMetadata
-        {
-            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
-            Operation = DataServiceOperation.Query,
-            StartedAt = start,
-            EndedAt = end,
-            AffectedRows = null,
-            ResultCount = rows.Count,
-            ExecutionOutcome = "success",
-            TraceChain = QueryTracePath(request, Dialect.Kind.ToString()),
-            Comment = request.Comment,
-            Purpose = request.Purpose,
-            IntentSource = request.IntentSource,
-            BackendRequestId = null,
-            ParameterizedQuery = compiled.Sql,
-            Parameters = compiled.Params.ToList(),
-            ParameterLogPolicies = compiled.ParameterLogPolicies,
-            GeneratedSql = compiled.GeneratedSql
-        };
 
         return new QueryResult { Rows = rows, Metadata = metadata };
     }
