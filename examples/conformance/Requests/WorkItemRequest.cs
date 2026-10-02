@@ -14,6 +14,10 @@ namespace Generated.Requests
         private SelectQuery _query;
         private string? _purpose;
         private string? _comment;
+        private static object TeaqlQueryValue(object value) =>
+            value is TimeSpan time
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                : value;
 
         public WorkItemRequest()
         {
@@ -47,15 +51,14 @@ namespace Generated.Requests
 
         public ExecutableWorkItemRequest Purpose(string p)
         {
-            if (string.IsNullOrWhiteSpace(p))
-                throw new ArgumentException("query purpose must not be empty", nameof(p));
+            p = QueryIntent.RequirePurpose(p);
             _query.Purpose(p);
             _purpose = p;
             return new ExecutableWorkItemRequest(
                 ExecuteForListInternalAsync,
+                ExecuteForOneInternalAsync,
                 ExecuteForPageInternalAsync,
                 ExecuteForStreamInternalAsync,
-                () => Limit(1),
                 c => Comment(c),
                 EnsureIntent);
         }
@@ -150,67 +153,67 @@ namespace Generated.Requests
                 }
                 public WorkItemRequest WithPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("platform", EntityDescriptor.New("Platform"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public WorkItemRequest WithoutPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("platform", EntityDescriptor.New("Platform"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", val));
+                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", val));
+                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", val));
+                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", val));
+                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", val));
+                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", val));
+                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", lower, upper));
+                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -234,54 +237,54 @@ namespace Generated.Requests
 
                 public WorkItemRequest WithTitleIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("title", val));
+                    _query.AndFilter(Expr.Eq("title", TeaqlQueryValue(val)));
                     return this;
                 }
                 public WorkItemRequest WithTitleIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("title", val));
+                    _query.AndFilter(Expr.Ne("title", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("title", vals));
+                    _query.AndFilter(Expr.In("title", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("title", vals));
+                    _query.AndFilter(Expr.NotIn("title", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("title", val));
+                    _query.AndFilter(Expr.Gt("title", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("title", val));
+                    _query.AndFilter(Expr.Gte("title", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("title", val));
+                    _query.AndFilter(Expr.Lt("title", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("title", val));
+                    _query.AndFilter(Expr.Lte("title", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("title", lower, upper));
+                    _query.AndFilter(Expr.Between("title", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -340,54 +343,54 @@ namespace Generated.Requests
 
                 public WorkItemRequest WithDescriptionIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("description", val));
+                    _query.AndFilter(Expr.Eq("description", TeaqlQueryValue(val)));
                     return this;
                 }
                 public WorkItemRequest WithDescriptionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("description", val));
+                    _query.AndFilter(Expr.Ne("description", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("description", vals));
+                    _query.AndFilter(Expr.In("description", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("description", vals));
+                    _query.AndFilter(Expr.NotIn("description", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("description", val));
+                    _query.AndFilter(Expr.Gt("description", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("description", val));
+                    _query.AndFilter(Expr.Gte("description", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("description", val));
+                    _query.AndFilter(Expr.Lt("description", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("description", val));
+                    _query.AndFilter(Expr.Lte("description", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("description", lower, upper));
+                    _query.AndFilter(Expr.Between("description", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -464,55 +467,55 @@ namespace Generated.Requests
 
                 public WorkItemRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", val));
+                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", val));
+                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", val));
+                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", val));
+                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", val));
+                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", val));
+                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", lower, upper));
+                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -659,11 +662,12 @@ namespace Generated.Requests
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
-            var req = new QueryRequest(_query);
+            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            var authorized = req.Query;
             var result = await service.QueryAsync(req);
-            foreach (var facet in _query.Facets)
+            foreach (var facet in authorized.Facets)
             {
-                var membership = _query.Copy();
+                var membership = authorized.CloneForExecution();
                 membership.Facets.Clear();
                 membership.Relations.Clear();
                 membership.Orders.Clear();
@@ -671,20 +675,20 @@ namespace Generated.Requests
                 membership.GroupFields.Clear();
                 membership.Projections.Clear();
                 membership.Project(facet.RelationName);
-                var membershipRows = (await service.QueryAsync(new QueryRequest(membership))).Rows;
+                var membershipRows = (await service.QueryAsync(req.WithQuery(membership))).Rows;
                 var counts = membershipRows
                     .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
                     .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw)!)
                     .ToDictionary(group => group.Key, group => group.Count());
 
-                var nested = facet.Query.Copy();
+                var nested = facet.Query.CloneForExecution();
                 nested.Facets.Clear();
                 var countAliases = nested.Aggregates
                     .Where(aggregate => aggregate.Function == AggregateFunction.Count)
                     .Select(aggregate => aggregate.Alias).ToArray();
                 nested.Aggregates.Clear();
                 nested.GroupFields.Clear();
-                var facetRows = (await service.QueryAsync(new QueryRequest(nested))).Rows;
+                var facetRows = (await service.QueryAsync(req.WithQuery(nested))).Rows;
                 var decorated = new SmartList<Record>();
                 foreach (var row in facetRows)
                 {
@@ -700,6 +704,16 @@ namespace Generated.Requests
             return result;
         }
 
+        private async Task<QueryResult> ExecuteForOneInternalAsync(UserContext context)
+        {
+            EnsureIntent();
+            var service = context.RequireResource<IDataService>();
+            var query = _query.CloneForExecution();
+            query.Limit(1);
+            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            return await service.QueryAsync(req);
+        }
+
         private async Task<WorkItemPage> ExecuteForPageInternalAsync(
             UserContext context, int offset, int limit)
         {
@@ -707,20 +721,31 @@ namespace Generated.Requests
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
             if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireResource<IDataService>();
-            _query.Offset(offset);
-            _query.Limit(limit);
-            var result = await service.QueryAsync(new QueryRequest(_query));
+            var query = _query.CloneForExecution();
+            query.Offset(offset);
+            query.Limit(limit);
+            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            var authorized = req.Query;
+            var result = await service.QueryAsync(req);
             long totalCount;
-            if (_query.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
+            if (authorized.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
             {
                 totalCount = checked((long)context.IdSetCount);
             }
             else
             {
-                var countQuery = new SelectQuery("WorkItem");
-                foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
+                var countQuery = authorized.CloneForExecution();
+                countQuery.Projection.Clear();
+                countQuery.ExprProjection.Clear();
+                countQuery.RelationLoads.Clear();
+                countQuery.RelationAggregates.Clear();
+                countQuery.OrderByItems.Clear();
+                countQuery.GroupByItems.Clear();
+                countQuery.AggregateItems.Clear();
+                countQuery.Slice = null;
+                countQuery.IdSetPagination = null;
                 countQuery.Aggregate("Count", "id", "count");
-                var countResult = await service.QueryAsync(new QueryRequest(countQuery));
+                var countResult = await service.QueryAsync(req.WithQuery(countQuery));
                 totalCount = countResult.Rows.Count == 0
                     ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
             }
@@ -740,8 +765,9 @@ namespace Generated.Requests
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
+            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
             await foreach (var chunk in streaming.QueryStreamAsync(
-                new QueryRequest(_query), chunkSize, cancellationToken).WithCancellation(cancellationToken))
+                req, chunkSize, cancellationToken).WithCancellation(cancellationToken))
             {
                 var queryRoot = new EntityRoot();
                 foreach (var row in chunk.Rows)
@@ -751,8 +777,7 @@ namespace Generated.Requests
 
         private void EnsureIntent()
         {
-            if (string.IsNullOrWhiteSpace(_purpose) || string.IsNullOrWhiteSpace(_comment))
-                throw new Exception("Security audit failure: Comment() and Purpose() must be non-empty before execution or NewEntity()");
+            _ = new QueryIntent(_comment, _purpose);
         }
 
     }
@@ -760,24 +785,24 @@ namespace Generated.Requests
     public sealed class ExecutableWorkItemRequest
     {
         private readonly Func<UserContext, Task<QueryResult>> _executeForRows;
+        private readonly Func<UserContext, Task<QueryResult>> _executeForOne;
         private readonly Func<UserContext, int, int, Task<WorkItemPage>> _executeForPage;
         private readonly Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.WorkItem>> _executeForStream;
-        private readonly Action _limitOne;
         private readonly Action<string> _comment;
         private readonly Action _ensureIntent;
 
         internal ExecutableWorkItemRequest(
             Func<UserContext, Task<QueryResult>> executeForRows,
+            Func<UserContext, Task<QueryResult>> executeForOne,
             Func<UserContext, int, int, Task<WorkItemPage>> executeForPage,
             Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.WorkItem>> executeForStream,
-            Action limitOne,
             Action<string> comment,
             Action ensureIntent)
         {
             _executeForRows = executeForRows;
+            _executeForOne = executeForOne;
             _executeForPage = executeForPage;
             _executeForStream = executeForStream;
-            _limitOne = limitOne;
             _comment = comment;
             _ensureIntent = ensureIntent;
         }
@@ -821,9 +846,10 @@ namespace Generated.Requests
         public async Task<Generated.Models.WorkItem?> ExecuteForOneAsync(
             UserContext context)
         {
-            _limitOne();
-            var entities = await ExecuteForListAsync(context);
-            return entities.Count > 0 ? entities[0] : null;
+            var result = await _executeForOne(context);
+            if (result.Rows.Count == 0) return null;
+            return Generated.Models.WorkItem.FromRecord(
+                result.Rows[0], new EntityRoot());
         }
     }
 

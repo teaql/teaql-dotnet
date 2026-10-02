@@ -13,6 +13,38 @@ static void Require(bool condition, string message)
     if (!condition) throw new InvalidOperationException(message);
 }
 
+static async Task RejectIntent(Func<Task> work, string code, string field, string kind)
+{
+    try { await work(); }
+    catch (RequestIntentException error)
+    {
+        Require(error.Code == code && error.Field == field && error.RequestKind == kind,
+            "Required request intent reported the wrong structured failure");
+        return;
+    }
+    throw new InvalidOperationException("Missing intent unexpectedly passed");
+}
+
+// No provider or transaction is installed: rejection must happen before either
+// resource lookup. Turning logs off must not disable governance.
+var policyProbe = new IntentPolicyProbe();
+var rejectedContext = new UserContext().WithRequestPolicy(policyProbe)
+    .DisableQuerySqlLog().DisableMutationSqlLog();
+await RejectIntent(() => Q.Schools().Purpose("verify missing comment")
+    .ExecuteForListAsync(rejectedContext), "REQUEST_COMMENT_REQUIRED", "comment", "query");
+await RejectIntent(() => Q.Schools().Comment("verify blank purpose").Purpose("\u2003")
+    .ExecuteForOneAsync(rejectedContext), "QUERY_PURPOSE_REQUIRED", "purpose", "query");
+await RejectIntent(() => new School().SaveAsync(rejectedContext),
+    "REQUEST_COMMENT_REQUIRED", "comment", "mutation");
+var callbackCount = 0;
+await RejectIntent(() => rejectedContext.ExecuteGraphSaveAsync("\u2003", () => {
+    callbackCount++;
+    return Task.FromResult(0);
+}), "REQUEST_COMMENT_REQUIRED", "comment", "mutation");
+Require(policyProbe.Calls == 0 && callbackCount == 0,
+    "Missing intent reached Policy or the graph callback");
+Console.WriteLine("PASS .NET generated required-intent rejection with logs disabled and no provider");
+
 var database = Path.Combine(Path.GetTempPath(), $"teaql-school-dotnet-{Guid.NewGuid():N}.sqlite");
 try
 {
@@ -119,4 +151,10 @@ finally
 sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
 {
     public EntityDescriptor? GetEntity(string name) => module.Metadata.GetEntity(name);
+}
+
+sealed class IntentPolicyProbe : IRequestPolicy
+{
+    public int Calls { get; private set; }
+    public SelectQuery Apply(SelectQuery query) { Calls++; return query; }
 }

@@ -12,11 +12,11 @@ public class GraphSaveTransactionTests
         var context = new UserContext().WithDataService(provider);
         var events = new List<string>();
 
-        var result = await context.ExecuteGraphSaveAsync(async () =>
+        var result = await context.ExecuteGraphSaveAsync("save parent graph", async () =>
         {
             context.AfterGraphCommit(() => events.Add("commit-action"));
             events.Add("work");
-            return await context.ExecuteGraphSaveAsync(() => Task.FromResult(42));
+            return await context.ExecuteGraphSaveAsync("save nested graph", () => Task.FromResult(42));
         });
 
         Assert.Equal(42, result);
@@ -32,7 +32,7 @@ public class GraphSaveTransactionTests
         var context = new UserContext().WithDataService(provider);
         var callbacks = new List<string>();
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => context.ExecuteGraphSaveAsync<int>(() =>
+        await Assert.ThrowsAsync<InvalidOperationException>(() => context.ExecuteGraphSaveAsync<int>("save rollback graph", () =>
         {
             context.AfterGraphRollback(() => callbacks.Add("parent"));
             context.AfterGraphRollback(() => callbacks.Add("child"));
@@ -52,7 +52,7 @@ public class GraphSaveTransactionTests
         var releaseFirst = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var secondEntered = false;
 
-        var first = context.ExecuteGraphSaveAsync(async () =>
+        var first = context.ExecuteGraphSaveAsync("save first independent graph", async () =>
         {
             firstEntered.SetResult();
             await releaseFirst.Task;
@@ -60,7 +60,7 @@ public class GraphSaveTransactionTests
         });
         await firstEntered.Task;
 
-        var second = context.ExecuteGraphSaveAsync(() =>
+        var second = context.ExecuteGraphSaveAsync("save second independent graph", () =>
         {
             secondEntered = true;
             return Task.FromResult(2);
@@ -85,12 +85,12 @@ public class GraphSaveTransactionTests
             .Install(new RuntimeModule().Checker("Task", checker))
             .WithDataService(provider);
 
-        await context.ExecuteGraphSaveAsync(async () =>
+        await context.ExecuteGraphSaveAsync("create tasks with one business clock", async () =>
         {
             var service = context.RequireResource<IDataService>();
-            await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Task")));
+            await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Task"), "create first task"));
             await Task.Delay(5);
-            await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Task")));
+            await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Task"), "create second task"));
             return true;
         });
 

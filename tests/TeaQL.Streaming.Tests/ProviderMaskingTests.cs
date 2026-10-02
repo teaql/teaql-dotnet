@@ -118,16 +118,14 @@ public class ProviderMaskingTests
                 .Value("password_hash", "PASSWORD-CANARY");
             command.TraceChain.Add(new TraceNode("Customer", null, "what: create masked customer"));
             var runtimeService = new RuntimeDataService(service, context);
-            await runtimeService.MutateAsync(new InsertMutationRequest(command));
+            await runtimeService.MutateAsync(new InsertMutationRequest(command, "what: create masked customer"));
             var query = new SelectQuery("Customer")
                 .Filter(Expr.And(new List<Expr> {
                     Expr.Eq("display_name", "Riverside"),
                     Expr.Eq("public_address", "1 Runtime Road")
                 })).Limit(1);
-            var result = await runtimeService.QueryAsync(new QueryRequest(query) {
-                Comment = "what: read masked customer",
-                Purpose = "why: verify live-provider SQL masking"
-            });
+            var result = await runtimeService.QueryAsync(new QueryRequest(query,
+                new QueryIntent("what: read masked customer", "why: verify live-provider SQL masking")));
             Assert.Single(result.Rows);
             Assert.Equal("Riverside", result.Rows[0]["display_name"].TryText());
             Assert.Equal("1 Runtime Road", result.Rows[0]["public_address"].TryText());

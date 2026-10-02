@@ -6,6 +6,7 @@ using TeaQL.Core;
 
 namespace Generated.Models
 {
+
     public class Customer
     {
         private static long _teaqlTemporaryId;
@@ -22,6 +23,8 @@ namespace Generated.Models
         };
         private static DateTime TeaqlDateTime(Value value) => value switch {
             Value.TimestampValue v => DateTimeOffset.FromUnixTimeMilliseconds(v.Milliseconds).UtcDateTime,
+            Value.I64Value v => DateTimeOffset.FromUnixTimeMilliseconds(v.Value).UtcDateTime,
+            Value.U64Value v => DateTimeOffset.FromUnixTimeMilliseconds(checked((long)v.Value)).UtcDateTime,
             Value.DateTimeValue v => v.Value,
             Value.DateValue v => v.Value,
             _ => Convert.ToDateTime(value.Raw)
@@ -153,9 +156,9 @@ namespace Generated.Models
                         if (record.TryGetValue("CustomerOrderList", out var customerOrderListValue))
                         {
                             entity.MarkLoaded("CustomerOrderList");
-                            var rows = customerOrderListValue.Raw as IEnumerable<Record>;
-                            if (rows != null)
-                                foreach (var row in rows) entity.CustomerOrderList.Add(global::Generated.Models.CustomerOrder.FromRecord(row));
+                            if (customerOrderListValue is Value.ListValue rows)
+                                foreach (var row in rows.Values.OfType<Value.ObjectValue>())
+                                    entity.CustomerOrderList.Add(global::Generated.Models.CustomerOrder.FromRecord(row.Value));
                         }
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -172,8 +175,12 @@ namespace Generated.Models
 
         public async Task<Customer> SaveAsync(UserContext context)
         {
-            return await context.ExecuteGraphSaveAsync(async () =>
+            var intent = new MutationIntent(_comment);
+            return await context.ExecuteGraphSaveAsync(intent.Comment, async () =>
             {
+                if (!Id.HasValue || _teaqlForceCreate)
+                {
+                }
                 TeaqlPreflightGraph(context);
                 return await TeaqlSaveWithinGraphAsync(context);
             });
@@ -181,8 +188,7 @@ namespace Generated.Models
 
         internal void TeaqlPreflightGraph(UserContext context)
         {
-            if (string.IsNullOrWhiteSpace(_comment))
-                throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
+            _ = new MutationIntent(_comment);
             var creating = !Id.HasValue || _teaqlForceCreate;
             if (!creating && !_markedForDeletion)
             {
@@ -262,10 +268,7 @@ namespace Generated.Models
                 _entityRoot.ClearEntity(TeaqlEntityKey());
                 if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
             });
-            if (string.IsNullOrWhiteSpace(_comment))
-            {
-                throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
-            }
+            _ = new MutationIntent(_comment);
             var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");

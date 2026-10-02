@@ -75,9 +75,8 @@ public class SqlMaskLifecycleTests
         return (new RuntimeDataService(provider, context), log);
     }
 
-    private static QueryRequest Request() => new(new SelectQuery("Customer").Limit(5)) {
-        Comment = "what: inspect customers", Purpose = "why: lifecycle regression"
-    };
+    private static QueryRequest Request() => new(new SelectQuery("Customer").Limit(5),
+        new QueryIntent("what: inspect customers", "why: lifecycle regression"));
 
     [Theory]
     [InlineData(false, "update")][InlineData(true, "update")]
@@ -89,9 +88,9 @@ public class SqlMaskLifecycleTests
             Failure = failure ? new InvalidOperationException("driver failed") : null };
         var (service, log) = Fixture(false, transport);
         MutationRequest request = operation switch {
-            "update" => new UpdateMutationRequest(new UpdateCommand("Customer", new Value.I64Value(1001))),
-            "delete" => new DeleteMutationRequest(new DeleteCommand("Customer", new Value.I64Value(1001))),
-            _ => new RecoverMutationRequest(new RecoverCommand { Entity = "Customer", Id = new Value.I64Value(1001), ExpectedVersionValue = -3 })
+            "update" => new UpdateMutationRequest(new UpdateCommand("Customer", new Value.I64Value(1001)), "what: update customer 1001"),
+            "delete" => new DeleteMutationRequest(new DeleteCommand("Customer", new Value.I64Value(1001)), "what: delete customer 1001"),
+            _ => new RecoverMutationRequest(new RecoverCommand { Entity = "Customer", Id = new Value.I64Value(1001), ExpectedVersionValue = -3 }, "what: recover customer 1001")
         };
         switch (request) {
             case UpdateMutationRequest update: update.Command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001")); break;
@@ -144,9 +143,9 @@ public class SqlMaskLifecycleTests
             if (operation == "query") await service.QueryAsync(Request());
             else {
                 MutationRequest request = operation switch {
-                    "insert" => new InsertMutationRequest(new InsertCommand("Customer")),
-                    "update" => new UpdateMutationRequest(new UpdateCommand("Customer", Value.FromObject(1L))),
-                    _ => new DeleteMutationRequest(new DeleteCommand("Customer", Value.FromObject(1L)))
+                    "insert" => new InsertMutationRequest(new InsertCommand("Customer"), "create customer for failed statement test"),
+                    "update" => new UpdateMutationRequest(new UpdateCommand("Customer", Value.FromObject(1L)), "update customer for failed statement test"),
+                    _ => new DeleteMutationRequest(new DeleteCommand("Customer", Value.FromObject(1L)), "delete customer for failed statement test")
                 };
                 await service.MutateAsync(request);
             }
@@ -234,14 +233,14 @@ public class SqlMaskLifecycleTests
     {
         var command = new InsertCommand("Customer").Value("name", "Riverside");
         command.TraceChain.Add(new TraceNode("Customer", null, "why: " + label));
-        return new InsertMutationRequest(command);
+        return new InsertMutationRequest(command, "why: " + label);
     }
 
     private static BatchMutationRequest Batch(bool nested) => new(new List<MutationRequest> {
-        nested ? new BatchMutationRequest(new List<MutationRequest> { Write("first") }) : Write("first"),
-        nested ? new BatchMutationRequest(new List<MutationRequest> { Write("second"), Write("unexecuted") }) : Write("second"),
+        nested ? new BatchMutationRequest(new List<MutationRequest> { Write("first") }, "save first customer branch") : Write("first"),
+        nested ? new BatchMutationRequest(new List<MutationRequest> { Write("second"), Write("unexecuted") }, "save second customer branch") : Write("second"),
         Write("unexecuted")
-    });
+    }, "save customer graph");
 
     [Theory]
     [InlineData(false, false, false)][InlineData(true, false, false)]
@@ -310,8 +309,8 @@ public class SqlMaskLifecycleTests
         var transport = new Transport { AffectedRows = 1 };
         var (service, log) = Fixture(transaction, transport);
         await Assert.ThrowsAsync<SqlExecutorException>(() => service.MutateAsync(new BatchMutationRequest(new() {
-            Write("first"), new InsertMutationRequest(new InsertCommand("UnknownEntity")), Write("unexecuted")
-        })));
+            Write("first"), new InsertMutationRequest(new InsertCommand("UnknownEntity"), "create unknown entity"), Write("unexecuted")
+        }, "save customer graph with missing schema")));
         Assert.Equal(1, transport.WriteCount);
         AssertLog(log, "success");
         Assert.Contains("1 rows affected", log.ToString());

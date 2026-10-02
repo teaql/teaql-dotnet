@@ -45,7 +45,7 @@ var allowed = new UserContext
     .WithAppAuditEventSink(audit)
     .WithDataService(allowedProvider);
 
-await allowed.ExecuteGraphSaveAsync(async () =>
+await allowed.ExecuteGraphSaveAsync("submit approved order graph", async () =>
 {
     var order = Insert("Order", 42, "create approved order");
     var line = Insert("OrderLine", 99, "create approved order line");
@@ -73,7 +73,7 @@ var denied = new UserContext()
     .WithDataService(deniedProvider);
 try
 {
-    await denied.ExecuteGraphSaveAsync(async () =>
+    await denied.ExecuteGraphSaveAsync("submit denied order graph", async () =>
     {
         var order = Insert("Order", 43, "create denied order");
         var line = Insert("OrderLine", 100, "create denied order line");
@@ -98,7 +98,7 @@ var missingPreflight = new UserContext()
     .WithDataService(missingPreflightProvider);
 try
 {
-    await missingPreflight.ExecuteGraphSaveAsync(() =>
+    await missingPreflight.ExecuteGraphSaveAsync("save order without preflight", () =>
         missingPreflight.RequireResource<IDataService>().MutateAsync(
             Insert("Order", 44, "missing graph preflight")));
     throw new InvalidOperationException("customer policy graph without preflight unexpectedly completed");
@@ -115,7 +115,7 @@ var snapshotPolicy = new StateCapturingPolicy(identity);
 var snapshotContext = new UserContext()
     .WithMutationPolicyRegistry(new DelegatingMutationPolicyRegistry(_ => snapshotPolicy))
     .WithDataService(snapshotProvider);
-await snapshotContext.ExecuteGraphSaveAsync(async () =>
+await snapshotContext.ExecuteGraphSaveAsync("save order from immutable plan", async () =>
 {
     var request = Insert("Order", 45, "prove immutable plan snapshot");
     request.Command.Value("state", new Value.TextValue("DRAFT"));
@@ -136,7 +136,7 @@ static InsertMutationRequest Insert(string entity, long id, string reason)
 {
     var command = new InsertCommand(entity).Value("id", new Value.I64Value(id));
     command.TraceChain.Add(new TraceNode(entity, null, reason));
-    return new InsertMutationRequest(command);
+    return new InsertMutationRequest(command, reason);
 }
 
 static void Require(bool condition, string message)

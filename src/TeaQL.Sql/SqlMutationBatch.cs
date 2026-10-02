@@ -15,11 +15,16 @@ internal static class SqlMutationBatch
         var parameters = new List<Value>();
         var statements = new List<ExecutionMetadata>();
         var observer = batch.DiagnosticObserver;
+        // Root prose may mention values belonging to a different branch, even
+        // one that has not executed. Keep redaction local to this invocation.
+        var intentValues = batch.InheritedIntentValues.Concat(Values(batch)).ToArray();
         var start = DateTimeOffset.UtcNow;
         try
         {
-            foreach (var request in batch.Requests)
+            foreach (var child in batch.Requests)
             {
+                var request = child.WithRootIntent(batch.Intent);
+                request.InheritedIntentValues = child.InheritedIntentValues.Concat(intentValues).ToArray();
                 var previous = request.DiagnosticObserver;
                 request.DiagnosticObserver = observer == null ? null : statements.Add;
                 MutationResult result;
@@ -51,6 +56,35 @@ internal static class SqlMutationBatch
                 Parameters = parameters, Statements = statements
             }
         };
+    }
+
+    private static IEnumerable<Value> Values(MutationRequest request)
+    {
+        switch (request)
+        {
+            case BatchMutationRequest batch:
+                foreach (var child in batch.Requests)
+                    foreach (var value in Values(child)) yield return value;
+                break;
+            case InsertMutationRequest insert:
+                foreach (var value in insert.Command.Values.Values) yield return value;
+                break;
+            case UpdateMutationRequest update:
+                yield return update.Command.Id;
+                foreach (var value in update.Command.Values.Values) yield return value;
+                foreach (var value in update.Command.Guards.Values) yield return value;
+                if (update.Command.OldValues is { } old)
+                    foreach (var value in old.Values) yield return value;
+                break;
+            case DeleteMutationRequest delete:
+                yield return delete.Command.Id;
+                foreach (var value in delete.Command.Guards.Values) yield return value;
+                break;
+            case RecoverMutationRequest recover:
+                yield return recover.Command.Id;
+                foreach (var value in recover.Command.Guards.Values) yield return value;
+                break;
+        }
     }
 
     private static void ReportFailureHistory(Action<ExecutionMetadata> observer, ExecutionMetadata statement)

@@ -149,12 +149,9 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         return result;
     }
 
-    private QueryRequest CopyRequest(QueryRequest source, SelectQuery query) => new()
+    private QueryRequest CopyRequest(QueryRequest source, SelectQuery query) => new(query, source.Intent)
     {
-        Query = query,
         TraceChain = new List<TraceNode>(source.TraceChain),
-        Comment = source.Comment,
-        Purpose = source.Purpose,
         IntentSource = source.IntentSource,
         RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry)
     };

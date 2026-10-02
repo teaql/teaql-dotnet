@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeaQL.DataService\TeaQL.DataService.csproj" />
+    <None Include="../../tests/fixtures/request-intent-v1.json" Link="request-intent-v1.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

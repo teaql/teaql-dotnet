@@ -205,8 +205,9 @@ public class UserContext
         return claims;
     }
 
-    public async Task<T> ExecuteGraphSaveAsync<T>(Func<Task<T>> work)
+    public async Task<T> ExecuteGraphSaveAsync<T>(string comment, Func<Task<T>> work)
     {
+        var intent = new MutationIntent(comment); // Must precede callbacks and transaction allocation.
         if (_ambientGraphSave.Value != null && ReferenceEquals(_ambientGraphSave.Value, _activeGraphSave))
             return await work().ConfigureAwait(false);
         await _graphSaveGate.WaitAsync().ConfigureAwait(false);
@@ -219,7 +220,7 @@ public class UserContext
                 .BeginTransactionAsync().ConfigureAwait(false);
             _activeGraphSave = session;
             _ambientGraphSave.Value = session;
-            _mutationPolicy.BeginGraph();
+            _mutationPolicy.BeginGraph(intent.Comment);
             _graphFixTime = BusinessTime;
             _currentFixEvidence = new List<FixEvidence>();
             _graphCommitActions = new List<Action>();
@@ -401,13 +402,19 @@ public class UserContext
     /// every entity query before any provider can observe it.
     /// </summary>
     public SelectQuery ApplyRequestPolicy(SelectQuery query)
+        => PrepareQueryRequest(new QueryRequest(query)).Query;
+
+    /// <summary>Freeze root intent before customer Policy, including replacements.</summary>
+    public QueryRequest PrepareQueryRequest(QueryRequest request)
     {
-        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(request);
         var policy = GetResource<IRequestPolicy>();
-        var clone = CloneQueryTree(query,
+        var clone = CloneQueryTree(request.Query,
             new Dictionary<SelectQuery, SelectQuery>(ReferenceEqualityComparer.Instance));
-        return policy == null ? clone : ApplyRequestPolicyTree(clone, policy,
+        var authorized = policy == null ? clone : ApplyRequestPolicyTree(clone, policy,
             new Dictionary<SelectQuery, SelectQuery>(ReferenceEqualityComparer.Instance));
+        authorized.Comment(request.Comment).Purpose(request.Purpose);
+        return request.WithQuery(authorized);
     }
 
     private static SelectQuery ApplyRequestPolicyTree(SelectQuery query, IRequestPolicy policy,

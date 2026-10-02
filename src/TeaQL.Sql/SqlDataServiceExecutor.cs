@@ -319,17 +319,14 @@ internal static class RelationQueryLoader
                     : new[] { childQuery };
                 foreach (var executionQuery in queries)
                 {
-                    var childResult = await queryAsync(new QueryRequest
+                    var childResult = await queryAsync(new QueryRequest(executionQuery, request.Intent)
                     {
-                        Query = executionQuery,
                         TraceChain = request.TraceChain.Concat(new[] {
                             new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
                                 Level = request.TraceChain.Count, Kind = "relation",
                                 Name = $"{request.Query.Entity}.{load.Name}"
                             }
                         }).ToList(),
-                        Comment = request.Comment,
-                        Purpose = request.Purpose,
                         IntentSource = inheritedIntent,
                         RelationLoadObserver = request.RelationLoadObserver,
                         DiagnosticObserver = request.DiagnosticObserver
@@ -392,17 +389,14 @@ internal static class RelationQueryLoader
             if (!childQuery.GroupByItems.Contains(relation.ForeignKeyValue))
                 childQuery.GroupByItems.Add(relation.ForeignKeyValue);
             childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
-            var result = await queryAsync(new QueryRequest
+            var result = await queryAsync(new QueryRequest(childQuery, request.Intent)
             {
-                Query = childQuery,
                 TraceChain = request.TraceChain.Concat(new[] {
                     new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
                         Level = request.TraceChain.Count, Kind = "relation",
                         Name = $"{request.Query.Entity}.{aggregate.RelationName}"
                     }
                 }).ToList(),
-                Comment = request.Comment,
-                Purpose = request.Purpose,
                 IntentSource = inheritedIntent,
                 RelationLoadObserver = request.RelationLoadObserver,
                 DiagnosticObserver = request.DiagnosticObserver

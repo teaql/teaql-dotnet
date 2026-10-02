@@ -73,7 +73,9 @@ internal static class SqlStatementDiagnostics
             RecoverMutationRequest recover => recover.Command.Id,
             _ => null
         };
-        return target == null || target is Value.NullValue or Value.TypedNullValue ? Array.Empty<Value>() : [target];
+        return target == null || target is Value.NullValue or Value.TypedNullValue
+            ? request.InheritedIntentValues
+            : request.InheritedIntentValues.Concat(new[] { target }).ToArray();
     }
 
     private static void Record(object request, ExecutionMetadata metadata)

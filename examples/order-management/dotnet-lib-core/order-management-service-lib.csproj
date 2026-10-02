@@ -6,10 +6,14 @@
     <OutputType Condition="!Exists('Program.cs')">Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.2.5</TeaQLRuntimeVersion>
+    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.2.9</TeaQLRuntimeVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TeaQLRuntimeSourceRoot)' == ''">
-    <PackageReference Include="TeaQL.Provider.Sqlite" Version="$(TeaQLRuntimeVersion)" />
+    <PackageReference Include="TeaQL.Core" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.DataService" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.Runtime" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.Sql" Version="[$(TeaQLRuntimeVersion)]" />
+    <PackageReference Include="TeaQL.Provider.Sqlite" Version="[$(TeaQLRuntimeVersion)]" />
   </ItemGroup>
   <ItemGroup Condition="'$(TeaQLRuntimeSourceRoot)' != ''">
     <ProjectReference Include="$(TeaQLRuntimeSourceRoot)/src/TeaQL.Core/TeaQL.Core.csproj" />

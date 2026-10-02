@@ -25,19 +25,30 @@ public class QueryRequest
     internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
     // Bind provenance for inherited intent on derived queries, not shared context state.
     internal ExecutionMetadata? IntentSource { get; set; }
-    public SelectQuery Query { get; set; } = new();
+    public SelectQuery Query { get; }
     public List<TraceNode> TraceChain { get; set; } = new();
-    private string? _comment;
-    private string? _purpose;
-    // Generated requests carry intent on SelectQuery. Preserve it for both
-    // constructors and object initializers, with explicit request overrides.
-    // RuntimeDataService snapshots these values when preparing execution.
-    public string? Comment { get => _comment ?? Query.CommentText; set => _comment = value; }
-    public string? Purpose { get => _purpose ?? Query.PurposeText; set => _purpose = value; }
+    public QueryIntent Intent { get; }
+    public string Comment => Intent.Comment;
+    public string Purpose => Intent.Purpose;
     /// <summary>Runtime-only observer; providers must not serialize it.</summary>
     public IRelationLoadObserver? RelationLoadObserver { get; set; }
-    public QueryRequest() { }
-    public QueryRequest(SelectQuery query) => Query = query;
+    public QueryRequest(SelectQuery query)
+        : this(query, new QueryIntent(query.CommentText, query.PurposeText)) { }
+
+    public QueryRequest(SelectQuery query, QueryIntent intent)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(intent);
+        Intent = intent;
+        Query = query.CloneForExecution();
+    }
+
+    /// <summary>Derived work inherits validated root intent, not nested builder prose.</summary>
+    public QueryRequest WithQuery(SelectQuery query) => new(query, Intent)
+    {
+        TraceChain = new List<TraceNode>(TraceChain), IntentSource = IntentSource,
+        RelationLoadObserver = RelationLoadObserver, DiagnosticObserver = DiagnosticObserver
+    };
 }
 
 public interface IRelationLoadObserver
@@ -56,32 +67,58 @@ public class QueryResult
 public abstract class MutationRequest
 {
     internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
+    // Execution-local prose redaction provenance for inherited graph intent.
+    // Never serialized, never used as SQL bindings or application payload.
+    internal IReadOnlyList<Value> InheritedIntentValues { get; set; } = Array.Empty<Value>();
     public EntityKey? LedgerKey { get; init; }
     public EntityRoot? LedgerRoot { get; init; }
     public abstract IReadOnlyList<TraceNode> TraceChain { get; }
-    public abstract string? Comment { get; }
+    public MutationIntent Intent { get; }
+    public string Comment => Intent.Comment;
+
+    protected MutationRequest(MutationIntent intent)
+    {
+        ArgumentNullException.ThrowIfNull(intent);
+        Intent = intent;
+    }
+
+    public MutationRequest WithRootIntent(MutationIntent intent)
+    {
+        MutationRequest request = this switch
+        {
+            InsertMutationRequest insert => new InsertMutationRequest(insert.Command, intent.Comment) { LedgerKey = LedgerKey, LedgerRoot = LedgerRoot },
+            UpdateMutationRequest update => new UpdateMutationRequest(update.Command, intent.Comment) { LedgerKey = LedgerKey, LedgerRoot = LedgerRoot },
+            DeleteMutationRequest delete => new DeleteMutationRequest(delete.Command, intent.Comment) { LedgerKey = LedgerKey, LedgerRoot = LedgerRoot },
+            RecoverMutationRequest recover => new RecoverMutationRequest(recover.Command, intent.Comment) { LedgerKey = LedgerKey, LedgerRoot = LedgerRoot },
+            BatchMutationRequest batch => new BatchMutationRequest(batch.Requests, intent.Comment) { LedgerKey = LedgerKey, LedgerRoot = LedgerRoot },
+            _ => throw new NotSupportedException("Unknown mutation request kind")
+        };
+        request.DiagnosticObserver = DiagnosticObserver;
+        request.InheritedIntentValues = InheritedIntentValues;
+        return request;
+    }
 
     public static MutationRequest Create(InsertCommand command, string comment, EntityKey ledgerKey, EntityRoot ledgerRoot)
     {
         AddAuditTrace(command.TraceChain, command.Entity, comment);
-        return new InsertMutationRequest(command) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
+        return new InsertMutationRequest(command, comment) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
     }
 
     public static MutationRequest Create(UpdateCommand command, string comment, EntityKey ledgerKey, EntityRoot ledgerRoot)
     {
         AddAuditTrace(command.TraceChain, command.Entity, comment);
-        return new UpdateMutationRequest(command) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
+        return new UpdateMutationRequest(command, comment) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
     }
 
     public static MutationRequest Create(DeleteCommand command, string comment, EntityKey ledgerKey, EntityRoot ledgerRoot)
     {
         AddAuditTrace(command.TraceChain, command.Entity, comment);
-        return new DeleteMutationRequest(command) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
+        return new DeleteMutationRequest(command, comment) { LedgerKey = ledgerKey, LedgerRoot = ledgerRoot };
     }
 
     private static void AddAuditTrace(List<TraceNode> trace, string entity, string comment)
     {
-        if (string.IsNullOrWhiteSpace(comment)) throw new ArgumentException("Mutation audit comment is required", nameof(comment));
+        _ = new MutationIntent(comment); // Validate before changing diagnostic state.
         trace.Add(new TraceNode(entity, null, comment));
     }
 }
@@ -90,65 +127,60 @@ public class InsertMutationRequest : MutationRequest
 {
     public InsertCommand Command { get; }
     
-    public InsertMutationRequest(InsertCommand command)
+    public InsertMutationRequest(InsertCommand command, string? comment) : base(new MutationIntent(comment))
     {
         Command = command;
     }
 
     public override IReadOnlyList<TraceNode> TraceChain => Command.TraceChain;
-    public override string? Comment => Command.TraceChain.LastOrDefault()?.Comment;
 }
 
 public class UpdateMutationRequest : MutationRequest
 {
     public UpdateCommand Command { get; }
     
-    public UpdateMutationRequest(UpdateCommand command)
+    public UpdateMutationRequest(UpdateCommand command, string? comment) : base(new MutationIntent(comment))
     {
         Command = command;
     }
 
     public override IReadOnlyList<TraceNode> TraceChain => Command.TraceChain;
-    public override string? Comment => Command.TraceChain.LastOrDefault()?.Comment;
 }
 
 public class DeleteMutationRequest : MutationRequest
 {
     public DeleteCommand Command { get; }
     
-    public DeleteMutationRequest(DeleteCommand command)
+    public DeleteMutationRequest(DeleteCommand command, string? comment) : base(new MutationIntent(comment))
     {
         Command = command;
     }
 
     public override IReadOnlyList<TraceNode> TraceChain => Command.TraceChain;
-    public override string? Comment => Command.TraceChain.LastOrDefault()?.Comment;
 }
 
 public class RecoverMutationRequest : MutationRequest
 {
     public RecoverCommand Command { get; }
     
-    public RecoverMutationRequest(RecoverCommand command)
+    public RecoverMutationRequest(RecoverCommand command, string? comment) : base(new MutationIntent(comment))
     {
         Command = command;
     }
 
     public override IReadOnlyList<TraceNode> TraceChain => Command.TraceChain;
-    public override string? Comment => Command.TraceChain.LastOrDefault()?.Comment;
 }
 
 public class BatchMutationRequest : MutationRequest
 {
     public List<MutationRequest> Requests { get; }
     
-    public BatchMutationRequest(List<MutationRequest> requests)
+    public BatchMutationRequest(List<MutationRequest> requests, string? comment) : base(new MutationIntent(comment))
     {
         Requests = requests;
     }
 
     public override IReadOnlyList<TraceNode> TraceChain => Array.Empty<TraceNode>();
-    public override string? Comment => null;
 }
 
 public class MutationResult

@@ -95,7 +95,7 @@ class Program
             UserEmail = "admin@robots.com",
             Version = 1
         };
-        await executor.MutateAsync(new InsertMutationRequest(p.ToInsertCommand()));
+        await executor.MutateAsync(new InsertMutationRequest(p.ToInsertCommand(), "initialize robot platform"));
 
         var tsId = 1001L;
         var ts = new Generated.Models.TaskStatus {
@@ -108,7 +108,7 @@ class Program
             Platform = pId,
             Version = 1
         };
-        await executor.MutateAsync(new InsertMutationRequest(ts.ToInsertCommand()));
+        await executor.MutateAsync(new InsertMutationRequest(ts.ToInsertCommand(), "initialize planned task status"));
 
         Console.WriteLine("Creating Task...");
         var tId = 1L;
@@ -119,7 +119,7 @@ class Program
             Platform = pId,
             Version = 1
         };
-        await executor.MutateAsync(new InsertMutationRequest(t.ToInsertCommand()));
+        await executor.MutateAsync(new InsertMutationRequest(t.ToInsertCommand(), "create robot task"));
 
         Console.WriteLine("Updating Task...");
         var tUpdate = new Generated.Models.Task {
@@ -127,7 +127,7 @@ class Program
             Name = "Updated Robot Task",
             Version = 2
         };
-        await executor.MutateAsync(new UpdateMutationRequest(tUpdate.ToUpdateCommand()));
+        await executor.MutateAsync(new UpdateMutationRequest(tUpdate.ToUpdateCommand(), "rename robot task"));
 
         Console.WriteLine("Inserting TaskExecutionLog...");
         var log = new Generated.Models.TaskExecutionLog {
@@ -137,11 +137,12 @@ class Program
             Detail = "Changed name to 'Updated Robot Task'",
             Version = 1
         };
-        await executor.MutateAsync(new InsertMutationRequest(log.ToInsertCommand()));
+        await executor.MutateAsync(new InsertMutationRequest(log.ToInsertCommand(), "record robot task rename"));
 
         Console.WriteLine("Querying Tasks...");
         var taskQuery = new SelectQuery("Task");
-        var taskResults = await executor.QueryAsync(new QueryRequest { Query = taskQuery });
+        var taskResults = await executor.QueryAsync(new QueryRequest(taskQuery,
+            new QueryIntent("load robot tasks", "display task board")));
 
         foreach (var row in taskResults.Rows)
         {
@@ -150,7 +151,8 @@ class Program
 
         Console.WriteLine("Querying TaskExecutionLogs...");
         var logQuery = new SelectQuery("TaskExecutionLog");
-        var logResults = await executor.QueryAsync(new QueryRequest { Query = logQuery });
+        var logResults = await executor.QueryAsync(new QueryRequest(logQuery,
+            new QueryIntent("load task execution history", "inspect robot task audit trail")));
 
         foreach (var row in logResults.Rows)
         {

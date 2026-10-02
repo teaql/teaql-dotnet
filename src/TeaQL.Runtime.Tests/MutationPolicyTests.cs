@@ -61,7 +61,7 @@ public class MutationPolicyTests
             .WithDataService(provider);
 
         var error = await Assert.ThrowsAsync<MutationPolicyException>(() =>
-            context.ExecuteGraphSaveAsync(async () =>
+            context.ExecuteGraphSaveAsync("submit denied order graph", async () =>
             {
                 context.PreflightMutation(OrderInsert());
                 context.PreflightMutation(LineInsert());
@@ -86,7 +86,7 @@ public class MutationPolicyTests
             .WithAppAuditEventSink(audit)
             .WithDataService(provider);
 
-        await context.ExecuteGraphSaveAsync(async () =>
+        await context.ExecuteGraphSaveAsync("save allowed order graph", async () =>
         {
             var request = OrderInsert();
             context.PreflightMutation(request);
@@ -114,7 +114,7 @@ public class MutationPolicyTests
             .WithDataService(provider);
 
         var error = await Assert.ThrowsAsync<MutationPolicyException>(() =>
-            context.ExecuteGraphSaveAsync(() =>
+            context.ExecuteGraphSaveAsync("save order without preflight", () =>
                 context.RequireResource<IDataService>().MutateAsync(OrderInsert())));
 
         Assert.Contains("complete graph preflight", error.Message);
@@ -139,7 +139,7 @@ public class MutationPolicyTests
             .WithMutationPolicyRegistry(new DelegatingMutationPolicyRegistry(_ => policy))
             .WithDataService(provider);
 
-        await context.ExecuteGraphSaveAsync(async () =>
+        await context.ExecuteGraphSaveAsync("save order from preflight snapshot", async () =>
         {
             var request = OrderInsert();
             request.Command.Value("state", new Value.TextValue("DRAFT"));
@@ -168,7 +168,7 @@ public class MutationPolicyTests
             .WithDataService(provider);
 
         await context.RequireResource<IDataService>().MutateAsync(new BatchMutationRequest(
-            new List<MutationRequest> { OrderInsert(), LineInsert() }));
+            new List<MutationRequest> { OrderInsert(), LineInsert() }, "create order and line"));
 
         Assert.Equal(2, observedOperations);
         Assert.Equal(1, provider.MutationCount);
@@ -194,14 +194,14 @@ public class MutationPolicyTests
     {
         var command = new InsertCommand("Order").Value("id", new Value.I64Value(42));
         command.TraceChain.Add(new TraceNode("Order", null, "create order"));
-        return new InsertMutationRequest(command);
+        return new InsertMutationRequest(command, "create order");
     }
 
     private static InsertMutationRequest LineInsert()
     {
         var command = new InsertCommand("OrderLine").Value("id", new Value.I64Value(99));
         command.TraceChain.Add(new TraceNode("OrderLine", null, "create line"));
-        return new InsertMutationRequest(command);
+        return new InsertMutationRequest(command, "create line");
     }
 
     private sealed class TestPolicy(

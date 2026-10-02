@@ -14,9 +14,9 @@ namespace TeaQL.DataService.Tests
         {
             var query = new SelectQuery();
             var trace = new List<TraceNode> { new TraceNode("test", null, "comment") };
-            var req = new QueryRequest { Query = query, TraceChain = trace, Comment = "comment" };
+            var req = new QueryRequest(query, new QueryIntent("comment", "verify request properties")) { TraceChain = trace };
 
-            Assert.Same(query, req.Query);
+            Assert.NotSame(query, req.Query);
             Assert.Same(trace, req.TraceChain);
             Assert.Equal("comment", req.Comment);
         }
@@ -37,7 +37,7 @@ namespace TeaQL.DataService.Tests
         {
             var trace = new List<TraceNode> { new TraceNode("test", null, "c1") };
             var cmd = new InsertCommand { TraceChain = trace };
-            var req = new InsertMutationRequest(cmd);
+            var req = new InsertMutationRequest(cmd, "c1");
 
             Assert.Same(cmd, req.Command);
             Assert.Same(trace, req.TraceChain);
@@ -49,7 +49,7 @@ namespace TeaQL.DataService.Tests
         {
             var trace = new List<TraceNode> { new TraceNode("test", null, "c2") };
             var cmd = new UpdateCommand { TraceChain = trace };
-            var req = new UpdateMutationRequest(cmd);
+            var req = new UpdateMutationRequest(cmd, "c2");
 
             Assert.Same(cmd, req.Command);
             Assert.Same(trace, req.TraceChain);
@@ -61,7 +61,7 @@ namespace TeaQL.DataService.Tests
         {
             var trace = new List<TraceNode> { new TraceNode("test", null, "c3") };
             var cmd = new DeleteCommand { TraceChain = trace };
-            var req = new DeleteMutationRequest(cmd);
+            var req = new DeleteMutationRequest(cmd, "c3");
 
             Assert.Same(cmd, req.Command);
             Assert.Same(trace, req.TraceChain);
@@ -73,7 +73,7 @@ namespace TeaQL.DataService.Tests
         {
             var trace = new List<TraceNode> { new TraceNode("test", null, "c4") };
             var cmd = new RecoverCommand { TraceChain = trace };
-            var req = new RecoverMutationRequest(cmd);
+            var req = new RecoverMutationRequest(cmd, "c4");
 
             Assert.Same(cmd, req.Command);
             Assert.Same(trace, req.TraceChain);
@@ -83,13 +83,13 @@ namespace TeaQL.DataService.Tests
         [Fact]
         public void BatchMutationRequest_Properties_Work()
         {
-            var innerReq = new InsertMutationRequest(new InsertCommand());
+            var innerReq = new InsertMutationRequest(new InsertCommand(), "create graph child");
             var reqs = new List<MutationRequest> { innerReq };
-            var batchReq = new BatchMutationRequest(reqs);
+            var batchReq = new BatchMutationRequest(reqs, "save graph");
 
             Assert.Same(reqs, batchReq.Requests);
             Assert.Empty(batchReq.TraceChain);
-            Assert.Null(batchReq.Comment);
+            Assert.Equal("save graph", batchReq.Comment);
         }
 
         [Fact]

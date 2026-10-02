@@ -20,12 +20,9 @@ static async Task VerifyLogBoundaryAsync()
         .WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(ordinary))
         .WithSensitiveDiagnosticSqlLogSink(new SensitiveDiagnosticSqlLogSink(sensitive))
         .WithDataService(provider);
-    await context.RequireResource<IDataService>().QueryAsync(new QueryRequest
-    {
-        Query = new SelectQuery("CustomerOrder").Limit(1),
-        Comment = "what: demonstrate safe SQL logging",
-        Purpose = "why: retain a runnable security example"
-    });
+    await context.RequireResource<IDataService>().QueryAsync(new QueryRequest(
+        new SelectQuery("CustomerOrder").Limit(1),
+        new QueryIntent("what: demonstrate safe SQL logging", "why: retain a runnable security example")));
     Require(!ordinary.ToString().Contains(ExampleDataService.Secret, StringComparison.Ordinal)
             && !ordinary.ToString().Contains("Debug SQL:", StringComparison.Ordinal),
         "ordinary SQL log leaked a value");
@@ -139,7 +136,8 @@ static void VerifyQueryPolicy()
     var policy = new ExampleQueryPolicy();
     var context = new UserContext().WithRequestPolicy(policy);
     var child = new SelectQuery("OrderLine");
-    var original = new SelectQuery("Order");
+    var original = new SelectQuery("Order").Comment("load order and lines")
+        .Purpose("verify complete graph query authorization");
     original.RelationLoads.Add(new RelationLoad("lines", child));
 
     var authorized = context.ApplyRequestPolicy(original);

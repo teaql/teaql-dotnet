@@ -187,11 +187,11 @@ public sealed class MutationPolicyRuntimeState
     internal IMutationGovernanceSink WarningSink { get; set; } = new TextMutationGovernanceSink();
     internal MutationGovernanceSnapshot? Current => _active.Value;
 
-    internal void BeginGraph()
+    internal void BeginGraph(string comment)
     {
         _preflight.Clear();
         _preflightRootEntity = null;
-        _preflightAuditReason = null;
+        _preflightAuditReason = new MutationIntent(comment).Comment;
         _graphActive = true;
         _graphReviewed = false;
         _active.Value = null;
@@ -382,12 +382,7 @@ public sealed class MutationPolicyRuntimeState
         _ => throw new MutationPolicyException($"Unsupported mutation request {request.GetType().Name}")
     };
 
-    private static string? FirstComment(MutationRequest request) => request switch
-    {
-        BatchMutationRequest batch => batch.Requests.Select(FirstComment)
-            .FirstOrDefault(comment => !string.IsNullOrWhiteSpace(comment)),
-        _ => request.Comment
-    };
+    private static string FirstComment(MutationRequest request) => request.Comment;
 
     private static IReadOnlyDictionary<string, Value> ReadOnlyValues(Record values) =>
         new ReadOnlyDictionary<string, Value>(values.ToDictionary(

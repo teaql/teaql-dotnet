@@ -475,6 +475,15 @@ public static class GeneratedRuntimeModule
        ["OrderSearchPreset"] = new List<RelationDescriptor> {
             RelationDescriptor.New("CommercePlatform", "CommercePlatform").LocalKey("commerce_platform").ForeignKey("id")
         }
+    }, new Dictionary<string, string>
+    {
+       ["CommercePlatform"] = "commerce_platform_data",
+       ["Customer"] = "customer_data",
+       ["OrderStatus"] = "order_status_data",
+       ["CustomerOrder"] = "customer_order_data",
+       ["Product"] = "product_data",
+       ["OrderLine"] = "order_line_data",
+       ["OrderSearchPreset"] = "order_search_preset_data"
     }).WireEntity(WireFields.CreateMetadata("CommercePlatform", ["id", "name", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Customer", ["id", "name", "email", "commerce_platform", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["email"] = ["email"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderStatus", ["id", "name", "code", "color", "display_order", "commerce_platform", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["color"] = ["color"], ["display_order"] = ["display_order"], ["commerce_platform"] = ["commerce_platform"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("CustomerOrder", ["id", "order_number", "order_date", "total_amount", "status", "customer", "commerce_platform", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["order_number"] = ["order_number"], ["order_date"] = ["order_date"], ["total_amount"] = ["total_amount"], ["status"] = ["status"], ["customer"] = ["customer"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Product", ["id", "name", "sku", "image_url", "commerce_platform", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["sku"] = ["sku"], ["image_url"] = ["image_url"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderLine", ["id", "customer_order", "product", "product_name", "sku", "quantity", "commerce_platform", "create_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["product"] = ["product"], ["product_name"] = ["product_name"], ["sku"] = ["sku"], ["quantity"] = ["quantity"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderSearchPreset", ["id", "name", "filter_json", "request_id", "owner_user_id", "commerce_platform", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["filter_json"] = ["filter_json"], ["request_id"] = ["request_id"], ["owner_user_id"] = ["owner_user_id"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
@@ -490,7 +499,8 @@ public static class GeneratedRuntimeModule
 
     private static async Task EnsureGeneratedBootstrapOnceAsync(UserContext context)
     {
-        using var bootstrapScope = context.EnterGeneratedBootstrap("CommercePlatform", 1);
+        {
+            using var bootstrapScope = context.EnterGeneratedBootstrap("CommercePlatform", 1);
         var domainRoot = await Q.CommercePlatforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (domainRoot == null)
         {
@@ -586,6 +596,19 @@ public static class GeneratedRuntimeModule
             }
             if (changed) constantOrderStatus1002 = await constantOrderStatus1002.AuditAs("reconcile model constant OrderStatus(1002)").SaveAsync(context);
         }
+        }
+        context.WithActiveRoot("CommercePlatform", 1);
     }
 
+
+    static GeneratedRuntimeModule()
+    {
+        Module.Entity(Module.Metadata.GetEntity("CommercePlatform")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("Customer")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("OrderStatus")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("CustomerOrder")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("Product")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("OrderLine")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("OrderSearchPreset")!.AuditMaskFields(new List<string> {  }));
+    }
 }

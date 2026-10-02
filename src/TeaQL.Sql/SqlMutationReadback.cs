@@ -29,9 +29,7 @@ internal static class SqlMutationReadback
                 // did: SQL succeeded even though the business snapshot is invalid.
                 if (compiled != null)
                 {
-                    var query = new QueryRequest(refresh) {
-                        Comment = request.Comment,
-                        Purpose = "why: refresh authoritative persisted row",
+                    var query = new QueryRequest(refresh, request.Intent.ReadbackIntent()) {
                         TraceChain = request.TraceChain.ToList()
                     };
                     var outcome = count.HasValue ? "success" : error is OperationCanceledException ? "cancelled" : "failure";

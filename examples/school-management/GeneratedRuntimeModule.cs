@@ -204,6 +204,11 @@ public static class GeneratedRuntimeModule
             RelationDescriptor.New("Platform", "Platform").LocalKey("platform").ForeignKey("id"),
             RelationDescriptor.New("SchoolType", "SchoolType").LocalKey("school_type").ForeignKey("id")
         }
+    }, new Dictionary<string, string>
+    {
+       ["Platform"] = "platform_data",
+       ["SchoolType"] = "school_type_data",
+       ["School"] = "school_data"
     }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "base_url", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["base_url"] = ["base_url"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("SchoolType", ["platform", "id", "name", "code", "display_order", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("School", ["id", "platform", "school_type", "name", "address", "established_date", "student_capacity", "active", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["school_type"] = ["school_type"], ["name"] = ["name"], ["address"] = ["address"], ["established_date"] = ["established_date"], ["student_capacity"] = ["student_capacity"], ["active"] = ["active"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
@@ -219,7 +224,8 @@ public static class GeneratedRuntimeModule
 
     private static async Task EnsureGeneratedBootstrapOnceAsync(UserContext context)
     {
-        using var bootstrapScope = context.EnterGeneratedBootstrap("Platform", 1);
+        {
+            using var bootstrapScope = context.EnterGeneratedBootstrap("Platform", 1);
         var domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (domainRoot == null)
         {
@@ -304,6 +310,15 @@ public static class GeneratedRuntimeModule
             }
             if (changed) constantSchoolType1002 = await constantSchoolType1002.AuditAs("reconcile model constant SchoolType(1002)").SaveAsync(context);
         }
+        }
+        context.WithActiveRoot("Platform", 1);
     }
 
+
+    static GeneratedRuntimeModule()
+    {
+        Module.Entity(Module.Metadata.GetEntity("Platform")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("SchoolType")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("School")!.AuditMaskFields(new List<string> {  }));
+    }
 }

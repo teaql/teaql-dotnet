@@ -108,10 +108,40 @@ public class SqlReadbackDiagnosticTests
         var command = new UpdateCommand("Customer", Value.FromObject(1L))
             .Value("name", "Riverside").Value("address", "1 Runtime Road").Value("password", "PASSWORD-CANARY");
         command.TraceChain.Add(new TraceNode("Customer", null, "why: preserve authoritative snapshot Riverside PASSWORD-CANARY"));
-        return new UpdateMutationRequest(command);
+        return new UpdateMutationRequest(command, "why: preserve authoritative snapshot Riverside PASSWORD-CANARY");
     }
 
     private static Record Row() => new() { ["id"] = Value.FromObject(1L), ["name"] = Value.FromObject("Riverside") };
+
+    [Fact]
+    public async Task BatchRootIntentScrubsSiblingValuesWithoutChangingRequestsOrBindings()
+    {
+        var transport = new Transport { Rows = new() { Row() } };
+        var sink = new Sink();
+        var service = Service(transport, sink);
+        var delete = new DeleteMutationRequest(
+            new DeleteCommand("Customer", Value.FromObject(9L)).HardDelete(), "delete obsolete customer");
+        var update = Update();
+        var batch = new BatchMutationRequest(new() { delete, update },
+            "save Riverside PASSWORD-CANARY customer graph");
+        await service.MutateAsync(batch);
+
+        Assert.Equal(2, sink.Entries.Count);
+        Assert.All(sink.Entries, entry =>
+            Assert.Equal("save [REDACTED] [REDACTED] customer graph", entry.AuditReason));
+        Assert.DoesNotContain("Riverside", sink.Text.ToString());
+        Assert.DoesNotContain("PASSWORD-CANARY", sink.Text.ToString());
+        Assert.Contains(transport.Writes.Last().Params, value => value.TryText() == "Riverside");
+        Assert.Contains(transport.Writes.Last().Params, value => value.TryText() == "PASSWORD-CANARY");
+        Assert.Equal("delete obsolete customer", delete.Comment);
+        Assert.Equal("why: preserve authoritative snapshot Riverside PASSWORD-CANARY", update.Comment);
+        Assert.Equal("save Riverside PASSWORD-CANARY customer graph", batch.Comment);
+
+        // The same service must not retain the previous graph's redaction data.
+        await service.QueryAsync(new QueryRequest(new SelectQuery("Customer").Limit(1),
+            new QueryIntent("inspect Riverside graph", "verify invocation-local intent provenance")));
+        Assert.Equal("inspect Riverside graph", sink.Entries.Last().Comment);
+    }
 
     [Theory]
     [InlineData(false)][InlineData(true)]
@@ -125,8 +155,8 @@ public class SqlReadbackDiagnosticTests
             .Value("name", "Riverside");
         command.TraceChain.Add(new TraceNode("Customer", 1001, "what: create customer 1001"));
         var service = Service(transport, sink);
-        if (failure) await Assert.ThrowsAsync<SqlExecutorException>(() => service.MutateAsync(new InsertMutationRequest(command)));
-        else Assert.Equal(1UL, (await service.MutateAsync(new InsertMutationRequest(command))).AffectedRows);
+        if (failure) await Assert.ThrowsAsync<SqlExecutorException>(() => service.MutateAsync(new InsertMutationRequest(command, "what: create customer 1001")));
+        else Assert.Equal(1UL, (await service.MutateAsync(new InsertMutationRequest(command, "what: create customer 1001"))).AffectedRows);
         var entry = Assert.Single(sink.Entries);
         Assert.Equal(failure ? "failure" : "success", entry.ExecutionOutcome);
         Assert.Equal("what: create customer [REDACTED]", entry.AuditReason);
@@ -144,7 +174,7 @@ public class SqlReadbackDiagnosticTests
         var sink = new Sink();
         var command = new UpdateCommand("Customer", new Value.I64Value(1001)).Value("name", "Riverside");
         command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001"));
-        var result = await Service(transport, sink).MutateAsync(new UpdateMutationRequest(command));
+        var result = await Service(transport, sink).MutateAsync(new UpdateMutationRequest(command, "what: update customer 1001"));
         Assert.Equal(1UL, result.AffectedRows);
         var entry = Assert.Single(sink.Entries);
         Assert.Equal("what: update customer [REDACTED]", entry.AuditReason);
@@ -167,7 +197,7 @@ public class SqlReadbackDiagnosticTests
             var sensitive = new SensitiveSink();
             var command = new UpdateCommand("Customer", new Value.I64Value(1001)).Value("name", "Riverside");
             command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001"));
-            await Service(transport, new Sink(), sensitiveSink: sensitive).MutateAsync(new UpdateMutationRequest(command));
+            await Service(transport, new Sink(), sensitiveSink: sensitive).MutateAsync(new UpdateMutationRequest(command, "what: update customer 1001"));
             var entry = Assert.Single(sensitive.Entries);
             Assert.Equal("what: update customer [REDACTED]", entry.AuditReason);
             Assert.Contains("1001", entry.DebugQuery);
@@ -191,9 +221,9 @@ public class SqlReadbackDiagnosticTests
         var service = Service(transport, sink);
         MutationRequest request = Update();
         if (batch) request = new BatchMutationRequest(new() {
-            new DeleteMutationRequest(new DeleteCommand("Customer", Value.FromObject(9L)).HardDelete()),
-            new BatchMutationRequest(new() { request, Update() })
-        });
+            new DeleteMutationRequest(new DeleteCommand("Customer", Value.FromObject(9L)).HardDelete(), "delete obsolete customer"),
+            new BatchMutationRequest(new() { request, Update() }, "refresh customer branch")
+        }, "why: preserve authoritative snapshot Riverside PASSWORD-CANARY");
         var error = await Xunit.Record.ExceptionAsync(() => service.MutateAsync(request));
         Assert.NotNull(error);
         if (transport.ReadFailure != null) Assert.Same(transport.ReadFailure, error);
