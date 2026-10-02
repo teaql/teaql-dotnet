@@ -58,6 +58,7 @@ internal static class SqlStatementDiagnostics
             IntentSource = query?.IntentSource,
             IntentValues = mutation == null ? Array.Empty<Value>() : MutationTargetIds(mutation, descriptor),
             Comment = query?.Comment ?? mutation?.Comment, Purpose = query?.Purpose, AuditReason = mutation?.Comment,
+            MutationLineage = mutation?.AuditLineage(entity) ?? Array.Empty<TraceNode>(),
             TraceChain = query != null ? SqlDataServiceTransaction.QueryTracePath(query, dialect.Kind.ToString())
                 : SqlDataServiceTransaction.MutationTracePath(mutation!, entity, operation, dialect.Kind.ToString())
         };

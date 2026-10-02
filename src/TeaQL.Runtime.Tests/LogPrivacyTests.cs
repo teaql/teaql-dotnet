@@ -49,12 +49,18 @@ public class LogPrivacyTests
     {
         var metadata = Entry("name", "PRIVATE-CUSTOMER-CANARY");
         metadata.ParameterizedQuery = "select * from customer where name='PRIVATE-CUSTOMER-CANARY'";
-        metadata.TraceChain.Add(new TraceNode("customer", 1, "load PRIVATE-CUSTOMER-CANARY"));
+        metadata.TraceChain.Add(new TraceNode("customer", 1, "load PRIVATE-CUSTOMER-CANARY")
+            { Detail = "custom PRIVATE-CUSTOMER-CANARY detail" });
+        metadata.MutationLineage = new[] { new TraceNode("customer", 1, "")
+            { Kind = "auditReason", Detail = "change PRIVATE-CUSTOMER-CANARY" } };
         using var writer = new StringWriter();
         new TextDiagnosticSqlLogSink(writer).Write(metadata);
         Assert.DoesNotContain("PRIVATE-CUSTOMER-CANARY", writer.ToString());
         Assert.Contains("NOT REPLAYABLE", writer.ToString());
         Assert.Contains("PRIVATE-CUSTOMER-CANARY", metadata.TraceChain[0].Comment);
+        Assert.Contains("PRIVATE-CUSTOMER-CANARY", metadata.TraceChain[0].Detail);
+        Assert.Equal(1UL, metadata.TraceChain[0].EntityId);
+        Assert.Contains("PRIVATE-CUSTOMER-CANARY", metadata.MutationLineage[0].Detail);
     }
 
     private static ExecutionMetadata Entry(string field, string value) => new()

@@ -35,6 +35,7 @@ internal static class SqlMutationReadback
                     var outcome = count.HasValue ? "success" : error is OperationCanceledException ? "cancelled" : "failure";
                     var read = SqlStatementDiagnostics.Metadata(dialect, query, compiled, started, outcome, count);
                     read.AuditReason = write.AuditReason;
+                    read.MutationLineage = write.MutationLineage;
                     read.IntentSource = write;
                     Report(observer, read);
                 }

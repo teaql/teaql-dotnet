@@ -27,6 +27,8 @@ public class QueryRequest
     internal ExecutionMetadata? IntentSource { get; set; }
     public SelectQuery Query { get; }
     public List<TraceNode> TraceChain { get; set; } = new();
+    // Immutable runtime-owned source. Public diagnostic frames are not provenance.
+    internal IReadOnlyList<TraceNode> TraceSource { get; private init; }
     public QueryIntent Intent { get; }
     public string Comment => Intent.Comment;
     public string Purpose => Intent.Purpose;
@@ -41,13 +43,27 @@ public class QueryRequest
         ArgumentNullException.ThrowIfNull(intent);
         Intent = intent;
         Query = query.CloneForExecution();
+        TraceSource = Array.AsReadOnly(new[] {
+            new TraceNode(query.Entity, null, "") { Kind = "comment", Detail = intent.Comment },
+            new TraceNode(query.Entity, null, "") { Kind = "purpose", Detail = intent.Purpose }
+        });
     }
 
     /// <summary>Derived work inherits validated root intent, not nested builder prose.</summary>
     public QueryRequest WithQuery(SelectQuery query) => new(query, Intent)
     {
         TraceChain = new List<TraceNode>(TraceChain), IntentSource = IntentSource,
+        TraceSource = TraceSource,
         RelationLoadObserver = RelationLoadObserver, DiagnosticObserver = DiagnosticObserver
+    };
+
+    internal QueryRequest Derive(SelectQuery query, string relation) => new(query, Intent)
+    {
+        TraceSource = Array.AsReadOnly(TraceSource.Append(
+            new TraceNode(query.Entity, null, "") { Kind = "relation", Name = relation,
+                Detail = $"{Query.Entity}.{relation}" }).ToArray()),
+        IntentSource = IntentSource, RelationLoadObserver = RelationLoadObserver,
+        DiagnosticObserver = DiagnosticObserver
     };
 }
 
@@ -80,6 +96,22 @@ public abstract class MutationRequest
     {
         ArgumentNullException.ThrowIfNull(intent);
         Intent = intent;
+    }
+
+    /// <summary>Snapshot of request and item reasons, separate from physical SQL.</summary>
+    internal IReadOnlyList<TraceNode> AuditLineage(string entity)
+    {
+        var nodes = new List<TraceNode> { new(entity, LedgerKey?.Id.TryU64(), "") {
+            Kind = "auditReason", Detail = Comment } };
+        foreach (var node in TraceChain)
+        {
+            var reason = node.Kind.Equals("auditReason", StringComparison.OrdinalIgnoreCase)
+                && node.Detail.Length > 0 ? node.Detail : node.Comment;
+            if (!string.IsNullOrWhiteSpace(reason) && reason != Comment)
+                nodes.Add(new TraceNode(node.EntityType, node.EntityId, "") {
+                    Kind = "auditReason", Name = node.EntityType, Detail = reason });
+        }
+        return nodes.AsReadOnly();
     }
 
     public MutationRequest WithRootIntent(MutationIntent intent)
@@ -218,6 +250,7 @@ public class ExecutionMetadata
     public int? ResultCount { get; set; }
     public List<TraceNode> TraceChain { get; set; } = new();
     public string? Comment { get; set; }
+    public IReadOnlyList<TraceNode> MutationLineage { get; set; } = Array.Empty<TraceNode>();
     public string? Purpose { get; set; }
     public string? AuditReason { get; set; }
     public string? BackendRequestId { get; set; }

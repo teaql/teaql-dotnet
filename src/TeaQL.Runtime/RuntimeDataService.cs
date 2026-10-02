@@ -149,12 +149,12 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         return result;
     }
 
-    private QueryRequest CopyRequest(QueryRequest source, SelectQuery query) => new(query, source.Intent)
+    private QueryRequest CopyRequest(QueryRequest source, SelectQuery query)
     {
-        TraceChain = new List<TraceNode>(source.TraceChain),
-        IntentSource = source.IntentSource,
-        RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry)
-    };
+        var copy = source.WithQuery(query);
+        copy.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry);
+        return copy;
+    }
 
     private string IdSetQueryKey(SelectQuery source, string namespaceName)
     {

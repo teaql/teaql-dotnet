@@ -1,5 +1,32 @@
 # TeaQL .NET SDK
 
+## Trace Chain on the feature branch
+
+`feature/request-trace-chain` requires a request-owned non-blank Query Comment
+and Purpose, and a non-blank Mutation Comment before policy/provider access.
+Logging switches do not relax validation. This is a local-source checkpoint,
+not a newly published package capability.
+
+The SQL path uses the Rust-baseline canonical algorithm: an operation names
+the originating entity, relation names are local, qualified properties belong
+in `TraceNode.Detail`, and provider/SQL nodes occur once. Intent stays in its
+structured metadata fields, not duplicated in every physical frame. Query
+snapshots privately preserve their origin across relation and aggregate
+derivation; caller-supplied diagnostic TraceChain frames cannot forge provenance.
+
+`ExecutionMetadata.MutationLineage` separately preserves existing root/item
+reasons, including partial batch failures and mutation readback. Default masking
+projects both that lineage and physical paths before sinks; execution values
+and original command trace lists are not changed. Frozen shared vectors and
+real SQLite root/three-level failure tests are separate evidence.
+
+Full graph parent scopes, ledger-specific replacement, assigned-ID graph
+lineage, commit-bound application audit, generated normative/concurrency
+acceptance and internal Registry replay remain open. Do not mistake the native
+request/item carrier for complete graph conformance. Run `dotnet test TeaQL.sln`,
+the separate `TeaQL.Core.Tests` project, and `bash scripts/verify-examples.sh`
+against this checkout before promoting an internal candidate.
+
 ## Sensitive log data
 
 Runtime diagnostic logs redact payload values by default, before delivery to

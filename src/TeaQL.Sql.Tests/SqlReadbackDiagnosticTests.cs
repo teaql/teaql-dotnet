@@ -99,7 +99,10 @@ public class SqlReadbackDiagnosticTests
         Assert.Equal(failure ? "failure" : "success", entry.ExecutionOutcome);
         Assert.Contains("Ri*****de", sink.Text.ToString());
         Assert.DoesNotContain("Riverside", sink.Text.ToString());
-        Assert.Contains(entry.TraceChain, node => node.Comment == "what: locate [REDACTED]");
+        // Intent is in structured metadata, not duplicated in physical frames.
+        Assert.All(entry.TraceChain, node => Assert.Equal("", node.Comment));
+        Assert.Equal("Customer", entry.TraceChain[0].Name);
+        Assert.Equal("query", entry.TraceChain[0].Detail);
         Assert.Equal("what: locate Riverside", query.CommentText);
     }
 

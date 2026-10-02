@@ -74,8 +74,13 @@ namespace TeaQL.Sql.Tests
             Assert.Equal(compiled.GeneratedSql, result.Metadata.GeneratedSql);
             Assert.Equal(req.Comment, result.Metadata.Comment);
             Assert.Equal(req.Purpose, result.Metadata.Purpose);
-            Assert.Equal(new[] { "operation", "request", "relation", "relation", "relation", "provider", "sql" },
+            // Caller-injected relation frames are not execution provenance.
+            // Actual three-level loading is exercised by TraceChainSqliteTests.
+            Assert.Equal(new[] { "operation", "request", "provider", "sql" },
                 result.Metadata.TraceChain.Select(node => node.Kind));
+            Assert.Equal("TestEntity", result.Metadata.TraceChain[0].Name);
+            Assert.Equal("query", result.Metadata.TraceChain[0].Detail);
+            Assert.DoesNotContain(result.Metadata.TraceChain, node => node.Kind == "relation");
         }
 
         [Fact]

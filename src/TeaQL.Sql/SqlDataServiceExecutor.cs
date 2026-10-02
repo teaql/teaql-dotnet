@@ -207,6 +207,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             ExecutionOutcome = "success",
             ResultCount = null,
             TraceChain = SqlDataServiceTransaction.MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
+            MutationLineage = request.AuditLineage(entityName),
             Comment = request.Comment,
             AuditReason = request.Comment,
             BackendRequestId = null,
@@ -319,18 +320,9 @@ internal static class RelationQueryLoader
                     : new[] { childQuery };
                 foreach (var executionQuery in queries)
                 {
-                    var childResult = await queryAsync(new QueryRequest(executionQuery, request.Intent)
-                    {
-                        TraceChain = request.TraceChain.Concat(new[] {
-                            new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
-                                Level = request.TraceChain.Count, Kind = "relation",
-                                Name = $"{request.Query.Entity}.{load.Name}"
-                            }
-                        }).ToList(),
-                        IntentSource = inheritedIntent,
-                        RelationLoadObserver = request.RelationLoadObserver,
-                        DiagnosticObserver = request.DiagnosticObserver
-                    });
+                    var derived = request.Derive(executionQuery, load.Name);
+                    derived.IntentSource = inheritedIntent;
+                    var childResult = await queryAsync(derived);
                     childRows.AddRange(childResult.Rows);
                 }
                 foreach (var child in childRows)
@@ -389,18 +381,9 @@ internal static class RelationQueryLoader
             if (!childQuery.GroupByItems.Contains(relation.ForeignKeyValue))
                 childQuery.GroupByItems.Add(relation.ForeignKeyValue);
             childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
-            var result = await queryAsync(new QueryRequest(childQuery, request.Intent)
-            {
-                TraceChain = request.TraceChain.Concat(new[] {
-                    new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
-                        Level = request.TraceChain.Count, Kind = "relation",
-                        Name = $"{request.Query.Entity}.{aggregate.RelationName}"
-                    }
-                }).ToList(),
-                IntentSource = inheritedIntent,
-                RelationLoadObserver = request.RelationLoadObserver,
-                DiagnosticObserver = request.DiagnosticObserver
-            });
+            var derived = request.Derive(childQuery, aggregate.RelationName);
+            derived.IntentSource = inheritedIntent;
+            var result = await queryAsync(derived);
             var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity);
             var foreignProperty = childDescriptor?.PropertyByName(relation.ForeignKeyValue);
             if (foreignProperty != null && foreignProperty.ColumnNameString != relation.ForeignKeyValue)
@@ -656,6 +639,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             ExecutionOutcome = "success",
             ResultCount = null,
             TraceChain = MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
+            MutationLineage = request.AuditLineage(entityName),
             Comment = request.Comment,
             AuditReason = request.Comment,
             BackendRequestId = null,
@@ -724,27 +708,18 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
     internal static List<TraceNode> QueryTracePath(QueryRequest request, string provider)
     {
-        var result = new List<TraceNode> {
-            new(request.Query.Entity, null, request.Comment ?? "") { Level = 0, Kind = "operation", Name = "query" },
-            new(request.Query.Entity, null, request.Comment ?? "") { Level = 1, Kind = "request", Name = request.Query.Entity }
-        };
-        result.AddRange(request.TraceChain);
-        result.Add(new TraceNode(request.Query.Entity, null, "") { Level = result.Count, Kind = "provider", Name = provider.ToLowerInvariant() });
-        result.Add(new TraceNode(request.Query.Entity, null, "") { Level = result.Count, Kind = "sql", Name = "select" });
-        return result;
+        return SqlTraceChain.Canonical(request.TraceSource, provider.ToLowerInvariant(), "select").TracePath
+            .Select((node, level) => node with { Level = level }).ToList();
     }
 
     internal static List<TraceNode> MutationTracePath(
         MutationRequest request, string entityName, DataServiceOperation operation, string provider)
     {
-        var result = new List<TraceNode> {
-            new(entityName, null, request.Comment ?? "") { Level = 0, Kind = "operation", Name = "mutation" },
-            new(entityName, null, request.Comment ?? "") { Level = 1, Kind = "entity", Name = entityName }
-        };
-        result.AddRange(request.TraceChain);
-        result.Add(new TraceNode(entityName, null, "") { Level = result.Count, Kind = "provider", Name = provider.ToLowerInvariant() });
-        result.Add(new TraceNode(entityName, null, "") { Level = result.Count, Kind = "sql", Name = operation.ToString().ToLowerInvariant() });
-        return result;
+        // Per-entity graph lineage is a separate carrier, not a physical route.
+        var source = new[] { new TraceNode(entityName, null, "") {
+            Kind = "auditReason", Detail = request.Comment } };
+        return SqlTraceChain.Canonical(source, provider.ToLowerInvariant(), operation.ToString().ToLowerInvariant())
+            .TracePath.Select((node, level) => node with { Level = level }).ToList();
     }
 
     public void Dispose()

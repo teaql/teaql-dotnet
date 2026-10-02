@@ -55,4 +55,30 @@ public class QueryIntentTests
         Assert.Equal("load school graph", child.Comment);
         Assert.Equal("show school", child.Purpose);
     }
+
+    [Fact]
+    public void RuntimeDerivationOwnsItsRootAndIgnoresCallerTraceFrames()
+    {
+        var request = new QueryRequest(new SelectQuery("School").Comment("load school graph").Purpose("show school"));
+        request.TraceChain.Add(new TraceNode("ForgedRoot", null, "forged reason")
+            { Kind = "relation", Name = "forged", Detail = "ForgedRoot.relation" });
+        var child = request.Derive(new SelectQuery("Platform"), "platform");
+        request.TraceChain.Clear();
+        var path = SqlTraceChain.Canonical(child.TraceSource, "sqlite", "select").TracePath;
+        Assert.Equal(new[] { "School", "School", "platform", "sqlite", "select" }, path.Select(node => node.Name));
+        Assert.Equal("School.platform", path[2].Detail);
+        Assert.Equal("load school graph", child.Comment);
+    }
+
+    [Fact]
+    public void ImmutableBranchesDoNotShareMutableRelationLists()
+    {
+        var root = new QueryRequest(new SelectQuery("School").Comment("load school graph").Purpose("show school"));
+        var first = root.Derive(new SelectQuery("Platform"), "platform");
+        var second = root.Derive(new SelectQuery("SchoolType"), "schoolType");
+        Assert.Equal(2, root.TraceSource.Count);
+        Assert.Equal("platform", first.TraceSource.Last().Name);
+        Assert.Equal("schoolType", second.TraceSource.Last().Name);
+        Assert.Equal("School", first.WithQuery(new SelectQuery("Platform")).TraceSource[0].Name);
+    }
 }

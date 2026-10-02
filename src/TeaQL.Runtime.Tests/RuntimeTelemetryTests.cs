@@ -15,6 +15,10 @@ using Xunit;
 
 namespace TeaQL.Runtime.Tests;
 
+[CollectionDefinition("Runtime telemetry SDK", DisableParallelization = true)]
+public class RuntimeTelemetrySdkCollection { }
+
+[Collection("Runtime telemetry SDK")]
 public class RuntimeTelemetryTests
 {
     [Fact]

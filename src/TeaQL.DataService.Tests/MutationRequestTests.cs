@@ -45,6 +45,21 @@ namespace TeaQL.DataService.Tests
         }
 
         [Fact]
+        public void ItemReasonsRemainInAnOwnedLineageSeparateFromRootIntent()
+        {
+            var command = new InsertCommand("Customer");
+            command.TraceChain.Add(new TraceNode("Customer", 7, "why: first"));
+            var request = new InsertMutationRequest(command, "save customer graph");
+            var lineage = request.AuditLineage("Customer");
+            command.TraceChain.Clear();
+            Assert.Equal(new[] { "save customer graph", "why: first" }, lineage.Select(node => node.Detail));
+            Assert.All(lineage, node => Assert.Equal("auditReason", node.Kind));
+            Assert.All(lineage, node => Assert.Equal("", node.Comment));
+            Assert.Equal(7UL, lineage[1].EntityId);
+            Assert.Equal("save customer graph", request.Comment);
+        }
+
+        [Fact]
         public void UpdateMutationRequest_Properties_Work()
         {
             var trace = new List<TraceNode> { new TraceNode("test", null, "c2") };
