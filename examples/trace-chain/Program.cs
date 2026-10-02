@@ -36,6 +36,12 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
     ?? throw new Exception("Generated bootstrap did not provision Platform#1");
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
+var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (!string.IsNullOrEmpty(ownershipScenario))
+{
+    await SharedReferenceChecks.RunAsync(context, capture, sink, faults, ownershipScenario);
+    return;
+}
 await IntentGate();
 var graph = await NormativeGraph();
 await ThreeLevelQuery(graph);
@@ -43,6 +49,7 @@ await ProviderRollback();
 await ReadbackFailure();
 await ConcurrentGraphs();
 Console.WriteLine("PASS: .NET generated trace-chain 6 scenarios; same database retained; no generated edits");
+await SharedReferenceChecks.RunAsync(context, capture, sink, faults);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)
@@ -285,7 +292,8 @@ sealed class EvidenceSink : IDiagnosticSqlLogSink, IAppAuditEventSink
     public void Clear() { _sql.Clear(); _audit.Clear(); }
 }
 
-sealed record CommandObservation(string Entity, long Id, string Operation, string Comment, IReadOnlyList<TraceNode> Lineage);
+sealed record CommandObservation(string Entity, long Id, string Operation, string Comment, IReadOnlyList<TraceNode> Lineage,
+    long? ExpectedVersion);
 sealed class BeginPause
 {
     public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -325,7 +333,9 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
         {
             var key = request.LedgerKey ?? throw new Exception("Generated mutation omitted its typed ledger key");
             var operation = request switch { InsertMutationRequest => "insert", UpdateMutationRequest => "update", DeleteMutationRequest => "delete", _ => "other" };
-            owner._commands.Enqueue(new(key.EntityType, checked((long)key.Id.TryU64()!.Value), operation, request.Comment, request.MutationLineage));
+            var version = request switch { UpdateMutationRequest update => update.Command.ExpectedVersionValue,
+                DeleteMutationRequest delete => delete.Command.Version.TryI64(), _ => (long?)null };
+            owner._commands.Enqueue(new(key.EntityType, checked((long)key.Id.TryU64()!.Value), operation, request.Comment, request.MutationLineage, version));
             Verify.Equal(auditCount, owner._sink.Audit.Count, "no audit before graph commit");
             var result = await inner.MutateAsync(request);
             Verify.Equal(Verify.Shape(request.MutationLineage), Verify.Shape(result.Metadata.MutationLineage), "provider metadata matches actual request");
@@ -342,8 +352,23 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
 sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransactionTransport, ISchemaConnectionInitializer
 {
     public bool FailAttemptReadback { get; set; }
+    public bool ReuseReadOnlyPlatformSnapshot { get; set; }
+    public Record? SharedPlatformSnapshot { get; private set; }
+    public int SharedPlatformUses { get; private set; }
     public Task EnsureSchemaFunctionsAsync() => inner.EnsureSchemaFunctionsAsync();
-    public Task<List<Record>> FetchAllSqlAsync(CompiledQuery query) => inner.FetchAllSqlAsync(query);
+    public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
+    {
+        var rows = await inner.FetchAllSqlAsync(query);
+        if (ReuseReadOnlyPlatformSnapshot && query.Sql.Contains("platform_data", StringComparison.Ordinal) && rows.Count == 1)
+        {
+            if (SharedPlatformSnapshot == null) SharedPlatformSnapshot = rows[0];
+            Verify.Equal(SharedPlatformSnapshot.ToJsonValue().ToJsonString(), rows[0].ToJsonValue().ToJsonString(),
+                "shared provider-loaded Platform snapshot has identical fields");
+            rows[0] = SharedPlatformSnapshot;
+            SharedPlatformUses++;
+        }
+        return rows;
+    }
     public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
     public async Task<ISqlTransaction> BeginSqlAsync() => new FaultTransaction(this, await inner.BeginSqlAsync());
     private sealed class FaultTransaction(FaultTransport owner, ISqlTransaction inner) : ISqlTransaction

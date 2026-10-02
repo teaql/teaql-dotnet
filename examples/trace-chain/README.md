@@ -24,6 +24,10 @@ selects another local checkout.
 | Actual provider failure | SQLite UNIQUE violation retains failed SQL lineage, rolls back the graph and emits no committed audit |
 | Readback failure | An injected authoritative fetch failure does not erase the successful write statement; the graph transaction rolls back and emits no committed audit |
 | Same Context concurrency | Two overlapping Task-based generated saves are serialized by the transaction gate while retaining independent root and branch reasons |
+| Shared read-only provider record | Two queries reuse the exact Platform record; generated wrappers and ledgers are separate. Overlapping root-only saves use versions 2 and 1, without updating children or Platform |
+| Reached child import | Adopting one changed child imports only that typed key. Its foreign root and unselected sibling stay pending and unsaved |
+| Clean ancestor | A changed child inherits the parent's reason, but the clean parent emits no SQL or audit and keeps its version |
+| Conflicting loaded versions | Two actual loaded versions of one entity fail before business SQL; both pending values survive |
 
 Data is written through generated Mutation APIs. `context.EnsureSchemaAsync()`
 provisions the root; there is no manual INSERT or seed workaround. Test-only
@@ -38,6 +42,22 @@ immutable `MutationRequest.MutationLineage` snapshot and never injects expected
 scopes or trace frames. Audit assertions run both before and after actual commit.
 The transport decorator injects a readback failure, not a fabricated successful
 write. Physical statement success does not imply transaction commit.
+
+The shared-record fixture reuses the actual provider-returned Record and verifies
+that its contents remain unchanged. Record is not a structurally immutable type;
+the fixture deliberately uses it read-only. This does not prove arbitrary
+mutable reference sharing. Ownership reflection is observation only; business
+reads and writes still use generated Q/E/Mutation APIs. Emitted commands, physical
+SQL metadata and committed audit are printed as `OWNERSHIP EVIDENCE` JSON.
+The full verifier ignores `TEAQL_TRACE_CHAIN_SCENARIO` and requires both the six
+normative checks and four ownership checks, twice without database cleanup.
+
+Hydration records original versions without leaving temporary new keys. Graph
+composition imports each explicitly reached key, not its entire foreign ledger.
+Only changed nodes are checked and written; clean ancestors still create an
+audit scope for changed descendants. Only post-commit cleanup may advance the
+ledger's authoritative version with `AcceptCommittedVersion`; generated libraries
+using the old post-commit `SetOriginalVersion` call must be regenerated.
 
 `model.xml`, the evaluated report, current Assist and producer-generated
 `AGENTS.md` are retained. Application API discovery uses those instructions and
