@@ -93,7 +93,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
 
-        return new QueryResult { Rows = rows, Metadata = metadata };
+        var facets = await FacetQueryLoader.LoadAsync(SchemaProvider, QueryAsync, request, compiled);
+        return new QueryResult { Rows = rows, Metadata = metadata, Facets = facets };
     }
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
@@ -271,7 +272,7 @@ internal static class RelationQueryLoader
             var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity)
                 ?? throw new SqlExecutorException($"SQL compile error: unknown entity {relation.TargetEntity}");
             var localKeys = parentKeys[relation.LocalKeyValue];
-            var parentIds = localKeys.OfType<Value>().ToList();
+            var parentIds = localKeys.OfType<Value>().Distinct().ToList();
             if (parentIds.Count == 0)
             {
                 Attach(parents, new List<Record>(), load.Name, relation, localKeys, Array.Empty<Value?>());
@@ -287,7 +288,9 @@ internal static class RelationQueryLoader
             if (limited && !childQuery.OrderByItems.Any(order => order.Field == "id"))
                 childQuery.OrderAsc("id");
             var threshold = childQuery.TopNProbeThreshold;
-            var useProbes = limited &&
+            // A selected relation's facets belong to that parent's relation
+            // result, not to a combined batch of unrelated parents.
+            var useProbes = childQuery.Facets.Count > 0 || limited &&
                 ((dialect.RelationTopNPolicy == "always_probe" && threshold is null) ||
                  (threshold is > 0 && (ulong)parentIds.Count <= threshold));
             var selectedPlan = useProbes ? "bounded_probes" : limited ? "window" : "batch";
@@ -317,6 +320,9 @@ internal static class RelationQueryLoader
                     derived.CaptureRelationKeys = rows =>
                         childKeys.AddRange(SnapshotKeys(rows, relation.ForeignKeyValue));
                     var childResult = await queryAsync(derived);
+                    foreach (var child in childResult.Rows)
+                        foreach (var facet in childResult.Facets)
+                            child.QueryFacets[facet.Key] = facet.Value;
                     childRows.AddRange(childResult.Rows);
                 }
                 foreach (var child in childRows)
@@ -545,7 +551,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
 
-        return new QueryResult { Rows = rows, Metadata = metadata };
+        var facets = await FacetQueryLoader.LoadAsync(SchemaProvider, QueryAsync, request, compiled);
+        return new QueryResult { Rows = rows, Metadata = metadata, Facets = facets };
     }
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)

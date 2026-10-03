@@ -34,7 +34,17 @@ Generated models now retain related-count aliases in a runtime-owned
 `KeyNotFoundException`. Projections are not modeled fields or ledger mutations.
 Regenerate libraries to acquire the API. The trace example exercises generated
 root/nested Q/E/save, private descendant intent, logging on/off and count failures.
-Broader aggregate/Facet, provider and immutable-artifact acceptance remain open.
+Native SQL execution also evaluates nested Facets and Facets inside a loaded
+relation. Membership COUNT and target materialization inherit the original
+request root, qualified relation route and private-binding provenance. Facets
+are returned through `QueryResult.Facets` / `SmartList<Record>.Facets`; loaded
+relation records expose query-only `Record.QueryFacets`, outside scalar fields
+and JSON. Loaded-relation Facets execute per distinct parent membership key.
+The SQLite regression covers direct and transaction queries, logging on/off,
+root-page-independent counts, multiple parents, caller snapshots and actual
+materialization failure. This is native SPI evidence: generated Q/E Facet
+consumption, broader query/provider shapes and immutable-artifact acceptance
+remain separate gates.
 
 `ExecutionMetadata.MutationLineage` separately preserves existing root/item
 reasons, including partial batch failures and mutation readback. Default masking
