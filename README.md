@@ -40,6 +40,8 @@ request root, qualified relation route and private-binding provenance. Facets
 are returned through `QueryResult.Facets` / `SmartList<Record>.Facets`; loaded
 relation records expose query-only `Record.QueryFacets`, outside scalar fields
 and JSON. Loaded-relation Facets execute per distinct parent membership key.
+SQL NULL is not a membership key. Root `IncludeAll` Facets still expose zero-count
+candidates; empty loaded to-many collections have no per-collection Facet carrier.
 The SQLite regression covers direct and transaction queries, logging on/off,
 root-page-independent counts, multiple parents, caller snapshots and actual
 materialization failure. This is native SPI evidence: generated Q/E Facet

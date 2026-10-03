@@ -55,6 +55,83 @@ public class FacetTraceSqliteTests
     [InlineData(true, false, true)]
     [InlineData(true, true, false)]
     [InlineData(true, true, true)]
+    public async Task NullParentKeysDoNotCreateMembershipButKeepRequestedFacets(bool allNull, bool transaction, bool includeAll)
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var parent = Entity("Parent").Property(PropertyDescriptor.New("code", DataType.Text))
+            .Relation(RelationDescriptor.New("children", "Child").LocalKey("code").ForeignKey("parent_ref").Many());
+        var child = Entity("Child").Property(PropertyDescriptor.New("parent_ref", DataType.Text))
+            .Property(PropertyDescriptor.New("category_id", DataType.I64))
+            .Relation(RelationDescriptor.New("category", "Category").LocalKey("category_id").ForeignKey("id"));
+        var category = Entity("Category").Property(PropertyDescriptor.New("name", DataType.Text));
+        var descriptors = new[] { parent, child, category };
+        var transport = new Transport(new SqliteTransport(connection));
+        var provider = new SqlDataServiceExecutor(new SqliteDialect(), transport,
+            new MetadataSchemaProvider(name => descriptors.SingleOrDefault(entity => entity.Name == name)));
+        var sink = new Sink();
+        var context = new RuntimeModule().Entity(parent).Entity(child).Entity(category).IntoContext()
+            .WithDataService(provider).WithDiagnosticSqlLogSink(sink);
+        await context.EnsureSchemaAsync();
+        var service = context.RequireResource<IDataService>();
+        await Seed(new InsertCommand("Parent").Value("id", Value.FromObject(1L)).Value("code", Value.FromObject("P1")));
+        await Seed(new InsertCommand("Parent").Value("id", Value.FromObject(2L)).Value("code", new Value.NullValue()));
+        await Seed(new InsertCommand("Category").Value("id", Value.FromObject(20L)).Value("name", Value.FromObject("related")));
+        await Seed(new InsertCommand("Category").Value("id", Value.FromObject(21L)).Value("name", Value.FromObject("orphan")));
+        await Seed(new InsertCommand("Child").Value("id", Value.FromObject(10L))
+            .Value("parent_ref", Value.FromObject("P1")).Value("category_id", Value.FromObject(20L)));
+        await Seed(new InsertCommand("Child").Value("id", Value.FromObject(11L))
+            .Value("parent_ref", new Value.NullValue()).Value("category_id", Value.FromObject(21L)));
+        var children = new SelectQuery("Child").Projects(new[] { "id", "parent_ref", "category_id" }).Limit(10);
+        children.Facets.Add(new FacetRequest("categories", "category", new SelectQuery("Category").Limit(10).Count("members"), false));
+        var query = new SelectQuery("Parent").Projects(new[] { "id", "code" }).OrderAsc("id").Limit(10)
+            .RelationQuery("children", children).Comment("load nullable membership").Purpose("exclude orphan children from relation facets");
+        query.Facets.Add(new FacetRequest("allChildren", "children",
+            new SelectQuery("Child").Projects(new[] { "id", "parent_ref" }).OrderAsc("id").Limit(10).Count("parents"), includeAll));
+        if (allNull) query.Filter(Expr.Eq("id", 2L));
+        sink.Entries.Clear(); transport.Reads.Clear();
+        using var tx = transaction ? await provider.BeginTransactionAsync() : null;
+        var execution = tx is null ? service : new RuntimeDataService(tx, context);
+        var result = await execution.QueryAsync(new QueryRequest(query));
+        Assert.Equal(allNull ? 1 : 2, result.Rows.Count);
+        var nullParent = result.Rows.Single(row => row["id"].TryI64() == 2L);
+        Assert.Empty(Assert.IsType<Value.ListValue>(nullParent["children"]).Values);
+        if (!allNull)
+        {
+            var related = Assert.IsType<Value.ObjectValue>(Assert.Single(
+                Assert.IsType<Value.ListValue>(result.Rows[0]["children"]).Values)).Value;
+            Assert.Equal(10L, related["id"].TryI64());
+            var counted = Assert.Single(related.QueryFacets["categories"]);
+            Assert.Equal(20L, counted["id"].TryI64());
+            Assert.Equal(1L, counted["members"].TryI64());
+        }
+        // IncludeAll may enumerate an orphan as a zero-count candidate; it must
+        // never be attached to a null-key parent or acquire a false membership.
+        Assert.True(result.Facets.TryGetValue("allChildren", out var requested));
+        Assert.Equal(includeAll ? 2 : allNull ? 0 : 1, requested!.Count);
+        foreach (var candidate in requested)
+            Assert.Equal(!allNull && candidate["id"].TryI64() == 10L ? 1L : 0L, candidate["parents"].TryI64());
+        Assert.DoesNotContain(transport.Reads.SelectMany(read => read.Params), value => value is Value.NullValue or Value.TypedNullValue);
+        Assert.All(sink.Entries, entry => Assert.Equal("Parent", entry.TraceChain[0].Name));
+        output.WriteLine("NULL FACET EVIDENCE " + JsonSerializer.Serialize(new {
+            allNull, transaction, includeAll, physicalReads = transport.Reads.Count,
+            candidateMembership = requested.Select(row => new { id = row["id"].TryI64(), count = row["parents"].TryI64() }),
+            sql = sink.Entries
+        }));
+        if (tx is not null) await tx.CommitAsync();
+
+        Task<MutationResult> Seed(InsertCommand command) => service.MutateAsync(new InsertMutationRequest(command, "seed nullable facet fixture"));
+    }
+
+    [Theory]
+    [InlineData(false, false, false)]
+    [InlineData(false, false, true)]
+    [InlineData(false, true, false)]
+    [InlineData(false, true, true)]
+    [InlineData(true, false, false)]
+    [InlineData(true, false, true)]
+    [InlineData(true, true, false)]
+    [InlineData(true, true, true)]
     [InlineData(false, false, true, true)]
     [InlineData(false, true, false, true)]
     [InlineData(true, false, true, true)]

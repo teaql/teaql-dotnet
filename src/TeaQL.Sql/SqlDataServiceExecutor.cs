@@ -460,7 +460,9 @@ internal static class RelationQueryLoader
     };
 
     private static Value?[] SnapshotKeys(IReadOnlyList<Record> rows, string field) =>
-        rows.Select(row => row.TryGetValue(field, out var value) ? value : null).ToArray();
+        // SQL NULL is absence of membership, not an identity shared by orphans.
+        rows.Select(row => row.TryGetValue(field, out var value)
+            && value is not Value.NullValue and not Value.TypedNullValue ? value : null).ToArray();
 
     private static void Attach(
         List<Record> parents,
