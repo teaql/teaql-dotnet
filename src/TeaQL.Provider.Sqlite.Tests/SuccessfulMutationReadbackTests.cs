@@ -5,11 +5,50 @@ using TeaQL.DataService;
 using TeaQL.Runtime;
 using TeaQL.Sql;
 using Xunit;
+using Record = TeaQL.Core.Record;
 
 namespace TeaQL.Provider.Sqlite.Tests;
 
 public class SuccessfulMutationReadbackTests
 {
+    [Theory]
+    [InlineData(false)][InlineData(true)]
+    public async Task LoadedSiblingOldValuesRemainPrivateAndRollbackIsAtomic(bool rollback)
+    {
+        await using var db = new SqliteConnection("Data Source=:memory:"); await db.OpenAsync();
+        var descriptors = new[] { "Parent", "Child" }.Select(name => EntityDescriptor.New(name).TableName(name.ToLowerInvariant() + "_data")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+            .Property(PropertyDescriptor.New("name", DataType.Text)).AuditMaskFields(new() { "name" })).ToArray();
+        var module = new RuntimeModule(); foreach (var descriptor in descriptors) module.Entity(descriptor);
+        var provider = new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(db),
+            new MetadataSchemaProvider(name => descriptors.Single(e => e.Name == name)));
+        var sink = new Sink(); var context = module.IntoContext().WithDataService(provider).WithDiagnosticSqlLogSink(sink).WithAppAuditEventSink(sink);
+        await context.EnsureSchemaAsync();
+        await context.RequireResource<IDataService>().MutateAsync(new InsertMutationRequest(
+            new InsertCommand("Child").Value("id", 11L).Value("name", "PRIVATEOLD"), "seed prior value"));
+        sink.Sql.Clear(); sink.Audit.Clear();
+        var update = new UpdateMutationRequest(new UpdateCommand("Child", Value.FromObject(11L)).ExpectedVersion(1).Value("name", "PRIVATENEW"), "update private item")
+            .WithLoadedSnapshot(new LoadedScalarSnapshot(new Record { ["name"] = Value.FromObject("PRIVATEOLD"), ["version"] = Value.FromObject(1L) }));
+        var operation = context.ExecuteGraphSaveAsync("page 1 PRIVATEOLD to PRIVATENEW", async graph => {
+            var parent = new InsertMutationRequest(new InsertCommand("Parent").Value("id", 22L).Value("name", "root fixture"), "save parent");
+            graph.Preflight(parent); graph.Preflight(update);
+            await graph.MutateAsync(parent); await graph.MutateAsync(update);
+            if (rollback) throw new InvalidOperationException("rollback fixture");
+            return true;
+        });
+        if (rollback) await Assert.ThrowsAsync<InvalidOperationException>(() => operation); else await operation;
+        Assert.Equal(4, sink.Sql.Count);
+        Assert.DoesNotContain("PRIVATEOLD", JsonSerializer.Serialize(sink.Sql));
+        Assert.DoesNotContain("PRIVATENEW", JsonSerializer.Serialize(sink.Sql));
+        Assert.All(sink.Sql, fact => Assert.Contains("page 1", fact.AuditReason));
+        Assert.Equal(rollback ? 0 : 2, sink.Audit.Count);
+        Assert.DoesNotContain("PRIVATEOLD", JsonSerializer.Serialize(sink.Audit));
+        Assert.All(sink.Audit, fact => Assert.Contains("page 1", fact["reason"]!.ToString()));
+        using var command = db.CreateCommand(); command.CommandText = "SELECT name FROM child_data WHERE id=11";
+        Assert.Equal(rollback ? "PRIVATEOLD" : "PRIVATENEW", await command.ExecuteScalarAsync());
+    }
+
     private sealed class Sink : IDiagnosticSqlLogSink,IAppAuditEventSink
     {
         public readonly List<ExecutionMetadata> Sql = new();

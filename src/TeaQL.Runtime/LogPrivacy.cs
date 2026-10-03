@@ -39,7 +39,7 @@ internal static class LogPrivacy
         return node == null ? [] : [node.ToString()];
     }
 
-    private static bool HasCredentials(JsonNode? value) => value switch
+    internal static bool HasCredentials(JsonNode? value) => value switch
     {
         JsonObject obj => obj.Any(pair => SensitiveLogNames.IsCredential(pair.Key) || HasCredentials(pair.Value)),
         JsonArray array => array.Any(HasCredentials),

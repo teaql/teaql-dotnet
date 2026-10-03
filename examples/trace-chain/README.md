@@ -109,3 +109,12 @@ Successful readbacks travel in ordered result metadata, not a duplicate observer
 notification. Failed/cancelled reads retain the existing failure observer path.
 Hard deletes and zero affected rows do not invent SELECT facts. Query-log and
 mutation-log switches independently control their physical statement categories.
+
+`LoadedPrivacyChecks` loads a complete parent/item graph, changes the same item
+twice and then marks it for deletion. Prior private values are not SQL parameters
+in those updates/deletes, but still must be removed from parent/sibling intent
+and committed audit. A runtime-owned scalar snapshot advances only after commit;
+it is neither a write payload nor shared Context state. Known public values
+(including version numbers in ordinary prose) are not indiscriminately redacted.
+Independent subsequent queries keep their own intent. The full verifier requires
+this check; `TEAQL_TRACE_CHAIN_SCENARIO=loaded-privacy` selects it alone.

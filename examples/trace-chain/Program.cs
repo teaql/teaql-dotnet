@@ -37,6 +37,11 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
 var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (ownershipScenario == "loaded-privacy")
+{
+    await LoadedPrivacyChecks.RunAsync(context, capture, sink);
+    return;
+}
 if (ownershipScenario == "readback")
 {
     await ReadbackChecks.RunAsync(context, capture, sink);
@@ -68,6 +73,8 @@ await SharedReferenceChecks.RunAsync(context, capture, sink, faults);
 await PageChecks.RunAsync(context, capture, sink);
 await StreamChecks.RunAsync(context, capture, sink, faults);
 await ReadbackChecks.RunAsync(context, capture, sink);
+
+await LoadedPrivacyChecks.RunAsync(context, capture, sink);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)

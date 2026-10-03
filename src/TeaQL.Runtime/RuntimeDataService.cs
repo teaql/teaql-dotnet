@@ -182,6 +182,8 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     {
         _context.ValidateGraphMutation(request, _graph);
         _context.CheckAndFix(request);
+        request.InheritedIntentValues = request.InheritedIntentValues
+            .Concat(LoadedPrivateValues(request, _context)).ToArray();
         using var mutationGovernance = _context.EnterMutationPolicyExecution(request);
         var entity = EntityName(request);
         var result = await _context.RuntimeTelemetry.ObserveAsync(
@@ -208,7 +210,6 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         {
             ["actor"] = _context.UserIdentifier,
             ["category"] = _context.GetNamedResource<string>("bootstrapCategory") ?? "mutation",
-            ["reason"] = LogPrivacy.ScrubAuditText(request.Comment, MutationValues(request)),
             ["entityType"] = EntityName(request),
             ["entityId"] = EntityId(request, result),
             ["mutationKind"] = MutationKind(request),
@@ -217,7 +218,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
             ["resultVersion"] = PersistedValue(result, "version"),
             ["affectedRows"] = result.AffectedRows
         };
-        var values = MutationValues(request).Concat(request.InheritedIntentValues).ToArray();
+        var values = PrivateMutationValues(request, _context).Concat(request.InheritedIntentValues).ToArray();
         safeEvent["traceChain"] = request.AuditLineage(EntityName(request))
             .Select(node => node with { Comment = "", Detail = LogPrivacy.ScrubAuditText(node.Detail, values) ?? "" })
             .ToArray();
@@ -230,18 +231,44 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         else await Publish().ConfigureAwait(false);
     }
 
-    internal static IEnumerable<Value> MutationValues(MutationRequest request) => request switch
+    internal static IEnumerable<Value> LoadedPrivateValues(MutationRequest request, UserContext context)
     {
-        InsertMutationRequest insert => insert.Command.Values.Values,
-        UpdateMutationRequest update => update.Command.Values.Values
-            .Concat(update.Command.Guards.Values)
-            .Concat(update.Command.OldValues?.Values ?? Enumerable.Empty<Value>())
-            .Append(update.Command.Id),
-        DeleteMutationRequest delete => delete.Command.Guards.Values.Append(delete.Command.Id),
-        RecoverMutationRequest recover => recover.Command.Guards.Values.Append(recover.Command.Id),
-        BatchMutationRequest batch => batch.Requests.SelectMany(MutationValues),
-        _ => []
-    };
+        if (request is BatchMutationRequest batch)
+            return batch.Requests.SelectMany(item => LoadedPrivateValues(item, context));
+        if (request.LoadedSnapshot == null) return [];
+        return PrivateFieldValues(request.LoadedSnapshot.CopyValues(), EntityName(request), context);
+    }
+
+    private static IEnumerable<Value> PrivateFieldValues(IEnumerable<KeyValuePair<string, Value>> fields,
+        string entity, UserContext context)
+    {
+        var descriptor = context.GetEntity(entity);
+        return fields.Where(pair => {
+            var property = descriptor?.PropertyByName(pair.Key);
+            return property == null || descriptor?.HasExplicitSqlLogPolicyMetadata != true
+                || LogPrivacy.HasCredentials(pair.Value.ToJsonValue())
+                || SensitiveLogNames.IsCredential(property.Name)
+                || SensitiveLogNames.IsCredential(property.ColumnNameString)
+                || descriptor.AuditMaskFieldList.Contains(property.Name);
+        }).Select(pair => pair.Value).ToArray();
+    }
+
+    internal static IEnumerable<Value> PrivateMutationValues(MutationRequest request, UserContext context)
+    {
+        if (request is BatchMutationRequest batch)
+            return batch.Requests.SelectMany(item => PrivateMutationValues(item, context));
+        IEnumerable<KeyValuePair<string, Value>> fields = request switch
+        {
+            InsertMutationRequest insert => insert.Command.Values,
+            UpdateMutationRequest update => update.Command.Values.Concat(update.Command.Guards)
+                .Concat(update.Command.OldValues ?? new Record())
+                .Append(new("id", update.Command.Id)),
+            DeleteMutationRequest delete => delete.Command.Guards.Append(new("id", delete.Command.Id)),
+            RecoverMutationRequest recover => recover.Command.Guards.Append(new("id", recover.Command.Id)),
+            _ => []
+        };
+        return PrivateFieldValues(fields, EntityName(request), context);
+    }
 
     private static IReadOnlyDictionary<string, object?> GovernanceEvidence(
         MutationGovernanceSnapshot governance) => new Dictionary<string, object?>

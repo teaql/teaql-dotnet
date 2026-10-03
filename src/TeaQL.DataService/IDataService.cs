@@ -94,6 +94,14 @@ public class QueryResult
 
 public abstract class MutationRequest
 {
+    internal LoadedScalarSnapshot? LoadedSnapshot { get; private set; }
+    /// <summary>Generated hydration provenance; never a JSON field or mutation payload.</summary>
+    public MutationRequest WithLoadedSnapshot(LoadedScalarSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        LoadedSnapshot = snapshot;
+        return this;
+    }
     internal object? GraphOwner { get; set; }
     internal MutationTraceScope? GraphScope { get; set; }
     internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
@@ -160,6 +168,7 @@ public abstract class MutationRequest
         };
         request.DiagnosticObserver = DiagnosticObserver;
         request.InheritedIntentValues = InheritedIntentValues;
+        request.LoadedSnapshot = LoadedSnapshot;
         request.GraphOwner = GraphOwner;
         request.GraphScope = GraphScope;
         return request;

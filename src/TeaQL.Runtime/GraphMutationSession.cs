@@ -69,7 +69,8 @@ public sealed class GraphMutationSession
         var captured = Request(request);
         _context.ValidateGraphMutation(captured, this);
         _context.PreflightMutation(captured);
-        _intentValues.AddRange(RuntimeDataService.MutationValues(captured));
+        _intentValues.AddRange(RuntimeDataService.PrivateMutationValues(captured, _context));
+        _intentValues.AddRange(RuntimeDataService.LoadedPrivateValues(captured, _context));
     }
 
     public Task<MutationResult> MutateAsync(MutationRequest request, MutationTraceScope? scope = null) =>
