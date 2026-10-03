@@ -434,40 +434,7 @@ public record SelectQuery
     public SelectQuery TopNProbeParentThreshold(int threshold) =>
         TopNProbeParentThreshold(checked((ulong)threshold));
 
-    public SelectQuery CloneForExecution()
-    {
-        return new SelectQuery(Entity)
-        {
-            HardLimitValue = HardLimitValue,
-            Projection = new List<string>(Projection),
-            ExprProjection = new List<NamedExpr>(ExprProjection),
-            SearchText = SearchText,
-            FilterCondition = FilterCondition,
-            HavingCondition = HavingCondition,
-            OrderByItems = new List<OrderBy>(OrderByItems),
-            Slice = Slice,
-            PartitionBy = PartitionBy,
-            AggregateItems = new List<Aggregate>(AggregateItems),
-            GroupByItems = new List<string>(GroupByItems),
-            RelationLoads = new List<RelationLoad>(RelationLoads),
-            RelationAggregates = new List<RelationAggregate>(RelationAggregates),
-            AggregationCache = AggregationCache,
-            CommentText = CommentText,
-            TraceChain = new List<TraceNode>(TraceChain),
-            RawSqlText = RawSqlText,
-            RawSqlSearchCriteriaItems = new List<string>(RawSqlSearchCriteriaItems),
-            DynamicProperties = new List<RawSqlProjection>(DynamicProperties),
-            RawProjections = new List<RawSqlProjection>(RawProjections),
-            ObjectGroupBys = new List<ObjectGroupBy>(ObjectGroupBys),
-            ChildEnhancements = new List<SelectQuery>(ChildEnhancements),
-            StreamConfig = StreamConfig,
-            IdSetPagination = IdSetPagination,
-            TopNProbeThreshold = TopNProbeThreshold,
-            Filters = new List<FilterExpression>(Filters),
-            Facets = new List<FacetRequest>(Facets),
-            PurposeText = PurposeText
-        };
-    }
+    public SelectQuery CloneForExecution() => new QuerySnapshot().Query(this);
 
     public SelectQuery Copy() => CloneForExecution();
 

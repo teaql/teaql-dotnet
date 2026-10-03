@@ -121,4 +121,23 @@ public class TraceChainSqliteTests
             Assert.Equal("observe every physical statement", entry.Purpose);
         });
     }
+
+    [Fact]
+    public async Task RequestCapturesMutableNestedQueriesBeforeExecution()
+    {
+        var fixture=await Fixture(); await using var connection=fixture.Connection;
+        var region=new SelectQuery("Region").Filter(Expr.Eq("id",1L)).Limit(1);
+        var query=new SelectQuery("School").Limit(1).Comment("captured graph").Purpose("snapshot nested request")
+            .RelationQuery("platform",new SelectQuery("Platform").Project("organizationId").Limit(1)
+                .RelationQuery("organization",new SelectQuery("Organization").Project("regionId").Limit(1).RelationQuery("region",region)));
+        var request=new QueryRequest(query);
+        region.Filter(Expr.Eq("id",999L));query.Comment("changed caller");
+        var result=await fixture.Context.RequireResource<IDataService>().QueryAsync(request);
+        var platform=Assert.IsType<Value.ObjectValue>(Assert.Single(result.Rows)["platform"]).Value;
+        var organization=Assert.IsType<Value.ObjectValue>(platform["organization"]).Value;
+        var actualRegion=Assert.IsType<Value.ObjectValue>(organization["region"]).Value;
+        Assert.Equal(1L,actualRegion["id"].TryI64());
+        Assert.Equal(4,fixture.Log.Entries.Count);
+        Assert.All(fixture.Log.Entries,entry=>Assert.Equal("captured graph",entry.Comment));
+    }
 }
