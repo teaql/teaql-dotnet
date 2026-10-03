@@ -21,12 +21,13 @@ public class SqlReadbackDiagnosticTests
         public List<CompiledQuery> Writes = new();
         public long? IdSpaceLevel;
         public int Reads;
+        public ulong AffectedRows = 1;
         public Task<ulong> ExecuteSqlAsync(CompiledQuery query)
         {
             Writes.Add(query);
             if (WriteFailure != null && !query.Sql.Contains("teaql_id_space", StringComparison.Ordinal))
                 return Task.FromException<ulong>(WriteFailure);
-            return Task.FromResult(1UL);
+            return Task.FromResult(AffectedRows);
         }
         public Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
         {
@@ -129,7 +130,7 @@ public class SqlReadbackDiagnosticTests
             "save Riverside PASSWORD-CANARY customer graph");
         await service.MutateAsync(batch);
 
-        Assert.Equal(2, sink.Entries.Count);
+        Assert.Equal(3, sink.Entries.Count); // DELETE, UPDATE, authoritative SELECT.
         Assert.All(sink.Entries, entry =>
             Assert.Equal("save [REDACTED] [REDACTED] customer graph", entry.AuditReason));
         Assert.DoesNotContain("Riverside", sink.Text.ToString());
@@ -160,7 +161,8 @@ public class SqlReadbackDiagnosticTests
         var service = Service(transport, sink);
         if (failure) await Assert.ThrowsAsync<SqlExecutorException>(() => service.MutateAsync(new InsertMutationRequest(command, "what: create customer 1001")));
         else Assert.Equal(1UL, (await service.MutateAsync(new InsertMutationRequest(command, "what: create customer 1001"))).AffectedRows);
-        var entry = Assert.Single(sink.Entries);
+        Assert.Equal(failure ? 1 : 2, sink.Entries.Count);
+        var entry = sink.Entries[0];
         Assert.Equal(failure ? "failure" : "success", entry.ExecutionOutcome);
         Assert.Equal("what: create customer [REDACTED]", entry.AuditReason);
         Assert.DoesNotContain("customer 1001", sink.Text.ToString());
@@ -179,7 +181,8 @@ public class SqlReadbackDiagnosticTests
         command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001"));
         var result = await Service(transport, sink).MutateAsync(new UpdateMutationRequest(command, "what: update customer 1001"));
         Assert.Equal(1UL, result.AffectedRows);
-        var entry = Assert.Single(sink.Entries);
+        Assert.Equal(2, sink.Entries.Count);
+        var entry = sink.Entries[0];
         Assert.Equal("what: update customer [REDACTED]", entry.AuditReason);
         Assert.DoesNotContain("customer 1001", sink.Text.ToString());
         Assert.Contains("1001", sink.Text.ToString());
@@ -201,7 +204,8 @@ public class SqlReadbackDiagnosticTests
             var command = new UpdateCommand("Customer", new Value.I64Value(1001)).Value("name", "Riverside");
             command.TraceChain.Add(new TraceNode("Customer", 1001, "what: update customer 1001"));
             await Service(transport, new Sink(), sensitiveSink: sensitive).MutateAsync(new UpdateMutationRequest(command, "what: update customer 1001"));
-            var entry = Assert.Single(sensitive.Entries);
+            Assert.Equal(2, sensitive.Entries.Count);
+            var entry = sensitive.Entries[0];
             Assert.Equal("what: update customer [REDACTED]", entry.AuditReason);
             Assert.Contains("1001", entry.DebugQuery);
             Assert.DoesNotContain("IntentValues", System.Text.Json.JsonSerializer.Serialize(entry));
@@ -257,7 +261,7 @@ public class SqlReadbackDiagnosticTests
     }
 
     [Fact]
-    public async Task SuccessfulReadbackKeepsSnapshotAndExistingLogScope()
+    public async Task SuccessfulReadbackKeepsSnapshotAndBothPhysicalStatements()
     {
         var row = Row();
         var transport = new Transport { Rows = new() { row } };
@@ -265,8 +269,54 @@ public class SqlReadbackDiagnosticTests
         var result = await Service(transport, sink).MutateAsync(Update());
         Assert.Same(row, result.PersistedRecord);
         Assert.Equal("Riverside", result.PersistedRecord!["name"].TryText());
-        Assert.Single(sink.Entries);
+        Assert.Equal(2, sink.Entries.Count);
         Assert.Equal(DataServiceOperation.Update, sink.Entries[0].Operation);
+        Assert.Equal(DataServiceOperation.Query, sink.Entries[1].Operation);
+        Assert.Equal(1, sink.Entries[1].ResultCount);
+        Assert.Null(sink.Entries[1].AffectedRows);
+        Assert.Equal(sink.Entries[0].AuditReason, sink.Entries[1].AuditReason);
+        Assert.Equal(DataServiceOperation.Update, result.Metadata.Operation);
+        Assert.Equal(1UL, result.AffectedRows);
+        Assert.Equal(2, result.Metadata.Statements.Count);
+        Assert.DoesNotContain("Riverside", sink.Text.ToString());
+        Assert.DoesNotContain("PASSWORD-CANARY", sink.Text.ToString());
+    }
+
+    [Fact]
+    public async Task SuccessfulReadbackWithoutObserverRetainsPhysicalResultChildren()
+    {
+        var transport = new Transport { Rows = new() { Row() } };
+        var entity = EntityDescriptor.New("Customer")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("name", DataType.Text));
+        var schema = new Mock<ISchemaProvider>();
+        schema.Setup(s => s.GetEntity("Customer")).Returns(entity);
+        var provider = new SqlDataServiceTransaction(new Dialect(), transport, schema.Object);
+        var result = await provider.MutateAsync(new UpdateMutationRequest(new UpdateCommand("Customer",Value.FromObject(1L)).Value("name","Riverside"),"save customer"));
+        Assert.Equal(2, result.Metadata.Statements.Count);
+        Assert.Equal(DataServiceOperation.Update, result.Metadata.Operation);
+        Assert.Equal(DataServiceOperation.Query, result.Metadata.Statements[1].Operation);
+        Assert.Equal("save customer", result.Metadata.Statements[1].Comment);
+        Assert.Equal("Riverside", result.PersistedRecord!["name"].TryText());
+        Assert.NotSame(result.Metadata, result.Metadata.Statements[0]);
+        _ = System.Text.Json.JsonSerializer.Serialize(result.Metadata);
+    }
+
+    [Theory]
+    [InlineData(false)][InlineData(true)]
+    public async Task ZeroRowsAndPhysicalDeleteDoNotInventReadback(bool hardDelete)
+    {
+        var transport = new Transport { AffectedRows = hardDelete ? 1UL : 0UL };
+        var sink = new Sink();
+        MutationRequest request = hardDelete
+            ? new DeleteMutationRequest(new DeleteCommand("Customer",Value.FromObject(1L)).HardDelete(),"physical delete")
+            : Update();
+        var result = await Service(transport,sink).MutateAsync(request);
+        Assert.Equal(0, transport.Reads);
+        Assert.Empty(result.Metadata.Statements);
+        Assert.Null(result.PersistedRecord);
+        Assert.Equal(transport.AffectedRows,result.AffectedRows);
+        Assert.NotEqual(DataServiceOperation.Query,Assert.Single(sink.Entries).Operation);
     }
 
     [Fact]

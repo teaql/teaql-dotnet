@@ -157,7 +157,14 @@ try
 }
 catch (SqlExecutorException error) when (error.InnerException is SqliteException { SqliteErrorCode: 19 }) { }
 var partialLog = File.ReadAllText(logPath)[partialStart..];
-if (partialLog.Split("[TeaQL SQL]").Length - 1 != 2
+var partialStatements = partialLog.Split('\n').Where(line => line.StartsWith("[TeaQL SQL]", StringComparison.Ordinal)).ToArray();
+// INSERT success, its authoritative SELECT success, then failed INSERT.
+if (partialStatements.Length != 3
+    || !partialStatements[0].StartsWith("[TeaQL SQL][insert]", StringComparison.Ordinal)
+    || !partialStatements[1].StartsWith("[TeaQL SQL][query]", StringComparison.Ordinal)
+    || !partialStatements[1].Contains("outcome=success")
+    || !partialStatements[2].StartsWith("[TeaQL SQL][insert]", StringComparison.Ordinal)
+    || !partialStatements[2].Contains("outcome=failure")
     || !partialLog.Contains("outcome=success") || !partialLog.Contains("outcome=failure")
     || partialLog.IndexOf("outcome=success", StringComparison.Ordinal) > partialLog.IndexOf("outcome=failure", StringComparison.Ordinal)
     || !partialLog.Contains("Partial Student 30") || !partialLog.Contains("Partial Student 20")

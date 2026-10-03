@@ -65,6 +65,18 @@ public class QueryRequest
         IntentSource = IntentSource, RelationLoadObserver = RelationLoadObserver,
         DiagnosticObserver = DiagnosticObserver
     };
+
+    internal static QueryRequest Readback(SelectQuery query, MutationRequest mutation)
+    {
+        var intent = mutation.Intent.ReadbackIntent();
+        var root = mutation.AuditLineage(query.Entity).FirstOrDefault()?.Name ?? query.Entity;
+        return new QueryRequest(query, intent) {
+            TraceSource = Array.AsReadOnly(new[] {
+                new TraceNode(root, null, "") { Kind = "comment", Detail = intent.Comment },
+                new TraceNode(root, null, "") { Kind = "purpose", Detail = intent.Purpose }
+            })
+        };
+    }
 }
 
 public interface IRelationLoadObserver
@@ -259,6 +271,15 @@ public enum DataServiceOperation
 
 public class ExecutionMetadata
 {
+    // A result envelope keeps business totals while carrying ordered physical
+    // statements. Do not mutate a leaf into its own parent (or create a cycle
+    // through inherited intent provenance).
+    internal ExecutionMetadata WithStatements(params ExecutionMetadata[] statements)
+    {
+        var envelope = (ExecutionMetadata)MemberwiseClone();
+        envelope.Statements = Array.AsReadOnly(statements);
+        return envelope;
+    }
     // Provider success can be observed before relation enhancement completes.
     // Runtime must not publish that same physical statement a second time.
     internal bool DiagnosticReported { get; set; }

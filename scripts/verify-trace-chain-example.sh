@@ -18,6 +18,7 @@ for round in 1 2; do
   rg -Fq 'PASS: .NET generated ownership 4 scenarios' "$run_log"
   rg -Fq 'PASS: .NET generated page count, scope, privacy and independent graph saves' "$run_log"
   rg -Fq 'PASS: .NET generated stream capture, overlapping cursors, privacy and independent saves' "$run_log"
+  rg -Fq 'PASS: .NET generated successful readbacks, sibling privacy and independent request intent' "$run_log"
   [[ "$before" == "$(fingerprint)" ]] || { echo 'FAIL: generated library bytes changed' >&2; exit 1; }
 done
 echo "PASS: .NET generated trace-chain twice without cleanup; $(wc -l <<< "$before") unchanged library files"

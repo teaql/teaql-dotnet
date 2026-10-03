@@ -37,6 +37,11 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
 var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (ownershipScenario == "readback")
+{
+    await ReadbackChecks.RunAsync(context, capture, sink);
+    return;
+}
 if (ownershipScenario == "page")
 {
     await PageChecks.RunAsync(context, capture, sink);
@@ -62,6 +67,7 @@ Console.WriteLine("PASS: .NET generated trace-chain 6 scenarios; same database r
 await SharedReferenceChecks.RunAsync(context, capture, sink, faults);
 await PageChecks.RunAsync(context, capture, sink);
 await StreamChecks.RunAsync(context, capture, sink, faults);
+await ReadbackChecks.RunAsync(context, capture, sink);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)
@@ -241,7 +247,7 @@ async Task ReadbackFailure()
     Verify.Equal("success", write.ExecutionOutcome, "successful physical write is not overwritten by refresh failure");
     Verify.Equal(Verify.Shape(write.MutationLineage), Verify.Shape(refresh.MutationLineage), "readback carries branch lineage");
     Verify.That(write.MutationLineage.Count == 2, "grandchild inherits payment reason");
-    Verify.Equal("PaymentAttempt", refresh.TraceChain[0].Name, "independent authoritative refresh origin");
+    Verify.Equal("CustomerOrder", refresh.TraceChain[0].Name, "authoritative refresh retains originating request root");
     Console.WriteLine("PASS TC-MUT-14: successful statement and failed readback remain separate; transaction rolls back");
 }
 

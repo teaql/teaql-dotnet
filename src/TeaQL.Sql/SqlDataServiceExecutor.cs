@@ -629,8 +629,10 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         };
         if (affectedRows > 0 && !physicallyDeleted && entityId != null && entityDesc.IdProperty() is { } id)
         {
-            persistedRecord = await SqlMutationReadback.ExecuteAsync(Dialect, Transport, entityDesc,
+            var readback = await SqlMutationReadback.ExecuteAsync(Dialect, Transport, entityDesc,
                 new SelectQuery(entityName).Filter(Expr.Eq(id.Name, entityId)), request, metadata);
+            persistedRecord = readback.Row;
+            metadata = metadata.WithStatements(metadata, readback.Read);
         }
 
         return new MutationResult

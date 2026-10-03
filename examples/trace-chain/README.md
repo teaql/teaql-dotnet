@@ -95,3 +95,17 @@ generated cancellation probe uses chunk size one). Run only this acceptance with
 Local streaming supports scalar rows, not relation-graph hydration: requesting
 relations, relation aggregates, facets or graph enhancements rejects explicitly.
 This does not establish TFP streaming or live external-provider conformance.
+
+`ReadbackChecks` creates and then updates a three-object graph through generated
+Q/Mutation APIs. Each save emits three physical writes and three authoritative
+SELECTs, but still only three mutation commands and three committed audit
+events. Reads retain the aggregate request root, branch lineage and a derived
+purpose. A secret in a later child's value is masked from the root and sibling
+write/readback intent; trusted values and subsequent independent requests remain
+unchanged. Generated E and reloads verify values and versions. Run this case
+alone with `TEAQL_TRACE_CHAIN_SCENARIO=readback`; full verification requires it.
+
+Successful readbacks travel in ordered result metadata, not a duplicate observer
+notification. Failed/cancelled reads retain the existing failure observer path.
+Hard deletes and zero affected rows do not invent SELECT facts. Query-log and
+mutation-log switches independently control their physical statement categories.
