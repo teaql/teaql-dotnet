@@ -45,6 +45,72 @@ public class GraphTraceSqliteTests
     private static string Shape(IEnumerable<TraceNode> nodes) => string.Join(" -> ",
         nodes.Select(node => $"{node.Name}#{node.EntityId}:{node.Detail}"));
 
+    private sealed class AuditProbe : IEntity
+    {
+        public static string EntityName => "PaymentAttempt";
+        public static EntityDescriptor EntityDescriptor() => TeaQL.Core.EntityDescriptor.New(EntityName);
+        public TeaQL.Core.Record IntoRecord() => new();
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task BlankLocalReasonsUseRuntimeParentFallbackWithoutLeakingSiblingReasons(bool logging)
+    {
+        var fixture = await Fixture(); await using var db = fixture.Db;
+        var context = fixture.Context; var sink = fixture.Sink;
+        context.EnableQuerySqlLog(logging).EnableMutationSqlLog(logging);
+        var blanks = new string?[] { null, "", " \t\r\n", "\u0085", "\u00a0", "\u2003" };
+        const string paymentLineage = "CustomerOrder#100:submit order -> Payment#201:authorize payment";
+        const string shipmentLineage = "CustomerOrder#100:submit order -> Shipment#301:dispatch shipment";
+        await context.ExecuteGraphSaveAsync("submit order", async graph =>
+        {
+            var root = graph.Scope("CustomerOrder", 100, null);
+            var payment = graph.Scope("Payment", 201, "authorize payment", root);
+            var shipment = graph.Scope("Shipment", 301, "dispatch shipment", root);
+            for (var index = 0; index < blanks.Length; index++)
+            {
+                var blank = blanks[index];
+                var intentError = Assert.Throws<RequestIntentException>(() => new MutationIntent(blank));
+                Assert.Equal("REQUEST_COMMENT_REQUIRED", intentError.Code);
+                Assert.Equal("comment", intentError.Field);
+                Assert.Equal("mutation", intentError.RequestKind);
+                Assert.Equal("comment", Assert.Throws<ArgumentException>(() =>
+                    new Audited<AuditProbe>(new AuditProbe(), blank!)).ParamName);
+
+                // Feed the actual invalid local reason to the runtime adapter.
+                // No test-side validation, coalescing or fallback substitution.
+                var inherited = graph.Scope("PaymentAttempt", (ulong)(400 + index), blank, payment);
+                Assert.Same(payment, inherited);
+                var result = await graph.MutateAsync(Insert("PaymentAttempt", (ulong)(400 + index)), inherited);
+                Assert.Equal(paymentLineage, Shape(result.Metadata.MutationLineage));
+                Assert.Equal(2, result.Metadata.Statements.Count);
+                Assert.All(result.Metadata.Statements, statement => {
+                    Assert.Equal(paymentLineage, Shape(statement.MutationLineage));
+                    Assert.Equal("submit order", statement.AuditReason);
+                });
+                Assert.Empty(sink.Audit);
+            }
+            var sibling = await graph.MutateAsync(Insert("Shipment", 301), shipment);
+            Assert.Equal(shipmentLineage, Shape(sibling.Metadata.MutationLineage));
+            Assert.Equal(paymentLineage, Shape(payment.Recover()));
+            Assert.Equal("CustomerOrder#100:submit order", Shape(root.Recover()));
+            return true;
+        });
+        Assert.Equal(blanks.Length + 1, sink.Audit.Count);
+        Assert.All(sink.Audit, audit => {
+            Assert.Equal("submit order", audit["reason"]);
+            var nodes = Assert.IsAssignableFrom<IEnumerable<TraceNode>>(audit["traceChain"]);
+            Assert.Equal(audit["entityType"]!.ToString() == "Shipment" ? shipmentLineage : paymentLineage,
+                Shape(nodes));
+        });
+        Assert.Equal(logging ? 2 * (blanks.Length + 1) : 0, sink.Sql.Count);
+        Assert.All(sink.Sql, statement => {
+            Assert.Equal("submit order", statement.AuditReason);
+            Assert.Contains(Shape(statement.MutationLineage), new[] { paymentLineage, shipmentLineage });
+        });
+    }
+
     [Fact]
     public async Task RealAllocatedGraphKeepsBranchDeleteLedgerAndCommittedAuditLineage()
     {

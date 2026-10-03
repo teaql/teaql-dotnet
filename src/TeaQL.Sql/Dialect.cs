@@ -221,17 +221,6 @@ public abstract class SqlDialect
             sql += $" WHERE {string.Join(" AND ", whereParts)}";
         }
 
-        if (partitioned)
-        {
-            var rank = QuoteIdent("__teaql_partition_rank");
-            var predicates = new List<string> { $"{rank} > {query.Slice!.Offset}" };
-            if (query.Slice.Limit.HasValue)
-            {
-                predicates.Add($"{rank} <= {query.Slice.Offset + query.Slice.Limit.Value}");
-            }
-            return $"SELECT * FROM ({sql}) AS {QuoteIdent("__teaql_partitioned")} WHERE {string.Join(" AND ", predicates)} ORDER BY {rank}";
-        }
-
         if (query.GroupByItems != null && query.GroupByItems.Count > 0)
         {
             var groupBy = string.Join(", ", query.GroupByItems.Select(field => ColumnSql(entity, field)));
@@ -242,6 +231,19 @@ public abstract class SqlDialect
         {
             var havingSql = CompileExpr(entity, query.HavingCondition, paramsList);
             sql += $" HAVING {havingSql}";
+        }
+
+        // Window ranking applies to the grouped/filtered result. Returning the
+        // wrapper earlier silently discards GROUP BY and HAVING on aggregates.
+        if (partitioned)
+        {
+            var rank = QuoteIdent("__teaql_partition_rank");
+            var predicates = new List<string> { $"{rank} > {query.Slice!.Offset}" };
+            if (query.Slice.Limit.HasValue)
+            {
+                predicates.Add($"{rank} <= {query.Slice.Offset + query.Slice.Limit.Value}");
+            }
+            return $"SELECT * FROM ({sql}) AS {QuoteIdent("__teaql_partitioned")} WHERE {string.Join(" AND ", predicates)} ORDER BY {rank}";
         }
 
         if (query.OrderByItems != null && query.OrderByItems.Count > 0)
