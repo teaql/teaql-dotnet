@@ -42,6 +42,11 @@ if (ownershipScenario == "page")
     await PageChecks.RunAsync(context, capture, sink);
     return;
 }
+if (ownershipScenario == "stream")
+{
+    await StreamChecks.RunAsync(context, capture, sink, faults);
+    return;
+}
 if (!string.IsNullOrEmpty(ownershipScenario))
 {
     await SharedReferenceChecks.RunAsync(context, capture, sink, faults, ownershipScenario);
@@ -56,6 +61,7 @@ await ConcurrentGraphs();
 Console.WriteLine("PASS: .NET generated trace-chain 6 scenarios; same database retained; no generated edits");
 await SharedReferenceChecks.RunAsync(context, capture, sink, faults);
 await PageChecks.RunAsync(context, capture, sink);
+await StreamChecks.RunAsync(context, capture, sink, faults);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)
@@ -355,8 +361,16 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
     }
 }
 
-sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransactionTransport, ISchemaConnectionInitializer
+sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransactionTransport, ISchemaConnectionInitializer, IStreamingSqlTransport
 {
+    public int StreamOpens, StreamCloses;
+    public async IAsyncEnumerable<Record> StreamSqlAsync(CompiledQuery query,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        StreamOpens++;
+        try { await foreach (var row in inner.StreamSqlAsync(query, cancellationToken)) yield return row; }
+        finally { StreamCloses++; }
+    }
     public bool FailAttemptReadback { get; set; }
     public bool ReuseReadOnlyPlatformSnapshot { get; set; }
     public Record? SharedPlatformSnapshot { get; private set; }

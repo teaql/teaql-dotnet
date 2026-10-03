@@ -30,6 +30,7 @@ selects another local checkout.
 | Conflicting loaded versions | Two actual loaded versions of one entity fail before business SQL; both pending values survive |
 | Scoped page and COUNT | Four seeded graphs, one excluded by Context policy, total three, offset one and two returned roots; policy prepares once, COUNT retains removed-child masking without a fictional relation edge |
 | Page/list graph ownership | Each returned root owns a ledger and its children; saving one graph leaves the other graph pending and unchanged in SQLite until explicitly saved |
+| Captured scalar streams | Context scope and request intent freeze before enumeration; two real SQLite cursors overlap with separate filters, safe terminal SQL and per-root ledgers, including two roots delivered in one chunk |
 
 Data is written through generated Mutation APIs. `context.EnsureSchemaAsync()`
 provisions the root; there is no manual INSERT or seed workaround. Test-only
@@ -81,5 +82,16 @@ mvn -B -pl generator -am -Dtest=DotnetTraceChainExampleGenerationTest \
 This is selected producer coverage. Prepared batch/item-index lineage, detached
 children, late low-level allocation, every entry point and privacy mode, reentrant
 root fail-fast behavior and immutable internal Registry replay remain open.
-Generated streaming now allocates a ledger per returned root too, but delayed
-stream capture and generated stream acceptance remain separate open work.
+`StreamChecks` creates eight items through generated mutation APIs, captures two
+streams with different Context scopes, changes the caller builder/policy, then
+holds both cursors open before completing them. Five and three rows retain their
+captured scope. Saving one streamed item leaves another pending and unchanged
+until explicitly saved. Missing comment rejects at stream creation even with
+logging disabled; never-polled streams produce no SQL. Cancellation through the
+enumerator token closes the cursor and retains masked terminal intent (the
+generated cancellation probe uses chunk size one). Run only this acceptance with
+`TEAQL_TRACE_CHAIN_SCENARIO=stream`; the full script always includes it.
+
+Local streaming supports scalar rows, not relation-graph hydration: requesting
+relations, relation aggregates, facets or graph enhancements rejects explicitly.
+This does not establish TFP streaming or live external-provider conformance.

@@ -143,16 +143,31 @@ internal static class SqlStatementDiagnostics
         DateTimeOffset start, Exception error, EntityDescriptor? descriptor = null) => Record(request, Metadata(dialect, request, compiled, start,
             error is OperationCanceledException ? "cancelled" : "failure", descriptor: descriptor));
 
-    internal static async IAsyncEnumerable<StreamChunk> Stream(SqlDialect dialect, ISqlTransport transport,
+    internal static IAsyncEnumerable<StreamChunk> Stream(SqlDialect dialect, ISqlTransport transport,
+        ISchemaProvider schema, QueryRequest request, int chunkSize, CancellationToken cancellationToken)
+    {
+        // Own input now, not when the caller eventually starts enumerating.
+        // The database cursor and physical SQL fact still start only on first poll.
+        var captured = request.WithQuery(request.Query);
+        return StreamCaptured(dialect, transport, schema, captured, chunkSize, cancellationToken);
+    }
+
+    private static async IAsyncEnumerable<StreamChunk> StreamCaptured(SqlDialect dialect, ISqlTransport transport,
         ISchemaProvider schema, QueryRequest request, int chunkSize,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
+        // Enumerating one cold stream twice must not share normalized AST/diagnostics.
+        request = request.WithQuery(request.Query);
         if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
-        if (request.Query.RelationLoads.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
+        if (request.Query.RelationLoads.Count != 0 || request.Query.RelationAggregates.Count != 0 ||
+            request.Query.Facets.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
             throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
         if (transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
+        request.Query.NormalizeGeneratedFilters().PrepareForList();
         var entity = schema.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
         var compiled = dialect.CompileSelect(entity, request.Query);
+        if (request.DiagnosticObserver != null)
+            request.IntentSource = CaptureQueryIntent(dialect, schema, request, compiled);
         var start = DateTimeOffset.UtcNow;
         var outcome = "cancelled";
         int delivered = 0, index = 0;

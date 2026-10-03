@@ -31,16 +31,14 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public DataServiceCapabilities Capabilities => _provider.Capabilities;
 
-    public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize,
-        [System.Runtime.CompilerServices.EnumeratorCancellation] System.Threading.CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize,
+        System.Threading.CancellationToken cancellationToken = default)
     {
         if (_provider is not IStreamQueryExecutor streaming)
             throw new NotSupportedException("The installed provider does not support streaming queries");
         var execution = CopyRequest(request, request.Query.CloneForExecution());
         execution.DiagnosticObserver = _context.RecordExecutionMetadata;
-        await foreach (var chunk in streaming.QueryStreamAsync(execution, chunkSize, cancellationToken)
-            .WithCancellation(cancellationToken).ConfigureAwait(false))
-            yield return chunk;
+        return streaming.QueryStreamAsync(execution, chunkSize, cancellationToken);
     }
 
     public Task<QueryResult> QueryAsync(QueryRequest request)

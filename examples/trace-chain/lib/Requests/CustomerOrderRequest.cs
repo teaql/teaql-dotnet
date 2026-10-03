@@ -868,18 +868,25 @@ namespace Generated.Requests
             return new CustomerOrderPage(rows, totalCount);
         }
 
-        private async IAsyncEnumerable<Generated.Models.CustomerOrder> ExecuteForStreamInternalAsync(
+        private IAsyncEnumerable<Generated.Models.CustomerOrder> ExecuteForStreamInternalAsync(
             UserContext context,
             int chunkSize,
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
-            await foreach (var chunk in streaming.QueryStreamAsync(
-                req, chunkSize, cancellationToken).WithCancellation(cancellationToken))
+            var captured = streaming.QueryStreamAsync(req, chunkSize, cancellationToken);
+            return HydrateStream(captured, cancellationToken);
+        }
+
+        private static async IAsyncEnumerable<Generated.Models.CustomerOrder> HydrateStream(
+            IAsyncEnumerable<StreamChunk> captured,
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            await foreach (var chunk in captured.WithCancellation(cancellationToken))
             {
                 foreach (var row in chunk.Rows)
                     yield return Generated.Models.CustomerOrder.FromRecord(row, new EntityRoot());

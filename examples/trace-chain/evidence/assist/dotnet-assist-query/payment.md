@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Generated;
 using Generated.Models;
 using TeaQL.Core;
+using TeaQL.Runtime;
 
 public static class PaymentQueryService
 {
@@ -33,6 +34,28 @@ predicate, ordering, and relation-selection APIs. Reuse the same active filters
 for rows, count, facets, and aggregates. Missing/blank intent, unknown fields,
 unbounded reads, and trusted-context inputs must fail. Use generated relation loading
 rather than handwritten child-query loops; never guess a plural.
+
+## Local scalar streaming
+
+```csharp
+var stream = Q.PaymentsWithMinimalFields()
+    .OrderByIdAscending().Limit(20)
+    .Comment("what: stream bounded Payment rows")
+    .Purpose("why: process the authorized result incrementally")
+    .ExecuteForStreamAsync(context, chunkSize: 2,
+        cancellationToken: System.Threading.CancellationToken.None);
+await foreach (var row in stream)
+{
+    var id = E.Payment(row).Id().Eval();
+}
+```
+
+The request and Context policy are captured when the stream is created; opening
+the cursor is deferred until enumeration. Each returned root has its own ledger.
+Use the full-field Q entry point before saving a streamed entity. This path is
+for local scalar rows: relation loads, relation aggregates, facets and graph
+enhancements are rejected, not silently ignored. An unused stream emits no SQL;
+early disposal/cancellation closes the cursor. TFP streaming is not implied.
 
 
 ## Field-specific Query Assist

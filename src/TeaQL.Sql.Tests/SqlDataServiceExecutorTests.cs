@@ -195,7 +195,9 @@ namespace TeaQL.Sql.Tests
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
             var compiled = new CompiledQuery("SELECT 1", new List<Value>(), null);
-            _mockDialect.Setup(d => d.CompileSelect(ed, req.Query)).Returns(compiled);
+            _mockDialect.Setup(d => d.CompileSelect(ed, It.Is<SelectQuery>(query =>
+                query.Entity == "TestEntity" && query.Slice != null && query.Slice.Limit == SelectQuery.DefaultHardLimit
+                && !ReferenceEquals(query, req.Query)))).Returns(compiled);
 
             var rows = new List<Record> { new Record(), new Record(), new Record() };
             _mockStreamingTransport.Setup(t => t.StreamSqlAsync(compiled, default)).Returns(StreamRows(rows));

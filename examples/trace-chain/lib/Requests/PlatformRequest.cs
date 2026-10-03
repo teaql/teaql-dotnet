@@ -581,18 +581,25 @@ namespace Generated.Requests
             return new PlatformPage(rows, totalCount);
         }
 
-        private async IAsyncEnumerable<Generated.Models.Platform> ExecuteForStreamInternalAsync(
+        private IAsyncEnumerable<Generated.Models.Platform> ExecuteForStreamInternalAsync(
             UserContext context,
             int chunkSize,
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
-            await foreach (var chunk in streaming.QueryStreamAsync(
-                req, chunkSize, cancellationToken).WithCancellation(cancellationToken))
+            var captured = streaming.QueryStreamAsync(req, chunkSize, cancellationToken);
+            return HydrateStream(captured, cancellationToken);
+        }
+
+        private static async IAsyncEnumerable<Generated.Models.Platform> HydrateStream(
+            IAsyncEnumerable<StreamChunk> captured,
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            await foreach (var chunk in captured.WithCancellation(cancellationToken))
             {
                 foreach (var row in chunk.Rows)
                     yield return Generated.Models.Platform.FromRecord(row, new EntityRoot());
