@@ -42,7 +42,16 @@ public class RelationAggregateTraceTests
     [InlineData(true, true, false)]
     [InlineData(false, true, true)]
     [InlineData(true, true, true)]
-    public async Task HydratedMembershipPreservesAggregatesAndNestedRoute(bool nested, bool logging, bool fail)
+    [InlineData(false, false, false, true, false)]
+    [InlineData(false, true, false, true, false)]
+    [InlineData(true, false, false, true, false)]
+    [InlineData(true, true, false, true, false)]
+    [InlineData(false, false, false, true, true)]
+    [InlineData(false, true, false, true, true)]
+    [InlineData(true, false, false, true, true)]
+    [InlineData(true, true, false, true, true)]
+    public async Task HydratedMembershipPreservesAggregatesAndNestedRoute(
+        bool nested, bool logging, bool fail, bool filtered = false, bool sibling = false)
     {
         await using var connection = new SqliteConnection("Data Source=:memory:");
         await connection.OpenAsync();
@@ -53,7 +62,8 @@ public class RelationAggregateTraceTests
             .Property(PropertyDescriptor.New("name", DataType.Text)).AuditMaskFields(new() { "name" })
             .Relation(RelationDescriptor.New("children", "Child").LocalKey("code").ForeignKey("parent_ref").Many());
         var child = Entity("Child").Property(PropertyDescriptor.New("parent_ref", DataType.Text))
-            .Relation(RelationDescriptor.New("parent_ref", "Parent").LocalKey("parent_ref").ForeignKey("code"));
+            .Relation(RelationDescriptor.New("parent_ref", "Parent").LocalKey("parent_ref").ForeignKey("code"))
+            .Relation(RelationDescriptor.New("parent_again", "Parent").LocalKey("parent_ref").ForeignKey("code"));
         var descriptors = new[] { parent, child };
         var schemas = new MetadataSchemaProvider(name => descriptors.FirstOrDefault(entity => entity.Name == name));
         var transport = new ObservedTransport(new SqliteTransport(connection));
@@ -70,8 +80,12 @@ public class RelationAggregateTraceTests
             .Value("id", Value.FromObject(1L)).Value("parent_ref", Value.FromObject("P1")), "seed child"));
         sink.Entries.Clear(); transport.Reads.Clear();
         if (!logging) context.DisableQuerySqlLog();
+        var forward = new SelectQuery("Parent").Projects(new[] { "id", "code", "name" }).Limit(1);
+        if (filtered) forward.Filter(Expr.Eq("code", "not-visible"));
         var childQuery = new SelectQuery("Child").Projects(new[] { "id", "parent_ref" }).Limit(1)
-            .RelationQuery("parent_ref", new SelectQuery("Parent").Projects(new[] { "id", "code", "name" }).Limit(1));
+            .RelationQuery("parent_ref", forward);
+        if (sibling) childQuery.RelationQuery("parent_again",
+            new SelectQuery("Parent").Projects(new[] { "id", "code", "name" }).Limit(1));
         childQuery.RelationAggregates.Add(new RelationAggregate("parent_ref", "parent_count",
             new SelectQuery("Parent").Filter(Expr.Eq("name", secret)).CountField("id", "n"), true));
         var query = (nested ? new SelectQuery("Parent").Projects(new[] { "id", "code" }).Limit(1)
@@ -92,10 +106,16 @@ public class RelationAggregateTraceTests
             if (nested)
                 row = Assert.IsType<Value.ObjectValue>(Assert.Single(Assert.IsType<Value.ListValue>(row["children"]).Values)).Value;
             Assert.Equal(1L, row["parent_count"].TryI64());
-            var loaded = Assert.IsType<Value.ObjectValue>(row["parent_ref"]).Value;
-            Assert.Equal("P1", loaded["code"].TryText());
-            Assert.Equal(secret, loaded["name"].TryText());
-            Assert.Equal(nested ? 4 : 3, transport.Reads.Count);
+            if (filtered) Assert.IsType<Value.NullValue>(row["parent_ref"]);
+            else
+            {
+                var loaded = Assert.IsType<Value.ObjectValue>(row["parent_ref"]).Value;
+                Assert.Equal("P1", loaded["code"].TryText());
+                Assert.Equal(secret, loaded["name"].TryText());
+            }
+            if (sibling)
+                Assert.Equal("P1", Assert.IsType<Value.ObjectValue>(row["parent_again"]).Value["code"].TryText());
+            Assert.Equal((nested ? 4 : 3) + (sibling ? 1 : 0), transport.Reads.Count);
         }
         if (logging)
         {

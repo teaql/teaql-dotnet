@@ -25,6 +25,9 @@ public class QueryRequest
     internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
     // Bind provenance for inherited intent on derived queries, not shared context state.
     internal ExecutionMetadata? IntentSource { get; set; }
+    // One derived relation load captures scalar join keys before hydration.
+    // Not inherited by descendants, serialized, or exposed in result records.
+    internal Action<IReadOnlyList<Record>>? CaptureRelationKeys { get; set; }
     public SelectQuery Query { get; }
     public List<TraceNode> TraceChain { get; set; } = new();
     // Immutable runtime-owned source. Public diagnostic frames are not provenance.

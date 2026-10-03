@@ -15,8 +15,10 @@ snapshots privately preserve their origin across relation and aggregate
 derivation; caller-supplied diagnostic TraceChain frames cannot forge provenance.
 
 Related aggregation consumes scalar membership keys before forward-reference
-hydration. Nested attachment resolves hydrated foreign keys through declared
-relation metadata, including targets keyed by `code` rather than `id`. Native
+hydration. Nested attachment captures original scalar keys before hydration,
+including targets keyed by `code` rather than `id`. A reference filtered to null
+does not detach its child from the parent list or prevent another sibling from
+using that FK. These per-load keys never become result fields or ledger entries. Native
 SQLite regression cases cover root/nested count results, original trace ancestry,
 descendant-binding privacy, logging disabled and aggregate failure recovery.
 Generated models now retain related-count aliases in a runtime-owned

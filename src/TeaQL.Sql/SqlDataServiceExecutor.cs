@@ -90,6 +90,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         }
         var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
         SqlStatementDiagnostics.QuerySucceeded(request, metadata);
+        request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
 
         return new QueryResult { Rows = rows, Metadata = metadata };
@@ -256,6 +257,10 @@ internal static class RelationQueryLoader
         var parentDescriptor = schemaProvider.GetEntity(request.Query.Entity)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {request.Query.Entity}");
         var inheritedIntent = SqlStatementDiagnostics.InheritedIntent(request, compiled);
+        var parentKeys = request.Query.RelationLoads
+            .Select(load => parentDescriptor.RelationByName(load.Name)?.LocalKeyValue)
+            .OfType<string>().Distinct()
+            .ToDictionary(field => field, field => SnapshotKeys(parents, field));
         // Membership must consume scalar keys before a selected reference replaces
         // the same field with its hydrated object.
         await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor, inheritedIntent);
@@ -265,13 +270,11 @@ internal static class RelationQueryLoader
                 ?? throw new SqlExecutorException($"SQL compile error: missing relation {request.Query.Entity}.{load.Name}");
             var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity)
                 ?? throw new SqlExecutorException($"SQL compile error: unknown entity {relation.TargetEntity}");
-            var parentIds = parents
-                .Select(parent => RelationKey(parent, parentDescriptor, relation.LocalKeyValue))
-                .OfType<Value>()
-                .ToList();
+            var localKeys = parentKeys[relation.LocalKeyValue];
+            var parentIds = localKeys.OfType<Value>().ToList();
             if (parentIds.Count == 0)
             {
-                Attach(parents, new List<Record>(), load.Name, relation, parentDescriptor, childDescriptor);
+                Attach(parents, new List<Record>(), load.Name, relation, localKeys, Array.Empty<Value?>());
                 continue;
             }
             var childQuery = Clone(load.Query ?? new SelectQuery(relation.TargetEntity));
@@ -297,6 +300,7 @@ internal static class RelationQueryLoader
             async Task LoadAndAttach()
             {
                 var childRows = new List<Record>();
+                var childKeys = new List<Value?>();
                 var queries = useProbes
                     ? parentIds.Select(parentId =>
                     {
@@ -310,6 +314,8 @@ internal static class RelationQueryLoader
                 {
                     var derived = request.Derive(executionQuery, load.Name);
                     derived.IntentSource = inheritedIntent;
+                    derived.CaptureRelationKeys = rows =>
+                        childKeys.AddRange(SnapshotKeys(rows, relation.ForeignKeyValue));
                     var childResult = await queryAsync(derived);
                     childRows.AddRange(childResult.Rows);
                 }
@@ -317,7 +323,7 @@ internal static class RelationQueryLoader
                 {
                     child.Remove("__teaql_partition_rank");
                 }
-                Attach(parents, childRows, load.Name, relation, parentDescriptor, childDescriptor);
+                Attach(parents, childRows, load.Name, relation, localKeys, childKeys);
             }
             if (request.RelationLoadObserver is { } observer)
                 await observer.ObserveAsync(request.Query.Entity, load.Name,
@@ -447,32 +453,28 @@ internal static class RelationQueryLoader
         ChildEnhancements = new List<SelectQuery>(query.ChildEnhancements)
     };
 
-    private static Value? RelationKey(Record row, EntityDescriptor descriptor, string field)
-    {
-        if (!row.TryGetValue(field, out var value)) return null;
-        var reference = descriptor.RelationByName(field);
-        if (value is Value.ObjectValue loaded && reference is { IsMany: false }
-            && reference.LocalKeyValue == field)
-            return loaded.Value.TryGetValue(reference.ForeignKeyValue, out var key) ? key : null;
-        return value;
-    }
+    private static Value?[] SnapshotKeys(IReadOnlyList<Record> rows, string field) =>
+        rows.Select(row => row.TryGetValue(field, out var value) ? value : null).ToArray();
 
     private static void Attach(
         List<Record> parents,
         List<Record> children,
         string relationName,
         RelationDescriptor relation,
-        EntityDescriptor parentDescriptor,
-        EntityDescriptor childDescriptor)
+        IReadOnlyList<Value?> parentKeys,
+        IReadOnlyList<Value?> childKeys)
     {
+        if (parentKeys.Count != parents.Count || childKeys.Count != children.Count)
+            throw new SqlExecutorException("Relation assembly key count differs from row count");
         var buckets = children
-            .Select(child => (Row: child, Key: RelationKey(child, childDescriptor, relation.ForeignKeyValue)))
+            .Select((child, index) => (Row: child, Key: childKeys[index]))
             .Where(item => item.Key != null)
             .GroupBy(item => item.Key!)
             .ToDictionary(group => group.Key, group => group.Select(item => item.Row).ToList());
-        foreach (var parent in parents)
+        for (var index = 0; index < parents.Count; index++)
         {
-            var localKey = RelationKey(parent, parentDescriptor, relation.LocalKeyValue);
+            var parent = parents[index];
+            var localKey = parentKeys[index];
             var related = localKey != null
                 && buckets.TryGetValue(localKey, out var bucket)
                 ? bucket
@@ -540,6 +542,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         }
         var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
         SqlStatementDiagnostics.QuerySucceeded(request, metadata);
+        request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
 
         return new QueryResult { Rows = rows, Metadata = metadata };
