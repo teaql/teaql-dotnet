@@ -256,17 +256,22 @@ internal static class RelationQueryLoader
         var parentDescriptor = schemaProvider.GetEntity(request.Query.Entity)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {request.Query.Entity}");
         var inheritedIntent = SqlStatementDiagnostics.InheritedIntent(request, compiled);
+        // Membership must consume scalar keys before a selected reference replaces
+        // the same field with its hydrated object.
+        await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor, inheritedIntent);
         foreach (var load in request.Query.RelationLoads)
         {
             var relation = parentDescriptor.RelationByName(load.Name)
                 ?? throw new SqlExecutorException($"SQL compile error: missing relation {request.Query.Entity}.{load.Name}");
+            var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity)
+                ?? throw new SqlExecutorException($"SQL compile error: unknown entity {relation.TargetEntity}");
             var parentIds = parents
-                .Where(parent => parent.ContainsKey(relation.LocalKeyValue))
-                .Select(parent => parent[relation.LocalKeyValue])
+                .Select(parent => RelationKey(parent, parentDescriptor, relation.LocalKeyValue))
+                .OfType<Value>()
                 .ToList();
             if (parentIds.Count == 0)
             {
-                Attach(parents, new List<Record>(), load.Name, relation);
+                Attach(parents, new List<Record>(), load.Name, relation, parentDescriptor, childDescriptor);
                 continue;
             }
             var childQuery = Clone(load.Query ?? new SelectQuery(relation.TargetEntity));
@@ -312,7 +317,7 @@ internal static class RelationQueryLoader
                 {
                     child.Remove("__teaql_partition_rank");
                 }
-                Attach(parents, childRows, load.Name, relation);
+                Attach(parents, childRows, load.Name, relation, parentDescriptor, childDescriptor);
             }
             if (request.RelationLoadObserver is { } observer)
                 await observer.ObserveAsync(request.Query.Entity, load.Name,
@@ -327,7 +332,6 @@ internal static class RelationQueryLoader
             else
                 await LoadAndAttach();
         }
-        await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor, inheritedIntent);
     }
 
     private static async Task EnhanceAggregatesAsync(
@@ -443,19 +447,33 @@ internal static class RelationQueryLoader
         ChildEnhancements = new List<SelectQuery>(query.ChildEnhancements)
     };
 
+    private static Value? RelationKey(Record row, EntityDescriptor descriptor, string field)
+    {
+        if (!row.TryGetValue(field, out var value)) return null;
+        var reference = descriptor.RelationByName(field);
+        if (value is Value.ObjectValue loaded && reference is { IsMany: false }
+            && reference.LocalKeyValue == field)
+            return loaded.Value.TryGetValue(reference.ForeignKeyValue, out var key) ? key : null;
+        return value;
+    }
+
     private static void Attach(
         List<Record> parents,
         List<Record> children,
         string relationName,
-        RelationDescriptor relation)
+        RelationDescriptor relation,
+        EntityDescriptor parentDescriptor,
+        EntityDescriptor childDescriptor)
     {
         var buckets = children
-            .Where(child => child.ContainsKey(relation.ForeignKeyValue))
-            .GroupBy(child => child[relation.ForeignKeyValue])
-            .ToDictionary(group => group.Key, group => group.ToList());
+            .Select(child => (Row: child, Key: RelationKey(child, childDescriptor, relation.ForeignKeyValue)))
+            .Where(item => item.Key != null)
+            .GroupBy(item => item.Key!)
+            .ToDictionary(group => group.Key, group => group.Select(item => item.Row).ToList());
         foreach (var parent in parents)
         {
-            var related = parent.TryGetValue(relation.LocalKeyValue, out var localKey)
+            var localKey = RelationKey(parent, parentDescriptor, relation.LocalKeyValue);
+            var related = localKey != null
                 && buckets.TryGetValue(localKey, out var bucket)
                 ? bucket
                 : new List<Record>();

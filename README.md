@@ -14,6 +14,14 @@ structured metadata fields, not duplicated in every physical frame. Query
 snapshots privately preserve their origin across relation and aggregate
 derivation; caller-supplied diagnostic TraceChain frames cannot forge provenance.
 
+Related aggregation consumes scalar membership keys before forward-reference
+hydration. Nested attachment resolves hydrated foreign keys through declared
+relation metadata, including targets keyed by `code` rather than `id`. Native
+SQLite regression cases cover root/nested count results, original trace ancestry,
+descendant-binding privacy, logging disabled and aggregate failure recovery.
+This is native-provider coverage; generated related-count result access and
+complete aggregate/Facet acceptance remain separate, open gates.
+
 `ExecutionMetadata.MutationLineage` separately preserves existing root/item
 reasons, including partial batch failures and mutation readback. Default masking
 projects both that lineage and physical paths before sinks; execution values
