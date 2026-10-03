@@ -7,7 +7,8 @@ static class LoadedPrivacyChecks
     public static async Task RunAsync(UserContext context, CapturingExecutor capture, EvidenceSink sink)
     {
         var nonce = Guid.NewGuid().ToString("N");
-        var oldValue = "PRIVATE-LOADED-" + nonce;
+        var alphabetic = string.Concat(nonce.Select(c => (char)('A' + Convert.ToInt32(c.ToString(), 16))));
+        var oldValue = "PRIVATE-LOADED-" + alphabetic;
         var root = Q.CustomerOrders().Comment("prepare loaded privacy graph").Purpose("verify old scalar provenance")
             .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber("loaded-" + nonce).UpdateDescription("initial");
         var child = Q.OrderItems().Comment("prepare private child").Purpose("verify old scalar provenance")
@@ -24,7 +25,7 @@ static class LoadedPrivacyChecks
         Verify.Equal(oldValue, E.OrderItem(loadedChild).Name().Eval(), "query hydrates private prior value");
         for (var round = 0; round < 2; round++)
         {
-            var nextValue = "PRIVATE-CHANGED-" + nonce + "-" + round;
+            var nextValue = "PRIVATE-CHANGED-" + alphabetic + "-" + (char)('A' + round);
             loaded.UpdateDescription("revision " + round);
             loadedChild.UpdateName(nextValue);
             capture.Clear(); sink.Clear();

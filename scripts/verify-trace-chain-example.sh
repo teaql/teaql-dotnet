@@ -10,7 +10,7 @@ fingerprint() {
 }
 before="$(fingerprint)"
 for round in 1 2; do
-  echo "TRACE CHAIN round $round on the same retained database"
+  echo "TRACE CHAIN round $round on the same retained database $database"
   run_log="$(mktemp -t teaql-dotnet-trace-chain.XXXXXX.log)"
   env -u TEAQL_TRACE_CHAIN_SCENARIO dotnet run --property:TeaQLRuntimeSourceRoot="$source_root" \
     --project "$example/trace-chain.csproj" -- --database "$database" | tee "$run_log"
@@ -20,6 +20,7 @@ for round in 1 2; do
   rg -Fq 'PASS: .NET generated stream capture, overlapping cursors, privacy and independent saves' "$run_log"
   rg -Fq 'PASS: .NET generated successful readbacks, sibling privacy and independent request intent' "$run_log"
   rg -Fq 'PASS: .NET loaded scalar privacy, snapshot refresh, deletion and independent request' "$run_log"
+  rg -Fq 'PASS: .NET loaded graph privacy rollback and same-wrapper retry' "$run_log"
   [[ "$before" == "$(fingerprint)" ]] || { echo 'FAIL: generated library bytes changed' >&2; exit 1; }
 done
 echo "PASS: .NET generated trace-chain twice without cleanup; $(wc -l <<< "$before") unchanged library files"

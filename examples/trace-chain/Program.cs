@@ -37,6 +37,11 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
 var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (ownershipScenario == "loaded-privacy-rollback")
+{
+    await LoadedPrivacyRollbackChecks.RunAsync(context, capture, sink, faults);
+    return;
+}
 if (ownershipScenario == "loaded-privacy")
 {
     await LoadedPrivacyChecks.RunAsync(context, capture, sink);
@@ -75,6 +80,8 @@ await StreamChecks.RunAsync(context, capture, sink, faults);
 await ReadbackChecks.RunAsync(context, capture, sink);
 
 await LoadedPrivacyChecks.RunAsync(context, capture, sink);
+
+await LoadedPrivacyRollbackChecks.RunAsync(context, capture, sink, faults);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)
@@ -385,6 +392,7 @@ sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransacti
         finally { StreamCloses++; }
     }
     public bool FailAttemptReadback { get; set; }
+    public bool FailItemReadback { get; set; }
     public bool ReuseReadOnlyPlatformSnapshot { get; set; }
     public Record? SharedPlatformSnapshot { get; private set; }
     public int SharedPlatformUses { get; private set; }
@@ -406,8 +414,9 @@ sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransacti
     public async Task<ISqlTransaction> BeginSqlAsync() => new FaultTransaction(this, await inner.BeginSqlAsync());
     private sealed class FaultTransaction(FaultTransport owner, ISqlTransaction inner) : ISqlTransaction
     {
-        public Task<List<Record>> FetchAllSqlAsync(CompiledQuery query) => owner.FailAttemptReadback &&
-            query.Sql.Contains("payment_attempt_data", StringComparison.Ordinal)
+        public Task<List<Record>> FetchAllSqlAsync(CompiledQuery query) => (owner.FailAttemptReadback &&
+            query.Sql.Contains("payment_attempt_data", StringComparison.Ordinal)) || (owner.FailItemReadback &&
+            query.Sql.Contains("order_item_data", StringComparison.Ordinal))
             ? Task.FromException<List<Record>>(new SqlExecutorException("Injected post-write authoritative fetch failure"))
             : inner.FetchAllSqlAsync(query);
         public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);

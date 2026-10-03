@@ -118,3 +118,19 @@ it is neither a write payload nor shared Context state. Known public values
 (including version numbers in ordinary prose) are not indiscriminately redacted.
 Independent subsequent queries keep their own intent. The full verifier requires
 this check; `TEAQL_TRACE_CHAIN_SCENARIO=loaded-privacy` selects it alone.
+
+## Loaded graph rollback privacy
+
+`LoadedPrivacyRollbackChecks` loads a complete parent/child graph, changes both
+objects, and rejects the child's authoritative readback after two actual UPDATEs.
+It requires safe failure diagnostics, no committed audit, unchanged stored data
+and restored wrapper versions. The same wrappers then retry without reloading;
+pending values must commit once, with old/new secrets still masked. A later
+independent query must retain its own intent. The controlled script requires
+this scenario on both starts of its retained database.
+
+Run the focused probe with `TEAQL_TRACE_CHAIN_SCENARIO=loaded-privacy-rollback`.
+Use a fresh SQLite path as well as retained-database starts. The private markers
+are alphabetic so numeric ID redaction cannot accidentally hide a missing
+old-value snapshot. Existing target-ID intent protection remains unchanged;
+this probe does not authorize a change to that policy.
