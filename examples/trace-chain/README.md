@@ -28,6 +28,8 @@ selects another local checkout.
 | Reached child import | Adopting one changed child imports only that typed key. Its foreign root and unselected sibling stay pending and unsaved |
 | Clean ancestor | A changed child inherits the parent's reason, but the clean parent emits no SQL or audit and keeps its version |
 | Conflicting loaded versions | Two actual loaded versions of one entity fail before business SQL; both pending values survive |
+| Scoped page and COUNT | Four seeded graphs, one excluded by Context policy, total three, offset one and two returned roots; policy prepares once, COUNT retains removed-child masking without a fictional relation edge |
+| Page/list graph ownership | Each returned root owns a ledger and its children; saving one graph leaves the other graph pending and unchanged in SQLite until explicitly saved |
 
 Data is written through generated Mutation APIs. `context.EnsureSchemaAsync()`
 provisions the root; there is no manual INSERT or seed workaround. Test-only
@@ -51,6 +53,13 @@ reads and writes still use generated Q/E/Mutation APIs. Emitted commands, physic
 SQL metadata and committed audit are printed as `OWNERSHIP EVIDENCE` JSON.
 The full verifier ignores `TEAQL_TRACE_CHAIN_SCENARIO` and requires both the six
 normative checks and four ownership checks, twice without database cleanup.
+It also requires `PageChecks`: four physical SELECTs (root, two child probes,
+COUNT), no child canary in safe SQL/comment/purpose, independent root/child
+saves and persisted version checks. The model marks `order_item.name` as masked.
+`TEAQL_TRACE_CHAIN_SCENARIO=page` runs this focused acceptance only; the full
+verifier ignores that selector. Direct `dotnet run --project
+examples/trace-chain/trace-chain.csproj -- --database /absolute/path.sqlite`
+also propagates its local runtime path to the generated project reference.
 
 Hydration records original versions without leaving temporary new keys. Graph
 composition imports each explicitly reached key, not its entire foreign ledger.
@@ -72,3 +81,5 @@ mvn -B -pl generator -am -Dtest=DotnetTraceChainExampleGenerationTest \
 This is selected producer coverage. Prepared batch/item-index lineage, detached
 children, late low-level allocation, every entry point and privacy mode, reentrant
 root fail-fast behavior and immutable internal Registry replay remain open.
+Generated streaming now allocates a ledger per returned root too, but delayed
+stream capture and generated stream acceptance remain separate open work.

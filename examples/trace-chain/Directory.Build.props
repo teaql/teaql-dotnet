@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)../../Directory.Build.props" />
+  <PropertyGroup>
+    <!-- Import during restore AND build of the application and generated library. -->
+    <TeaQLRuntimeSourceRoot Condition="'$(TeaQLRuntimeSourceRoot)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</TeaQLRuntimeSourceRoot>
+  </PropertyGroup>
+</Project>

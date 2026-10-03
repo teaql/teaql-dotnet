@@ -598,25 +598,14 @@ namespace Generated.Requests
             }
             else
             {
-                var countQuery = authorized.CloneForExecution();
-                countQuery.Projection.Clear();
-                countQuery.ExprProjection.Clear();
-                countQuery.RelationLoads.Clear();
-                countQuery.RelationAggregates.Clear();
-                countQuery.OrderByItems.Clear();
-                countQuery.GroupByItems.Clear();
-                countQuery.AggregateItems.Clear();
-                countQuery.Slice = null;
-                countQuery.IdSetPagination = null;
-                countQuery.Aggregate("Count", "id", "count");
+                var countQuery = authorized.ForExactCount();
                 var countResult = await service.QueryAsync(req.WithQuery(countQuery));
                 totalCount = countResult.Rows.Count == 0
                     ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
             }
             var rows = new SmartList<Generated.Models.PaymentAttempt>();
-            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                rows.Add(Generated.Models.PaymentAttempt.FromRecord(row, queryRoot));
+                rows.Add(Generated.Models.PaymentAttempt.FromRecord(row, new EntityRoot()));
             return new PaymentAttemptPage(rows, totalCount);
         }
 
@@ -633,9 +622,8 @@ namespace Generated.Requests
             await foreach (var chunk in streaming.QueryStreamAsync(
                 req, chunkSize, cancellationToken).WithCancellation(cancellationToken))
             {
-                var queryRoot = new EntityRoot();
                 foreach (var row in chunk.Rows)
-                    yield return Generated.Models.PaymentAttempt.FromRecord(row, queryRoot);
+                    yield return Generated.Models.PaymentAttempt.FromRecord(row, new EntityRoot());
             }
         }
 
@@ -690,9 +678,8 @@ namespace Generated.Requests
         {
             var result = await ExecuteForRowsAsync(context);
             var entities = new SmartList<Generated.Models.PaymentAttempt>();
-            var queryRoot = new EntityRoot();
             foreach (var row in result.Rows)
-                entities.Add(Generated.Models.PaymentAttempt.FromRecord(row, queryRoot));
+                entities.Add(Generated.Models.PaymentAttempt.FromRecord(row, new EntityRoot()));
             entities.Facets = result.Facets;
             return entities;
         }

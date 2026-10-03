@@ -279,7 +279,7 @@ public static class GeneratedRuntimeModule
     {
         Module.Entity(Module.Metadata.GetEntity("Platform")!.AuditMaskFields(new List<string> {  }));
         Module.Entity(Module.Metadata.GetEntity("CustomerOrder")!.AuditMaskFields(new List<string> {  }));
-        Module.Entity(Module.Metadata.GetEntity("OrderItem")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("OrderItem")!.AuditMaskFields(new List<string> { "name" }));
         Module.Entity(Module.Metadata.GetEntity("Payment")!.AuditMaskFields(new List<string> {  }));
         Module.Entity(Module.Metadata.GetEntity("PaymentAttempt")!.AuditMaskFields(new List<string> {  }));
         Module.Entity(Module.Metadata.GetEntity("Shipment")!.AuditMaskFields(new List<string> {  }));

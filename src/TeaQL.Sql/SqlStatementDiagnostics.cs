@@ -25,6 +25,11 @@ internal static class SqlStatementDiagnostics
             foreach (var aggregate in query.RelationAggregates)
                 if (entity.RelationByName(aggregate.RelationName) is { } relation)
                     pending.Push((aggregate.Query, relation.TargetEntity));
+            foreach (var facet in query.Facets)
+                pending.Push((facet.Query, entity.RelationByName(facet.RelationName)?.TargetEntity ?? facet.Query.Entity));
+            foreach (var child in query.ChildEnhancements) pending.Push((child, child.Entity));
+            foreach (var group in query.ObjectGroupBys) pending.Push((group.Query, group.Query.Entity));
+            if (query.DiagnosticOrigin is { } origin) pending.Push((origin, origin.Entity));
         }
         if (schema.GetEntity(request.Query.Entity) is { } root) Children(request.Query, root);
         while (pending.TryPop(out var item))
@@ -33,8 +38,7 @@ internal static class SqlStatementDiagnostics
             if (!entities.Add(item.Entity)) continue;
             var entity = schema.GetEntity(item.Entity) ?? throw new SqlExecutorException("Unknown relation entity");
             var query = item.Query.CloneForExecution(); query.Entity = item.Entity;
-            // This compilation collects binding policies only. Applying execution
-            // limits would mutate nested builders shared by the shallow copy.
+            // Collect binding policies only; never execute or add physical trace edges.
             query.NormalizeGeneratedFilters();
             var child = dialect.CompileSelect(entity, query);
             var intent = InheritedIntent(new QueryRequest(query, request.Intent), child);

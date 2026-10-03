@@ -37,6 +37,11 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
 var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (ownershipScenario == "page")
+{
+    await PageChecks.RunAsync(context, capture, sink);
+    return;
+}
 if (!string.IsNullOrEmpty(ownershipScenario))
 {
     await SharedReferenceChecks.RunAsync(context, capture, sink, faults, ownershipScenario);
@@ -50,6 +55,7 @@ await ReadbackFailure();
 await ConcurrentGraphs();
 Console.WriteLine("PASS: .NET generated trace-chain 6 scenarios; same database retained; no generated edits");
 await SharedReferenceChecks.RunAsync(context, capture, sink, faults);
+await PageChecks.RunAsync(context, capture, sink);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)

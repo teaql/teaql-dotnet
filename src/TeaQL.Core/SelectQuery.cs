@@ -436,6 +436,30 @@ public record SelectQuery
 
     public SelectQuery CloneForExecution() => new QuerySnapshot().Query(this);
 
+    // Runtime-owned diagnostic provenance, not a wire field or application API.
+    // The snapshot is inaccessible to callers and is never used as executable SQL.
+    private SelectQuery? diagnosticOrigin;
+    internal SelectQuery? DiagnosticOrigin => diagnosticOrigin;
+
+    /// <summary>Count matching entities, independent of page size and loaded relations.</summary>
+    public SelectQuery ForExactCount()
+    {
+        if (RawSqlText != null || GroupByItems.Count != 0 || AggregateItems.Count != 0 || HavingCondition != null)
+            throw new NotSupportedException("Exact entity count requires an entity query, not raw SQL or grouped aggregates");
+        var source = CloneForExecution();
+        var count = source.CloneForExecution();
+        count.diagnosticOrigin = source.diagnosticOrigin ?? source;
+        count.Projection.Clear(); count.ExprProjection.Clear();
+        count.RelationLoads.Clear(); count.RelationAggregates.Clear();
+        count.OrderByItems.Clear(); count.GroupByItems.Clear(); count.AggregateItems.Clear();
+        count.RawProjections.Clear(); count.DynamicProperties.Clear();
+        count.ChildEnhancements.Clear(); count.ObjectGroupBys.Clear(); count.Facets.Clear();
+        count.Slice = null; count.IdSetPagination = null; count.PartitionBy = null;
+        count.StreamConfig = null; count.AggregationCache = null;
+        count.AggregateItems.Add(Core.Aggregate.Count(RequestConstants.COUNT_ALIAS));
+        return count;
+    }
+
     public SelectQuery Copy() => CloneForExecution();
 
     public SelectQuery PartitionByField(string field)

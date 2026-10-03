@@ -5,7 +5,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <TeaQLRuntimeSourceRoot Condition="'$(TeaQLRuntimeSourceRoot)' == ''">$(MSBuildThisFileDirectory)../..</TeaQLRuntimeSourceRoot>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="lib/**" />
