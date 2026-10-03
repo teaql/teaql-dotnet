@@ -9,6 +9,12 @@ Child entity: `payment`
 | Capability | Generated API |
 | --- | --- |
 | Select | `.SelectPaymentList()`, `.SelectPaymentListWith(childRequest)` |
+| Related count | `.CountPaymentsAs(alias)` |
+| Filtered related count | `.CountPaymentsWith(alias, childRequest)` |
+| Read related count | `entity.QueryProjection(alias).TryI64()`; require a present numeric value |
+| Check projection presence | `entity.HasQueryProjection(alias)` |
+
+Missing aliases throw KeyNotFoundException; null and zero are present values. Related counts are query-only projections, never mutation fields. Use a dedicated child request for each count, not a reused row selection. Use E for modeled fields and loaded relations; aliases have no generated E accessor. List and nested loaded entities retain aliases; scalar-only streams reject relation aggregates. Do not collide with model fields or relation names. Projection values are isolated copies, not implicit queries or live recalculations after save.
 
 Reverse relations are model-derived and never perform an implicit database query. Select the relation explicitly before expression access. Apply query methods before the executable purpose stage, then execute with exactly one trusted context.
 

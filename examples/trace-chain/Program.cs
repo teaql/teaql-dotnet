@@ -37,6 +37,11 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
 var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (ownershipScenario == "aggregate")
+{
+    await AggregateChecks.RunAsync(context, capture, sink, faults);
+    return;
+}
 if (ownershipScenario == "loaded-privacy-rollback")
 {
     await LoadedPrivacyRollbackChecks.RunAsync(context, capture, sink, faults);
@@ -82,6 +87,8 @@ await ReadbackChecks.RunAsync(context, capture, sink);
 await LoadedPrivacyChecks.RunAsync(context, capture, sink);
 
 await LoadedPrivacyRollbackChecks.RunAsync(context, capture, sink, faults);
+
+await AggregateChecks.RunAsync(context, capture, sink, faults);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)
@@ -335,6 +342,8 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
 {
     private readonly EvidenceSink _sink = sink;
     private readonly ConcurrentQueue<CommandObservation> _commands = new();
+    private readonly ConcurrentQueue<string[]> _changedFields = new();
+    public IReadOnlyList<string[]> ChangedFields => _changedFields.ToArray();
     private BeginPause? _pause;
     private int _begin, _active;
     public int BeginCount => _begin;
@@ -344,7 +353,7 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
     public Task<QueryResult> QueryAsync(QueryRequest request) => inner.QueryAsync(request);
     public Task<MutationResult> MutateAsync(MutationRequest request) => inner.MutateAsync(request);
     public BeginPause PauseNextBegin() => _pause = new BeginPause();
-    public void Clear() { _commands.Clear(); _begin = 0; }
+    public void Clear() { _commands.Clear(); _changedFields.Clear(); _begin = 0; }
     public async Task<ITransaction> BeginTransactionAsync()
     {
         Interlocked.Increment(ref _begin);
@@ -364,6 +373,8 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
         public async Task<MutationResult> MutateAsync(MutationRequest request)
         {
             var key = request.LedgerKey ?? throw new Exception("Generated mutation omitted its typed ledger key");
+            if (request is UpdateMutationRequest updateFields)
+                owner._changedFields.Enqueue(updateFields.Command.Values.Keys.Where(name => name != "version").Order().ToArray());
             var operation = request switch { InsertMutationRequest => "insert", UpdateMutationRequest => "update", DeleteMutationRequest => "delete", _ => "other" };
             var version = request switch { UpdateMutationRequest update => update.Command.ExpectedVersionValue,
                 DeleteMutationRequest delete => delete.Command.Version.TryI64(), _ => (long?)null };
@@ -383,6 +394,8 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
 
 sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransactionTransport, ISchemaConnectionInitializer, IStreamingSqlTransport
 {
+    public ConcurrentQueue<string> QueryReads { get; } = new();
+    public bool FailAggregateQuery { get; set; }
     public int StreamOpens, StreamCloses;
     public async IAsyncEnumerable<Record> StreamSqlAsync(CompiledQuery query,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -399,6 +412,9 @@ sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransacti
     public Task EnsureSchemaFunctionsAsync() => inner.EnsureSchemaFunctionsAsync();
     public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
     {
+        QueryReads.Enqueue(query.Sql);
+        if (FailAggregateQuery && query.Sql.Contains("COUNT(", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("synthetic aggregate failure");
         var rows = await inner.FetchAllSqlAsync(query);
         if (ReuseReadOnlyPlatformSnapshot && query.Sql.Contains("platform_data", StringComparison.Ordinal) && rows.Count == 1)
         {

@@ -12,6 +12,9 @@ namespace Generated.Models
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
+        private QueryProjectionSnapshot _queryProjections = QueryProjectionSnapshot.Empty;
+        public Value QueryProjection(string alias) => _queryProjections.Get(alias);
+        public bool HasQueryProjection(string alias) => _queryProjections.Contains(alias);
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("PaymentAttempt", Id ?? _ledgerId);
@@ -102,6 +105,12 @@ namespace Generated.Models
         public static PaymentAttempt FromRecord(Record record)
         {
             var entity = new PaymentAttempt().MarkLoadedOnly();
+            entity._queryProjections = new QueryProjectionSnapshot(record, new[] {
+                "Id", "id",
+                "Payment", "payment",
+                "ReferenceCode", "reference_code",
+                "Version", "version",
+            });
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {

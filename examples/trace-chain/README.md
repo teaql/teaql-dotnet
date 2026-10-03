@@ -79,6 +79,16 @@ mvn -B -pl generator -am -Dtest=DotnetTraceChainExampleGenerationTest \
   -Dteaql.dotnet.runtime=/absolute/path/to/teaql-dotnet test
 ```
 
+`AggregateChecks` additionally uses current field Assist to count related items
+at the root and through a loaded Payment→CustomerOrder relation. Four root/nested
+and logging-on/off combinations assert results, actual physical reads, original
+ancestry and safe intent. Two injected count failures restore the next request.
+The generated `QueryProjection(alias)` API returns owned query-only values;
+missing throws, null/zero are present, and the snapshot is not a live calculation.
+Saving a loaded model changes only description, not aggregate aliases or clean
+children. `TEAQL_TRACE_CHAIN_SCENARIO=aggregate` selects this slice; the full
+verifier requires it twice on the retained database with stable library hashes.
+
 This is selected producer coverage. Prepared batch/item-index lineage, detached
 children, late low-level allocation, every entry point and privacy mode, reentrant
 root fail-fast behavior and immutable internal Registry replay remain open.

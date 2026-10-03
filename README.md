@@ -19,8 +19,13 @@ hydration. Nested attachment resolves hydrated foreign keys through declared
 relation metadata, including targets keyed by `code` rather than `id`. Native
 SQLite regression cases cover root/nested count results, original trace ancestry,
 descendant-binding privacy, logging disabled and aggregate failure recovery.
-This is native-provider coverage; generated related-count result access and
-complete aggregate/Facet acceptance remain separate, open gates.
+Generated models now retain related-count aliases in a runtime-owned
+`QueryProjectionSnapshot`: `QueryProjection(alias)` returns an isolated `Value`,
+`HasQueryProjection(alias)` distinguishes presence, and missing throws
+`KeyNotFoundException`. Projections are not modeled fields or ledger mutations.
+Regenerate libraries to acquire the API. The trace example exercises generated
+root/nested Q/E/save, private descendant intent, logging on/off and count failures.
+Broader aggregate/Facet, provider and immutable-artifact acceptance remain open.
 
 `ExecutionMetadata.MutationLineage` separately preserves existing root/item
 reasons, including partial batch failures and mutation readback. Default masking
