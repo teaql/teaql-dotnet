@@ -7,6 +7,13 @@ and Purpose, and a non-blank Mutation Comment before policy/provider access.
 Logging switches do not relax validation. This is a local-source checkpoint,
 not a newly published package capability.
 
+The [School bootstrap example](examples/school-management/README.md) also
+checks generated root/constant saves without injected trace nodes: physical
+SQL routes, assigned audit identities, idempotence, audited reconciliation and
+caller restoration. Its script runs twice on each retained SQLite database with
+SQL logs on/off. At audit delivery, an independent read-only connection must
+already observe the committed version. See `scripts/verify-school-bootstrap-example.sh`.
+
 The SQL path uses the Rust-baseline canonical algorithm: an operation names
 the originating entity, relation names are local, qualified properties belong
 in `TraceNode.Detail`, and provider/SQL nodes occur once. Intent stays in its

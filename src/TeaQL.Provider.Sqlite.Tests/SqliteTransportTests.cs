@@ -83,8 +83,8 @@ namespace TeaQL.Provider.Sqlite.Tests
                             .Value("id", new Value.I64Value(1))
                             .Value("name", new Value.TextValue("Campus Learning Platform"))
                             .Value("version", new Value.I64Value(1));
-                        command.TraceChain.Add(new TraceNode(
-                            "Platform", 1, "initialize generated Platform root"));
+                        // Intent is request-owned; no expected runtime trace
+                        // frame is injected by this bootstrap callback.
                         await service.MutateAsync(new InsertMutationRequest(command, "initialize generated Platform root"));
                     }
                 })

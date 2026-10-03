@@ -24,6 +24,7 @@ dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/runtime-logging/runtime-logging.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/mutation-policy/mutation-policy.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/school-management/school-management-service-lib.csproj"
+TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-school-bootstrap-example.sh"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/security-foundations/security-foundations.csproj"
 TEAQL_ORDER_MANAGEMENT_DB="$order_management_tmp/order.db" \
   dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/order-management/dotnet-app-console/dotnet-app-console.csproj"
