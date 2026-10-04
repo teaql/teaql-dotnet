@@ -44,11 +44,6 @@ internal static class FacetQueryLoader
                     && key is not Value.NullValue and not Value.TypedNullValue)
                     counts[key] = row[CountAlias].TryI64() ?? 0;
 
-            if (!facet.IncludeAllFacets && counts.Count == 0)
-            {
-                facets[facet.Name] = new SmartList<Record>();
-                continue;
-            }
             var materialization = facet.Query.CloneForExecution();
             materialization.Entity = relation.TargetEntity;
             var aliases = materialization.AggregateItems.Where(item => item.Function == AggregateFunction.Count)
@@ -58,7 +53,10 @@ internal static class FacetQueryLoader
             if (materialization.Projection.Count > 0 && !materialization.Projection.Contains(relation.ForeignKeyValue))
                 materialization.Projection.Add(relation.ForeignKeyValue);
             if (!facet.IncludeAllFacets)
-                materialization.AndFilter(Expr.InList(relation.ForeignKeyValue, counts.Keys.ToList()));
+                // Keep requested nested Facets even when this candidate list is
+                // empty; an explicit false membership also excludes unrelated rows.
+                materialization.AndFilter(counts.Count == 0 ? Expr.Value(new Value.BoolValue(false))
+                    : Expr.InList(relation.ForeignKeyValue, counts.Keys.ToList()));
             var derived = request.Derive(materialization, facet.RelationName);
             derived.IntentSource = inheritedIntent;
             var result = await queryAsync(derived);

@@ -47,6 +47,64 @@ public class FacetTraceSqliteTests
         .Property(PropertyDescriptor.New("version", DataType.I64).Version());
 
     [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task EmptyMatchedOnlyFacetKeepsNestedRequestedMetadata(bool transaction, bool logging)
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var attempt = Entity("Attempt").Property(PropertyDescriptor.New("payment_id", DataType.I64))
+            .Relation(RelationDescriptor.New("payment", "Payment").LocalKey("payment_id").ForeignKey("id"));
+        var payment = Entity("Payment").Property(PropertyDescriptor.New("order_id", DataType.I64))
+            .Relation(RelationDescriptor.New("order", "CustomerOrder").LocalKey("order_id").ForeignKey("id"));
+        var order = Entity("CustomerOrder").Property(PropertyDescriptor.New("name", DataType.Text))
+            .AuditMaskFields(new() { "name" });
+        var descriptors = new[] { attempt, payment, order };
+        var transport = new Transport(new SqliteTransport(connection));
+        var provider = new SqlDataServiceExecutor(new SqliteDialect(), transport,
+            new MetadataSchemaProvider(name => descriptors.SingleOrDefault(entity => entity.Name == name)));
+        var sink = new Sink();
+        var context = new RuntimeModule().Entity(attempt).Entity(payment).Entity(order).IntoContext()
+            .WithDataService(provider).WithDiagnosticSqlLogSink(sink);
+        await context.EnsureSchemaAsync();
+        var service = context.RequireResource<IDataService>();
+        const string secret = "EMPTY-FUTURE-FACET-PRIVATE";
+        await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Payment")
+            .Value("id", Value.FromObject(10L)).Value("order_id", Value.FromObject(20L)), "seed unrelated candidate"));
+        await service.MutateAsync(new InsertMutationRequest(new InsertCommand("CustomerOrder")
+            .Value("id", Value.FromObject(20L)).Value("name", Value.FromObject(secret)), "seed unrelated nested candidate"));
+        var payments = new SelectQuery("Payment").Limit(10).Count("members");
+        payments.Facets.Add(new FacetRequest("orders", "order", new SelectQuery("CustomerOrder")
+            .Filter(Expr.Eq("name", secret)).Limit(10).Count("members"), false));
+        var query = new SelectQuery("Attempt").Limit(1).Comment("empty " + secret).Purpose("keep requested empty Facets");
+        query.Facets.Add(new FacetRequest("payments", "payment", payments, false));
+        transport.Reads.Clear(); sink.Entries.Clear(); context.EnableQuerySqlLog(logging);
+        using var tx = transaction ? await provider.BeginTransactionAsync() : null;
+        var execution = tx is null ? service : new RuntimeDataService(tx, context);
+        var result = await execution.QueryAsync(new QueryRequest(query));
+        Assert.Empty(result.Rows);
+        var choices = result.Facets["payments"];
+        Assert.Empty(choices);
+        Assert.Empty(choices.Facets["orders"]);
+        Assert.Equal(5, transport.Reads.Count);
+        if (logging)
+        {
+            Assert.Equal(new[] { "", "payment", "payment", "payment/order", "payment/order" },
+                sink.Entries.Select(entry => string.Join("/", entry.TraceChain.Where(node => node.Kind == "relation").Select(node => node.Name))));
+            Assert.All(sink.Entries, entry => {
+                Assert.Equal("Attempt", entry.TraceChain[0].Name);
+                Assert.Equal("empty [REDACTED]", entry.Comment);
+                Assert.DoesNotContain(secret, JsonSerializer.Serialize(entry));
+            });
+        }
+        else Assert.Empty(sink.Entries);
+        output.WriteLine("EMPTY NESTED FACET " + JsonSerializer.Serialize(new { transaction, logging, physicalReads = transport.Reads.Count, sql = sink.Entries }));
+        if (tx is not null) await tx.CommitAsync();
+    }
+
+    [Theory]
     [InlineData(false, false, false)]
     [InlineData(false, false, true)]
     [InlineData(false, true, false)]
