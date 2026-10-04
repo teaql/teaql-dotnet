@@ -82,6 +82,12 @@ database without cleanup and an unchanged library. It covers branch/deletion
 reasons, assigned typed IDs, a three-level query, real UNIQUE rollback,
 successful-write/readback-failure separation and concurrent generated saves.
 The read-only provider SPI `MutationRequest.MutationLineage` is not a wire field.
+The [generated School Facet example](examples/facet-trace) exercises 24
+root/nested/loaded-relation combinations twice on a retained SQLite database,
+with exact physical SQL/count numbers, ordered logical ancestry and returned
+empty metadata. It also proves that Facet-bearing no-op saves emit no writes,
+and that a real reverse child change saves through its root with one audit.
+Run `bash examples/facet-trace/verify.sh`; the all-examples gate includes it.
 Successful relation SQL is now logged at each physical execution boundary;
 parent/descendant binding provenance protects intent before parent logs are
 emitted, and root statements are not reported twice.
