@@ -14,6 +14,7 @@ internal static class SqlMutationBatch
         var parameterizedQueries = new List<string>();
         var parameters = new List<Value>();
         var statements = new List<ExecutionMetadata>();
+        var items = new List<MutationBatchItemResult>();
         var observer = batch.DiagnosticObserver;
         // Root prose may mention values belonging to a different branch, even
         // one that has not executed. Keep redaction local to this invocation.
@@ -30,6 +31,7 @@ internal static class SqlMutationBatch
                 MutationResult result;
                 try { result = await execute(request); }
                 finally { request.DiagnosticObserver = previous; }
+                items.Add(new(items.Count, request, result));
                 totalAffected += result.AffectedRows;
                 if (!string.IsNullOrWhiteSpace(result.Metadata.ParameterizedQuery))
                     parameterizedQueries.Add(result.Metadata.ParameterizedQuery);
@@ -45,6 +47,7 @@ internal static class SqlMutationBatch
         }
 
         return new MutationResult {
+            BatchItems = items.AsReadOnly(),
             AffectedRows = totalAffected,
             GeneratedValues = new Record(),
             Metadata = new ExecutionMetadata {

@@ -264,11 +264,17 @@ public class BatchMutationRequest : MutationRequest
 
 public class MutationResult
 {
+    // SQL execution's ordered request/result correlation, not a wire payload.
+    // Keep the public aggregate result unchanged; never infer item outcomes
+    // from its affected-row total or from physical readback statement counts.
+    internal IReadOnlyList<MutationBatchItemResult>? BatchItems { get; init; }
     public ulong AffectedRows { get; set; }
     public Record GeneratedValues { get; set; } = new();
     public Record? PersistedRecord { get; set; }
     public ExecutionMetadata Metadata { get; set; } = new();
 }
+
+internal sealed record MutationBatchItemResult(int Index, MutationRequest Request, MutationResult Result);
 
 public enum DataServiceOperation
 {

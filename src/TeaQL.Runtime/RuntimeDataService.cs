@@ -204,15 +204,46 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     private async Task PublishMutationAuditAsync(MutationRequest request, MutationResult result)
     {
+        var deliveries = new List<Func<Task>>();
+        CollectMutationAudits(request, result, deliveries);
+        if (_graph != null)
+        {
+            foreach (var publish in deliveries) _graph.AfterCommit(publish);
+            return;
+        }
+        // Project EVERY leaf before the first callback can mutate caller-owned
+        // commands/ledgers, including leaves in later nested batch containers.
+        var failures = new List<Exception>();
+        foreach (var publish in deliveries)
+            try { await publish().ConfigureAwait(false); }
+            catch (Exception error) { failures.Add(error); }
+        // Provider execution already succeeded. Delivery failure cannot justify
+        // re-running writes or skipping later committed item notifications.
+        if (failures.Count == 1) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failures[0]).Throw();
+        if (failures.Count > 1) throw new AggregateException("Batch audit delivery failed", failures);
+    }
+
+    private void CollectMutationAudits(MutationRequest request, MutationResult result, List<Func<Task>> deliveries)
+    {
+        if (request is BatchMutationRequest && result.BatchItems is { } items)
+        {
+            // These are the actual execution requests, with captured root intent
+            // and sibling privacy provenance. Nested groups recurse once in
+            // request order; each successful leaf retains its own persisted row.
+            foreach (var item in items)
+                CollectMutationAudits(item.Request, item.Result, deliveries);
+            return;
+        }
         if (result.AffectedRows == 0 || _context.GetResource<IAppAuditEventSink>() == null) return;
+        var entity = EntityName(request); var mutationKind = MutationKind(request);
         var changedFields = ChangedFields(request).OrderBy(field => field, StringComparer.Ordinal).ToArray();
         var safeEvent = new Dictionary<string, object?>
         {
             ["actor"] = _context.UserIdentifier,
             ["category"] = _context.GetNamedResource<string>("bootstrapCategory") ?? "mutation",
-            ["entityType"] = EntityName(request),
+            ["entityType"] = entity,
             ["entityId"] = EntityId(request, result),
-            ["mutationKind"] = MutationKind(request),
+            ["mutationKind"] = mutationKind,
             ["changedFields"] = changedFields,
             ["changedFieldCount"] = changedFields.Length,
             ["resultVersion"] = PersistedValue(result, "version"),
@@ -225,10 +256,8 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         safeEvent["reason"] = LogPrivacy.ScrubAuditText(request.Comment, values);
         if (_context.CurrentMutationGovernance is { } governance)
             safeEvent["mutationGovernance"] = GovernanceEvidence(governance);
-        Task Publish() => _context.PublishAppAuditEventAsync(
-            EntityName(request), MutationKind(request), changedFields.Length, safeEvent);
-        if (_graph != null) _graph.AfterCommit(Publish);
-        else await Publish().ConfigureAwait(false);
+        deliveries.Add(() => _context.PublishAppAuditEventAsync(
+            entity, mutationKind, changedFields.Length, safeEvent));
     }
 
     internal static IEnumerable<Value> LoadedPrivateValues(MutationRequest request, UserContext context)
