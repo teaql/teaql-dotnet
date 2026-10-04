@@ -19,7 +19,8 @@ selects another local checkout.
 | Scenario | Observed evidence |
 | --- | --- |
 | Required request intent | Blank/missing reasons fail before transactions, even with SQL logging off |
-| Normative six-mutation graph | Root, ordinary item, Payment, inherited PaymentAttempt, Shipment and deleted item retain their own ordered lineage in emitted commands, safe SQL and committed audit |
+| Normative six-mutation graph | Root, ordinary item, Payment, inherited PaymentAttempt, Shipment and deleted item retain their own ordered lineage in emitted commands, safe SQL and committed audit. Each boundary must cover exactly the six `(type, ID)` identities, without duplicates. SQL identities are bound through actual observed commands, not fabricated path IDs |
+| Identity guard controls | Duplicate, unknown replacement and equal-ID type collapse each fail, even when six observations remain |
 | Three-level generated Q and E | PaymentAttempt → Payment → CustomerOrder → Platform loads safely; four physical statements retain the same origin and qualified relation frames; unselected E access fails |
 | Actual provider failure | SQLite UNIQUE violation retains failed SQL lineage, rolls back the graph and emits no committed audit |
 | Readback failure | An injected authoritative fetch failure does not erase the successful write statement; the graph transaction rolls back and emits no committed audit |

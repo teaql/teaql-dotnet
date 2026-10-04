@@ -15,6 +15,7 @@ for round in 1 2; do
   env -u TEAQL_TRACE_CHAIN_SCENARIO dotnet run --property:TeaQLRuntimeSourceRoot="$source_root" \
     --project "$example/trace-chain.csproj" -- --database "$database" | tee "$run_log"
   rg -Fq 'PASS: .NET generated trace-chain 6 scenarios' "$run_log"
+  rg -Fq 'PASS .NET graph identity controls: duplicate, missing and equal-ID type collapse rejected' "$run_log"
   rg -Fq 'PASS FORWARD_NOTLOADED: generated Q/E retains FK and fails closed on hidden detail' "$run_log"
   rg -Fq 'PASS: .NET generated ownership 4 scenarios' "$run_log"
   rg -Fq 'PASS: .NET generated page count, scope, privacy and independent graph saves' "$run_log"

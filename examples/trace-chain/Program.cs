@@ -77,6 +77,7 @@ if (!string.IsNullOrEmpty(ownershipScenario))
     await SharedReferenceChecks.RunAsync(context, capture, sink, faults, ownershipScenario);
     return;
 }
+await IdentityGuard();
 await IntentGate();
 var graph = await NormativeGraph();
 await ThreeLevelQuery(graph);
@@ -109,6 +110,19 @@ Shipment NewShipment(string code) => Q.Shipments().Comment("prepare a shipment")
     .Purpose("compose a generated child").NewEntity(context).UpdateReferenceCode(code);
 
 void ClearEvidence() { capture.Clear(); sink.Clear(); }
+async Task IdentityGuard()
+{
+    var expected = new (string, long)[] { ("CustomerOrder", 100), ("OrderItem", 201), ("OrderItem", 202),
+        ("Payment", 100), ("PaymentAttempt", 401), ("Shipment", 501) };
+    Verify.ExactIdentities(expected, expected, "positive identity control");
+    var duplicate = expected.ToArray(); duplicate[2] = duplicate[1];
+    await Verify.Throws<Exception>(() => { Verify.ExactIdentities(expected, duplicate, "duplicate identity control"); return Task.CompletedTask; }, "duplicate identity");
+    var missing = expected.ToArray(); missing[5] = ("Shipment", 999);
+    await Verify.Throws<Exception>(() => { Verify.ExactIdentities(expected, missing, "missing identity control"); return Task.CompletedTask; }, "missing identity");
+    var collapsed = expected.ToArray(); collapsed[3] = collapsed[0];
+    await Verify.Throws<Exception>(() => { Verify.ExactIdentities(expected, collapsed, "type collapse control"); return Task.CompletedTask; }, "equal-ID type collapse");
+    Console.WriteLine("PASS .NET graph identity controls: duplicate, missing and equal-ID type collapse rejected");
+}
 async Task IntentGate()
 {
     ClearEvidence(); context.DisableQuerySqlLog().DisableMutationSqlLog();
@@ -178,6 +192,7 @@ async Task<(CustomerOrder Order, Payment Payment, PaymentAttempt Attempt)> Norma
     };
     Verify.Equal(6, capture.Commands.Count, "normative emitted commands");
     Verify.Equal(6, sink.Audit.Count, "normative committed audit events");
+    Verify.ExactIdentities(expected.Keys, capture.Commands.Select(value => (value.Entity, value.Id)), "actual commands");
     foreach (var command in capture.Commands)
     {
         Verify.Equal(expected[(command.Entity, command.Id)], Verify.Shape(command.Lineage), "actual command lineage");
@@ -185,11 +200,14 @@ async Task<(CustomerOrder Order, Payment Payment, PaymentAttempt Attempt)> Norma
         Verify.That(command.Lineage.All(node => node.EntityId.HasValue), "assigned IDs in emitted command lineage");
         Verify.That(command.Lineage.All(node => node.Kind == "auditReason" && node.Comment == ""), "typed audit nodes keep reasons in Detail");
     }
+    var physicalIdentities = new List<(string, long)>();
     foreach (var record in sink.Sql.Where(value => value.Operation != DataServiceOperation.Query))
     {
         var entity = record.TraceChain.Single(value => value.Kind == "entity").Name;
         var command = capture.Commands.Single(value => value.Entity == entity &&
             Verify.Shape(value.Lineage) == Verify.Shape(record.MutationLineage));
+        // IDs belong to actual observed commands, not the canonical SQL path.
+        physicalIdentities.Add((command.Entity, command.Id));
         Verify.Equal(expected[(command.Entity, command.Id)], Verify.Shape(record.MutationLineage), "safe SQL lineage");
         Verify.Equal("CustomerOrder", record.TraceChain[0].Name, "physical mutation root");
         Verify.Equal(0, record.TraceChain.Count(value => value.Kind == "auditReason"), "no audit nodes in physical path");
@@ -197,11 +215,20 @@ async Task<(CustomerOrder Order, Payment Payment, PaymentAttempt Attempt)> Norma
         Verify.Equal(1, record.TraceChain.Count(value => value.Kind == "sql"), "one physical SQL frame");
     }
     Verify.Equal(6, sink.Sql.Count(value => value.Operation != DataServiceOperation.Query), "physical mutation SQL count");
+    Verify.ExactIdentities(expected.Keys, physicalIdentities, "command-bound physical SQL");
+    Verify.ExactIdentities(expected.Keys, sink.Audit.Select(value =>
+        (value["entityType"]!.ToString()!, Convert.ToInt64(value["entityId"]))), "committed audit");
     foreach (var audit in sink.Audit)
     {
         var key = (audit["entityType"]!.ToString()!, Convert.ToInt64(audit["entityId"]));
         Verify.Equal(expected[key], Verify.Shape((IEnumerable<TraceNode>)audit["traceChain"]!), "committed audit lineage");
     }
+    Console.WriteLine("GRAPH IDENTITY EVIDENCE " + System.Text.Json.JsonSerializer.Serialize(new {
+        expected = expected.Keys.Select(value => new { entity = value.Item1, id = value.Item2 }),
+        commands = capture.Commands.Select(value => new { entity = value.Entity, id = value.Id }),
+        physical = physicalIdentities.Select(value => new { entity = value.Item1, id = value.Item2 }),
+        audit = sink.Audit.Select(value => new { entity = value["entityType"]!.ToString(), id = Convert.ToInt64(value["entityId"]) })
+    }));
     Verify.That(capture.Commands.Single(value => value.Id == removed.Id && value.Entity == "OrderItem").Operation == "delete",
         "deleted child went through deletion command");
     var hidden = await Q.OrderItems().WithIdIs(removed.Id!.Value).Limit(1)
@@ -351,6 +378,15 @@ static class Verify
     public static void Equal<T>(T expected, T actual, string message) => That(EqualityComparer<T>.Default.Equals(expected, actual),
         $"{message}; expected={expected}, actual={actual}");
     public static string Shape(IEnumerable<TraceNode> nodes) => string.Join(" -> ", nodes.Select(value => $"{value.Name}#{value.EntityId}:{value.Detail}"));
+    public static void ExactIdentities(IEnumerable<(string Entity, long Id)> expected,
+        IEnumerable<(string Entity, long Id)> actual, string boundary)
+    {
+        var required = expected.ToHashSet();
+        var observed = actual.ToArray();
+        Equal(required.Count, observed.Length, boundary + " count");
+        Equal(observed.Length, observed.ToHashSet().Count, boundary + " duplicate identity");
+        That(required.SetEquals(observed), boundary + " exact typed identities");
+    }
     public static async Task Throws<T>(Func<Task> work, string message) where T : Exception
     {
         try { await work(); } catch (T) { return; }
