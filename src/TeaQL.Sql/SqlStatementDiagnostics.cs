@@ -69,6 +69,13 @@ internal static class SqlStatementDiagnostics
         if (request.IntentSource is { } inherited)
             Append(inherited.Parameters, inherited.ParameterLogPolicies, inherited.GeneratedSql, inherited.ParameterizedQuery);
         Append(compiled.Params, compiled.ParameterLogPolicies, compiled.GeneratedSql, compiled.Sql);
+        // Extra original operands are intent provenance, never physical binds
+        // or serialized safe metadata. Retain their actual field policy.
+        foreach (var operand in compiled.IntentOperands)
+        {
+            values.Add(operand.Value);
+            policies.Add(operand.Policy);
+        }
         return new ExecutionMetadata { Parameters = values, ParameterLogPolicies = policies, GeneratedSql = true };
     }
 

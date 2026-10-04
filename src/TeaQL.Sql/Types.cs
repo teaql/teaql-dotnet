@@ -22,6 +22,7 @@ public class CompiledQuery
     public string? Comment { get; }
     public IReadOnlyList<SqlParameterLogPolicy> ParameterLogPolicies { get; }
     public bool GeneratedSql { get; }
+    internal IReadOnlyList<(Value Value, SqlParameterLogPolicy Policy)> IntentOperands { get; }
 
     public CompiledQuery(string sql, List<Value> @params, string? comment = null)
     {
@@ -30,6 +31,7 @@ public class CompiledQuery
         Comment = comment;
         ParameterLogPolicies = SqlLogBindings.Policies(@params);
         GeneratedSql = SqlLogBindings.IsGenerated(@params);
+        IntentOperands = SqlLogBindings.IntentOperands(@params);
     }
 
     public string SqlWithComment()

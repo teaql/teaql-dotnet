@@ -746,6 +746,12 @@ public abstract class SqlDialect
 
     private string CompileBinaryExpr(EntityDescriptor entity, Expr.BinaryExpr bin, List<Value> paramsList)
     {
+        // Only helper-owned LIKE lowering can prove an original operand. A raw
+        // LIKE pattern or a caller-rewritten binding must never be stripped.
+        if (bin.Op is BinaryOp.Like or BinaryOp.NotLike
+            && bin.Right is Expr.ValueExpr { LikeOperand: { } source } value
+            && value.NodeValue == source.Binding)
+            SqlLogBindings.AddIntentOperand(paramsList, source.Operand);
         if (bin.Op is BinaryOp.In or BinaryOp.NotIn or BinaryOp.InLarge or BinaryOp.NotInLarge)
         {
             return CompileIn(entity, bin.Left, bin.Op, bin.Right, paramsList);
