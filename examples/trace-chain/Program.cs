@@ -37,6 +37,11 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
 var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (ownershipScenario == "checker-overlap")
+{
+    await CheckerOverlapChecks.RunAsync(context, capture, sink, faults);
+    return;
+}
 if (ownershipScenario == "aggregate")
 {
     await AggregateChecks.RunAsync(context, capture, sink, faults);
@@ -89,6 +94,7 @@ await LoadedPrivacyChecks.RunAsync(context, capture, sink);
 await LoadedPrivacyRollbackChecks.RunAsync(context, capture, sink, faults);
 
 await AggregateChecks.RunAsync(context, capture, sink, faults);
+await CheckerOverlapChecks.RunAsync(context, capture, sink, faults);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
     .Purpose("compose a generated graph").NewEntity(context)
@@ -345,15 +351,17 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
     private readonly ConcurrentQueue<string[]> _changedFields = new();
     public IReadOnlyList<string[]> ChangedFields => _changedFields.ToArray();
     private BeginPause? _pause;
-    private int _begin, _active;
+    private int _begin, _active, _commit, _rollback;
     public int BeginCount => _begin;
     public int ActiveTransactions => _active;
+    public int CommitCount => _commit;
+    public int RollbackCount => _rollback;
     public IReadOnlyList<CommandObservation> Commands => _commands.ToArray();
     public DataServiceCapabilities Capabilities => inner.Capabilities;
     public Task<QueryResult> QueryAsync(QueryRequest request) => inner.QueryAsync(request);
     public Task<MutationResult> MutateAsync(MutationRequest request) => inner.MutateAsync(request);
     public BeginPause PauseNextBegin() => _pause = new BeginPause();
-    public void Clear() { _commands.Clear(); _changedFields.Clear(); _begin = 0; }
+    public void Clear() { _commands.Clear(); _changedFields.Clear(); _begin = 0; _commit = 0; _rollback = 0; }
     public async Task<ITransaction> BeginTransactionAsync()
     {
         Interlocked.Increment(ref _begin);
@@ -385,15 +393,17 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
             Verify.Equal(auditCount, owner._sink.Audit.Count, "no audit immediately after a statement");
             return result;
         }
-        public async Task CommitAsync() { await inner.CommitAsync(); Finish(); }
-        public async Task RollbackAsync() { await inner.RollbackAsync(); Finish(); }
+        public async Task CommitAsync() { await inner.CommitAsync(); Interlocked.Increment(ref owner._commit); Finish(); }
+        public async Task RollbackAsync() { await inner.RollbackAsync(); Interlocked.Increment(ref owner._rollback); Finish(); }
         private void Finish() { if (!_finished) { _finished = true; Interlocked.Decrement(ref owner._active); } }
         public void Dispose() { inner.Dispose(); Finish(); }
     }
 }
 
+sealed record PhysicalSQLObservation(bool IsRead, string Sql, IReadOnlyList<Value> Parameters);
 sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransactionTransport, ISchemaConnectionInitializer, IStreamingSqlTransport
 {
+    public ConcurrentQueue<PhysicalSQLObservation> PhysicalStatements { get; } = new();
     public ConcurrentQueue<string> QueryReads { get; } = new();
     public bool FailAggregateQuery { get; set; }
     public int StreamOpens, StreamCloses;
@@ -412,6 +422,7 @@ sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransacti
     public Task EnsureSchemaFunctionsAsync() => inner.EnsureSchemaFunctionsAsync();
     public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
     {
+        PhysicalStatements.Enqueue(new(true, query.Sql, query.Params.ToArray()));
         QueryReads.Enqueue(query.Sql);
         if (FailAggregateQuery && query.Sql.Contains("COUNT(", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("synthetic aggregate failure");
@@ -426,16 +437,22 @@ sealed class FaultTransport(SqliteTransport inner) : IAutomaticMutationTransacti
         }
         return rows;
     }
-    public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+    public Task<ulong> ExecuteSqlAsync(CompiledQuery query)
+    { PhysicalStatements.Enqueue(new(false, query.Sql, query.Params.ToArray())); return inner.ExecuteSqlAsync(query); }
     public async Task<ISqlTransaction> BeginSqlAsync() => new FaultTransaction(this, await inner.BeginSqlAsync());
     private sealed class FaultTransaction(FaultTransport owner, ISqlTransaction inner) : ISqlTransaction
     {
-        public Task<List<Record>> FetchAllSqlAsync(CompiledQuery query) => (owner.FailAttemptReadback &&
+        public Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
+        {
+            owner.PhysicalStatements.Enqueue(new(true, query.Sql, query.Params.ToArray()));
+            return (owner.FailAttemptReadback &&
             query.Sql.Contains("payment_attempt_data", StringComparison.Ordinal)) || (owner.FailItemReadback &&
             query.Sql.Contains("order_item_data", StringComparison.Ordinal))
             ? Task.FromException<List<Record>>(new SqlExecutorException("Injected post-write authoritative fetch failure"))
             : inner.FetchAllSqlAsync(query);
-        public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+        }
+        public Task<ulong> ExecuteSqlAsync(CompiledQuery query)
+        { owner.PhysicalStatements.Enqueue(new(false, query.Sql, query.Params.ToArray())); return inner.ExecuteSqlAsync(query); }
         public Task CommitSqlAsync() => inner.CommitSqlAsync();
         public Task RollbackSqlAsync() => inner.RollbackSqlAsync();
         public void Dispose() => inner.Dispose();

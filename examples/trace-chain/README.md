@@ -24,6 +24,7 @@ selects another local checkout.
 | Actual provider failure | SQLite UNIQUE violation retains failed SQL lineage, rolls back the graph and emits no committed audit |
 | Readback failure | An injected authoritative fetch failure does not erase the successful write statement; the graph transaction rolls back and emits no committed audit |
 | Same Context concurrency | Two overlapping Task-based generated saves are serialized by the transaction gate while retaining independent root and branch reasons |
+| Accepted/rejected generated Checker overlap | Two public saves overlap on the same Context; its transaction gate serializes actual generated checking. Missing OrderItem name causes a genuine required-field rejection and rollback, while only the valid graph emits commands, physical SQL and committed audit. Both orderings and logging modes retain independent ledgers and one shared read-only Platform record; the failed wrappers repair and save successfully |
 | Shared read-only provider record | Two queries reuse the exact Platform record; generated wrappers and ledgers are separate. Overlapping root-only saves use versions 2 and 1, without updating children or Platform |
 | Reached child import | Adopting one changed child imports only that typed key. Its foreign root and unselected sibling stay pending and unsaved |
 | Clean ancestor | A changed child inherits the parent's reason, but the clean parent emits no SQL or audit and keeps its version |
@@ -52,6 +53,13 @@ the fixture deliberately uses it read-only. This does not prove arbitrary
 mutable reference sharing. Ownership reflection is observation only; business
 reads and writes still use generated Q/E/Mutation APIs. Emitted commands, physical
 SQL metadata and committed audit are printed as `OWNERSHIP EVIDENCE` JSON.
+`TEAQL_TRACE_CHAIN_SCENARIO=checker-overlap` selects the four accepted/rejected
+Checker cases. Installed generated checkers are not replaced, wrapped or given
+fabricated results. `CHECKER VIOLATIONS` records the actual required-field
+location; `CHECKER OVERLAP EVIDENCE` separates trusted raw physical bindings from
+safe SQL and committed audit. The latter never contain the private child name.
+This is overlapping public calls, not simultaneous Checker callbacks. The full
+verifier requires this scenario twice with unchanged generated-library hashes.
 The full verifier ignores `TEAQL_TRACE_CHAIN_SCENARIO` and requires both the six
 normative checks and four ownership checks, twice without database cleanup.
 It also requires `PageChecks`: four physical SELECTs (root, two child probes,
