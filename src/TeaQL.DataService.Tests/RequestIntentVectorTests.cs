@@ -68,6 +68,42 @@ public sealed class RequestIntentVectorTests
         Assert.Null(typeof(QueryIntent).GetProperty("Comment")!.SetMethod);
     }
 
+    [Theory]
+    [InlineData("entity", "OrderItem")]
+    [InlineData("provider", "sqlite")]
+    [InlineData("sql", "insert")]
+    public void ExplicitMutationCommentSurvivesEachBlankTypedRouteTail(string kind, string name)
+    {
+        const string comment = "  explicit mutation request reason  ";
+        var command = new InsertCommand("Order") {
+            TraceChain = new() {
+                new TraceNode("Order", 1, "") {
+                    Kind = "auditReason", Detail = "trace-only reason is not request ownership"
+                },
+                new TraceNode(name, null, "") { Kind = kind, Name = name, Detail = "" }
+            }
+        };
+        // The typed blank tail is already present when the request is built.
+        // These are deliberate native inputs, not generated-planner evidence.
+        var request = new InsertMutationRequest(command, comment);
+        var tail = request.TraceChain.Last();
+        Assert.Equal((kind, name, "", ""), (tail.Kind, tail.Name, tail.Detail, tail.Comment));
+        Assert.Equal(comment, request.Comment);
+        Assert.Equal(comment, request.Intent.Comment);
+        Assert.Equal(comment, request.Intent.ReadbackIntent().Comment);
+
+        foreach (var missing in new string?[] { null, "", " \t\r\n" })
+        {
+            var error = Assert.Throws<RequestIntentException>(() => new InsertMutationRequest(command, missing));
+            Assert.Equal("REQUEST_COMMENT_REQUIRED", error.Code);
+            Assert.Equal("comment", error.Field);
+            Assert.Equal("mutation", error.RequestKind);
+        }
+        Assert.Equal(comment, request.Comment);
+        Assert.Equal(2, command.TraceChain.Count);
+        Assert.Same(tail, command.TraceChain.Last());
+    }
+
     [Fact]
     public void BatchCannotBorrowAChildReasonAndReadbackHasExplicitRuntimePurpose()
     {
