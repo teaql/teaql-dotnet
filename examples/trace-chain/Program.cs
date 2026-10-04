@@ -229,6 +229,20 @@ async Task ThreeLevelQuery((CustomerOrder Order, Payment Payment, PaymentAttempt
     Verify.Equal("Trace Chain Verification", E.Platform(root).Name().Eval(), "loaded E traversal");
     Verify.Equal(graph.Order.Id, E.CustomerOrder(order).Id().Eval(), "related order identity");
     Verify.Equal(4, sink.Sql.Count, "root plus three relation SQL statements");
+    var expectedRelations = new[] { "PaymentAttempt.Payment", "Payment.CustomerOrder", "CustomerOrder.Platform" };
+    for (var depth = 0; depth < sink.Sql.Count; depth++)
+    {
+        var statement = sink.Sql[depth];
+        Verify.That(statement.TraceChain[0].Kind == "operation" && statement.TraceChain[0].Name == "PaymentAttempt"
+            && statement.TraceChain[1].Kind == "request" && statement.TraceChain[1].Name == "PaymentAttempt",
+            "each derived statement retains Operation and Request root");
+        Verify.That(statement.TraceChain.Where(node => node.Kind == "relation").Select(node => node.Detail)
+            .SequenceEqual(expectedRelations.Take(depth)), "each derived statement retains its exact relation prefix");
+        Verify.Equal("load attempt detail", statement.Comment, "each derived statement inherits root comment");
+        Verify.Equal("render a governed three-level graph", statement.Purpose, "each derived statement inherits root purpose");
+        Verify.That(statement.TraceChain[^2].Kind == "provider" && statement.TraceChain[^1].Kind == "sql"
+            && statement.TraceChain[^1].Name == "select", "each derived statement retains physical SQL tail");
+    }
     var deepest = sink.Sql.Single(value => value.TraceChain.Count(node => node.Kind == "relation") == 3);
     Verify.Equal("PaymentAttempt", deepest.TraceChain[0].Name, "query origin retained through all levels");
     Verify.Equal("PaymentAttempt.Payment -> Payment.CustomerOrder -> CustomerOrder.Platform",
