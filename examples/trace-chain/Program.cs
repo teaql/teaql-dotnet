@@ -240,6 +240,15 @@ async Task ThreeLevelQuery((CustomerOrder Order, Payment Payment, PaymentAttempt
             .SequenceEqual(expectedRelations.Take(depth)), "each derived statement retains its exact relation prefix");
         Verify.Equal("load attempt detail", statement.Comment, "each derived statement inherits root comment");
         Verify.Equal("render a governed three-level graph", statement.Purpose, "each derived statement inherits root purpose");
+        var canonical = new List<(string Kind, string Name, string Detail)>
+        {
+            ("operation", "PaymentAttempt", "query"), ("request", "PaymentAttempt", "")
+        };
+        canonical.AddRange(new[] { "Payment", "CustomerOrder", "Platform" }.Take(depth)
+            .Select((name, i) => ("relation", name, expectedRelations[i])));
+        canonical.Add(("provider", "sqlite", "")); canonical.Add(("sql", "select", ""));
+        Verify.That(statement.TraceChain.Select(n => (n.Kind, n.Name, n.Detail ?? "")).SequenceEqual(canonical),
+            "canonical generated path at every physical boundary");
         Verify.That(statement.TraceChain[^2].Kind == "provider" && statement.TraceChain[^1].Kind == "sql"
             && statement.TraceChain[^1].Name == "select", "each derived statement retains physical SQL tail");
     }
