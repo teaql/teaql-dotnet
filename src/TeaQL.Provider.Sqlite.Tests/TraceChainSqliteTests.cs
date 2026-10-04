@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.Data.Sqlite;
 using TeaQL.Core;
@@ -11,6 +12,18 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class TraceChainSqliteTests
 {
+    // Native-test observation only; do not add public runtime introspection.
+    // Retain scalar values and service identities, not copies of SQL sink data.
+    private static Dictionary<string, object?> ContextFields(UserContext context) =>
+        typeof(UserContext).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            .ToDictionary(field => field.Name, field => field.GetValue(context));
+
+    private static Dictionary<TKey, object> ContextResources<TKey>(UserContext context, string field)
+        where TKey : notnull =>
+        ((ConcurrentDictionary<TKey, object>)typeof(UserContext)
+            .GetField(field, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(context)!)
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
+
     private sealed class Sink : IDiagnosticSqlLogSink
     {
         public readonly ConcurrentQueue<ExecutionMetadata> Entries = new();
@@ -114,6 +127,26 @@ public class TraceChainSqliteTests
         fixture.Context.WithDataService(observer).EnableQuerySqlLog(logging);
         var service = fixture.Context.RequireResource<IDataService>();
         barrier!.Enabled = true;
+        var contextFieldsBefore = ContextFields(fixture.Context);
+        var typedResourcesBefore = ContextResources<Type>(fixture.Context, "_typedResources");
+        var namedResourcesBefore = ContextResources<string>(fixture.Context, "_namedResources");
+        void AssertContextUnchanged()
+        {
+            var fields = ContextFields(fixture.Context);
+            Assert.Equal(contextFieldsBefore.Keys.Order(), fields.Keys.Order());
+            foreach (var (key, original) in contextFieldsBefore)
+                if (original is null || original.GetType().IsValueType) Assert.Equal(original, fields[key]);
+                else Assert.Same(original, fields[key]);
+            void AssertResources<TKey>(Dictionary<TKey, object> before, Dictionary<TKey, object> after)
+                where TKey : notnull
+            {
+                Assert.True(before.Count == after.Count && before.Keys.All(after.ContainsKey),
+                    "shared Context resource keys changed during independent queries");
+                foreach (var key in before.Keys) Assert.Same(before[key], after[key]);
+            }
+            AssertResources(typedResourcesBefore, ContextResources<Type>(fixture.Context, "_typedResources"));
+            AssertResources(namedResourcesBefore, ContextResources<string>(fixture.Context, "_namedResources"));
+        }
         QueryRequest Request(string label) => new(new SelectQuery("School").Limit(1)
             .RelationQuery("platform", new SelectQuery("Platform").Project("organizationId").Limit(1)
                 .RelationQuery("organization", new SelectQuery("Organization").Project("regionId").Limit(1)
@@ -132,6 +165,7 @@ public class TraceChainSqliteTests
             Assert.Equal(new[] { "load alpha graph", "load beta graph" }, observer.Requests.Select(r => r.Comment));
             Assert.Equal(new[] { "render alpha graph", "render beta graph" }, observer.Requests.Select(r => r.Purpose));
             Assert.All(observer.Requests, request => Assert.Empty(request.TraceChain));
+            AssertContextUnchanged();
             barrier.Release.TrySetResult(true);
             var results = await completed.WaitAsync(TimeSpan.FromSeconds(5));
             foreach (var result in results)
@@ -143,6 +177,7 @@ public class TraceChainSqliteTests
             }
             Assert.Equal(8, observer.Statements.Count);
             Assert.Equal(logging ? 8 : 0, fixture.Log.Entries.Count);
+            AssertContextUnchanged();
             foreach (var entries in new[] { observer.Statements, fixture.Log.Entries })
             foreach (var label in new[] { "alpha", "beta" })
             {
