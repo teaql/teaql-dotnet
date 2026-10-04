@@ -506,7 +506,9 @@ internal static class RelationQueryLoader
             parent[relationName] = relation.IsMany
                 ? new Value.ListValue(new SmartList<Value>(related.Select(row => (Value)new Value.ObjectValue(row)))
                     { Facets = facets ?? new() })
-                : related.Count > 0 ? new Value.ObjectValue(related[0]) : new Value.NullValue();
+                : related.Count > 0 ? new Value.ObjectValue(related[0])
+                : localKey != null ? new Value.ObjectValue(new Record { [relation.ForeignKeyValue] = localKey })
+                : new Value.NullValue(); // Only an actually NULL FK means a null relation.
         }
     }
 }

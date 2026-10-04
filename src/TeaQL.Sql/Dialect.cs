@@ -610,9 +610,20 @@ public abstract class SqlDialect
         }
 
         var parts = new List<string>();
-        if (query.Projection != null)
+        var projectedFields = new List<string>(query.Projection ?? new List<string>());
+        // A requested relationship needs its real membership key. An omitted
+        // FK must never be mistaken for a loaded SQL NULL; do not mutate the query.
+        if (query.GroupByItems.Count == 0)
         {
-            foreach (var field in query.Projection)
+            var relationNames = query.Relations.Select(load => load.Name)
+                .Concat(query.RelationAggregates.Select(aggregate => aggregate.RelationName));
+            foreach (var name in relationNames)
+                if (entity.RelationByName(name) is { } relation && !projectedFields.Contains(relation.LocalKeyValue))
+                    projectedFields.Add(relation.LocalKeyValue);
+        }
+        if (projectedFields.Count > 0)
+        {
+            foreach (var field in projectedFields)
             {
                 var property = entity.Properties.FirstOrDefault(p => p.Name == field)
                     ?? throw SqlCompileException.UnknownField(field);

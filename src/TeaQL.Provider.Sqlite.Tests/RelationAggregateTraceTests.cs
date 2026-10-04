@@ -55,6 +55,39 @@ public class RelationAggregateTraceTests
         .Property(PropertyDescriptor.New("id", DataType.I64).Id())
         .Property(PropertyDescriptor.New("version", DataType.I64).Version());
 
+    [Fact]
+    public async Task ForwardIdReferenceKeepsIdentityWhileSqlNullAndUnrequestedRelationStayDistinct()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var parent = Entity("Parent").Property(PropertyDescriptor.New("name", DataType.Text));
+        var child = Entity("Child").Property(PropertyDescriptor.New("parent_id", DataType.I64))
+            .Relation(RelationDescriptor.New("parent", "Parent").LocalKey("parent_id").ForeignKey("id"));
+        var descriptors = new[] { parent, child };
+        var provider = new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(connection),
+            new MetadataSchemaProvider(name => descriptors.FirstOrDefault(entity => entity.Name == name)));
+        var context = new RuntimeModule().Entity(parent).Entity(child).IntoContext().WithDataService(provider);
+        await context.EnsureSchemaAsync();
+        context.DisableQuerySqlLog();
+        var service = context.RequireResource<IDataService>();
+        await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Parent")
+            .Value("id", Value.FromObject(1L)).Value("name", Value.FromObject("visible")), "seed reference"));
+        for (var id = 1L; id <= 2L; id++)
+            await service.MutateAsync(new InsertMutationRequest(new InsertCommand("Child")
+                .Value("id", Value.FromObject(id)).Value("parent_id", Value.FromObject(id == 1 ? 1L : null)),
+                "seed nullable reference"));
+        var query = new SelectQuery("Child").Project("id").OrderAsc("id").Limit(2)
+            .Comment("load nullable references").Purpose("distinguish identity, details and SQL NULL");
+        var plain = await service.QueryAsync(new QueryRequest(query));
+        Assert.DoesNotContain("parent", plain.Rows[0].Keys);
+        query.RelationQuery("parent", new SelectQuery("Parent").Filter(Expr.Eq("name", "absent")));
+        var result = await service.QueryAsync(new QueryRequest(query));
+        var identity = Assert.IsType<Value.ObjectValue>(result.Rows[0]["parent"]).Value;
+        Assert.Single(identity);
+        Assert.Equal(1L, identity["id"].TryI64());
+        Assert.IsType<Value.NullValue>(result.Rows[1]["parent"]);
+    }
+
     [Theory]
     [InlineData(false, false)]
     [InlineData(false, true)]
@@ -222,7 +255,13 @@ public class RelationAggregateTraceTests
             if (nested)
                 row = Assert.IsType<Value.ObjectValue>(Assert.Single(Assert.IsType<Value.ListValue>(row["children"]).Values)).Value;
             Assert.Equal(1L, row["parent_count"].TryI64());
-            if (filtered) Assert.IsType<Value.NullValue>(row["parent_ref"]);
+            if (filtered)
+            {
+                var identity = Assert.IsType<Value.ObjectValue>(row["parent_ref"]).Value;
+                Assert.Equal("P1", identity["code"].TryText());
+                Assert.False(identity.ContainsKey("name"));
+                Assert.False(identity.ContainsKey("id")); // a code FK does not reveal an unfetched ID
+            }
             else
             {
                 var loaded = Assert.IsType<Value.ObjectValue>(row["parent_ref"]).Value;

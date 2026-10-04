@@ -238,6 +238,20 @@ async Task ThreeLevelQuery((CustomerOrder Order, Payment Payment, PaymentAttempt
     var projected = (await Q.PaymentAttemptsWithMinimalFields().WithIdIs(graph.Attempt.Id!.Value).Limit(1)
         .Comment("check incomplete projection").Purpose("ensure E fails closed").ExecuteForListAsync(context))[0];
     await Verify.Throws<TeaQLNotLoadedException>(() => Task.FromResult(E.PaymentAttempt(projected).Payment().Eval()), "NotLoaded E access");
+    var hidden = (await Q.PaymentsWithMinimalFields().WithIdIs(graph.Payment.Id!.Value)
+        .SelectCustomerOrderWith(Q.CustomerOrdersWithMinimalFields().WithIdIs(0).Limit(1))
+        .Limit(1).Comment("load filtered forward reference").Purpose("preserve known FK identity")
+        .ExecuteForListAsync(context))[0];
+    var identity = E.Payment(hidden).CustomerOrder().Eval();
+    Verify.Equal(graph.Order.Id, E.CustomerOrder(identity).Id().Eval(), "filtered reference retains identity");
+    await Verify.Throws<TeaQLNotLoadedException>(() => Task.FromResult(E.CustomerOrder(identity).Description().Eval()), "filtered detail is NotLoaded");
+    var visible = (await Q.PaymentsWithMinimalFields().WithIdIs(graph.Payment.Id!.Value)
+        .SelectCustomerOrderWith(Q.CustomerOrdersWithMinimalFields().SelectDescription().Limit(1))
+        .Limit(1).Comment("load full forward reference").Purpose("verify independent detail view")
+        .ExecuteForListAsync(context))[0];
+    Verify.Equal(graph.Order.Description, E.CustomerOrder(E.Payment(visible).CustomerOrder().Eval()).Description().Eval(), "full detail remains usable");
+    await Verify.Throws<TeaQLNotLoadedException>(() => Task.FromResult(E.CustomerOrder(identity).Description().Eval()), "full view does not widen filtered edge");
+    Console.WriteLine("PASS FORWARD_NOTLOADED: generated Q/E retains FK and fails closed on hidden detail");
     Console.WriteLine("PASS TC-SQL-07: generated Q/E creates three qualified relation frames without test-injected frames");
 }
 
