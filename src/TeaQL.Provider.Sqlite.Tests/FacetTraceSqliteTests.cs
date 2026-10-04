@@ -55,7 +55,16 @@ public class FacetTraceSqliteTests
     [InlineData(true, false, true)]
     [InlineData(true, true, false)]
     [InlineData(true, true, true)]
-    public async Task NullParentKeysDoNotCreateMembershipButKeepRequestedFacets(bool allNull, bool transaction, bool includeAll)
+    [InlineData(false, false, false, false)]
+    [InlineData(false, false, true, false)]
+    [InlineData(false, true, false, false)]
+    [InlineData(false, true, true, false)]
+    [InlineData(true, false, false, false)]
+    [InlineData(true, false, true, false)]
+    [InlineData(true, true, false, false)]
+    [InlineData(true, true, true, false)]
+    public async Task NullParentKeysDoNotCreateMembershipButKeepRequestedFacets(
+        bool allNull, bool transaction, bool includeAll, bool logging = true)
     {
         await using var connection = new SqliteConnection("Data Source=:memory:");
         await connection.OpenAsync();
@@ -76,6 +85,7 @@ public class FacetTraceSqliteTests
         var service = context.RequireResource<IDataService>();
         await Seed(new InsertCommand("Parent").Value("id", Value.FromObject(1L)).Value("code", Value.FromObject("P1")));
         await Seed(new InsertCommand("Parent").Value("id", Value.FromObject(2L)).Value("code", new Value.NullValue()));
+        await Seed(new InsertCommand("Parent").Value("id", Value.FromObject(3L)).Value("code", Value.FromObject("EMPTY")));
         await Seed(new InsertCommand("Category").Value("id", Value.FromObject(20L)).Value("name", Value.FromObject("related")));
         await Seed(new InsertCommand("Category").Value("id", Value.FromObject(21L)).Value("name", Value.FromObject("orphan")));
         await Seed(new InsertCommand("Child").Value("id", Value.FromObject(10L))
@@ -83,25 +93,41 @@ public class FacetTraceSqliteTests
         await Seed(new InsertCommand("Child").Value("id", Value.FromObject(11L))
             .Value("parent_ref", new Value.NullValue()).Value("category_id", Value.FromObject(21L)));
         var children = new SelectQuery("Child").Projects(new[] { "id", "parent_ref", "category_id" }).Limit(10);
-        children.Facets.Add(new FacetRequest("categories", "category", new SelectQuery("Category").Limit(10).Count("members"), false));
+        children.Facets.Add(new FacetRequest("categories", "category", new SelectQuery("Category").Limit(10).Count("members"), includeAll));
         var query = new SelectQuery("Parent").Projects(new[] { "id", "code" }).OrderAsc("id").Limit(10)
             .RelationQuery("children", children).Comment("load nullable membership").Purpose("exclude orphan children from relation facets");
         query.Facets.Add(new FacetRequest("allChildren", "children",
             new SelectQuery("Child").Projects(new[] { "id", "parent_ref" }).OrderAsc("id").Limit(10).Count("parents"), includeAll));
         if (allNull) query.Filter(Expr.Eq("id", 2L));
         sink.Entries.Clear(); transport.Reads.Clear();
+        context.EnableQuerySqlLog(logging);
         using var tx = transaction ? await provider.BeginTransactionAsync() : null;
         var execution = tx is null ? service : new RuntimeDataService(tx, context);
         var result = await execution.QueryAsync(new QueryRequest(query));
-        Assert.Equal(allNull ? 1 : 2, result.Rows.Count);
+        Assert.Equal(allNull ? 1 : 3, result.Rows.Count);
         var nullParent = result.Rows.Single(row => row["id"].TryI64() == 2L);
         Assert.Empty(Assert.IsType<Value.ListValue>(nullParent["children"]).Values);
+        foreach (var owner in result.Rows)
+        {
+            var loaded = Assert.IsType<SmartList<Value>>(Assert.IsType<Value.ListValue>(owner["children"]).Values);
+            Assert.True(loaded.IsLoaded);
+            var hasMember = owner["id"].TryI64() == 1L;
+            Assert.Equal(hasMember ? 1 : 0, loaded.Count);
+            Assert.True(loaded.Facets.TryGetValue("categories", out var categories));
+            Assert.Equal(includeAll ? 2 : hasMember ? 1 : 0, categories!.Count);
+            foreach (var candidate in categories)
+                Assert.Equal(hasMember && candidate["id"].TryI64() == 20L ? 1L : 0L, candidate["members"].TryI64());
+            Assert.DoesNotContain("categories", owner.ToJsonValue().ToJsonString());
+            Assert.DoesNotContain("categories", JsonSerializer.Serialize(owner));
+            var snapshot = new LoadedScalarSnapshot(owner).CopyValues();
+            Assert.IsNotType<SmartList<Value>>(Assert.IsType<Value.ListValue>(snapshot["children"]).Values);
+        }
         if (!allNull)
         {
             var related = Assert.IsType<Value.ObjectValue>(Assert.Single(
                 Assert.IsType<Value.ListValue>(result.Rows[0]["children"]).Values)).Value;
             Assert.Equal(10L, related["id"].TryI64());
-            var counted = Assert.Single(related.QueryFacets["categories"]);
+            var counted = Assert.Single(related.QueryFacets["categories"].Where(row => row["id"].TryI64() == 20L));
             Assert.Equal(20L, counted["id"].TryI64());
             Assert.Equal(1L, counted["members"].TryI64());
         }
@@ -113,8 +139,9 @@ public class FacetTraceSqliteTests
             Assert.Equal(!allNull && candidate["id"].TryI64() == 10L ? 1L : 0L, candidate["parents"].TryI64());
         Assert.DoesNotContain(transport.Reads.SelectMany(read => read.Params), value => value is Value.NullValue or Value.TypedNullValue);
         Assert.All(sink.Entries, entry => Assert.Equal("Parent", entry.TraceChain[0].Name));
+        if (!logging) Assert.Empty(sink.Entries);
         output.WriteLine("NULL FACET EVIDENCE " + JsonSerializer.Serialize(new {
-            allNull, transaction, includeAll, physicalReads = transport.Reads.Count,
+            allNull, transaction, includeAll, logging, physicalReads = transport.Reads.Count,
             candidateMembership = requested.Select(row => new { id = row["id"].TryI64(), count = row["parents"].TryI64() }),
             sql = sink.Entries
         }));

@@ -273,13 +273,13 @@ internal static class RelationQueryLoader
                 ?? throw new SqlExecutorException($"SQL compile error: unknown entity {relation.TargetEntity}");
             var localKeys = parentKeys[relation.LocalKeyValue];
             var parentIds = localKeys.OfType<Value>().Distinct().ToList();
-            if (parentIds.Count == 0)
+            var childQuery = Clone(load.Query ?? new SelectQuery(relation.TargetEntity));
+            childQuery.Entity = relation.TargetEntity;
+            if (parentIds.Count == 0 && childQuery.Facets.Count == 0)
             {
                 Attach(parents, new List<Record>(), load.Name, relation, localKeys, Array.Empty<Value?>());
                 continue;
             }
-            var childQuery = Clone(load.Query ?? new SelectQuery(relation.TargetEntity));
-            childQuery.Entity = relation.TargetEntity;
             if (!childQuery.Projection.Contains(relation.ForeignKeyValue))
             {
                 childQuery.Projection.Add(relation.ForeignKeyValue);
@@ -294,7 +294,11 @@ internal static class RelationQueryLoader
                 ((dialect.RelationTopNPolicy == "always_probe" && threshold is null) ||
                  (threshold is > 0 && (ulong)parentIds.Count <= threshold));
             var selectedPlan = useProbes ? "bounded_probes" : limited ? "window" : "batch";
-            var probeCount = useProbes ? parentIds.Count : 0;
+            var probeKeys = parentIds.Cast<Value?>().ToList();
+            // A null key has no members, but requested include-all Facets still
+            // enumerate zero-count candidates. Never compare an orphan FK to NULL.
+            if (childQuery.Facets.Count > 0 && localKeys.Any(key => key == null)) probeKeys.Add(null);
+            var probeCount = useProbes ? probeKeys.Count : 0;
             if (!useProbes)
             {
                 childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
@@ -304,22 +308,27 @@ internal static class RelationQueryLoader
             {
                 var childRows = new List<Record>();
                 var childKeys = new List<Value?>();
+                var facetsByKey = new Dictionary<Value, Dictionary<string, SmartList<Record>>>();
+                Dictionary<string, SmartList<Record>>? emptyFacets = null;
                 var queries = useProbes
-                    ? parentIds.Select(parentId =>
+                    ? probeKeys.Select(parentId =>
                     {
                         var probe = Clone(childQuery);
                         probe.PartitionBy = null;
-                        probe.AndFilter(Expr.Eq(relation.ForeignKeyValue, parentId));
-                        return probe;
+                        probe.AndFilter(parentId == null ? Expr.Value(new Value.BoolValue(false))
+                            : Expr.Eq(relation.ForeignKeyValue, parentId));
+                        return (Key: parentId, Query: probe);
                     })
-                    : new[] { childQuery };
+                    : new[] { (Key: (Value?)null, Query: childQuery) };
                 foreach (var executionQuery in queries)
                 {
-                    var derived = request.Derive(executionQuery, load.Name);
+                    var derived = request.Derive(executionQuery.Query, load.Name);
                     derived.IntentSource = inheritedIntent;
                     derived.CaptureRelationKeys = rows =>
                         childKeys.AddRange(SnapshotKeys(rows, relation.ForeignKeyValue));
                     var childResult = await queryAsync(derived);
+                    if (executionQuery.Key is { } key) facetsByKey[key] = childResult.Facets;
+                    else emptyFacets = childResult.Facets;
                     foreach (var child in childResult.Rows)
                         foreach (var facet in childResult.Facets)
                             child.QueryFacets[facet.Key] = facet.Value;
@@ -329,7 +338,7 @@ internal static class RelationQueryLoader
                 {
                     child.Remove("__teaql_partition_rank");
                 }
-                Attach(parents, childRows, load.Name, relation, localKeys, childKeys);
+                Attach(parents, childRows, load.Name, relation, localKeys, childKeys, facetsByKey, emptyFacets);
             }
             if (request.RelationLoadObserver is { } observer)
                 await observer.ObserveAsync(request.Query.Entity, load.Name,
@@ -470,7 +479,9 @@ internal static class RelationQueryLoader
         string relationName,
         RelationDescriptor relation,
         IReadOnlyList<Value?> parentKeys,
-        IReadOnlyList<Value?> childKeys)
+        IReadOnlyList<Value?> childKeys,
+        IReadOnlyDictionary<Value, Dictionary<string, SmartList<Record>>>? facetsByKey = null,
+        Dictionary<string, SmartList<Record>>? emptyFacets = null)
     {
         if (parentKeys.Count != parents.Count || childKeys.Count != children.Count)
             throw new SqlExecutorException("Relation assembly key count differs from row count");
@@ -487,8 +498,14 @@ internal static class RelationQueryLoader
                 && buckets.TryGetValue(localKey, out var bucket)
                 ? bucket
                 : new List<Record>();
+            // List-compatible query carrier retains metadata even without a
+            // first row. Value/record serialization and scalar snapshots still
+            // copy only list elements, never Facets or mutation ownership.
+            var facets = localKey != null && facetsByKey != null && facetsByKey.TryGetValue(localKey, out var found)
+                ? found : localKey == null ? emptyFacets : null;
             parent[relationName] = relation.IsMany
-                ? new Value.ListValue(related.Select(row => (Value)new Value.ObjectValue(row)).ToList())
+                ? new Value.ListValue(new SmartList<Value>(related.Select(row => (Value)new Value.ObjectValue(row)))
+                    { Facets = facets ?? new() })
                 : related.Count > 0 ? new Value.ObjectValue(related[0]) : new Value.NullValue();
         }
     }
