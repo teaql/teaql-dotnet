@@ -20,16 +20,17 @@ var provider = new SqlDataServiceExecutor(new SqliteDialect(), faults,
     new MetadataSchemaProvider(module.Metadata.GetEntity));
 var context = module.IntoContext().WithDataService(provider)
     .WithDiagnosticSqlLogSink(sink).WithAppAuditEventSink(sink);
-await context.EnsureSchemaAsync();
+var capture = new CapturingExecutor(provider, sink);
+context.InsertResource<ITransactionExecutor>(capture);
+sink.ActiveTransactions = () => capture.ActiveTransactions;
+await BootstrapChecks.RunOffAsync(database + ".bootstrap-off");
+await BootstrapChecks.RunAsync(context, capture, sink, database, logging: true);
 // This is fault-injection DDL, not application DML or manual seeding.
 using (var unique = connection.CreateCommand())
 {
     unique.CommandText = "CREATE UNIQUE INDEX IF NOT EXISTS trace_payment_reference ON payment_data(reference_code)";
     await unique.ExecuteNonQueryAsync();
 }
-var capture = new CapturingExecutor(provider, sink);
-context.InsertResource<ITransactionExecutor>(capture);
-sink.ActiveTransactions = () => capture.ActiveTransactions;
 var nonce = Guid.NewGuid().ToString("N");
 var platform = await Q.Platforms().WithIdIs(1).Limit(1)
     .Comment("load the provided root").Purpose("reuse generated bootstrap").ExecuteForOneAsync(context)
@@ -401,11 +402,13 @@ sealed class EvidenceSink : IDiagnosticSqlLogSink, IAppAuditEventSink
     public IReadOnlyList<ExecutionMetadata> Sql => _sql.ToArray();
     public IReadOnlyList<IReadOnlyDictionary<string, object?>> Audit => _audit.ToArray();
     public Func<int>? ActiveTransactions { get; set; }
+    public Func<IReadOnlyDictionary<string, object?>, Task>? CommittedProbe { get; set; }
     public void Write(ExecutionMetadata metadata) => _sql.Enqueue(metadata);
-    public Task RecordAsync(IReadOnlyDictionary<string, object?> record, CancellationToken token = default)
+    public async Task RecordAsync(IReadOnlyDictionary<string, object?> record, CancellationToken token = default)
     {
         Verify.Equal(0, ActiveTransactions?.Invoke() ?? 0, "audit must follow successful database commit");
-        _audit.Enqueue(record); return Task.CompletedTask;
+        if (CommittedProbe != null) await CommittedProbe(record);
+        _audit.Enqueue(record);
     }
     public void Clear() { _sql.Clear(); _audit.Clear(); }
 }
@@ -422,6 +425,8 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
     private readonly EvidenceSink _sink = sink;
     private readonly ConcurrentQueue<CommandObservation> _commands = new();
     private readonly ConcurrentQueue<string[]> _changedFields = new();
+    private readonly ConcurrentQueue<ExecutionMetadata> _mutationResults = new();
+    public IReadOnlyList<ExecutionMetadata> MutationResults => _mutationResults.ToArray();
     public IReadOnlyList<string[]> ChangedFields => _changedFields.ToArray();
     private BeginPause? _pause;
     private int _begin, _active, _commit, _rollback;
@@ -434,7 +439,7 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
     public Task<QueryResult> QueryAsync(QueryRequest request) => inner.QueryAsync(request);
     public Task<MutationResult> MutateAsync(MutationRequest request) => inner.MutateAsync(request);
     public BeginPause PauseNextBegin() => _pause = new BeginPause();
-    public void Clear() { _commands.Clear(); _changedFields.Clear(); _begin = 0; _commit = 0; _rollback = 0; }
+    public void Clear() { _commands.Clear(); _changedFields.Clear(); _mutationResults.Clear(); _begin = 0; _commit = 0; _rollback = 0; }
     public async Task<ITransaction> BeginTransactionAsync()
     {
         Interlocked.Increment(ref _begin);
@@ -462,6 +467,7 @@ sealed class CapturingExecutor(ITransactionExecutor inner, EvidenceSink sink) : 
             owner._commands.Enqueue(new(key.EntityType, checked((long)key.Id.TryU64()!.Value), operation, request.Comment, request.MutationLineage, version));
             Verify.Equal(auditCount, owner._sink.Audit.Count, "no audit before graph commit");
             var result = await inner.MutateAsync(request);
+            owner._mutationResults.Enqueue(result.Metadata);
             Verify.Equal(Verify.Shape(request.MutationLineage), Verify.Shape(result.Metadata.MutationLineage), "provider metadata matches actual request");
             Verify.Equal(auditCount, owner._sink.Audit.Count, "no audit immediately after a statement");
             return result;
