@@ -31,6 +31,7 @@ for round in 1 2; do
   [[ "$(rg -c '^PASS .NET complete private lineage:' "$run_log")" == 3 ]]
   rg -Fq 'PASS: .NET loaded graph privacy rollback and same-wrapper retry' "$run_log"
   rg -Fq 'PASS: .NET generated aggregates 4 cases, isolated saves and 2 failure recoveries' "$run_log"
+  rg -Fq 'PASS .NET generated aggregate membership: 8 list scenarios; actual SQL, complete safe ancestry, FK and independent filtered views' "$run_log"
   rg -Fq 'PASS: .NET generated Checker accepted/rejected overlap 4 cases, shared reference and retry' "$run_log"
   [[ "$before" == "$(fingerprint)" ]] || { echo 'FAIL: generated library bytes changed' >&2; exit 1; }
 done

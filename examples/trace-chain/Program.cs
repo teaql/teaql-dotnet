@@ -38,6 +38,11 @@ var platform = await Q.Platforms().WithIdIs(1).Limit(1)
 Verify.Equal(1L, E.Platform(platform).Id().Eval(), "bootstrap identity");
 
 var ownershipScenario = Environment.GetEnvironmentVariable("TEAQL_TRACE_CHAIN_SCENARIO");
+if (ownershipScenario == "aggregate-membership")
+{
+    await AggregateMembershipChecks.RunAsync(context, capture, sink, faults);
+    return;
+}
 if (ownershipScenario == "checker-overlap")
 {
     await CheckerOverlapChecks.RunAsync(context, capture, sink, faults);
@@ -96,6 +101,7 @@ await LoadedPrivacyChecks.RunAsync(context, capture, sink);
 await LoadedPrivacyRollbackChecks.RunAsync(context, capture, sink, faults);
 
 await AggregateChecks.RunAsync(context, capture, sink, faults);
+await AggregateMembershipChecks.RunAsync(context, capture, sink, faults);
 await CheckerOverlapChecks.RunAsync(context, capture, sink, faults);
 
 CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")

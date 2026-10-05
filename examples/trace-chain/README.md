@@ -98,6 +98,18 @@ Saving a loaded model changes only description, not aggregate aliases or clean
 children. `TEAQL_TRACE_CHAIN_SCENARIO=aggregate` selects this slice; the full
 verifier requires it twice on the retained database with stable library hashes.
 
+`AggregateMembershipChecks` composes a selected child list, a filtered count and
+each child's explicit forward parent selection in the same generated query.
+Eight root/nested, logging-on/off and forward-filtered/unfiltered list cases
+check the real SQL/bindings, every safe physical route, the count alias and both
+child IDs. Hidden parent detail stays NotLoaded while its real FK/ID survives;
+an independent full read cannot widen the old views. Read probes produce no
+mutation commands or committed audit. The full gate requires this slice twice;
+`TEAQL_TRACE_CHAIN_SCENARIO=aggregate-membership` selects it independently.
+`bash scripts/verify-current-aggregate.sh` also runs native membership/count
+regressions twice. This list coverage does not claim relation streaming:
+the current .NET scalar-only stream contract rejects relation aggregates.
+
 This is selected producer coverage. Prepared batch/item-index lineage, detached
 children, late low-level allocation, every entry point and privacy mode, reentrant
 root fail-fast behavior and immutable internal Registry replay remain open.
