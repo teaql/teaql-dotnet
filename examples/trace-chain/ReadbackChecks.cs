@@ -23,6 +23,7 @@ static class ReadbackChecks
             capture.Clear();sink.Clear();
             await root.AuditAs("save graph "+secret).SaveAsync(context);
             Verify.Equal(3,capture.Commands.Count,"readbacks do not add mutation commands");
+            Verify.Equal(3,capture.MutationResults.Count,"capture each actual mutation result");
             Verify.Equal(3,sink.Audit.Count,"readbacks do not add committed audits");
             Verify.Equal(6,sink.Sql.Count,"three writes and three authoritative reads");
             Verify.That(!JsonSerializer.Serialize(sink.Sql).Contains(secret),"root and sibling readbacks mask future child secret");
@@ -30,6 +31,13 @@ static class ReadbackChecks
             for(var i=0;i<6;i+=2)
             {
                 var write=sink.Sql[i];var read=sink.Sql[i+1];
+                var command=capture.Commands[i/2];var result=capture.MutationResults[i/2];
+                Verify.Equal("save graph "+secret,command.Comment,"actual command retains private root intent");
+                Verify.Equal(command.Comment,result.Comment,"raw result retains original command comment");
+                Verify.Equal(command.Comment,result.AuditReason,"raw result retains original audit reason");
+                Verify.Equal("save graph [REDACTED]",write.Comment,"safe write masks root intent without replacing it");
+                Verify.Equal(write.Comment,read.Comment,"derived readback inherits safe root comment, not child reason");
+                Verify.Equal("verify the persisted mutation result",read.Purpose,"derived readback has explicit verification purpose");
                 Verify.Equal(round==0?DataServiceOperation.Insert:DataServiceOperation.Update,write.Operation,"actual physical write");
                 Verify.Equal(DataServiceOperation.Query,read.Operation,"actual readback SELECT");
                 Verify.Equal("success",read.ExecutionOutcome,"successful physical readback");
@@ -42,6 +50,7 @@ static class ReadbackChecks
                 Verify.That(write.EndedAt<=read.StartedAt,"physical write precedes readback");
             }
             Console.WriteLine("READBACK EVIDENCE "+JsonSerializer.Serialize(new{round,rootId=E.CustomerOrder(root).Id().Eval(),childId=E.OrderItem(child).Id().Eval(),paymentId=E.Payment(payment).Id().Eval(),sql=sink.Sql,audits=sink.Audit.Count}));
+            Console.WriteLine("TC-REQ-10 DOTNET READBACK PASSED round="+round+" writes=3 readbacks=3");
             var loaded=await Q.OrderItems().WithIdIs(E.OrderItem(child).Id().Eval()!.Value).Limit(1)
                 .Comment("reload private item").Purpose("check authoritative value and version").ExecuteForOneAsync(context)
                 ??throw new Exception("missing item after save");

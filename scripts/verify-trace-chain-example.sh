@@ -24,6 +24,9 @@ for round in 1 2; do
   rg -Fq 'PASS: .NET generated page count, scope, privacy and independent graph saves' "$run_log"
   rg -Fq 'PASS: .NET generated stream capture, overlapping cursors, privacy and independent saves' "$run_log"
   rg -Fq 'PASS: .NET generated successful readbacks, sibling privacy and independent request intent' "$run_log"
+  for mutation_round in 0 1; do
+    rg -Fq "TC-REQ-10 DOTNET READBACK PASSED round=$mutation_round writes=3 readbacks=3" "$run_log"
+  done
   rg -Fq 'PASS: .NET loaded scalar privacy, snapshot refresh, deletion and independent request' "$run_log"
   rg -Fq 'PASS: .NET loaded graph privacy rollback and same-wrapper retry' "$run_log"
   rg -Fq 'PASS: .NET generated aggregates 4 cases, isolated saves and 2 failure recoveries' "$run_log"
