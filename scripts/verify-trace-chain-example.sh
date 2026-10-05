@@ -28,6 +28,7 @@ for round in 1 2; do
     rg -Fq "TC-REQ-10 DOTNET READBACK PASSED round=$mutation_round writes=3 readbacks=3" "$run_log"
   done
   rg -Fq 'PASS: .NET loaded scalar privacy, snapshot refresh, deletion and independent request' "$run_log"
+  [[ "$(rg -c '^PASS .NET complete private lineage:' "$run_log")" == 3 ]]
   rg -Fq 'PASS: .NET loaded graph privacy rollback and same-wrapper retry' "$run_log"
   rg -Fq 'PASS: .NET generated aggregates 4 cases, isolated saves and 2 failure recoveries' "$run_log"
   rg -Fq 'PASS: .NET generated Checker accepted/rejected overlap 4 cases, shared reference and retry' "$run_log"
