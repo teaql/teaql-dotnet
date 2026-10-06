@@ -88,6 +88,10 @@ public static class GeneratedRuntimeModule
        ["WorkItem"] = new List<RelationDescriptor> {
             RelationDescriptor.New("Platform", "Platform").LocalKey("platform").ForeignKey("id")
         }
+    }, new Dictionary<string, string>
+    {
+       ["Platform"] = "platform_data",
+       ["WorkItem"] = "work_item_data"
     }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("WorkItem", ["id", "title", "description", "platform", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["title"] = ["title"], ["description"] = ["description"], ["platform"] = ["platform"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
@@ -103,7 +107,8 @@ public static class GeneratedRuntimeModule
 
     private static async Task EnsureGeneratedBootstrapOnceAsync(UserContext context)
     {
-        using var bootstrapScope = context.EnterGeneratedBootstrap("Platform", 1);
+        {
+            using var bootstrapScope = context.EnterGeneratedBootstrap("Platform", 1);
         var domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (domainRoot == null)
         {
@@ -113,6 +118,14 @@ public static class GeneratedRuntimeModule
             try { domainRoot = await created.AuditAs("create generated Domain Root Platform").SaveAsync(context); }
             catch { domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: recover concurrent Domain Root bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (domainRoot == null) throw; }
         }
+        }
+        context.WithActiveRoot("Platform", 1);
     }
 
+
+    static GeneratedRuntimeModule()
+    {
+        Module.Entity(Module.Metadata.GetEntity("Platform")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("WorkItem")!.AuditMaskFields(new List<string> {  }));
+    }
 }

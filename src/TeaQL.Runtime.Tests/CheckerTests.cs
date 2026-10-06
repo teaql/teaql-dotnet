@@ -44,7 +44,7 @@ public class CheckerTests
             .Install(new RuntimeModule().Checker("School", checker))
             .WithDataService(provider);
         var service = context.RequireResource<IDataService>();
-        var request = new InsertMutationRequest(new InsertCommand("School"));
+        var request = new InsertMutationRequest(new InsertCommand("School"), "create school with checker validation");
 
         for (var attempt = 0; attempt < 2; attempt++)
         {
@@ -85,7 +85,7 @@ public class CheckerTests
 
         using (context.EnterGeneratedBootstrap("Platform", 1))
             await context.RequireResource<IDataService>()
-                .MutateAsync(new UpdateMutationRequest(command));
+                .MutateAsync(new UpdateMutationRequest(command, "reconcile generated constant"));
 
         var audit = Assert.Single(sink.Events);
         Assert.Equal("teaql-generated-bootstrap", audit["actor"]);
@@ -109,7 +109,7 @@ public class CheckerTests
         var command = new UpdateCommand("SchoolType", new Value.I64Value(1001))
             .Value("name", new Value.TextValue("PRIVATE-NAME-CANARY"));
         command.TraceChain.Add(new TraceNode("SchoolType", 1001, "rename PRIVATE-NAME-CANARY"));
-        await context.RequireResource<IDataService>().MutateAsync(new UpdateMutationRequest(command));
+        await context.RequireResource<IDataService>().MutateAsync(new UpdateMutationRequest(command, "rename PRIVATE-NAME-CANARY"));
         Assert.Equal("rename [REDACTED]", Assert.Single(sink.Events)["reason"]);
         Assert.Equal("PRIVATE-NAME-CANARY", command.Values["name"].TryText());
     }
@@ -128,7 +128,8 @@ public class CheckerTests
         command.TraceChain.Add(new TraceNode("SchoolType", 1001,
             "update 1001 OLD-VALUE-CANARY NEW-VALUE-CANARY GUARD-VALUE-CANARY"));
 
-        await context.RequireResource<IDataService>().MutateAsync(new UpdateMutationRequest(command));
+        await context.RequireResource<IDataService>().MutateAsync(new UpdateMutationRequest(command,
+            "update 1001 OLD-VALUE-CANARY NEW-VALUE-CANARY GUARD-VALUE-CANARY"));
 
         var audit = Assert.Single(sink.Events);
         Assert.Equal(1001L, audit["entityId"]);
@@ -153,14 +154,14 @@ public class CheckerTests
                 Entity = "SchoolType", Id = new Value.I64Value(1001), ExpectedVersionValue = 2
             }.Guard("code", new Value.TextValue("GUARD-VALUE-CANARY"));
             command.TraceChain.Add(new TraceNode("SchoolType", 1001, "recover 1001 GUARD-VALUE-CANARY"));
-            request = new RecoverMutationRequest(command);
+            request = new RecoverMutationRequest(command, "recover 1001 GUARD-VALUE-CANARY");
         }
         else
         {
             var command = new DeleteCommand("SchoolType", new Value.I64Value(1001))
                 .Guard("code", new Value.TextValue("GUARD-VALUE-CANARY"));
             command.TraceChain.Add(new TraceNode("SchoolType", 1001, "delete 1001 GUARD-VALUE-CANARY"));
-            request = new DeleteMutationRequest(command);
+            request = new DeleteMutationRequest(command, "delete 1001 GUARD-VALUE-CANARY");
         }
 
         await context.RequireResource<IDataService>().MutateAsync(request);
@@ -179,7 +180,7 @@ public class CheckerTests
         command.TraceChain.Add(new TraceNode("School", null, "create school"));
 
         var result = await context.RequireResource<IDataService>()
-            .MutateAsync(new InsertMutationRequest(command));
+            .MutateAsync(new InsertMutationRequest(command, "create school"));
 
         Assert.Equal(1ul, result.AffectedRows);
         Assert.Equal(1, provider.MutationCalls);

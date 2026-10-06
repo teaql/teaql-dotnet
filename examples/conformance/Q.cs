@@ -1,3 +1,4 @@
+using Generated.Models;
 using Generated.Requests;
 
 namespace Generated

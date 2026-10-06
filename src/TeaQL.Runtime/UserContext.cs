@@ -30,11 +30,7 @@ public class UserContext
     private readonly ConcurrentDictionary<string, IEntityChecker> _checkers = new();
     private readonly MutationPolicyRuntimeState _mutationPolicy = new();
     private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
-    private sealed class GraphSaveSession { }
-    private readonly AsyncLocal<GraphSaveSession?> _ambientGraphSave = new();
-    private GraphSaveSession? _activeGraphSave;
-    private List<Action> _graphCommitActions = new();
-    private List<Action> _graphRollbackActions = new();
+    private GraphMutationSession? _activeGraphSave;
     private DateTimeOffset? _graphFixTime;
     private IBusinessClock _businessClock = SystemBusinessClock.Instance;
     private List<FixEvidence> _currentFixEvidence = new();
@@ -205,72 +201,58 @@ public class UserContext
         return claims;
     }
 
-    public async Task<T> ExecuteGraphSaveAsync<T>(Func<Task<T>> work)
+    public async Task<T> ExecuteGraphSaveAsync<T>(string comment, Func<GraphMutationSession, Task<T>> work)
     {
-        if (_ambientGraphSave.Value != null && ReferenceEquals(_ambientGraphSave.Value, _activeGraphSave))
-            return await work().ConfigureAwait(false);
+        var intent = new MutationIntent(comment); // Must precede callbacks and transaction allocation.
         await _graphSaveGate.WaitAsync().ConfigureAwait(false);
-        var original = RequireResource<IDataService>();
         ITransaction? transaction = null;
-        var session = new GraphSaveSession();
+        GraphMutationSession? session = null;
         try
         {
             transaction = await RequireResource<ITransactionExecutor>()
                 .BeginTransactionAsync().ConfigureAwait(false);
+            session = new GraphMutationSession(this, transaction, intent);
             _activeGraphSave = session;
-            _ambientGraphSave.Value = session;
-            _mutationPolicy.BeginGraph();
+            _mutationPolicy.BeginGraph(intent.Comment);
             _graphFixTime = BusinessTime;
             _currentFixEvidence = new List<FixEvidence>();
-            _graphCommitActions = new List<Action>();
-            _graphRollbackActions = new List<Action>();
-            InsertResource<IDataService>(new RuntimeDataService(transaction, this));
             T result;
             try
             {
-                result = await work().ConfigureAwait(false);
+                result = await work(session).ConfigureAwait(false);
                 await transaction.CommitAsync().ConfigureAwait(false);
             }
             catch
             {
                 try { await transaction.RollbackAsync().ConfigureAwait(false); }
-                finally
-                {
-                    for (var index = _graphRollbackActions.Count - 1; index >= 0; index--)
-                        _graphRollbackActions[index]();
-                }
+                finally { session.Restore(); }
                 throw;
             }
-            foreach (var action in _graphCommitActions) action();
+            await session.CompleteAsync().ConfigureAwait(false);
             return result;
         }
         finally
         {
             _lastFixEvidence = _currentFixEvidence.AsReadOnly();
-            InsertResource<IDataService>(original);
-            _ambientGraphSave.Value = null;
+            session?.Close();
             _activeGraphSave = null;
             _mutationPolicy.EndGraph();
             _graphFixTime = null;
-            _graphCommitActions = new List<Action>();
-            _graphRollbackActions = new List<Action>();
             transaction?.Dispose();
             _graphSaveGate.Release();
         }
     }
 
-    public void AfterGraphCommit(Action action)
+    internal void ValidateGraphMutation(MutationRequest request, GraphMutationSession? owner)
     {
-        if (_ambientGraphSave.Value == null || !ReferenceEquals(_ambientGraphSave.Value, _activeGraphSave))
-            throw new InvalidOperationException("No graph save is active");
-        _graphCommitActions.Add(action);
-    }
-
-    public void AfterGraphRollback(Action action)
-    {
-        if (_ambientGraphSave.Value == null || !ReferenceEquals(_ambientGraphSave.Value, _activeGraphSave))
-            throw new InvalidOperationException("No graph save is active");
-        _graphRollbackActions.Add(action);
+        if (owner != null)
+        {
+            owner.Validate(request);
+            if (!ReferenceEquals(owner, _activeGraphSave))
+                throw new InvalidOperationException("GRAPH_CAPABILITY_OWNER_MISMATCH");
+        }
+        else if (_activeGraphSave != null || request.GraphOwner != null)
+            throw new InvalidOperationException("GRAPH_CAPABILITY_REQUIRED");
     }
 
     public UserContext WithIdSetStore(IIdSetStore store)
@@ -401,13 +383,19 @@ public class UserContext
     /// every entity query before any provider can observe it.
     /// </summary>
     public SelectQuery ApplyRequestPolicy(SelectQuery query)
+        => PrepareQueryRequest(new QueryRequest(query)).Query;
+
+    /// <summary>Freeze root intent before customer Policy, including replacements.</summary>
+    public QueryRequest PrepareQueryRequest(QueryRequest request)
     {
-        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(request);
         var policy = GetResource<IRequestPolicy>();
-        var clone = CloneQueryTree(query,
+        var clone = CloneQueryTree(request.Query,
             new Dictionary<SelectQuery, SelectQuery>(ReferenceEqualityComparer.Instance));
-        return policy == null ? clone : ApplyRequestPolicyTree(clone, policy,
+        var authorized = policy == null ? clone : ApplyRequestPolicyTree(clone, policy,
             new Dictionary<SelectQuery, SelectQuery>(ReferenceEqualityComparer.Instance));
+        authorized.Comment(request.Comment).Purpose(request.Purpose);
+        return request.WithQuery(authorized);
     }
 
     private static SelectQuery ApplyRequestPolicyTree(SelectQuery query, IRequestPolicy policy,
@@ -534,7 +522,7 @@ public class UserContext
     }
 
     /// <summary>Generated graph infrastructure validates/fixes every node before its first provider mutation.</summary>
-    public void PreflightMutation(MutationRequest request)
+    internal void PreflightMutation(MutationRequest request)
     {
         CheckAndFix(request);
         _mutationPolicy.RecordPreflight(request);

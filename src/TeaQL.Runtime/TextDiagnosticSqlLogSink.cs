@@ -26,7 +26,7 @@ public sealed class TextDiagnosticSqlLogSink : IDiagnosticSqlLogSink
         lock (_gate)
         {
             _writer.WriteLine($"[TeaQL SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us] {summary} outcome={metadata.ExecutionOutcome ?? "unknown"} parameterCount={metadata.ParameterCount}");
-            _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)}");
+            _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)} mutationLineage={string.Join(" -> ", metadata.MutationLineage)}");
             _writer.WriteLine($"SQL: {metadata.DebugQuery}");
         }
     }
@@ -47,7 +47,7 @@ public sealed class SensitiveDiagnosticSqlLogSink : ISensitiveDiagnosticSqlLogSi
         lock (_gate)
         {
             _writer.WriteLine($"[TeaQL SENSITIVE SQL][{metadata.Operation.ToString().ToLowerInvariant()}][{elapsedMicros}us] outcome={metadata.ExecutionOutcome ?? "unknown"} parameterCount={metadata.ParameterCount}");
-            _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)}");
+            _writer.WriteLine($"comment={metadata.Comment} purpose={metadata.Purpose} auditReason={metadata.AuditReason} tracePath={string.Join(" -> ", metadata.TraceChain)} mutationLineage={string.Join(" -> ", metadata.MutationLineage)}");
             _writer.WriteLine($"Debug SQL: {metadata.DebugQuery}");
         }
     }

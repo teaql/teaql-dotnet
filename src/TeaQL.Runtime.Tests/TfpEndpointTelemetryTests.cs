@@ -8,6 +8,7 @@ using OpenTelemetry.Trace;
 
 namespace TeaQL.Runtime.Tests;
 
+[Collection("Runtime telemetry SDK")]
 public class TfpEndpointTelemetryTests
 {
     [Fact]

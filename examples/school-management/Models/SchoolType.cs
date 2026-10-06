@@ -6,6 +6,7 @@ using TeaQL.Core;
 
 namespace Generated.Models
 {
+
     public class SchoolType
     {
         private static long _teaqlTemporaryId;
@@ -14,7 +15,16 @@ namespace Generated.Models
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("SchoolType", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
-        internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; } foreach (var child in SchoolList) child.AttachRoot(root); }
+        internal void AttachRoot(EntityRoot root, bool hydration = false)
+        {
+            var key = TeaqlEntityKey();
+            if (!ReferenceEquals(root, _entityRoot) && (hydration || _entityRoot.HasPending(key)))
+            {
+                root.MergeEntityFrom(_entityRoot, key);
+                _entityRoot = root;
+            }
+            foreach (var child in SchoolList) child.AttachRoot(root, hydration);
+        }
         private static Value TeaqlValue(object? value) => value switch {
             null => new Value.NullValue(), string v => new Value.TextValue(v), bool v => new Value.BoolValue(v),
             double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.TimestampValue(new DateTimeOffset(v).ToUnixTimeMilliseconds()), TimeSpan v => new Value.TimeValue(v),
@@ -22,6 +32,8 @@ namespace Generated.Models
         };
         private static DateTime TeaqlDateTime(Value value) => value switch {
             Value.TimestampValue v => DateTimeOffset.FromUnixTimeMilliseconds(v.Milliseconds).UtcDateTime,
+            Value.I64Value v => DateTimeOffset.FromUnixTimeMilliseconds(v.Value).UtcDateTime,
+            Value.U64Value v => DateTimeOffset.FromUnixTimeMilliseconds(checked((long)v.Value)).UtcDateTime,
             Value.DateTimeValue v => v.Value,
             Value.DateValue v => v.Value,
             _ => Convert.ToDateTime(value.Raw)
@@ -71,7 +83,7 @@ namespace Generated.Models
 
         public SchoolType AuditAs(string comment)
         {
-            _comment = comment;
+            _comment = new MutationIntent(comment).Comment;
             return this;
         }
 
@@ -84,12 +96,16 @@ namespace Generated.Models
 
         public static SchoolType Refer(long id)
         {
-            return new SchoolType { Id = id }.MarkLoadedOnly("Id");
+            var entity = new SchoolType();
+            entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
+            entity.Id = id;
+            return entity.MarkLoadedOnly("Id");
         }
 
         public static SchoolType FromRecord(Record record)
         {
             var entity = new SchoolType().MarkLoadedOnly();
+            entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("Platform", out var platformValue)
                         || record.TryGetValue("platform", out platformValue))
                     {
@@ -146,9 +162,9 @@ namespace Generated.Models
                         if (record.TryGetValue("SchoolList", out var schoolListValue))
                         {
                             entity.MarkLoaded("SchoolList");
-                            var rows = schoolListValue.Raw as IEnumerable<Record>;
-                            if (rows != null)
-                                foreach (var row in rows) entity.SchoolList.Add(global::Generated.Models.School.FromRecord(row));
+                            if (schoolListValue is Value.ListValue rows)
+                                foreach (var row in rows.Values.OfType<Value.ObjectValue>())
+                                    entity.SchoolList.Add(global::Generated.Models.School.FromRecord(row.Value));
                         }
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -159,24 +175,28 @@ namespace Generated.Models
         internal static SchoolType FromRecord(Record record, EntityRoot root)
         {
             var entity = FromRecord(record);
-            entity.AttachRoot(root);
+            entity.AttachRoot(root, hydration: true);
             return entity;
         }
 
         public async Task<SchoolType> SaveAsync(UserContext context)
         {
-            return await context.ExecuteGraphSaveAsync(async () =>
+            var intent = new MutationIntent(_comment);
+            return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
-                TeaqlPreflightGraph(context);
-                return await TeaqlSaveWithinGraphAsync(context);
+                if (!Id.HasValue || _teaqlForceCreate)
+                {
+                }
+                TeaqlPreflightGraph(context, graph);
+                return await TeaqlSaveWithinGraphAsync(context, graph);
             });
         }
 
-        internal void TeaqlPreflightGraph(UserContext context)
+        internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
-            if (string.IsNullOrWhiteSpace(_comment))
-                throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
             var creating = !Id.HasValue || _teaqlForceCreate;
+            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            {
             if (!creating && !_markedForDeletion)
             {
                 if (!IsLoaded("Platform"))
@@ -197,16 +217,17 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 ((UpdateCommand)command).Values = _entityRoot.Change(TeaqlEntityKey());
-                if (Version.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(Version.Value);
+                var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
+                if (originalVersion.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            context.PreflightMutation(TeaqlMutationRequest(command));
+            graph.Preflight(TeaqlMutationRequest(command, graph.Intent.Comment));
+            }
             for (var index = 0; index < SchoolList.Count; index++)
             {
                 var child = SchoolList[index];
                 child.AttachRoot(_entityRoot);
-                child.UpdateSchoolTypeId(Id ?? _ledgerId);
-                child.AuditAs(_comment!);
-                try { child.TeaqlPreflightGraph(context); }
+                if (child.SchoolType != (Id ?? _ledgerId)) child.UpdateSchoolTypeId(Id ?? _ledgerId);
+                try { child.TeaqlPreflightGraph(context, graph); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("school_list").Index(index);
@@ -216,8 +237,17 @@ namespace Generated.Models
             }
         }
 
-        internal async Task<SchoolType> TeaqlSaveWithinGraphAsync(UserContext context)
+        internal async Task<SchoolType> TeaqlSaveWithinGraphAsync(UserContext context,
+            GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
+            var creating = !this.Id.HasValue || _teaqlForceCreate;
+            if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
+            {
+                var cleanScope = graph.Scope("SchoolType",
+                    Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
+                await TeaqlSaveChildrenAsync(context, graph, cleanScope);
+                return this;
+            }
             var teaqlOriginalKey = TeaqlEntityKey();
             var teaqlOriginalLedgerId = _ledgerId;
             var teaqlOriginalMarkedForDeletion = _markedForDeletion;
@@ -230,7 +260,7 @@ namespace Generated.Models
             var teaqlOriginalCode = this.Code;
             var teaqlOriginalDisplayOrder = this.DisplayOrder;
             var teaqlOriginalVersion = this.Version;
-            context.AfterGraphRollback(() =>
+            graph.AfterRollback(() =>
             {
                 var currentKey = TeaqlEntityKey();
                 this.Platform = teaqlOriginalPlatform;
@@ -246,27 +276,31 @@ namespace Generated.Models
                 _loadedFields = teaqlOriginalLoadedFields;
                 _entityRoot.Rekey(currentKey, teaqlOriginalKey);
             });
-            context.AfterGraphCommit(() =>
+            graph.AfterCommit(() =>
             {
                 _entityRoot.ClearEntity(TeaqlEntityKey());
-                if (Version.HasValue) _entityRoot.SetOriginalVersion(TeaqlEntityKey(), Version.Value);
+                if (Version.HasValue) _entityRoot.AcceptCommittedVersion(TeaqlEntityKey(), Version.Value);
             });
-            if (string.IsNullOrWhiteSpace(_comment))
-            {
-                throw new Exception("Security audit failure: AuditAs() must be called before SaveAsync()");
-            }
-            var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
+            if (creating && !Id.HasValue)
+            {
+                var allocationKey = TeaqlEntityKey();
+                Id = checked((long)await graph.AllocateIdAsync("SchoolType"));
+                _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
+            }
+            var scope = graph.Scope("SchoolType",
+                Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
             var cmd = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand()
                 : (object)ToUpdateCommand();
             if (!creating && !_markedForDeletion) {
                 ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
-                if (Version.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(Version.Value);
+                var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
+                if (originalVersion.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            var req = TeaqlMutationRequest(cmd);
-            var mutationResult = await context.RequireResource<IDataService>().MutateAsync(req);
+            var req = TeaqlMutationRequest(cmd, graph.Intent.Comment);
+            var mutationResult = await graph.MutateAsync(req, scope);
             if (mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for SchoolType");
             var saved = FromRecord(mutationResult.PersistedRecord);
@@ -280,13 +314,18 @@ namespace Generated.Models
             _ledgerId = Id ?? _ledgerId;
             _teaqlForceCreate = false;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
+            await TeaqlSaveChildrenAsync(context, graph, scope);
+            return saved;
+        }
+
+        private async Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
+        {
             for (var index = 0; index < SchoolList.Count; index++)
             {
                 var child = SchoolList[index];
                 child.AttachRoot(_entityRoot);
-                child.UpdateSchoolTypeId(Id);
-                child.AuditAs(_comment!);
-                try { await child.TeaqlSaveWithinGraphAsync(context); }
+                if (child.SchoolType != Id) child.UpdateSchoolTypeId(Id);
+                try { await child.TeaqlSaveWithinGraphAsync(context, graph, scope); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("school_list").Index(index);
@@ -294,14 +333,14 @@ namespace Generated.Models
                         new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
                 }
             }
-            return saved;
+            await Task.CompletedTask;
         }
 
-        private MutationRequest TeaqlMutationRequest(object command) => command switch
+        private MutationRequest TeaqlMutationRequest(object command, string rootComment) => command switch
         {
-            InsertCommand insert => MutationRequest.Create(insert, _comment!, TeaqlEntityKey(), _entityRoot),
-            UpdateCommand update => MutationRequest.Create(update, _comment!, TeaqlEntityKey(), _entityRoot),
-            DeleteCommand delete => MutationRequest.Create(delete, _comment!, TeaqlEntityKey(), _entityRoot),
+            InsertCommand insert => MutationRequest.Create(insert, rootComment, TeaqlEntityKey(), _entityRoot),
+            UpdateCommand update => MutationRequest.Create(update, rootComment, TeaqlEntityKey(), _entityRoot),
+            DeleteCommand delete => MutationRequest.Create(delete, rootComment, TeaqlEntityKey(), _entityRoot),
             _ => throw new InvalidOperationException("Unsupported mutation command")
         };
 
@@ -340,7 +379,7 @@ namespace Generated.Models
             return new UpdateCommand { 
                 Entity = "SchoolType", 
                 Id = this.Id.HasValue ? new Value.I64Value(this.Id.Value) : throw new InvalidOperationException("Update requires a loaded id"),
-                ExpectedVersionValue = this.Version,
+                ExpectedVersionValue = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? this.Version,
                 Values = record 
             };
         }
@@ -352,7 +391,7 @@ namespace Generated.Models
             return new DeleteCommand {
                 Entity = "SchoolType",
                 Id = new Value.I64Value(Id.Value),
-                Version = new Value.I64Value(Version.Value)
+                Version = new Value.I64Value(_entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version.Value)
             };
         }
 

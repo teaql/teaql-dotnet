@@ -221,17 +221,6 @@ public abstract class SqlDialect
             sql += $" WHERE {string.Join(" AND ", whereParts)}";
         }
 
-        if (partitioned)
-        {
-            var rank = QuoteIdent("__teaql_partition_rank");
-            var predicates = new List<string> { $"{rank} > {query.Slice!.Offset}" };
-            if (query.Slice.Limit.HasValue)
-            {
-                predicates.Add($"{rank} <= {query.Slice.Offset + query.Slice.Limit.Value}");
-            }
-            return $"SELECT * FROM ({sql}) AS {QuoteIdent("__teaql_partitioned")} WHERE {string.Join(" AND ", predicates)} ORDER BY {rank}";
-        }
-
         if (query.GroupByItems != null && query.GroupByItems.Count > 0)
         {
             var groupBy = string.Join(", ", query.GroupByItems.Select(field => ColumnSql(entity, field)));
@@ -242,6 +231,19 @@ public abstract class SqlDialect
         {
             var havingSql = CompileExpr(entity, query.HavingCondition, paramsList);
             sql += $" HAVING {havingSql}";
+        }
+
+        // Window ranking applies to the grouped/filtered result. Returning the
+        // wrapper earlier silently discards GROUP BY and HAVING on aggregates.
+        if (partitioned)
+        {
+            var rank = QuoteIdent("__teaql_partition_rank");
+            var predicates = new List<string> { $"{rank} > {query.Slice!.Offset}" };
+            if (query.Slice.Limit.HasValue)
+            {
+                predicates.Add($"{rank} <= {query.Slice.Offset + query.Slice.Limit.Value}");
+            }
+            return $"SELECT * FROM ({sql}) AS {QuoteIdent("__teaql_partitioned")} WHERE {string.Join(" AND ", predicates)} ORDER BY {rank}";
         }
 
         if (query.OrderByItems != null && query.OrderByItems.Count > 0)
@@ -608,9 +610,20 @@ public abstract class SqlDialect
         }
 
         var parts = new List<string>();
-        if (query.Projection != null)
+        var projectedFields = new List<string>(query.Projection ?? new List<string>());
+        // A requested relationship needs its real membership key. An omitted
+        // FK must never be mistaken for a loaded SQL NULL; do not mutate the query.
+        if (query.GroupByItems.Count == 0)
         {
-            foreach (var field in query.Projection)
+            var relationNames = query.Relations.Select(load => load.Name)
+                .Concat(query.RelationAggregates.Select(aggregate => aggregate.RelationName));
+            foreach (var name in relationNames)
+                if (entity.RelationByName(name) is { } relation && !projectedFields.Contains(relation.LocalKeyValue))
+                    projectedFields.Add(relation.LocalKeyValue);
+        }
+        if (projectedFields.Count > 0)
+        {
+            foreach (var field in projectedFields)
             {
                 var property = entity.Properties.FirstOrDefault(p => p.Name == field)
                     ?? throw SqlCompileException.UnknownField(field);
@@ -744,6 +757,12 @@ public abstract class SqlDialect
 
     private string CompileBinaryExpr(EntityDescriptor entity, Expr.BinaryExpr bin, List<Value> paramsList)
     {
+        // Only helper-owned LIKE lowering can prove an original operand. A raw
+        // LIKE pattern or a caller-rewritten binding must never be stripped.
+        if (bin.Op is BinaryOp.Like or BinaryOp.NotLike
+            && bin.Right is Expr.ValueExpr { LikeOperand: { } source } value
+            && value.NodeValue == source.Binding)
+            SqlLogBindings.AddIntentOperand(paramsList, source.Operand);
         if (bin.Op is BinaryOp.In or BinaryOp.NotIn or BinaryOp.InLarge or BinaryOp.NotInLarge)
         {
             return CompileIn(entity, bin.Left, bin.Op, bin.Right, paramsList);

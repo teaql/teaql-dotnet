@@ -31,7 +31,8 @@ namespace TeaQL.Sql.Tests
         [Fact]
         public async Task QueryAsync_Throws_WhenDialectThrows()
         {
-            var req = new QueryRequest { Query = new SelectQuery { Entity = "TestEntity" } };
+            var req = new QueryRequest(new SelectQuery("TestEntity"),
+                new QueryIntent("load fixture rows", "verify dialect failure diagnosis"));
             var ed = new EntityDescriptor { Name = "TestEntity" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
@@ -43,7 +44,8 @@ namespace TeaQL.Sql.Tests
         [Fact]
         public async Task QueryAsync_Throws_WhenTransportThrows()
         {
-            var req = new QueryRequest { Query = new SelectQuery { Entity = "TestEntity" } };
+            var req = new QueryRequest(new SelectQuery("TestEntity"),
+                new QueryIntent("load fixture rows", "verify transport failure diagnosis"));
             var ed = new EntityDescriptor { Name = "TestEntity" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
@@ -59,9 +61,9 @@ namespace TeaQL.Sql.Tests
         public async Task MutateAsync_Batch_CallsSubRequests()
         {
             var insertCmd = new InsertCommand { Entity = "TestEntity" };
-            var req1 = new InsertMutationRequest(insertCmd);
-            var req2 = new InsertMutationRequest(insertCmd);
-            var batchReq = new BatchMutationRequest(new List<MutationRequest> { req1, req2 });
+            var req1 = new InsertMutationRequest(insertCmd, "create first fixture");
+            var req2 = new InsertMutationRequest(insertCmd, "create second fixture");
+            var batchReq = new BatchMutationRequest(new List<MutationRequest> { req1, req2 }, "create fixture batch");
 
             var ed = new EntityDescriptor { Name = "TestEntity" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
@@ -79,12 +81,15 @@ namespace TeaQL.Sql.Tests
         [Fact]
         public async Task QueryStreamAsync_Throws_WhenTransportThrows()
         {
-            var req = new QueryRequest { Query = new SelectQuery { Entity = "TestEntity" } };
+            var req = new QueryRequest(new SelectQuery("TestEntity"),
+                new QueryIntent("stream fixture rows", "verify stream transport failure diagnosis"));
             var ed = new EntityDescriptor { Name = "TestEntity" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
             var compiled = new CompiledQuery("SELECT 1", new List<Value>());
-            _mockDialect.Setup(d => d.CompileSelect(ed, req.Query)).Returns(compiled);
+            _mockDialect.Setup(d => d.CompileSelect(ed, It.Is<SelectQuery>(query =>
+                query.Entity == "TestEntity" && query.Slice != null && query.Slice.Limit == SelectQuery.DefaultHardLimit
+                && !ReferenceEquals(query, req.Query)))).Returns(compiled);
 
             _mockStreamingTransport.Setup(t => t.StreamSqlAsync(compiled, default)).Returns(ThrowingRows());
 

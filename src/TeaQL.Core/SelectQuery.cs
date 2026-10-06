@@ -434,39 +434,30 @@ public record SelectQuery
     public SelectQuery TopNProbeParentThreshold(int threshold) =>
         TopNProbeParentThreshold(checked((ulong)threshold));
 
-    public SelectQuery CloneForExecution()
+    public SelectQuery CloneForExecution() => new QuerySnapshot().Query(this);
+
+    // Runtime-owned diagnostic provenance, not a wire field or application API.
+    // The snapshot is inaccessible to callers and is never used as executable SQL.
+    private SelectQuery? diagnosticOrigin;
+    internal SelectQuery? DiagnosticOrigin => diagnosticOrigin;
+
+    /// <summary>Count matching entities, independent of page size and loaded relations.</summary>
+    public SelectQuery ForExactCount()
     {
-        return new SelectQuery(Entity)
-        {
-            HardLimitValue = HardLimitValue,
-            Projection = new List<string>(Projection),
-            ExprProjection = new List<NamedExpr>(ExprProjection),
-            SearchText = SearchText,
-            FilterCondition = FilterCondition,
-            HavingCondition = HavingCondition,
-            OrderByItems = new List<OrderBy>(OrderByItems),
-            Slice = Slice,
-            PartitionBy = PartitionBy,
-            AggregateItems = new List<Aggregate>(AggregateItems),
-            GroupByItems = new List<string>(GroupByItems),
-            RelationLoads = new List<RelationLoad>(RelationLoads),
-            RelationAggregates = new List<RelationAggregate>(RelationAggregates),
-            AggregationCache = AggregationCache,
-            CommentText = CommentText,
-            TraceChain = new List<TraceNode>(TraceChain),
-            RawSqlText = RawSqlText,
-            RawSqlSearchCriteriaItems = new List<string>(RawSqlSearchCriteriaItems),
-            DynamicProperties = new List<RawSqlProjection>(DynamicProperties),
-            RawProjections = new List<RawSqlProjection>(RawProjections),
-            ObjectGroupBys = new List<ObjectGroupBy>(ObjectGroupBys),
-            ChildEnhancements = new List<SelectQuery>(ChildEnhancements),
-            StreamConfig = StreamConfig,
-            IdSetPagination = IdSetPagination,
-            TopNProbeThreshold = TopNProbeThreshold,
-            Filters = new List<FilterExpression>(Filters),
-            Facets = new List<FacetRequest>(Facets),
-            PurposeText = PurposeText
-        };
+        if (RawSqlText != null || GroupByItems.Count != 0 || AggregateItems.Count != 0 || HavingCondition != null)
+            throw new NotSupportedException("Exact entity count requires an entity query, not raw SQL or grouped aggregates");
+        var source = CloneForExecution();
+        var count = source.CloneForExecution();
+        count.diagnosticOrigin = source.diagnosticOrigin ?? source;
+        count.Projection.Clear(); count.ExprProjection.Clear();
+        count.RelationLoads.Clear(); count.RelationAggregates.Clear();
+        count.OrderByItems.Clear(); count.GroupByItems.Clear(); count.AggregateItems.Clear();
+        count.RawProjections.Clear(); count.DynamicProperties.Clear();
+        count.ChildEnhancements.Clear(); count.ObjectGroupBys.Clear(); count.Facets.Clear();
+        count.Slice = null; count.IdSetPagination = null; count.PartitionBy = null;
+        count.StreamConfig = null; count.AggregationCache = null;
+        count.AggregateItems.Add(Core.Aggregate.Count(RequestConstants.COUNT_ALIAS));
+        return count;
     }
 
     public SelectQuery Copy() => CloneForExecution();

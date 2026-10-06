@@ -44,7 +44,7 @@ var schoolInsert = new InsertCommand("School")
     .Value("version", new Value.I64Value(1));
 schoolInsert.TraceChain.Add(new TraceNode("School", null, "why: seed runtime log fixture")
     { Kind = "auditReason", Name = "School" });
-await service.MutateAsync(new InsertMutationRequest(schoolInsert));
+await service.MutateAsync(new InsertMutationRequest(schoolInsert, "why: seed runtime log fixture"));
 
 var studentInsert = new InsertCommand("Student")
     .Value("id", new Value.I64Value(10))
@@ -53,14 +53,13 @@ var studentInsert = new InsertCommand("Student")
     .Value("version", new Value.I64Value(1));
 studentInsert.TraceChain.Add(new TraceNode("Student", null, "why: seed related fixture")
     { Kind = "auditReason", Name = "Student" });
-await service.MutateAsync(new InsertMutationRequest(studentInsert));
+await service.MutateAsync(new InsertMutationRequest(studentInsert, "why: seed related fixture"));
 
 var query = new SelectQuery("School").Relation("students").Limit(10)
     .Comment("what: load schools and students")
     .Purpose("why: prove default multi-level relation logging");
-var result = await service.QueryAsync(new QueryRequest
+var result = await service.QueryAsync(new QueryRequest(query)
 {
-    Query = query,
     TraceChain = new List<TraceNode>
     {
         new("School", null, "students") { Kind = "relation", Name = "School.students" }
@@ -82,15 +81,13 @@ InsertMutationRequest PrivacyInsert(string name)
     var command = new InsertCommand("School").Value("id", 99L).Value("name", name).Value("version", 1L);
     command.TraceChain.Add(new TraceNode("School", null, "why: verify privacy persistence")
         { Kind = "auditReason", Name = "School" });
-    return new InsertMutationRequest(command);
+    return new InsertMutationRequest(command, "why: verify privacy persistence");
 }
 async Task VerifyPrivacyRow(string? name)
 {
-    var rows = (await service.QueryAsync(new QueryRequest
-    {
-        Query = new SelectQuery("School").Filter(Expr.Eq("id", new Value.I64Value(99))).Limit(1),
-        Comment = "what: read privacy fixture", Purpose = "why: verify original values"
-    })).Rows;
+    var rows = (await service.QueryAsync(new QueryRequest(
+        new SelectQuery("School").Filter(Expr.Eq("id", new Value.I64Value(99))).Limit(1),
+        new QueryIntent("what: read privacy fixture", "why: verify original values")))).Rows;
     if (name is null ? rows.Count != 0 : rows.Count != 1 || rows[0]["name"] != new Value.TextValue(name))
         throw new InvalidOperationException("privacy projection changed persistence");
 }
@@ -98,7 +95,7 @@ await service.MutateAsync(PrivacyInsert(markers[0]));
 await VerifyPrivacyRow(markers[0]);
 var privacyUpdate = new UpdateCommand("School", new Value.I64Value(99)).ExpectedVersion(1).Value("name", markers[1]);
 privacyUpdate.TraceChain.Add(new TraceNode("School", null, "why: update privacy fixture") { Kind = "auditReason", Name = "School" });
-await service.MutateAsync(new UpdateMutationRequest(privacyUpdate));
+await service.MutateAsync(new UpdateMutationRequest(privacyUpdate, "why: update privacy fixture"));
 await VerifyPrivacyRow(markers[1]);
 try
 {
@@ -109,7 +106,7 @@ catch (SqlExecutorException error) when (error.InnerException is SqliteException
 await VerifyPrivacyRow(markers[1]);
 var privacyDelete = new DeleteCommand("School", new Value.I64Value(99)).ExpectedVersion(2).HardDelete();
 privacyDelete.TraceChain.Add(new TraceNode("School", null, "why: delete privacy fixture") { Kind = "auditReason", Name = "School" });
-await service.MutateAsync(new DeleteMutationRequest(privacyDelete));
+await service.MutateAsync(new DeleteMutationRequest(privacyDelete, "why: delete privacy fixture"));
 await VerifyPrivacyRow(null);
 var privacyLog = File.ReadAllText(logPath) + captured.Text;
 if (captured.Count < 7 || privacyLog.Length == 0 || markers.Any(privacyLog.Contains))
@@ -127,13 +124,12 @@ foreach (var id in new[] { 20L, 21L })
         .Value("name", $"Public Student {id}").Value("password", "BATCH-PASSWORD-CANARY").Value("version", 1L);
     command.TraceChain.Add(new TraceNode("Student", null, "why: verify independent batch log")
         { Kind = "auditReason", Name = "Student" });
-    batchRequests.Add(new InsertMutationRequest(command));
+    batchRequests.Add(new InsertMutationRequest(command, "why: verify independent batch log"));
 }
-await service.MutateAsync(new BatchMutationRequest(batchRequests));
-var batchRows = (await service.QueryAsync(new QueryRequest {
-    Query = new SelectQuery("Student").Filter(Expr.Gte("id", 20L)).Limit(2),
-    Comment = "what: read batch rows", Purpose = "why: ensure log projection preserves credentials in storage"
-})).Rows;
+await service.MutateAsync(new BatchMutationRequest(batchRequests, "why: verify independent batch log"));
+var batchRows = (await service.QueryAsync(new QueryRequest(
+    new SelectQuery("Student").Filter(Expr.Gte("id", 20L)).Limit(2),
+    new QueryIntent("what: read batch rows", "why: ensure log projection preserves credentials in storage")))).Rows;
 if (batchRows.Count != 2 || batchRows.Any(row => row["password"].TryText() != "BATCH-PASSWORD-CANARY"))
     throw new InvalidOperationException("batch logging changed driver data");
 var batchLog = File.ReadAllText(logPath) + captured.Text;
@@ -152,25 +148,31 @@ foreach (var id in new[] { 30L, 20L, 31L })
         .Value("name", $"Partial Student {id}").Value("password", "PARTIAL-PASSWORD-CANARY").Value("version", 1L);
     command.TraceChain.Add(new TraceNode("Student", null, "why: verify partial batch rollback")
         { Kind = "auditReason", Name = "Student" });
-    partialRequests.Add(new InsertMutationRequest(command));
+    partialRequests.Add(new InsertMutationRequest(command, "why: verify partial batch rollback"));
 }
 try
 {
-    await service.MutateAsync(new BatchMutationRequest(partialRequests));
+    await service.MutateAsync(new BatchMutationRequest(partialRequests, "why: verify partial batch rollback"));
     throw new InvalidOperationException("partial batch unexpectedly succeeded");
 }
 catch (SqlExecutorException error) when (error.InnerException is SqliteException { SqliteErrorCode: 19 }) { }
 var partialLog = File.ReadAllText(logPath)[partialStart..];
-if (partialLog.Split("[TeaQL SQL]").Length - 1 != 2
+var partialStatements = partialLog.Split('\n').Where(line => line.StartsWith("[TeaQL SQL]", StringComparison.Ordinal)).ToArray();
+// INSERT success, its authoritative SELECT success, then failed INSERT.
+if (partialStatements.Length != 3
+    || !partialStatements[0].StartsWith("[TeaQL SQL][insert]", StringComparison.Ordinal)
+    || !partialStatements[1].StartsWith("[TeaQL SQL][query]", StringComparison.Ordinal)
+    || !partialStatements[1].Contains("outcome=success")
+    || !partialStatements[2].StartsWith("[TeaQL SQL][insert]", StringComparison.Ordinal)
+    || !partialStatements[2].Contains("outcome=failure")
     || !partialLog.Contains("outcome=success") || !partialLog.Contains("outcome=failure")
     || partialLog.IndexOf("outcome=success", StringComparison.Ordinal) > partialLog.IndexOf("outcome=failure", StringComparison.Ordinal)
     || !partialLog.Contains("Partial Student 30") || !partialLog.Contains("Partial Student 20")
     || partialLog.Contains("Partial Student 31") || partialLog.Contains("PARTIAL-PASSWORD-CANARY"))
     throw new InvalidOperationException("partial batch diagnostics lost statement order, scope, or masking");
-var rolledBackRows = await service.QueryAsync(new QueryRequest {
-    Query = new SelectQuery("Student").Filter(Expr.Gte("id", 30L)).Limit(2),
-    Comment = "what: inspect partial batch rows", Purpose = "why: distinguish SQL success from transaction commit"
-});
+var rolledBackRows = await service.QueryAsync(new QueryRequest(
+    new SelectQuery("Student").Filter(Expr.Gte("id", 30L)).Limit(2),
+    new QueryIntent("what: inspect partial batch rows", "why: distinguish SQL success from transaction commit")));
 if (rolledBackRows.Rows.Count != 0)
     throw new InvalidOperationException("partial batch did not roll back");
 Console.WriteLine("PASS .NET partial SQLite batch reports executed SQL without claiming commit");
@@ -197,7 +199,7 @@ try
         { Kind = "auditReason", Name = "School" });
     try
     {
-        await service.MutateAsync(new InsertMutationRequest(command));
+        await service.MutateAsync(new InsertMutationRequest(command, "why: verify READBACK-PRIVATE-CANARY authoritative snapshot"));
         throw new InvalidOperationException("missing authoritative snapshot unexpectedly accepted");
     }
     catch (SqlExecutorException error) when (error.Message.StartsWith("Authoritative persisted row not found", StringComparison.Ordinal)) { }
@@ -230,10 +232,9 @@ if (readbackLog.Split("[TeaQL SQL]").Length - 1 != 2
     || !readbackLog.Contains("0 rows returned outcome=success")
     || readbackLog.Contains("outcome=failure") || readbackLog.Contains("READBACK-PRIVATE-CANARY"))
     throw new InvalidOperationException("readback diagnostic confused SQL success with snapshot validity or leaked inherited intent");
-var afterReadback = await service.QueryAsync(new QueryRequest {
-    Query = new SelectQuery("School").Filter(Expr.Eq("id", 777L)).Limit(1),
-    Comment = "what: inspect readback probe", Purpose = "why: verify failed mutation is not persisted"
-});
+var afterReadback = await service.QueryAsync(new QueryRequest(
+    new SelectQuery("School").Filter(Expr.Eq("id", 777L)).Limit(1),
+    new QueryIntent("what: inspect readback probe", "why: verify failed mutation is not persisted")));
 if (afterReadback.Rows.Count != 0)
     throw new InvalidOperationException("failed readback mutation was committed");
 Console.WriteLine("PASS .NET SQLite readback reports write success and zero-row query without exposing inherited intent");
@@ -242,10 +243,9 @@ Console.WriteLine("PASS .NET SQLite readback reports write success and zero-row 
 // projection policy as ordinary queries, including file and custom sinks.
 var streamLogStart = File.ReadAllText(logPath).Length;
 var delivered = 0;
-await foreach (var chunk in ((IStreamQueryExecutor)service).QueryStreamAsync(new QueryRequest {
-    Query = new SelectQuery("School").Filter(Expr.Eq("name", "Runtime School")).Limit(3),
-    Comment = "what: stream schools", Purpose = "why: verify early disposal diagnostics"
-}, 1))
+await foreach (var chunk in ((IStreamQueryExecutor)service).QueryStreamAsync(new QueryRequest(
+    new SelectQuery("School").Filter(Expr.Eq("name", "Runtime School")).Limit(3),
+    new QueryIntent("what: stream schools", "why: verify early disposal diagnostics")), 1))
 {
     if (chunk.Rows[0]["name"].TryText() != "Runtime School")
         throw new InvalidOperationException("stream changed original data");
@@ -257,10 +257,9 @@ if (delivered != 1 || !streamLog.Contains("outcome=cancelled") || !streamLog.Con
     || !streamLog.Contains("Ru**********ol") || streamLog.Contains("Runtime School"))
     throw new InvalidOperationException("missing or unsafe stream terminal diagnostic");
 // Reuse the same SQLite connection after cursor disposal.
-var afterStream = await service.QueryAsync(new QueryRequest {
-    Query = new SelectQuery("School").Filter(Expr.Eq("id", 1L)).Limit(1),
-    Comment = "what: inspect school after stream", Purpose = "why: verify connection remains usable"
-});
+var afterStream = await service.QueryAsync(new QueryRequest(
+    new SelectQuery("School").Filter(Expr.Eq("id", 1L)).Limit(1),
+    new QueryIntent("what: inspect school after stream", "why: verify connection remains usable")));
 if (afterStream.Rows.Count != 1 || !File.ReadAllText(logPath).Contains("outcome=failure"))
     throw new InvalidOperationException("missing SQLite failure evidence or unusable connection");
 Console.WriteLine("PASS .NET real SQLite stream disposal and failure terminal diagnostics");

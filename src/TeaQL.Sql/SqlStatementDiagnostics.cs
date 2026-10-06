@@ -6,6 +6,49 @@ namespace TeaQL.Sql;
 
 internal static class SqlStatementDiagnostics
 {
+    // Parent SQL can finish before a descendant does. Capture declared child
+    // bindings/policies before emitting parent prose, without executing a query,
+    // changing caller builders, or sharing provenance through Context.
+    internal static ExecutionMetadata CaptureQueryIntent(SqlDialect dialect, ISchemaProvider schema,
+        QueryRequest request, CompiledQuery compiled)
+    {
+        var current = InheritedIntent(request, compiled);
+        var values = current.Parameters.ToList();
+        var policies = current.ParameterLogPolicies.ToList();
+        var pending = new Stack<(SelectQuery Query, string Entity)>();
+        var seen = new Dictionary<SelectQuery, HashSet<string>>(ReferenceEqualityComparer.Instance);
+        void Children(SelectQuery query, EntityDescriptor entity)
+        {
+            foreach (var load in query.RelationLoads)
+                if (load.Query != null && entity.RelationByName(load.Name) is { } relation)
+                    pending.Push((load.Query, relation.TargetEntity));
+            foreach (var aggregate in query.RelationAggregates)
+                if (entity.RelationByName(aggregate.RelationName) is { } relation)
+                    pending.Push((aggregate.Query, relation.TargetEntity));
+            foreach (var facet in query.Facets)
+                pending.Push((facet.Query, entity.RelationByName(facet.RelationName)?.TargetEntity ?? facet.Query.Entity));
+            foreach (var child in query.ChildEnhancements) pending.Push((child, child.Entity));
+            foreach (var group in query.ObjectGroupBys) pending.Push((group.Query, group.Query.Entity));
+            if (query.DiagnosticOrigin is { } origin) pending.Push((origin, origin.Entity));
+        }
+        if (schema.GetEntity(request.Query.Entity) is { } root) Children(request.Query, root);
+        while (pending.TryPop(out var item))
+        {
+            if (!seen.TryGetValue(item.Query, out var entities)) seen[item.Query] = entities = new();
+            if (!entities.Add(item.Entity)) continue;
+            var entity = schema.GetEntity(item.Entity) ?? throw new SqlExecutorException("Unknown relation entity");
+            var query = item.Query.CloneForExecution(); query.Entity = item.Entity;
+            // Collect binding policies only; never execute or add physical trace edges.
+            query.NormalizeGeneratedFilters();
+            var child = dialect.CompileSelect(entity, query);
+            var intent = InheritedIntent(new QueryRequest(query, request.Intent), child);
+            values.AddRange(intent.Parameters); policies.AddRange(intent.ParameterLogPolicies);
+            Children(item.Query, entity);
+        }
+        return new ExecutionMetadata { Parameters = values.ToArray(), ParameterLogPolicies = policies.ToArray(),
+            IntentValues = request.IntentSource?.IntentValues ?? Array.Empty<Value>(), GeneratedSql = true };
+    }
+
     // Flatten only binding provenance, not SQL or free-form intent. A grandchild
     // needs both its parent's and earlier ancestors' policies. No global cache.
     internal static ExecutionMetadata InheritedIntent(QueryRequest request, CompiledQuery compiled)
@@ -26,6 +69,13 @@ internal static class SqlStatementDiagnostics
         if (request.IntentSource is { } inherited)
             Append(inherited.Parameters, inherited.ParameterLogPolicies, inherited.GeneratedSql, inherited.ParameterizedQuery);
         Append(compiled.Params, compiled.ParameterLogPolicies, compiled.GeneratedSql, compiled.Sql);
+        // Extra original operands are intent provenance, never physical binds
+        // or serialized safe metadata. Retain their actual field policy.
+        foreach (var operand in compiled.IntentOperands)
+        {
+            values.Add(operand.Value);
+            policies.Add(operand.Policy);
+        }
         return new ExecutionMetadata { Parameters = values, ParameterLogPolicies = policies, GeneratedSql = true };
     }
 
@@ -58,6 +108,7 @@ internal static class SqlStatementDiagnostics
             IntentSource = query?.IntentSource,
             IntentValues = mutation == null ? Array.Empty<Value>() : MutationTargetIds(mutation, descriptor),
             Comment = query?.Comment ?? mutation?.Comment, Purpose = query?.Purpose, AuditReason = mutation?.Comment,
+            MutationLineage = mutation?.AuditLineage(entity) ?? Array.Empty<TraceNode>(),
             TraceChain = query != null ? SqlDataServiceTransaction.QueryTracePath(query, dialect.Kind.ToString())
                 : SqlDataServiceTransaction.MutationTracePath(mutation!, entity, operation, dialect.Kind.ToString())
         };
@@ -73,32 +124,57 @@ internal static class SqlStatementDiagnostics
             RecoverMutationRequest recover => recover.Command.Id,
             _ => null
         };
-        return target == null || target is Value.NullValue or Value.TypedNullValue ? Array.Empty<Value>() : [target];
+        return target == null || target is Value.NullValue or Value.TypedNullValue
+            ? request.InheritedIntentValues
+            : request.InheritedIntentValues.Concat(new[] { target }).ToArray();
     }
 
     private static void Record(object request, ExecutionMetadata metadata)
     {
         var observer = request is QueryRequest q ? q.DiagnosticObserver : ((MutationRequest)request).DiagnosticObserver;
+        if (observer == null) return;
+        metadata.DiagnosticReported = true;
         try { observer?.Invoke(metadata); }
         catch when (metadata.ExecutionOutcome != "success") {
             // A failing sink must not replace an in-flight provider failure/cancellation.
         }
     }
 
+    internal static void QuerySucceeded(QueryRequest request, ExecutionMetadata metadata)
+    {
+        try { Record(request, metadata); }
+        catch (Exception error) when (error is not OutOfMemoryException) { }
+    }
+
     internal static void Failure(SqlDialect dialect, object request, CompiledQuery compiled,
         DateTimeOffset start, Exception error, EntityDescriptor? descriptor = null) => Record(request, Metadata(dialect, request, compiled, start,
             error is OperationCanceledException ? "cancelled" : "failure", descriptor: descriptor));
 
-    internal static async IAsyncEnumerable<StreamChunk> Stream(SqlDialect dialect, ISqlTransport transport,
+    internal static IAsyncEnumerable<StreamChunk> Stream(SqlDialect dialect, ISqlTransport transport,
+        ISchemaProvider schema, QueryRequest request, int chunkSize, CancellationToken cancellationToken)
+    {
+        // Own input now, not when the caller eventually starts enumerating.
+        // The database cursor and physical SQL fact still start only on first poll.
+        var captured = request.WithQuery(request.Query);
+        return StreamCaptured(dialect, transport, schema, captured, chunkSize, cancellationToken);
+    }
+
+    private static async IAsyncEnumerable<StreamChunk> StreamCaptured(SqlDialect dialect, ISqlTransport transport,
         ISchemaProvider schema, QueryRequest request, int chunkSize,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
+        // Enumerating one cold stream twice must not share normalized AST/diagnostics.
+        request = request.WithQuery(request.Query);
         if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
-        if (request.Query.RelationLoads.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
+        if (request.Query.RelationLoads.Count != 0 || request.Query.RelationAggregates.Count != 0 ||
+            request.Query.Facets.Count != 0 || request.Query.ChildEnhancements.Count != 0 || request.Query.ObjectGroupBys.Count != 0)
             throw new NotSupportedException("streaming relation or aggregate enhancement is not supported; stream a root query or use ExecuteForListAsync");
         if (transport is not IStreamingSqlTransport streaming) throw new NotSupportedException("streaming query is not supported by this transport");
+        request.Query.NormalizeGeneratedFilters().PrepareForList();
         var entity = schema.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
         var compiled = dialect.CompileSelect(entity, request.Query);
+        if (request.DiagnosticObserver != null)
+            request.IntentSource = CaptureQueryIntent(dialect, schema, request, compiled);
         var start = DateTimeOffset.UtcNow;
         var outcome = "cancelled";
         int delivered = 0, index = 0;

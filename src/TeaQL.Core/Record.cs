@@ -4,6 +4,10 @@ namespace TeaQL.Core;
 
 public class Record : Dictionary<string, Value>
 {
+    /// <summary>Query-only facet results for an already-loaded relation, never scalar write fields.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Dictionary<string, SmartList<Record>> QueryFacets { get; } = new();
+
     public Record() : base() { }
     public Record(IReadOnlyDictionary<string, Value> dictionary)
         : base(dictionary.ToDictionary(item => item.Key, item => item.Value)) { }

@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeaQL.Core\TeaQL.Core.csproj" />
+    <None Update="fixtures/sql-trace-path-v1.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

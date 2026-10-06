@@ -11,6 +11,7 @@ public static class SqlLogBindings
     private sealed class State
     {
         public readonly Dictionary<int, SqlParameterLogPolicy> Policies = new();
+        public readonly List<(Value Value, SqlParameterLogPolicy Policy)> IntentOperands = new();
         public SqlParameterLogPolicy? Scope;
         public bool Generated;
     }
@@ -26,6 +27,15 @@ public static class SqlLogBindings
     public static IReadOnlyList<SqlParameterLogPolicy> Policies(List<Value> values) =>
         Enumerable.Range(0, values.Count).Select(index => States.TryGetValue(values, out var state)
             && state.Policies.TryGetValue(index, out var policy) ? policy : SqlParameterLogPolicy.Unknown).ToArray();
+
+    internal static IReadOnlyList<(Value Value, SqlParameterLogPolicy Policy)> IntentOperands(List<Value> values) =>
+        States.TryGetValue(values, out var state) ? state.IntentOperands.ToArray() : [];
+
+    internal static void AddIntentOperand(List<Value> values, Value operand)
+    {
+        var state = States.GetOrCreateValue(values);
+        state.IntentOperands.Add((operand, state.Scope ?? SqlParameterLogPolicy.Unknown));
+    }
 
     public static void Add(List<Value> values, Value value, SqlParameterLogPolicy? policy = null)
     {

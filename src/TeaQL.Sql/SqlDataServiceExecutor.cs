@@ -74,6 +74,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
         }
 
+        if (request.DiagnosticObserver != null)
+            request.IntentSource = SqlStatementDiagnostics.CaptureQueryIntent(Dialect, SchemaProvider, request, compiled);
         var start = DateTimeOffset.UtcNow;
         List<Record> rows;
         try
@@ -86,30 +88,13 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
+        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
+        SqlStatementDiagnostics.QuerySucceeded(request, metadata);
+        request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
-        var end = DateTimeOffset.UtcNow;
 
-        var metadata = new ExecutionMetadata
-        {
-            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
-            Operation = DataServiceOperation.Query,
-            StartedAt = start,
-            EndedAt = end,
-            AffectedRows = null,
-            ResultCount = rows.Count,
-            ExecutionOutcome = "success",
-            TraceChain = SqlDataServiceTransaction.QueryTracePath(request, Dialect.Kind.ToString()),
-            Comment = request.Comment,
-            Purpose = request.Purpose,
-            IntentSource = request.IntentSource,
-            BackendRequestId = null,
-            ParameterizedQuery = compiled.Sql,
-            Parameters = compiled.Params.ToList(),
-            ParameterLogPolicies = compiled.ParameterLogPolicies,
-            GeneratedSql = compiled.GeneratedSql
-        };
-
-        return new QueryResult { Rows = rows, Metadata = metadata };
+        var facets = await FacetQueryLoader.LoadAsync(SchemaProvider, QueryAsync, request, compiled);
+        return new QueryResult { Rows = rows, Metadata = metadata, Facets = facets };
     }
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
@@ -207,6 +192,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             ExecutionOutcome = "success",
             ResultCount = null,
             TraceChain = SqlDataServiceTransaction.MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
+            MutationLineage = request.AuditLineage(entityName),
             Comment = request.Comment,
             AuditReason = request.Comment,
             BackendRequestId = null,
@@ -272,34 +258,55 @@ internal static class RelationQueryLoader
         var parentDescriptor = schemaProvider.GetEntity(request.Query.Entity)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {request.Query.Entity}");
         var inheritedIntent = SqlStatementDiagnostics.InheritedIntent(request, compiled);
+        var parentKeys = request.Query.RelationLoads
+            .Select(load => parentDescriptor.RelationByName(load.Name)?.LocalKeyValue)
+            .OfType<string>().Distinct()
+            .ToDictionary(field => field, field => SnapshotKeys(parents, field));
+        // Membership must consume scalar keys before a selected reference replaces
+        // the same field with its hydrated object.
+        await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor, inheritedIntent);
         foreach (var load in request.Query.RelationLoads)
         {
             var relation = parentDescriptor.RelationByName(load.Name)
                 ?? throw new SqlExecutorException($"SQL compile error: missing relation {request.Query.Entity}.{load.Name}");
-            var parentIds = parents
-                .Where(parent => parent.ContainsKey(relation.LocalKeyValue))
-                .Select(parent => parent[relation.LocalKeyValue])
-                .ToList();
-            if (parentIds.Count == 0)
-            {
-                Attach(parents, new List<Record>(), load.Name, relation);
-                continue;
-            }
+            var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity)
+                ?? throw new SqlExecutorException($"SQL compile error: unknown entity {relation.TargetEntity}");
+            var localKeys = parentKeys[relation.LocalKeyValue];
+            var parentIds = localKeys.OfType<Value>().Distinct().ToList();
             var childQuery = Clone(load.Query ?? new SelectQuery(relation.TargetEntity));
             childQuery.Entity = relation.TargetEntity;
+            if (parentIds.Count == 0 && childQuery.Facets.Count == 0)
+            {
+                Attach(parents, new List<Record>(), load.Name, relation, localKeys, Array.Empty<Value?>());
+                continue;
+            }
             if (!childQuery.Projection.Contains(relation.ForeignKeyValue))
             {
                 childQuery.Projection.Add(relation.ForeignKeyValue);
             }
             var limited = childQuery.Slice?.Limit is > 0;
-            if (limited && !childQuery.OrderByItems.Any(order => order.Field == "id"))
-                childQuery.OrderAsc("id");
+            if (limited)
+            {
+                // Aggregate rows have group identities, not source-row IDs.
+                IEnumerable<string> stableFields = childQuery.GroupByItems.Count > 0
+                    ? childQuery.GroupByItems
+                    : childQuery.AggregateItems.Count == 0 ? new[] { "id" } : Array.Empty<string>();
+                foreach (var field in stableFields)
+                    if (!childQuery.OrderByItems.Any(order => order.Field == field))
+                        childQuery.OrderAsc(field);
+            }
             var threshold = childQuery.TopNProbeThreshold;
-            var useProbes = limited &&
+            // A selected relation's facets belong to that parent's relation
+            // result, not to a combined batch of unrelated parents.
+            var useProbes = childQuery.Facets.Count > 0 || limited &&
                 ((dialect.RelationTopNPolicy == "always_probe" && threshold is null) ||
                  (threshold is > 0 && (ulong)parentIds.Count <= threshold));
             var selectedPlan = useProbes ? "bounded_probes" : limited ? "window" : "batch";
-            var probeCount = useProbes ? parentIds.Count : 0;
+            var probeKeys = parentIds.Cast<Value?>().ToList();
+            // A null key has no members, but requested include-all Facets still
+            // enumerate zero-count candidates. Never compare an orphan FK to NULL.
+            if (childQuery.Facets.Count > 0 && localKeys.Any(key => key == null)) probeKeys.Add(null);
+            var probeCount = useProbes ? probeKeys.Count : 0;
             if (!useProbes)
             {
                 childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
@@ -308,39 +315,38 @@ internal static class RelationQueryLoader
             async Task LoadAndAttach()
             {
                 var childRows = new List<Record>();
+                var childKeys = new List<Value?>();
+                var facetsByKey = new Dictionary<Value, Dictionary<string, SmartList<Record>>>();
+                Dictionary<string, SmartList<Record>>? emptyFacets = null;
                 var queries = useProbes
-                    ? parentIds.Select(parentId =>
+                    ? probeKeys.Select(parentId =>
                     {
                         var probe = Clone(childQuery);
                         probe.PartitionBy = null;
-                        probe.AndFilter(Expr.Eq(relation.ForeignKeyValue, parentId));
-                        return probe;
+                        probe.AndFilter(parentId == null ? Expr.Value(new Value.BoolValue(false))
+                            : Expr.Eq(relation.ForeignKeyValue, parentId));
+                        return (Key: parentId, Query: probe);
                     })
-                    : new[] { childQuery };
+                    : new[] { (Key: (Value?)null, Query: childQuery) };
                 foreach (var executionQuery in queries)
                 {
-                    var childResult = await queryAsync(new QueryRequest
-                    {
-                        Query = executionQuery,
-                        TraceChain = request.TraceChain.Concat(new[] {
-                            new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
-                                Level = request.TraceChain.Count, Kind = "relation",
-                                Name = $"{request.Query.Entity}.{load.Name}"
-                            }
-                        }).ToList(),
-                        Comment = request.Comment,
-                        Purpose = request.Purpose,
-                        IntentSource = inheritedIntent,
-                        RelationLoadObserver = request.RelationLoadObserver,
-                        DiagnosticObserver = request.DiagnosticObserver
-                    });
+                    var derived = request.Derive(executionQuery.Query, load.Name);
+                    derived.IntentSource = inheritedIntent;
+                    derived.CaptureRelationKeys = rows =>
+                        childKeys.AddRange(SnapshotKeys(rows, relation.ForeignKeyValue));
+                    var childResult = await queryAsync(derived);
+                    if (executionQuery.Key is { } key) facetsByKey[key] = childResult.Facets;
+                    else emptyFacets = childResult.Facets;
+                    foreach (var child in childResult.Rows)
+                        foreach (var facet in childResult.Facets)
+                            child.QueryFacets[facet.Key] = facet.Value;
                     childRows.AddRange(childResult.Rows);
                 }
                 foreach (var child in childRows)
                 {
                     child.Remove("__teaql_partition_rank");
                 }
-                Attach(parents, childRows, load.Name, relation);
+                Attach(parents, childRows, load.Name, relation, localKeys, childKeys, facetsByKey, emptyFacets);
             }
             if (request.RelationLoadObserver is { } observer)
                 await observer.ObserveAsync(request.Query.Entity, load.Name,
@@ -355,7 +361,6 @@ internal static class RelationQueryLoader
             else
                 await LoadAndAttach();
         }
-        await EnhanceAggregatesAsync(schemaProvider, queryAsync, parents, request, parentDescriptor, inheritedIntent);
     }
 
     private static async Task EnhanceAggregatesAsync(
@@ -392,21 +397,9 @@ internal static class RelationQueryLoader
             if (!childQuery.GroupByItems.Contains(relation.ForeignKeyValue))
                 childQuery.GroupByItems.Add(relation.ForeignKeyValue);
             childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
-            var result = await queryAsync(new QueryRequest
-            {
-                Query = childQuery,
-                TraceChain = request.TraceChain.Concat(new[] {
-                    new TraceNode(relation.TargetEntity, null, request.Comment ?? "") {
-                        Level = request.TraceChain.Count, Kind = "relation",
-                        Name = $"{request.Query.Entity}.{aggregate.RelationName}"
-                    }
-                }).ToList(),
-                Comment = request.Comment,
-                Purpose = request.Purpose,
-                IntentSource = inheritedIntent,
-                RelationLoadObserver = request.RelationLoadObserver,
-                DiagnosticObserver = request.DiagnosticObserver
-            });
+            var derived = request.Derive(childQuery, aggregate.RelationName);
+            derived.IntentSource = inheritedIntent;
+            var result = await queryAsync(derived);
             var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity);
             var foreignProperty = childDescriptor?.PropertyByName(relation.ForeignKeyValue);
             if (foreignProperty != null && foreignProperty.ColumnNameString != relation.ForeignKeyValue)
@@ -483,25 +476,47 @@ internal static class RelationQueryLoader
         ChildEnhancements = new List<SelectQuery>(query.ChildEnhancements)
     };
 
+    private static Value?[] SnapshotKeys(IReadOnlyList<Record> rows, string field) =>
+        // SQL NULL is absence of membership, not an identity shared by orphans.
+        rows.Select(row => row.TryGetValue(field, out var value)
+            && value is not Value.NullValue and not Value.TypedNullValue ? value : null).ToArray();
+
     private static void Attach(
         List<Record> parents,
         List<Record> children,
         string relationName,
-        RelationDescriptor relation)
+        RelationDescriptor relation,
+        IReadOnlyList<Value?> parentKeys,
+        IReadOnlyList<Value?> childKeys,
+        IReadOnlyDictionary<Value, Dictionary<string, SmartList<Record>>>? facetsByKey = null,
+        Dictionary<string, SmartList<Record>>? emptyFacets = null)
     {
+        if (parentKeys.Count != parents.Count || childKeys.Count != children.Count)
+            throw new SqlExecutorException("Relation assembly key count differs from row count");
         var buckets = children
-            .Where(child => child.ContainsKey(relation.ForeignKeyValue))
-            .GroupBy(child => child[relation.ForeignKeyValue])
-            .ToDictionary(group => group.Key, group => group.ToList());
-        foreach (var parent in parents)
+            .Select((child, index) => (Row: child, Key: childKeys[index]))
+            .Where(item => item.Key != null)
+            .GroupBy(item => item.Key!)
+            .ToDictionary(group => group.Key, group => group.Select(item => item.Row).ToList());
+        for (var index = 0; index < parents.Count; index++)
         {
-            var related = parent.TryGetValue(relation.LocalKeyValue, out var localKey)
+            var parent = parents[index];
+            var localKey = parentKeys[index];
+            var related = localKey != null
                 && buckets.TryGetValue(localKey, out var bucket)
                 ? bucket
                 : new List<Record>();
+            // List-compatible query carrier retains metadata even without a
+            // first row. Value/record serialization and scalar snapshots still
+            // copy only list elements, never Facets or mutation ownership.
+            var facets = localKey != null && facetsByKey != null && facetsByKey.TryGetValue(localKey, out var found)
+                ? found : localKey == null ? emptyFacets : null;
             parent[relationName] = relation.IsMany
-                ? new Value.ListValue(related.Select(row => (Value)new Value.ObjectValue(row)).ToList())
-                : related.Count > 0 ? new Value.ObjectValue(related[0]) : new Value.NullValue();
+                ? new Value.ListValue(new SmartList<Value>(related.Select(row => (Value)new Value.ObjectValue(row)))
+                    { Facets = facets ?? new() })
+                : related.Count > 0 ? new Value.ObjectValue(related[0])
+                : localKey != null ? new Value.ObjectValue(new Record { [relation.ForeignKeyValue] = localKey })
+                : new Value.NullValue(); // Only an actually NULL FK means a null relation.
         }
     }
 }
@@ -546,6 +561,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
         }
 
+        if (request.DiagnosticObserver != null)
+            request.IntentSource = SqlStatementDiagnostics.CaptureQueryIntent(Dialect, SchemaProvider, request, compiled);
         var start = DateTimeOffset.UtcNow;
         List<Record> rows;
         try
@@ -558,30 +575,13 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
+        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
+        SqlStatementDiagnostics.QuerySucceeded(request, metadata);
+        request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
-        var end = DateTimeOffset.UtcNow;
 
-        var metadata = new ExecutionMetadata
-        {
-            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
-            Operation = DataServiceOperation.Query,
-            StartedAt = start,
-            EndedAt = end,
-            AffectedRows = null,
-            ResultCount = rows.Count,
-            ExecutionOutcome = "success",
-            TraceChain = QueryTracePath(request, Dialect.Kind.ToString()),
-            Comment = request.Comment,
-            Purpose = request.Purpose,
-            IntentSource = request.IntentSource,
-            BackendRequestId = null,
-            ParameterizedQuery = compiled.Sql,
-            Parameters = compiled.Params.ToList(),
-            ParameterLogPolicies = compiled.ParameterLogPolicies,
-            GeneratedSql = compiled.GeneratedSql
-        };
-
-        return new QueryResult { Rows = rows, Metadata = metadata };
+        var facets = await FacetQueryLoader.LoadAsync(SchemaProvider, QueryAsync, request, compiled);
+        return new QueryResult { Rows = rows, Metadata = metadata, Facets = facets };
     }
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
@@ -662,6 +662,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             ExecutionOutcome = "success",
             ResultCount = null,
             TraceChain = MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
+            MutationLineage = request.AuditLineage(entityName),
             Comment = request.Comment,
             AuditReason = request.Comment,
             BackendRequestId = null,
@@ -685,8 +686,10 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         };
         if (affectedRows > 0 && !physicallyDeleted && entityId != null && entityDesc.IdProperty() is { } id)
         {
-            persistedRecord = await SqlMutationReadback.ExecuteAsync(Dialect, Transport, entityDesc,
+            var readback = await SqlMutationReadback.ExecuteAsync(Dialect, Transport, entityDesc,
                 new SelectQuery(entityName).Filter(Expr.Eq(id.Name, entityId)), request, metadata);
+            persistedRecord = readback.Row;
+            metadata = metadata.WithStatements(metadata, readback.Read);
         }
 
         return new MutationResult
@@ -730,27 +733,20 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
     internal static List<TraceNode> QueryTracePath(QueryRequest request, string provider)
     {
-        var result = new List<TraceNode> {
-            new(request.Query.Entity, null, request.Comment ?? "") { Level = 0, Kind = "operation", Name = "query" },
-            new(request.Query.Entity, null, request.Comment ?? "") { Level = 1, Kind = "request", Name = request.Query.Entity }
-        };
-        result.AddRange(request.TraceChain);
-        result.Add(new TraceNode(request.Query.Entity, null, "") { Level = result.Count, Kind = "provider", Name = provider.ToLowerInvariant() });
-        result.Add(new TraceNode(request.Query.Entity, null, "") { Level = result.Count, Kind = "sql", Name = "select" });
-        return result;
+        return SqlTraceChain.Canonical(request.TraceSource, provider.ToLowerInvariant(), "select").TracePath
+            .Select((node, level) => node with { Level = level }).ToList();
     }
 
     internal static List<TraceNode> MutationTracePath(
         MutationRequest request, string entityName, DataServiceOperation operation, string provider)
     {
-        var result = new List<TraceNode> {
-            new(entityName, null, request.Comment ?? "") { Level = 0, Kind = "operation", Name = "mutation" },
-            new(entityName, null, request.Comment ?? "") { Level = 1, Kind = "entity", Name = entityName }
-        };
-        result.AddRange(request.TraceChain);
-        result.Add(new TraceNode(entityName, null, "") { Level = result.Count, Kind = "provider", Name = provider.ToLowerInvariant() });
-        result.Add(new TraceNode(entityName, null, "") { Level = result.Count, Kind = "sql", Name = operation.ToString().ToLowerInvariant() });
-        return result;
+        // Per-entity graph lineage is a separate carrier, not a physical route.
+        var root = request.AuditLineage(entityName).FirstOrDefault()?.Name ?? entityName;
+        var source = new[] { new TraceNode(root, null, "") {
+            Kind = "auditReason", Detail = request.Comment },
+            new TraceNode(entityName, request.LedgerKey?.Id.TryU64(), "") { Kind = "entity" } };
+        return SqlTraceChain.Canonical(source, provider.ToLowerInvariant(), operation.ToString().ToLowerInvariant())
+            .TracePath.Select((node, level) => node with { Level = level }).ToList();
     }
 
     public void Dispose()

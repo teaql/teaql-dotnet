@@ -45,15 +45,14 @@ var allowed = new UserContext
     .WithAppAuditEventSink(audit)
     .WithDataService(allowedProvider);
 
-await allowed.ExecuteGraphSaveAsync(async () =>
+await allowed.ExecuteGraphSaveAsync("submit approved order graph", async graph =>
 {
     var order = Insert("Order", 42, "create approved order");
     var line = Insert("OrderLine", 99, "create approved order line");
-    allowed.PreflightMutation(order);
-    allowed.PreflightMutation(line);
-    var service = allowed.RequireResource<IDataService>();
-    await service.MutateAsync(order);
-    return await service.MutateAsync(line);
+    graph.Preflight(order);
+    graph.Preflight(line);
+    await graph.MutateAsync(order);
+    return await graph.MutateAsync(line);
 });
 
 Require(policy.LastOperationCount == 2, "policy did not receive the complete graph");
@@ -73,13 +72,13 @@ var denied = new UserContext()
     .WithDataService(deniedProvider);
 try
 {
-    await denied.ExecuteGraphSaveAsync(async () =>
+    await denied.ExecuteGraphSaveAsync("submit denied order graph", async graph =>
     {
         var order = Insert("Order", 43, "create denied order");
         var line = Insert("OrderLine", 100, "create denied order line");
-        denied.PreflightMutation(order);
-        denied.PreflightMutation(line);
-        return await denied.RequireResource<IDataService>().MutateAsync(order);
+        graph.Preflight(order);
+        graph.Preflight(line);
+        return await graph.MutateAsync(order);
     });
     throw new InvalidOperationException("denied mutation unexpectedly completed");
 }
@@ -98,8 +97,8 @@ var missingPreflight = new UserContext()
     .WithDataService(missingPreflightProvider);
 try
 {
-    await missingPreflight.ExecuteGraphSaveAsync(() =>
-        missingPreflight.RequireResource<IDataService>().MutateAsync(
+    await missingPreflight.ExecuteGraphSaveAsync("save order without preflight", graph =>
+        graph.MutateAsync(
             Insert("Order", 44, "missing graph preflight")));
     throw new InvalidOperationException("customer policy graph without preflight unexpectedly completed");
 }
@@ -115,13 +114,13 @@ var snapshotPolicy = new StateCapturingPolicy(identity);
 var snapshotContext = new UserContext()
     .WithMutationPolicyRegistry(new DelegatingMutationPolicyRegistry(_ => snapshotPolicy))
     .WithDataService(snapshotProvider);
-await snapshotContext.ExecuteGraphSaveAsync(async () =>
+await snapshotContext.ExecuteGraphSaveAsync("save order from immutable plan", async graph =>
 {
     var request = Insert("Order", 45, "prove immutable plan snapshot");
     request.Command.Value("state", new Value.TextValue("DRAFT"));
-    snapshotContext.PreflightMutation(request);
+    graph.Preflight(request);
     request.Command.Value("state", new Value.TextValue("APPROVED"));
-    return await snapshotContext.RequireResource<IDataService>().MutateAsync(request);
+    return await graph.MutateAsync(request);
 });
 Require(snapshotPolicy.ObservedState == "DRAFT", "policy plan changed after preflight");
 
@@ -136,7 +135,7 @@ static InsertMutationRequest Insert(string entity, long id, string reason)
 {
     var command = new InsertCommand(entity).Value("id", new Value.I64Value(id));
     command.TraceChain.Add(new TraceNode(entity, null, reason));
-    return new InsertMutationRequest(command);
+    return new InsertMutationRequest(command, reason);
 }
 
 static void Require(bool condition, string message)

@@ -15,6 +15,10 @@ using Xunit;
 
 namespace TeaQL.Runtime.Tests;
 
+[CollectionDefinition("Runtime telemetry SDK", DisableParallelization = true)]
+public class RuntimeTelemetrySdkCollection { }
+
+[Collection("Runtime telemetry SDK")]
 public class RuntimeTelemetryTests
 {
     [Fact]
@@ -149,7 +153,7 @@ public class RuntimeTelemetryTests
             .WithRuntimeTelemetry(telemetry);
 
         var result = await context.RequireResource<IDataService>().QueryAsync(
-            new QueryRequest { Query = new SelectQuery("School") });
+            new QueryRequest(new SelectQuery("School"), new QueryIntent("load school rows", "verify query and provider spans")));
         tracerProvider.ForceFlush();
 
         Assert.Single(result.Rows);
@@ -168,7 +172,7 @@ public class RuntimeTelemetryTests
 
         context.WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(output));
         await context.RequireResource<IDataService>().QueryAsync(
-            new QueryRequest { Query = new SelectQuery("School") });
+            new QueryRequest(new SelectQuery("School"), new QueryIntent("load school rows", "verify safe SQL diagnostics")));
         Assert.DoesNotContain("Parameterized SQL:", output.ToString());
         Assert.Contains("SQL: -- TeaQL SAFE", output.ToString());
         Assert.Contains("name = '[REDACTED]' /* masked */", output.ToString());
@@ -178,7 +182,7 @@ public class RuntimeTelemetryTests
         var sensitive = new StringWriter();
         context.WithSensitiveDiagnosticSqlLogSink(new SensitiveDiagnosticSqlLogSink(sensitive));
         await context.RequireResource<IDataService>().QueryAsync(
-            new QueryRequest { Query = new SelectQuery("School") });
+            new QueryRequest(new SelectQuery("School"), new QueryIntent("load school rows", "verify sensitive sink remains masked")));
         Assert.DoesNotContain("O''Brien", sensitive.ToString());
         Assert.DoesNotContain("O'Brien", sensitive.ToString());
         Assert.Contains("Debug SQL:", sensitive.ToString());
@@ -186,7 +190,7 @@ public class RuntimeTelemetryTests
         var before = output.ToString();
         context.DisableQuerySqlLog();
         await context.RequireResource<IDataService>().QueryAsync(
-            new QueryRequest { Query = new SelectQuery("School") });
+            new QueryRequest(new SelectQuery("School"), new QueryIntent("load school rows", "verify logging switch does not bypass query execution")));
         Assert.Equal(before, output.ToString());
         Assert.True(context.MutationSqlLogEnabled);
         context.EnableQuerySqlLog().DisableMutationSqlLog();
@@ -204,7 +208,8 @@ public class RuntimeTelemetryTests
         var context = new UserContext()
             .WithDataService(new StubDataService(observeRelation: true))
             .WithRuntimeTelemetry(telemetry);
-        var queryRequest = new QueryRequest { Query = new SelectQuery("School") };
+        var queryRequest = new QueryRequest(new SelectQuery("School"),
+            new QueryIntent("load school and students", "verify relation observer propagation"));
         queryRequest.Query.Relation("students");
 
         await context.RequireResource<IDataService>().QueryAsync(queryRequest);
@@ -227,14 +232,14 @@ public class RuntimeTelemetryTests
             .WithDiagnosticSqlLogSink(ordinary);
 
         var result = await context.RequireResource<IDataService>().QueryAsync(
-            new QueryRequest { Query = new SelectQuery("School") });
+            new QueryRequest(new SelectQuery("School"), new QueryIntent("load school rows", "verify independent SQL diagnostic sinks")));
 
         Assert.Single(result.Rows);
         Assert.Equal(1, ordinary.Count);
 
         context.WithDiagnosticSqlLogSink(new ThrowingDiagnosticSink());
         result = await context.RequireResource<IDataService>().QueryAsync(
-            new QueryRequest { Query = new SelectQuery("School") });
+            new QueryRequest(new SelectQuery("School"), new QueryIntent("load school rows", "verify failed SQL diagnostic sink is fail open")));
         Assert.Single(result.Rows);
     }
 

@@ -18,6 +18,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 {
     private readonly IDataService _provider;
     private readonly UserContext _context;
+    private readonly GraphMutationSession? _graph;
 
     public RuntimeDataService(IDataService provider, UserContext context)
     {
@@ -25,18 +26,19 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         _context = context;
     }
 
+    internal RuntimeDataService(IDataService provider, UserContext context, GraphMutationSession graph)
+        : this(provider, context) => _graph = graph;
+
     public DataServiceCapabilities Capabilities => _provider.Capabilities;
 
-    public async IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize,
-        [System.Runtime.CompilerServices.EnumeratorCancellation] System.Threading.CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize,
+        System.Threading.CancellationToken cancellationToken = default)
     {
         if (_provider is not IStreamQueryExecutor streaming)
             throw new NotSupportedException("The installed provider does not support streaming queries");
         var execution = CopyRequest(request, request.Query.CloneForExecution());
         execution.DiagnosticObserver = _context.RecordExecutionMetadata;
-        await foreach (var chunk in streaming.QueryStreamAsync(execution, chunkSize, cancellationToken)
-            .WithCancellation(cancellationToken).ConfigureAwait(false))
-            yield return chunk;
+        return streaming.QueryStreamAsync(execution, chunkSize, cancellationToken);
     }
 
     public Task<QueryResult> QueryAsync(QueryRequest request)
@@ -149,15 +151,12 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         return result;
     }
 
-    private QueryRequest CopyRequest(QueryRequest source, SelectQuery query) => new()
+    private QueryRequest CopyRequest(QueryRequest source, SelectQuery query)
     {
-        Query = query,
-        TraceChain = new List<TraceNode>(source.TraceChain),
-        Comment = source.Comment,
-        Purpose = source.Purpose,
-        IntentSource = source.IntentSource,
-        RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry)
-    };
+        var copy = source.WithQuery(query);
+        copy.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry);
+        return copy;
+    }
 
     private string IdSetQueryKey(SelectQuery source, string namespaceName)
     {
@@ -181,7 +180,10 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
+        _context.ValidateGraphMutation(request, _graph);
         _context.CheckAndFix(request);
+        request.InheritedIntentValues = request.InheritedIntentValues
+            .Concat(LoadedPrivateValues(request, _context)).ToArray();
         using var mutationGovernance = _context.EnterMutationPolicyExecution(request);
         var entity = EntityName(request);
         var result = await _context.RuntimeTelemetry.ObserveAsync(
@@ -202,39 +204,100 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     private async Task PublishMutationAuditAsync(MutationRequest request, MutationResult result)
     {
+        var deliveries = new List<Func<Task>>();
+        CollectMutationAudits(request, result, deliveries);
+        if (_graph != null)
+        {
+            foreach (var publish in deliveries) _graph.AfterCommit(publish);
+            return;
+        }
+        // Project EVERY leaf before the first callback can mutate caller-owned
+        // commands/ledgers, including leaves in later nested batch containers.
+        var failures = new List<Exception>();
+        foreach (var publish in deliveries)
+            try { await publish().ConfigureAwait(false); }
+            catch (Exception error) { failures.Add(error); }
+        // Provider execution already succeeded. Delivery failure cannot justify
+        // re-running writes or skipping later committed item notifications.
+        if (failures.Count == 1) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failures[0]).Throw();
+        if (failures.Count > 1) throw new AggregateException("Batch audit delivery failed", failures);
+    }
+
+    private void CollectMutationAudits(MutationRequest request, MutationResult result, List<Func<Task>> deliveries)
+    {
+        if (request is BatchMutationRequest && result.BatchItems is { } items)
+        {
+            // These are the actual execution requests, with captured root intent
+            // and sibling privacy provenance. Nested groups recurse once in
+            // request order; each successful leaf retains its own persisted row.
+            foreach (var item in items)
+                CollectMutationAudits(item.Request, item.Result, deliveries);
+            return;
+        }
         if (result.AffectedRows == 0 || _context.GetResource<IAppAuditEventSink>() == null) return;
+        var entity = EntityName(request); var mutationKind = MutationKind(request);
         var changedFields = ChangedFields(request).OrderBy(field => field, StringComparer.Ordinal).ToArray();
         var safeEvent = new Dictionary<string, object?>
         {
             ["actor"] = _context.UserIdentifier,
             ["category"] = _context.GetNamedResource<string>("bootstrapCategory") ?? "mutation",
-            ["reason"] = LogPrivacy.ScrubAuditText(request.Comment, MutationValues(request)),
-            ["entityType"] = EntityName(request),
+            ["entityType"] = entity,
             ["entityId"] = EntityId(request, result),
-            ["mutationKind"] = MutationKind(request),
+            ["mutationKind"] = mutationKind,
             ["changedFields"] = changedFields,
             ["changedFieldCount"] = changedFields.Length,
             ["resultVersion"] = PersistedValue(result, "version"),
             ["affectedRows"] = result.AffectedRows
         };
+        var values = PrivateMutationValues(request, _context).Concat(request.InheritedIntentValues).ToArray();
+        safeEvent["traceChain"] = request.AuditLineage(EntityName(request))
+            .Select(node => node with { Comment = "", Detail = LogPrivacy.ScrubAuditText(node.Detail, values) ?? "" })
+            .ToArray();
+        safeEvent["reason"] = LogPrivacy.ScrubAuditText(request.Comment, values);
         if (_context.CurrentMutationGovernance is { } governance)
             safeEvent["mutationGovernance"] = GovernanceEvidence(governance);
-        await _context.PublishAppAuditEventAsync(
-            EntityName(request), MutationKind(request), changedFields.Length, safeEvent).ConfigureAwait(false);
+        deliveries.Add(() => _context.PublishAppAuditEventAsync(
+            entity, mutationKind, changedFields.Length, safeEvent));
     }
 
-    private static IEnumerable<Value> MutationValues(MutationRequest request) => request switch
+    internal static IEnumerable<Value> LoadedPrivateValues(MutationRequest request, UserContext context)
     {
-        InsertMutationRequest insert => insert.Command.Values.Values,
-        UpdateMutationRequest update => update.Command.Values.Values
-            .Concat(update.Command.Guards.Values)
-            .Concat(update.Command.OldValues?.Values ?? Enumerable.Empty<Value>())
-            .Append(update.Command.Id),
-        DeleteMutationRequest delete => delete.Command.Guards.Values.Append(delete.Command.Id),
-        RecoverMutationRequest recover => recover.Command.Guards.Values.Append(recover.Command.Id),
-        BatchMutationRequest batch => batch.Requests.SelectMany(MutationValues),
-        _ => []
-    };
+        if (request is BatchMutationRequest batch)
+            return batch.Requests.SelectMany(item => LoadedPrivateValues(item, context));
+        if (request.LoadedSnapshot == null) return [];
+        return PrivateFieldValues(request.LoadedSnapshot.CopyValues(), EntityName(request), context);
+    }
+
+    private static IEnumerable<Value> PrivateFieldValues(IEnumerable<KeyValuePair<string, Value>> fields,
+        string entity, UserContext context)
+    {
+        var descriptor = context.GetEntity(entity);
+        return fields.Where(pair => {
+            var property = descriptor?.PropertyByName(pair.Key);
+            return property == null || descriptor?.HasExplicitSqlLogPolicyMetadata != true
+                || LogPrivacy.HasCredentials(pair.Value.ToJsonValue())
+                || SensitiveLogNames.IsCredential(property.Name)
+                || SensitiveLogNames.IsCredential(property.ColumnNameString)
+                || descriptor.AuditMaskFieldList.Contains(property.Name);
+        }).Select(pair => pair.Value).ToArray();
+    }
+
+    internal static IEnumerable<Value> PrivateMutationValues(MutationRequest request, UserContext context)
+    {
+        if (request is BatchMutationRequest batch)
+            return batch.Requests.SelectMany(item => PrivateMutationValues(item, context));
+        IEnumerable<KeyValuePair<string, Value>> fields = request switch
+        {
+            InsertMutationRequest insert => insert.Command.Values,
+            UpdateMutationRequest update => update.Command.Values.Concat(update.Command.Guards)
+                .Concat(update.Command.OldValues ?? new Record())
+                .Append(new("id", update.Command.Id)),
+            DeleteMutationRequest delete => delete.Command.Guards.Append(new("id", delete.Command.Id)),
+            RecoverMutationRequest recover => recover.Command.Guards.Append(new("id", recover.Command.Id)),
+            _ => []
+        };
+        return PrivateFieldValues(fields, EntityName(request), context);
+    }
 
     private static IReadOnlyDictionary<string, object?> GovernanceEvidence(
         MutationGovernanceSnapshot governance) => new Dictionary<string, object?>
@@ -303,7 +366,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
             {
                 ["teaql.result.cardinality"] = result.Rows.Count
             }).ConfigureAwait(false);
-        _context.RecordExecutionMetadata(result.Metadata);
+        if (!result.Metadata.DiagnosticReported) _context.RecordExecutionMetadata(result.Metadata);
         return result;
     }
 

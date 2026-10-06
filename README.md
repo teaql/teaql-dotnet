@@ -1,5 +1,108 @@
 # TeaQL .NET SDK
 
+## Trace Chain on the feature branch
+
+`feature/request-trace-chain` requires a request-owned non-blank Query Comment
+and Purpose, and a non-blank Mutation Comment before policy/provider access.
+Logging switches do not relax validation. This is a local-source checkpoint,
+not a newly published package capability.
+
+The [School bootstrap example](examples/school-management/README.md) also
+checks generated root/constant saves without injected trace nodes: physical
+SQL routes, assigned audit identities, idempotence, audited reconciliation and
+caller restoration. Its script runs twice on each retained SQLite database with
+SQL logs on/off. At audit delivery, an independent read-only connection must
+already observe the committed version. See `scripts/verify-school-bootstrap-example.sh`.
+
+The SQL path uses the Rust-baseline canonical algorithm: an operation names
+the originating entity, relation names are local, qualified properties belong
+in `TraceNode.Detail`, and provider/SQL nodes occur once. Intent stays in its
+structured metadata fields, not duplicated in every physical frame. Query
+snapshots privately preserve their origin across relation and aggregate
+derivation; caller-supplied diagnostic TraceChain frames cannot forge provenance.
+
+Related aggregation consumes scalar membership keys before forward-reference
+hydration. Nested attachment captures original scalar keys before hydration,
+including targets keyed by `code` rather than `id`. A reference filtered to null
+does not detach its child from the parent list or prevent another sibling from
+using that FK. These per-load keys never become result fields or ledger entries. Native
+SQLite regression cases cover root/nested count results, original trace ancestry,
+descendant-binding privacy, logging disabled and aggregate failure recovery.
+Generated models now retain related-count aliases in a runtime-owned
+`QueryProjectionSnapshot`: `QueryProjection(alias)` returns an isolated `Value`,
+`HasQueryProjection(alias)` distinguishes presence, and missing throws
+`KeyNotFoundException`. Projections are not modeled fields or ledger mutations.
+Regenerate libraries to acquire the API. The trace example exercises generated
+root/nested Q/E/save, private descendant intent, logging on/off and count failures.
+Native SQL execution also evaluates nested Facets and Facets inside a loaded
+relation. Membership COUNT and target materialization inherit the original
+request root, qualified relation route and private-binding provenance. Facets
+are returned through `QueryResult.Facets` / `SmartList<Record>.Facets`; loaded
+relation records expose query-only `Record.QueryFacets`, outside scalar fields
+and JSON. Loaded-relation Facets execute per distinct parent membership key.
+SQL NULL is not a membership key. Root `IncludeAll` Facets still expose zero-count
+candidates; empty loaded to-many collections have no per-collection Facet carrier.
+The SQLite regression covers direct and transaction queries, logging on/off,
+root-page-independent counts, multiple parents, caller snapshots and actual
+materialization failure. This is native SPI evidence: generated Q/E Facet
+consumption, broader query/provider shapes and immutable-artifact acceptance
+remain separate gates.
+
+`ExecutionMetadata.MutationLineage` separately preserves existing root/item
+reasons, including partial batch failures and mutation readback. Default masking
+projects both that lineage and physical paths before sinks; execution values
+and original command trace lists are not changed. Frozen shared vectors and
+real SQLite root/three-level failure tests are separate evidence.
+
+Graph saves explicitly receive an operation-owned `GraphMutationSession`.
+Persistent immutable parent scopes retain sibling and deletion reasons; typed
+ledger traces are complete per-entity replacements. The generated adapter
+allocates IDs through the transaction before constructing a scope. Context does
+not hold a trace stack or implicitly join nested saves. Untagged active-graph
+mutations, expired capabilities and borrowed parent scopes fail closed.
+
+The graph transaction queues safe application audit until commit and discards it
+on rollback. Post-commit errors are `GraphCommittedException` (`Committed=true`);
+remaining cleanup/audits still run and the committed transaction is not rolled
+back. Whole-graph preflight supplies invocation-local sibling redaction values.
+The native SQLite tests exercise allocation, deletion, typed ledger replacement,
+real UNIQUE rollback and two concurrent requests serialized on one Context.
+Shared helper vectors remain separate from that execution proof.
+
+Regenerate dependent libraries: the adapter callback is now
+`ExecuteGraphSaveAsync(comment, async graph => ...)`, with `graph.Preflight`,
+`graph.MutateAsync` and graph-owned completion callbacks. Public generated
+`.AuditAs(...).SaveAsync(context)` is unchanged. School, Conformance and Order
+libraries are regenerated from their retained models, not patched manually.
+
+The [generated six-entity example](examples/trace-chain) observes actual provider
+commands, safe SQL and committed audit through generated Q/E/Mutation APIs.
+Run `bash scripts/verify-trace-chain-example.sh` for two executions on the same
+database without cleanup and an unchanged library. It covers branch/deletion
+reasons, assigned typed IDs, a three-level query, real UNIQUE rollback,
+successful-write/readback-failure separation and concurrent generated saves.
+The read-only provider SPI `MutationRequest.MutationLineage` is not a wire field.
+The [generated School Facet example](examples/facet-trace) exercises 24
+root/nested/loaded-relation combinations twice on a retained SQLite database,
+with exact physical SQL/count numbers, ordered logical ancestry and returned
+empty metadata. It also proves that Facet-bearing no-op saves emit no writes,
+and that a real reverse child change saves through its root with one audit.
+Run `bash examples/facet-trace/verify.sh`; the all-examples gate includes it.
+Successful relation SQL is now logged at each physical execution boundary;
+parent/descendant binding provenance protects intent before parent logs are
+emitted, and root statements are not reported twice.
+
+Prepared batch/item-index lineage, detached-child and late low-level allocation, complete
+entry-point/privacy coverage and internal Registry replay remain open. A direct
+legacy transaction wrapper is not proof of commit-bound audit. Run
+`bash scripts/verify-trace-chain-source-tests.sh /tmp/teaql-dotnet-tests-<unique-run>`
+and `bash scripts/verify-examples.sh` against this checkout before promoting an
+internal candidate. The source-test gate discovers projects under both `src/`
+and `tests/`, including `TeaQL.Core.Tests` (which is absent from `TeaQL.sln`).
+It retains separate TRX files, refuses overwrite, and rejects zero, skipped,
+failed or incompletely executed suites. Release CI uses this same gate; append
+`-c Release -p:UseSharedCompilation=false` to exercise its release configuration.
+
 ## Sensitive log data
 
 Runtime diagnostic logs redact payload values by default, before delivery to

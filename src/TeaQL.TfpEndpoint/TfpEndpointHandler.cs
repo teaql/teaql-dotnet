@@ -170,12 +170,7 @@ namespace TeaQL.TfpEndpoint
             if (tfpQuery.CommentText != null)
                 q.Comment(tfpQuery.CommentText);
 
-            var req = new QueryRequest
-            {
-                Query = q,
-                Comment = tfpQuery.CommentText,
-                Purpose = tfpQuery.PurposeText
-            };
+            var req = new QueryRequest(q, new QueryIntent(tfpQuery.CommentText, tfpQuery.PurposeText));
 
             QueryResult res;
             try { res = await _dataService.QueryAsync(req); }
@@ -265,10 +260,10 @@ namespace TeaQL.TfpEndpoint
 
             MutationRequest mutReq = tfpMut.Action switch
             {
-                "Create" => new InsertMutationRequest(new InsertCommand { Entity = tfpMut.Entity, Values = record, TraceChain = trace }),
-                "Update" => new UpdateMutationRequest(new UpdateCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, Values = record, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }),
-                "Delete" => new DeleteMutationRequest(new DeleteCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, SoftDelete = true, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }),
-                "Recover" => new RecoverMutationRequest(new RecoverCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion!.Value, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }),
+                "Create" => new InsertMutationRequest(new InsertCommand { Entity = tfpMut.Entity, Values = record, TraceChain = trace }, tfpMut.Comment),
+                "Update" => new UpdateMutationRequest(new UpdateCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, Values = record, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }, tfpMut.Comment),
+                "Delete" => new DeleteMutationRequest(new DeleteCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion, SoftDelete = true, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }, tfpMut.Comment),
+                "Recover" => new RecoverMutationRequest(new RecoverCommand { Entity = tfpMut.Entity, Id = idVal, ExpectedVersionValue = expectedVersion!.Value, TraceChain = trace, Guards = new Record { [trusted.TenantField] = trusted.TenantId } }, tfpMut.Comment),
                 _ => throw new TfpEndpointException("TFP_INVALID_REQUEST", "Unknown mutation action")
             };
 

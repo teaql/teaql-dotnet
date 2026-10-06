@@ -74,21 +74,18 @@ namespace TeaQL.Provider.Sqlite.Tests
                 {
                     calls.Add("first");
                     var service = context.RequireResource<IDataService>();
-                    var before = await service.QueryAsync(new QueryRequest
-                    {
-                        Query = new SelectQuery("Platform"),
-                        Comment = "what: inspect generated bootstrap state",
-                        Purpose = "why: verify schema exists before generated bootstrap"
-                    });
+                    var before = await service.QueryAsync(new QueryRequest(new SelectQuery("Platform"),
+                        new QueryIntent("what: inspect generated bootstrap state",
+                            "why: verify schema exists before generated bootstrap")));
                     if (before.Rows.Count == 0)
                     {
                         var command = new InsertCommand("Platform")
                             .Value("id", new Value.I64Value(1))
                             .Value("name", new Value.TextValue("Campus Learning Platform"))
                             .Value("version", new Value.I64Value(1));
-                        command.TraceChain.Add(new TraceNode(
-                            "Platform", 1, "initialize generated Platform root"));
-                        await service.MutateAsync(new InsertMutationRequest(command));
+                        // Intent is request-owned; no expected runtime trace
+                        // frame is injected by this bootstrap callback.
+                        await service.MutateAsync(new InsertMutationRequest(command, "initialize generated Platform root"));
                     }
                 })
                 .GeneratedBootstrap(context =>
@@ -114,7 +111,8 @@ namespace TeaQL.Provider.Sqlite.Tests
                 Assert.Equal(1L, reader.GetInt64(1));
                 Assert.Equal("?000", reader.GetString(2));
             }
-            var roots = await executor.QueryAsync(new QueryRequest { Query = new SelectQuery("Platform") });
+            var roots = await executor.QueryAsync(new QueryRequest(new SelectQuery("Platform"),
+                new QueryIntent("load provisioned platform", "verify bootstrap idempotency")));
             Assert.Single(roots.Rows);
             Assert.Equal("Campus Learning Platform", roots.Rows[0]["name"].TryText());
         }
@@ -171,10 +169,8 @@ namespace TeaQL.Provider.Sqlite.Tests
                             .AndFilter(Expr.Eq("name", filter.Value.GetString())), "id"),
                     _ => throw new InvalidOperationException("Unbound trusted field")
                 }, order => OrderBy.Asc(order.FieldPath), warnings.Add);
-            var rows = await executor.QueryAsync(new QueryRequest
-            {
-                Query = merged.Query, Comment = basis.CommentText, Purpose = basis.PurposeText
-            });
+            var rows = await executor.QueryAsync(new QueryRequest(merged.Query,
+                new QueryIntent(basis.CommentText, basis.PurposeText)));
             Assert.Equal(new long[] { 3, 2 }, rows.Rows.Select(row => ((Value.I64Value)row["id"]).Value));
             Assert.Equal(4, warnings.Count);
             Assert.Equal(2UL, merged.Query.HardLimitValue);
@@ -241,16 +237,15 @@ namespace TeaQL.Provider.Sqlite.Tests
             };
 
             Assert.Equal("included", (await executor.QueryAsync(
-                new QueryRequest { Query = included })).Rows.Single()["name"].TryText());
+                new QueryRequest(included, new QueryIntent("load included records", "verify positive relation predicate")))).Rows.Single()["name"].TryText());
             Assert.Equal("excluded", (await executor.QueryAsync(
-                new QueryRequest { Query = excluded })).Rows.Single()["name"].TryText());
+                new QueryRequest(excluded, new QueryIntent("load excluded records", "verify negative relation predicate")))).Rows.Single()["name"].TryText());
 
             async Task<long[]> Ids(string entityName, Expr filter) =>
-                (await executor.QueryAsync(new QueryRequest
-                {
-                    Query = new SelectQuery(entityName)
-                        .Filter(filter).OrderAsc("id")
-                })).Rows.Select(row => row["id"].TryI64()!.Value).ToArray();
+                (await executor.QueryAsync(new QueryRequest(new SelectQuery(entityName)
+                        .Filter(filter).OrderAsc("id"),
+                    new QueryIntent("load relation predicate IDs", "verify positive and negative subqueries"))))
+                    .Rows.Select(row => row["id"].TryI64()!.Value).ToArray();
 
             Assert.Equal([11L, 12L], await Ids("QueryRecord", Expr.IsNotNull("queryGroup")));
             Assert.Equal([13L], await Ids("QueryRecord", Expr.IsNull("queryGroup")));
@@ -298,7 +293,8 @@ namespace TeaQL.Provider.Sqlite.Tests
                     .Filter(Expr.Eq("state", new Value.TextValue("visible")))
                     .AndFilter(Expr.Gt("version", new Value.I64Value(0))).OrderDesc("name").Limit(3);
                 if (threshold is not null) child.TopNProbeParentThreshold(threshold.Value);
-                return new SelectQuery("Order").OrderAsc("id").RelationQuery("lines", child);
+                return new SelectQuery("Order").OrderAsc("id").RelationQuery("lines", child)
+                    .Comment("load orders and top ranked lines").Purpose("verify stable equivalent Top-N plans");
             }
             static string Ids(List<Record> rows) => string.Join(";", rows.Select(row =>
                 $"{row["id"].TryI64()}:{string.Join(',', ((Value.ListValue)row["lines"]).Values
@@ -306,7 +302,7 @@ namespace TeaQL.Provider.Sqlite.Tests
 
             var observer = new RecordingTopNObserver();
             recording.Queries.Clear();
-            var probes = await executor.QueryAsync(new QueryRequest { Query = Query(), RelationLoadObserver = observer });
+            var probes = await executor.QueryAsync(new QueryRequest(Query()) { RelationLoadObserver = observer });
             Assert.Equal([3, 3, 0], probes.Rows.Select(row => ((Value.ListValue)row["lines"]).Values.Count).ToArray());
             Assert.Equal(4, recording.Queries.Count);
             Assert.DoesNotContain(recording.Queries, sql => sql.Contains("COUNT(", StringComparison.OrdinalIgnoreCase));
@@ -318,7 +314,7 @@ namespace TeaQL.Provider.Sqlite.Tests
             });
 
             recording.Queries.Clear();
-            var window = await executor.QueryAsync(new QueryRequest { Query = Query(0), RelationLoadObserver = observer });
+            var window = await executor.QueryAsync(new QueryRequest(Query(0)) { RelationLoadObserver = observer });
             Assert.Equal(2, recording.Queries.Count);
             Assert.Contains("ROW_NUMBER() OVER", recording.Queries[1]);
             Assert.Contains("state", recording.Queries[1]);
@@ -331,10 +327,10 @@ namespace TeaQL.Provider.Sqlite.Tests
             foreach (var (threshold, expected) in new[] { (3ul, 4), (2ul, 2) })
             {
                 recording.Queries.Clear();
-                var first = await executor.QueryAsync(new QueryRequest { Query = Query(threshold) });
+                var first = await executor.QueryAsync(new QueryRequest(Query(threshold)));
                 var sql = recording.Queries.ToArray();
                 recording.Queries.Clear();
-                var second = await executor.QueryAsync(new QueryRequest { Query = Query(threshold) });
+                var second = await executor.QueryAsync(new QueryRequest(Query(threshold)));
                 Assert.Equal(expected, recording.Queries.Count);
                 Assert.Equal(sql, recording.Queries);
                 Assert.Equal(Ids(first.Rows), Ids(second.Rows));
@@ -381,7 +377,8 @@ namespace TeaQL.Provider.Sqlite.Tests
                     FilterCondition = expression,
                     OrderByItems = [OrderBy.Asc("id")]
                 };
-                return (await executor.QueryAsync(new QueryRequest { Query = query })).Rows
+                return (await executor.QueryAsync(new QueryRequest(query,
+                    new QueryIntent("load scalar predicate IDs", "verify required nullable and temporal scalar types")))).Rows
                     .Select(row => row["id"].TryI64() ?? -1).ToArray();
             }
             Assert.Equal([1], await Ids(Expr.Eq("requiredText", new Value.TextValue("Alpha"))));
@@ -512,7 +509,7 @@ namespace TeaQL.Provider.Sqlite.Tests
                 new SqliteDialect(), _transport, new SingleSchemaProvider(descriptor));
             var command = new InsertCommand("Widget").Value("id", new Value.I64Value(7));
 
-            var result = await executor.MutateAsync(new InsertMutationRequest(command));
+            var result = await executor.MutateAsync(new InsertMutationRequest(command, "create widget with database defaults"));
 
             Assert.NotNull(result.PersistedRecord);
             Assert.Equal(7, ((Value.I64Value)result.PersistedRecord!["id"]).Value);

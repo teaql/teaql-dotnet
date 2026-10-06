@@ -14,6 +14,10 @@ namespace Generated.Requests
         private SelectQuery _query;
         private string? _purpose;
         private string? _comment;
+        private static object TeaqlQueryValue(object value) =>
+            value is TimeSpan time
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                : value;
 
         public CustomerOrderRequest()
         {
@@ -47,15 +51,14 @@ namespace Generated.Requests
 
         public ExecutableCustomerOrderRequest Purpose(string p)
         {
-            if (string.IsNullOrWhiteSpace(p))
-                throw new ArgumentException("query purpose must not be empty", nameof(p));
+            p = QueryIntent.RequirePurpose(p);
             _query.Purpose(p);
             _purpose = p;
             return new ExecutableCustomerOrderRequest(
                 ExecuteForListInternalAsync,
+                ExecuteForOneInternalAsync,
                 ExecuteForPageInternalAsync,
                 ExecuteForStreamInternalAsync,
-                () => Limit(1),
                 c => Comment(c),
                 EnsureIntent);
         }
@@ -197,89 +200,89 @@ namespace Generated.Requests
                 }
                 public CustomerOrderRequest WithStatusMatching(OrderStatusRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("status", EntityDescriptor.New("OrderStatus"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery("status", GeneratedRuntimeModule.Module.Metadata.GetEntity("OrderStatus")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerOrderRequest WithoutStatusMatching(OrderStatusRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("status", EntityDescriptor.New("OrderStatus"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery("status", GeneratedRuntimeModule.Module.Metadata.GetEntity("OrderStatus")!, related.GetQuery(), "id"));
                     return this;
                 }
                 public CustomerOrderRequest WithCustomerMatching(CustomerRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("customer", EntityDescriptor.New("Customer"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery("customer", GeneratedRuntimeModule.Module.Metadata.GetEntity("Customer")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerOrderRequest WithoutCustomerMatching(CustomerRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("customer", EntityDescriptor.New("Customer"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery("customer", GeneratedRuntimeModule.Module.Metadata.GetEntity("Customer")!, related.GetQuery(), "id"));
                     return this;
                 }
                 public CustomerOrderRequest WithCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("commerce_platform", EntityDescriptor.New("CommercePlatform"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerOrderRequest WithoutCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("commerce_platform", EntityDescriptor.New("CommercePlatform"), related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", val));
+                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", val));
+                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", val));
+                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", val));
+                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", val));
+                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", val));
+                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", lower, upper));
+                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -303,54 +306,54 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithOrderNumberIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("order_number", val));
+                    _query.AndFilter(Expr.Eq("order_number", TeaqlQueryValue(val)));
                     return this;
                 }
                 public CustomerOrderRequest WithOrderNumberIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("order_number", val));
+                    _query.AndFilter(Expr.Ne("order_number", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderNumberIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("order_number", vals));
+                    _query.AndFilter(Expr.In("order_number", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderNumberNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("order_number", vals));
+                    _query.AndFilter(Expr.NotIn("order_number", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderNumberGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("order_number", val));
+                    _query.AndFilter(Expr.Gt("order_number", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderNumberGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("order_number", val));
+                    _query.AndFilter(Expr.Gte("order_number", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderNumberLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("order_number", val));
+                    _query.AndFilter(Expr.Lt("order_number", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderNumberLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("order_number", val));
+                    _query.AndFilter(Expr.Lte("order_number", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderNumberBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("order_number", lower, upper));
+                    _query.AndFilter(Expr.Between("order_number", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -403,55 +406,55 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithOrderDateIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("order_date", val));
+                    _query.AndFilter(Expr.Eq("order_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("order_date", val));
+                    _query.AndFilter(Expr.Ne("order_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("order_date", vals));
+                    _query.AndFilter(Expr.In("order_date", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("order_date", vals));
+                    _query.AndFilter(Expr.NotIn("order_date", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("order_date", val));
+                    _query.AndFilter(Expr.Gt("order_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("order_date", val));
+                    _query.AndFilter(Expr.Gte("order_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("order_date", val));
+                    _query.AndFilter(Expr.Lt("order_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("order_date", val));
+                    _query.AndFilter(Expr.Lte("order_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("order_date", lower, upper));
+                    _query.AndFilter(Expr.Between("order_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -469,55 +472,55 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithTotalAmountIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("total_amount", val));
+                    _query.AndFilter(Expr.Eq("total_amount", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("total_amount", val));
+                    _query.AndFilter(Expr.Ne("total_amount", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("total_amount", vals));
+                    _query.AndFilter(Expr.In("total_amount", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("total_amount", vals));
+                    _query.AndFilter(Expr.NotIn("total_amount", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("total_amount", val));
+                    _query.AndFilter(Expr.Gt("total_amount", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("total_amount", val));
+                    _query.AndFilter(Expr.Gte("total_amount", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("total_amount", val));
+                    _query.AndFilter(Expr.Lt("total_amount", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("total_amount", val));
+                    _query.AndFilter(Expr.Lte("total_amount", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithTotalAmountBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("total_amount", lower, upper));
+                    _query.AndFilter(Expr.Between("total_amount", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -619,55 +622,55 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithCreateTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("create_time", val));
+                    _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("create_time", val));
+                    _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals));
+                    _query.AndFilter(Expr.In("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals));
+                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("create_time", val));
+                    _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("create_time", val));
+                    _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("create_time", val));
+                    _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("create_time", val));
+                    _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithCreateTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("create_time", lower, upper));
+                    _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -685,55 +688,55 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithUpdateTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("update_time", val));
+                    _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("update_time", val));
+                    _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals));
+                    _query.AndFilter(Expr.In("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals));
+                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("update_time", val));
+                    _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("update_time", val));
+                    _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("update_time", val));
+                    _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("update_time", val));
+                    _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithUpdateTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("update_time", lower, upper));
+                    _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -751,55 +754,55 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", val));
+                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", val));
+                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", val));
+                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", val));
+                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", val));
+                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", val));
+                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", lower, upper));
+                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -1123,13 +1126,13 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithOrderLineListMatching(OrderLineRequest child)
                 {
-                    _query.AndFilter(Expr.InSubquery("id", EntityDescriptor.New("OrderLine"), child.GetQuery(), "customer_order"));
+                    _query.AndFilter(Expr.InSubquery("id", GeneratedRuntimeModule.Module.Metadata.GetEntity("OrderLine")!, child.GetQuery(), "customer_order"));
                     return this;
                 }
 
                 public CustomerOrderRequest WithoutOrderLineListMatching(OrderLineRequest child)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("id", EntityDescriptor.New("OrderLine"), child.GetQuery(), "customer_order"));
+                    _query.AndFilter(Expr.NotInSubquery("id", GeneratedRuntimeModule.Module.Metadata.GetEntity("OrderLine")!, child.GetQuery(), "customer_order"));
                     return this;
                 }
                 public CustomerOrderRequest CountOrderLines()
@@ -1249,11 +1252,12 @@ namespace Generated.Requests
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
-            var req = new QueryRequest(_query);
+            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            var authorized = req.Query;
             var result = await service.QueryAsync(req);
-            foreach (var facet in _query.Facets)
+            foreach (var facet in authorized.Facets)
             {
-                var membership = _query.Copy();
+                var membership = authorized.CloneForExecution();
                 membership.Facets.Clear();
                 membership.Relations.Clear();
                 membership.Orders.Clear();
@@ -1261,20 +1265,20 @@ namespace Generated.Requests
                 membership.GroupFields.Clear();
                 membership.Projections.Clear();
                 membership.Project(facet.RelationName);
-                var membershipRows = (await service.QueryAsync(new QueryRequest(membership))).Rows;
+                var membershipRows = (await service.QueryAsync(req.WithQuery(membership))).Rows;
                 var counts = membershipRows
                     .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
                     .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw)!)
                     .ToDictionary(group => group.Key, group => group.Count());
 
-                var nested = facet.Query.Copy();
+                var nested = facet.Query.CloneForExecution();
                 nested.Facets.Clear();
                 var countAliases = nested.Aggregates
                     .Where(aggregate => aggregate.Function == AggregateFunction.Count)
                     .Select(aggregate => aggregate.Alias).ToArray();
                 nested.Aggregates.Clear();
                 nested.GroupFields.Clear();
-                var facetRows = (await service.QueryAsync(new QueryRequest(nested))).Rows;
+                var facetRows = (await service.QueryAsync(req.WithQuery(nested))).Rows;
                 var decorated = new SmartList<Record>();
                 foreach (var row in facetRows)
                 {
@@ -1290,6 +1294,16 @@ namespace Generated.Requests
             return result;
         }
 
+        private async Task<QueryResult> ExecuteForOneInternalAsync(UserContext context)
+        {
+            EnsureIntent();
+            var service = context.RequireResource<IDataService>();
+            var query = _query.CloneForExecution();
+            query.Limit(1);
+            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            return await service.QueryAsync(req);
+        }
+
         private async Task<CustomerOrderPage> ExecuteForPageInternalAsync(
             UserContext context, int offset, int limit)
         {
@@ -1297,20 +1311,31 @@ namespace Generated.Requests
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
             if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireResource<IDataService>();
-            _query.Offset(offset);
-            _query.Limit(limit);
-            var result = await service.QueryAsync(new QueryRequest(_query));
+            var query = _query.CloneForExecution();
+            query.Offset(offset);
+            query.Limit(limit);
+            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            var authorized = req.Query;
+            var result = await service.QueryAsync(req);
             long totalCount;
-            if (_query.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
+            if (authorized.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
             {
                 totalCount = checked((long)context.IdSetCount);
             }
             else
             {
-                var countQuery = new SelectQuery("CustomerOrder");
-                foreach (var filter in _query.Filters) countQuery.Filters.Add(filter);
+                var countQuery = authorized.CloneForExecution();
+                countQuery.Projection.Clear();
+                countQuery.ExprProjection.Clear();
+                countQuery.RelationLoads.Clear();
+                countQuery.RelationAggregates.Clear();
+                countQuery.OrderByItems.Clear();
+                countQuery.GroupByItems.Clear();
+                countQuery.AggregateItems.Clear();
+                countQuery.Slice = null;
+                countQuery.IdSetPagination = null;
                 countQuery.Aggregate("Count", "id", "count");
-                var countResult = await service.QueryAsync(new QueryRequest(countQuery));
+                var countResult = await service.QueryAsync(req.WithQuery(countQuery));
                 totalCount = countResult.Rows.Count == 0
                     ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
             }
@@ -1330,8 +1355,9 @@ namespace Generated.Requests
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
+            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
             await foreach (var chunk in streaming.QueryStreamAsync(
-                new QueryRequest(_query), chunkSize, cancellationToken).WithCancellation(cancellationToken))
+                req, chunkSize, cancellationToken).WithCancellation(cancellationToken))
             {
                 var queryRoot = new EntityRoot();
                 foreach (var row in chunk.Rows)
@@ -1341,8 +1367,7 @@ namespace Generated.Requests
 
         private void EnsureIntent()
         {
-            if (string.IsNullOrWhiteSpace(_purpose) || string.IsNullOrWhiteSpace(_comment))
-                throw new Exception("Security audit failure: Comment() and Purpose() must be non-empty before execution or NewEntity()");
+            _ = new QueryIntent(_comment, _purpose);
         }
 
     }
@@ -1350,24 +1375,24 @@ namespace Generated.Requests
     public sealed class ExecutableCustomerOrderRequest
     {
         private readonly Func<UserContext, Task<QueryResult>> _executeForRows;
+        private readonly Func<UserContext, Task<QueryResult>> _executeForOne;
         private readonly Func<UserContext, int, int, Task<CustomerOrderPage>> _executeForPage;
         private readonly Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.CustomerOrder>> _executeForStream;
-        private readonly Action _limitOne;
         private readonly Action<string> _comment;
         private readonly Action _ensureIntent;
 
         internal ExecutableCustomerOrderRequest(
             Func<UserContext, Task<QueryResult>> executeForRows,
+            Func<UserContext, Task<QueryResult>> executeForOne,
             Func<UserContext, int, int, Task<CustomerOrderPage>> executeForPage,
             Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.CustomerOrder>> executeForStream,
-            Action limitOne,
             Action<string> comment,
             Action ensureIntent)
         {
             _executeForRows = executeForRows;
+            _executeForOne = executeForOne;
             _executeForPage = executeForPage;
             _executeForStream = executeForStream;
-            _limitOne = limitOne;
             _comment = comment;
             _ensureIntent = ensureIntent;
         }
@@ -1411,9 +1436,10 @@ namespace Generated.Requests
         public async Task<Generated.Models.CustomerOrder?> ExecuteForOneAsync(
             UserContext context)
         {
-            _limitOne();
-            var entities = await ExecuteForListAsync(context);
-            return entities.Count > 0 ? entities[0] : null;
+            var result = await _executeForOne(context);
+            if (result.Rows.Count == 0) return null;
+            return Generated.Models.CustomerOrder.FromRecord(
+                result.Rows[0], new EntityRoot());
         }
     }
 

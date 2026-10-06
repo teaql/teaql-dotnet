@@ -18,7 +18,14 @@ public abstract record Expr
     private Expr() { }
 
     public sealed record ColumnExpr(string Name) : Expr;
-    public sealed record ValueExpr(Value NodeValue) : Expr;
+    public sealed record ValueExpr(Value NodeValue) : Expr
+    {
+        // Lowering provenance only: owned by the immutable expression and
+        // preserved by query snapshots, never serialized as query input.
+        [System.Text.Json.Serialization.JsonIgnore]
+        internal LikeOperandSource? LikeOperand { get; init; }
+    }
+    internal sealed record LikeOperandSource(Core.Value.TextValue Operand, Core.Value.TextValue Binding);
     public sealed record FunctionExpr(ExprFunction Fn, List<Expr> Args) : Expr;
     public sealed record BinaryExpr(Expr Left, BinaryOp Op, Expr Right) : Expr;
     public sealed record SubQueryExpr(Expr Left, BinaryOp Op, EntityDescriptor Entity, SelectQuery Query) : Expr;
@@ -87,12 +94,19 @@ public abstract record Expr
     public static Expr NotLike(string column, string pattern) => 
         Binary(Column(column), BinaryOp.NotLike, Value(new Core.Value.TextValue(pattern)));
 
-    public static Expr Contain(string column, string value) => Like(column, $"%{value}%");
-    public static Expr NotContain(string column, string value) => NotLike(column, $"%{value}%");
-    public static Expr BeginWith(string column, string value) => Like(column, $"{value}%");
-    public static Expr NotBeginWith(string column, string value) => NotLike(column, $"{value}%");
-    public static Expr EndWith(string column, string value) => Like(column, $"%{value}");
-    public static Expr NotEndWith(string column, string value) => NotLike(column, $"%{value}");
+    public static Expr Contain(string column, string value) => DecoratedLike(column, value, "%", "%", false);
+    public static Expr NotContain(string column, string value) => DecoratedLike(column, value, "%", "%", true);
+    public static Expr BeginWith(string column, string value) => DecoratedLike(column, value, "", "%", false);
+    public static Expr NotBeginWith(string column, string value) => DecoratedLike(column, value, "", "%", true);
+    public static Expr EndWith(string column, string value) => DecoratedLike(column, value, "%", "", false);
+    public static Expr NotEndWith(string column, string value) => DecoratedLike(column, value, "%", "", true);
+
+    private static Expr DecoratedLike(string column, string operand, string prefix, string suffix, bool negative)
+    {
+        var binding = new Core.Value.TextValue(prefix + operand + suffix);
+        return Binary(Column(column), negative ? BinaryOp.NotLike : BinaryOp.Like,
+            new ValueExpr(binding) { LikeOperand = new(new Core.Value.TextValue(operand), binding) });
+    }
 
     public static Expr Binary(Expr left, BinaryOp op, Expr right) => new BinaryExpr(left, op, right);
 

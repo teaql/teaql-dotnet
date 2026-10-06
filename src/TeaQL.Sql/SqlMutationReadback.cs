@@ -5,7 +5,7 @@ namespace TeaQL.Sql;
 
 internal static class SqlMutationReadback
 {
-    internal static async Task<Record> ExecuteAsync(SqlDialect dialect, ISqlTransport transport,
+    internal static async Task<(Record Row, ExecutionMetadata Read)> ExecuteAsync(SqlDialect dialect, ISqlTransport transport,
         EntityDescriptor entity, SelectQuery refresh, MutationRequest request, ExecutionMetadata write)
     {
         CompiledQuery? compiled = null;
@@ -17,8 +17,9 @@ internal static class SqlMutationReadback
             started = DateTimeOffset.UtcNow;
             var rows = await transport.FetchAllSqlAsync(compiled);
             count = rows.Count;
-            return rows.SingleOrDefault()
+            var row = rows.SingleOrDefault()
                 ?? throw new SqlExecutorException($"Authoritative persisted row not found for {refresh.Entity}");
+            return (row, ReadMetadata("success"));
         }
         catch (Exception error)
         {
@@ -29,19 +30,21 @@ internal static class SqlMutationReadback
                 // did: SQL succeeded even though the business snapshot is invalid.
                 if (compiled != null)
                 {
-                    var query = new QueryRequest(refresh) {
-                        Comment = request.Comment,
-                        Purpose = "why: refresh authoritative persisted row",
-                        TraceChain = request.TraceChain.ToList()
-                    };
                     var outcome = count.HasValue ? "success" : error is OperationCanceledException ? "cancelled" : "failure";
-                    var read = SqlStatementDiagnostics.Metadata(dialect, query, compiled, started, outcome, count);
-                    read.AuditReason = write.AuditReason;
-                    read.IntentSource = write;
-                    Report(observer, read);
+                    Report(observer, ReadMetadata(outcome));
                 }
             }
             throw;
+        }
+
+        ExecutionMetadata ReadMetadata(string outcome)
+        {
+            var query = QueryRequest.Readback(refresh, request);
+            var read = SqlStatementDiagnostics.Metadata(dialect, query, compiled!, started, outcome, count);
+            read.AuditReason = write.AuditReason;
+            read.MutationLineage = write.MutationLineage;
+            read.IntentSource = write;
+            return read;
         }
     }
 

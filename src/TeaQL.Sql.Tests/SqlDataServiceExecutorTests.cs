@@ -41,10 +41,8 @@ namespace TeaQL.Sql.Tests
         [Fact]
         public async Task QueryAsync_CallsTransport_AndReturnsResult()
         {
-            var req = new QueryRequest {
-                Query = new SelectQuery { Entity = "TestEntity" },
-                Comment = "what: load governed records",
-                Purpose = "why: verify trace inheritance",
+            var req = new QueryRequest(new SelectQuery { Entity = "TestEntity" },
+                new QueryIntent("what: load governed records", "why: verify trace inheritance")) {
                 TraceChain = new List<TraceNode> {
                     new("Organization", null, "organization") { Level = 2, Kind = "relation", Name = "TestEntity.organization" },
                     new("Region", null, "region") { Level = 3, Kind = "relation", Name = "Organization.region" },
@@ -76,14 +74,20 @@ namespace TeaQL.Sql.Tests
             Assert.Equal(compiled.GeneratedSql, result.Metadata.GeneratedSql);
             Assert.Equal(req.Comment, result.Metadata.Comment);
             Assert.Equal(req.Purpose, result.Metadata.Purpose);
-            Assert.Equal(new[] { "operation", "request", "relation", "relation", "relation", "provider", "sql" },
+            // Caller-injected relation frames are not execution provenance.
+            // Actual three-level loading is exercised by TraceChainSqliteTests.
+            Assert.Equal(new[] { "operation", "request", "provider", "sql" },
                 result.Metadata.TraceChain.Select(node => node.Kind));
+            Assert.Equal("TestEntity", result.Metadata.TraceChain[0].Name);
+            Assert.Equal("query", result.Metadata.TraceChain[0].Detail);
+            Assert.DoesNotContain(result.Metadata.TraceChain, node => node.Kind == "relation");
         }
 
         [Fact]
         public async Task QueryAsync_ThrowsIfEntityNotFound()
         {
-            var req = new QueryRequest { Query = new SelectQuery { Entity = "Unknown" } };
+            var req = new QueryRequest(new SelectQuery("Unknown"),
+                new QueryIntent("load unknown entity", "verify missing schema diagnosis"));
             _mockSchemaProvider.Setup(s => s.GetEntity("Unknown")).Returns((EntityDescriptor?)null);
 
             await Assert.ThrowsAsync<SqlExecutorException>(() => _executor.QueryAsync(req));
@@ -111,8 +115,9 @@ namespace TeaQL.Sql.Tests
             var observer = new RecordingRelationObserver();
             var query = new SelectQuery("School").Relation("students");
 
-            var result = await _executor.QueryAsync(new QueryRequest
-                { Query = query, RelationLoadObserver = observer });
+            var result = await _executor.QueryAsync(new QueryRequest(query,
+                new QueryIntent("load school and students", "verify relation attachment observation"))
+                { RelationLoadObserver = observer });
 
             Assert.Equal("School", observer.Entity);
             Assert.Equal("students", observer.Relation);
@@ -149,7 +154,8 @@ namespace TeaQL.Sql.Tests
             query.RelationAggregates.Add(new RelationAggregate("students", "recordCount", countQuery, true));
             query.RelationAggregates.Add(new RelationAggregate("students", "scoreTotal", sumQuery, true));
 
-            var result = await _executor.QueryAsync(new QueryRequest { Query = query });
+            var result = await _executor.QueryAsync(new QueryRequest(query,
+                new QueryIntent("load school student aggregates", "verify batched count and sum aliases")));
 
             Assert.Equal(2, result.Rows[0]["recordCount"].TryI64());
             Assert.Equal(42, result.Rows[0]["scoreTotal"].TryI64());
@@ -162,7 +168,7 @@ namespace TeaQL.Sql.Tests
         {
             var cmd = new InsertCommand { Entity = "TestEntity" };
             cmd.TraceChain.Add(new TraceNode("TestEntity", null, "create fixture") { Kind = "auditReason", Name = "TestEntity" });
-            var req = new InsertMutationRequest(cmd);
+            var req = new InsertMutationRequest(cmd, "create fixture");
             var ed = new EntityDescriptor { Name = "TestEntity", TableNameValue = "test" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
@@ -183,12 +189,15 @@ namespace TeaQL.Sql.Tests
         [Fact]
         public async Task QueryStreamAsync_ChunksResults()
         {
-            var req = new QueryRequest { Query = new SelectQuery { Entity = "TestEntity" } };
+            var req = new QueryRequest(new SelectQuery("TestEntity"),
+                new QueryIntent("stream fixture rows", "verify stream chunk boundaries"));
             var ed = new EntityDescriptor { Name = "TestEntity", TableNameValue = "test" };
             _mockSchemaProvider.Setup(s => s.GetEntity("TestEntity")).Returns(ed);
 
             var compiled = new CompiledQuery("SELECT 1", new List<Value>(), null);
-            _mockDialect.Setup(d => d.CompileSelect(ed, req.Query)).Returns(compiled);
+            _mockDialect.Setup(d => d.CompileSelect(ed, It.Is<SelectQuery>(query =>
+                query.Entity == "TestEntity" && query.Slice != null && query.Slice.Limit == SelectQuery.DefaultHardLimit
+                && !ReferenceEquals(query, req.Query)))).Returns(compiled);
 
             var rows = new List<Record> { new Record(), new Record(), new Record() };
             _mockStreamingTransport.Setup(t => t.StreamSqlAsync(compiled, default)).Returns(StreamRows(rows));

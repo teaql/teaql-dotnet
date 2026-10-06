@@ -10,7 +10,7 @@ public class QueryPolicyTests
     {
         var policy = new TenantPolicy();
         var context = new UserContext().WithRequestPolicy(policy);
-        var root = new SelectQuery("Order");
+        var root = new SelectQuery("Order").Comment("load order graph").Purpose("verify nested query policy");
         var item = new SelectQuery("OrderItem");
         root.RelationLoads.Add(new RelationLoad("items", item));
         root.Facets.Add(new FacetRequest("items", "item", item, true));
@@ -31,7 +31,7 @@ public class QueryPolicyTests
     public void MissingPolicyUsesADeepExecutionClone()
     {
         var child = new SelectQuery("OrderItem");
-        var root = new SelectQuery("Order");
+        var root = new SelectQuery("Order").Comment("load order graph").Purpose("verify execution clone isolation");
         root.RelationLoads.Add(new RelationLoad("items", child));
 
         var prepared = new UserContext().ApplyRequestPolicy(root);
@@ -44,7 +44,7 @@ public class QueryPolicyTests
     public void ReplacementPolicyPreservesSharedQueryIdentity()
     {
         var shared = new SelectQuery("OrderItem");
-        var root = new SelectQuery("Order");
+        var root = new SelectQuery("Order").Comment("load order graph").Purpose("verify shared query identity after policy");
         root.RelationLoads.Add(new RelationLoad("items", shared));
         root.Facets.Add(new FacetRequest("items", "item", shared, true));
 

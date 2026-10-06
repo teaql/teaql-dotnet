@@ -39,7 +39,7 @@ internal static class LogPrivacy
         return node == null ? [] : [node.ToString()];
     }
 
-    private static bool HasCredentials(JsonNode? value) => value switch
+    internal static bool HasCredentials(JsonNode? value) => value switch
     {
         JsonObject obj => obj.Any(pair => SensitiveLogNames.IsCredential(pair.Key) || HasCredentials(pair.Value)),
         JsonArray array => array.Any(HasCredentials),
@@ -165,8 +165,13 @@ internal static class LogPrivacy
             Comment = Scrub(source.Comment), Purpose = Scrub(source.Purpose), AuditReason = Scrub(source.AuditReason),
             TraceChain = source.TraceChain.Select(node => node with
             {
-                Comment = Scrub(node.Comment)!, Name = Scrub(node.Name)!, EntityType = Scrub(node.EntityType)!, Kind = Scrub(node.Kind)!
+                Comment = Scrub(node.Comment)!, Detail = Scrub(node.Detail)!, Name = Scrub(node.Name)!,
+                EntityType = Scrub(node.EntityType)!, Kind = Scrub(node.Kind)!
             }).ToList(),
+            MutationLineage = Array.AsReadOnly(source.MutationLineage.Select(node => node with {
+                Comment = Scrub(node.Comment)!, Detail = Scrub(node.Detail)!, Name = Scrub(node.Name)!,
+                EntityType = Scrub(node.EntityType)!, Kind = Scrub(node.Kind)!
+            }).ToArray()),
             ParameterizedQuery = reason == null ? sql : RedactedSql,
             Parameters = values, ParameterCount = source.ParameterCount,
             DebugQuery = rendered, ParameterLogPolicies = effective, MaskedParameters = masked,

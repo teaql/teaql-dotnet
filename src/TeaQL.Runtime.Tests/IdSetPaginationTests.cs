@@ -11,7 +11,7 @@ public class IdSetPaginationTests
         var provider = new DynamicDataService(5, 4, 3, 2, 1);
         var context = Context(provider, new InMemoryIdSetStore(), "disabled");
         var query = new SelectQuery("School").OrderDesc("id").Limit(2);
-        var result = await context.RequireResource<IDataService>().QueryAsync(new QueryRequest { Query = query });
+        var result = await context.RequireResource<IDataService>().QueryAsync(PageRequest(query));
         Assert.Equal("ID_SET_DISABLED", context.IdSetPlan);
         Assert.Equal(1, provider.Calls);
         Assert.Equal(new ulong[] { 5, 4 }, Ids(result));
@@ -26,19 +26,13 @@ public class IdSetPaginationTests
             .WithDataService(provider);
         var service = context.RequireResource<IDataService>();
 
-        var first = await service.QueryAsync(new QueryRequest
-        {
-            Query = Query(0)
-        });
+        var first = await service.QueryAsync(PageRequest(Query(0)));
         Assert.Equal(new ulong[] { 5, 4 }, Ids(first));
         Assert.Equal("ID_SET_BUILD", context.IdSetPlan);
         Assert.Equal("EXACT", context.IdSetCountAccuracy);
         Assert.Equal(5UL, context.IdSetCount);
 
-        var second = await service.QueryAsync(new QueryRequest
-        {
-            Query = Query(2)
-        });
+        var second = await service.QueryAsync(PageRequest(Query(2)));
         Assert.Equal(new ulong[] { 3, 2 }, Ids(second));
         Assert.Equal("ID_SET_HIT", context.IdSetPlan);
         Assert.Equal(3, provider.Calls);
@@ -56,10 +50,7 @@ public class IdSetPaginationTests
             .WithIdSetStore(new InMemoryIdSetStore())
             .WithDataService(provider);
 
-        var result = await context.RequireResource<IDataService>().QueryAsync(new QueryRequest
-        {
-            Query = Query(0)
-        });
+        var result = await context.RequireResource<IDataService>().QueryAsync(PageRequest(Query(0)));
 
         Assert.Empty(result.Rows);
         Assert.Equal(1, provider.Calls);
@@ -75,7 +66,7 @@ public class IdSetPaginationTests
         var context = Context(provider, new InMemoryIdSetStore(), "tie-breaker");
         var query = new SelectQuery("School").OrderDesc("name").Limit(2)
             .OptimizePaginationWithIdSet("tie-breaker", 60, 100);
-        await context.RequireResource<IDataService>().QueryAsync(new QueryRequest { Query = query });
+        await context.RequireResource<IDataService>().QueryAsync(PageRequest(query));
         var build = Assert.Single(provider.Queries.Where(item => item.Projection.SequenceEqual(new[] { "id" })));
         Assert.Contains(build.OrderByItems, order => order.Field == "id");
     }
@@ -86,7 +77,7 @@ public class IdSetPaginationTests
         var provider = new DynamicDataService(5, 4, 3, 2, 1);
         var context = Context(provider, new InMemoryIdSetStore(), "overflow");
         var query = Query(0).OptimizePaginationWithIdSet("overflow", 60, 2);
-        var result = await context.RequireResource<IDataService>().QueryAsync(new QueryRequest { Query = query });
+        var result = await context.RequireResource<IDataService>().QueryAsync(PageRequest(query));
         Assert.Equal("ID_SET_FALLBACK_LIMIT_EXCEEDED", context.IdSetPlan);
         Assert.Equal("LOWER_BOUND", context.IdSetCountAccuracy);
         Assert.Equal(3UL, context.IdSetCount);
@@ -101,9 +92,9 @@ public class IdSetPaginationTests
         var context = Context(provider, store, "ttl");
         var service = context.RequireResource<IDataService>();
         var query = Query(0).OptimizePaginationWithIdSet("ttl", 1, 100);
-        await service.QueryAsync(new QueryRequest { Query = query });
+        await service.QueryAsync(PageRequest(query));
         await Task.Delay(1100);
-        await service.QueryAsync(new QueryRequest { Query = query });
+        await service.QueryAsync(PageRequest(query));
         Assert.Equal("ID_SET_BUILD", context.IdSetPlan);
         Assert.Equal(2, provider.IdBuildCalls);
     }
@@ -114,10 +105,8 @@ public class IdSetPaginationTests
         var store = new InMemoryIdSetStore();
         var provider = new DynamicDataService(5, 4, 3, 2, 1);
         async Task Run(UserContext context, string parameter) =>
-            await context.RequireResource<IDataService>().QueryAsync(new QueryRequest
-            {
-                Query = Query(0).AndFilter(Expr.Eq("name", new Value.TextValue(parameter)))
-            });
+            await context.RequireResource<IDataService>().QueryAsync(PageRequest(
+                Query(0).AndFilter(Expr.Eq("name", new Value.TextValue(parameter)))));
 
         await Run(Context(provider, store, "user-a").WithTrustedTenant("tenant-a").WithActiveRoot("Platform", 1), "A");
         await Run(Context(provider, store, "user-b").WithTrustedTenant("tenant-a").WithActiveRoot("Platform", 1), "A");
@@ -141,8 +130,8 @@ public class IdSetPaginationTests
         var first = Context(provider, store, "same-user");
         var second = Context(provider, store, "same-user");
         await Task.WhenAll(
-            first.RequireResource<IDataService>().QueryAsync(new QueryRequest { Query = Query(0) }),
-            second.RequireResource<IDataService>().QueryAsync(new QueryRequest { Query = Query(2) }));
+            first.RequireResource<IDataService>().QueryAsync(PageRequest(Query(0))),
+            second.RequireResource<IDataService>().QueryAsync(PageRequest(Query(2))));
         Assert.Equal(1, provider.IdBuildCalls);
         Assert.Contains(new[] { first.IdSetPlan, second.IdSetPlan }, plan => plan == "ID_SET_BUILD");
         Assert.Contains(new[] { first.IdSetPlan, second.IdSetPlan }, plan => plan == "ID_SET_HIT");
@@ -153,7 +142,7 @@ public class IdSetPaginationTests
     {
         var provider = new DynamicDataService(5, 4, 3, 2, 1);
         var context = Context(provider, new FailingStore(), "store-failure");
-        var result = await context.RequireResource<IDataService>().QueryAsync(new QueryRequest { Query = Query(0) });
+        var result = await context.RequireResource<IDataService>().QueryAsync(PageRequest(Query(0)));
         Assert.Equal("ID_SET_FALLBACK_STORE_UNAVAILABLE", context.IdSetPlan);
         Assert.Equal(new ulong[] { 5, 4 }, Ids(result));
     }
@@ -164,7 +153,7 @@ public class IdSetPaginationTests
         var provider = new DynamicDataService(5, 4, 3, 2, 1);
         var context = Context(provider, new InMemoryIdSetStore(), "unsupported");
         var query = Query(0).Count("count");
-        await context.RequireResource<IDataService>().QueryAsync(new QueryRequest { Query = query });
+        await context.RequireResource<IDataService>().QueryAsync(PageRequest(query));
         Assert.Equal("ID_SET_FALLBACK_UNSUPPORTED_SHAPE", context.IdSetPlan);
         Assert.Equal(1, provider.Calls);
     }
@@ -175,13 +164,16 @@ public class IdSetPaginationTests
         var provider = new DynamicDataService(5, 4, 3, 2, 1);
         var context = Context(provider, new InMemoryIdSetStore(), "delete-stability");
         var service = context.RequireResource<IDataService>();
-        await service.QueryAsync(new QueryRequest { Query = Query(0) });
+        await service.QueryAsync(PageRequest(Query(0)));
         provider.Delete(4);
-        var page = await service.QueryAsync(new QueryRequest { Query = Query(2) });
+        var page = await service.QueryAsync(PageRequest(Query(2)));
         Assert.Equal(new ulong[] { 3, 2 }, Ids(page));
         Assert.Equal("ID_SET_HIT", context.IdSetPlan);
         Assert.Equal(1, provider.IdBuildCalls);
     }
+
+    private static QueryRequest PageRequest(SelectQuery query) => new(query,
+        new QueryIntent("load retained school page", "verify ID set pagination behavior"));
 
     private static SelectQuery Query(ulong offset) => new SelectQuery("School")
         .OrderDesc("id")

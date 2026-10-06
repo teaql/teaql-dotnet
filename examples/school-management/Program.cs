@@ -13,7 +13,42 @@ static void Require(bool condition, string message)
     if (!condition) throw new InvalidOperationException(message);
 }
 
-var database = Path.Combine(Path.GetTempPath(), $"teaql-school-dotnet-{Guid.NewGuid():N}.sqlite");
+static async Task RejectIntent(Func<Task> work, string code, string field, string kind)
+{
+    try { await work(); }
+    catch (RequestIntentException error)
+    {
+        Require(error.Code == code && error.Field == field && error.RequestKind == kind,
+            "Required request intent reported the wrong structured failure");
+        return;
+    }
+    throw new InvalidOperationException("Missing intent unexpectedly passed");
+}
+
+// No provider or transaction is installed: rejection must happen before either
+// resource lookup. Turning logs off must not disable governance.
+var policyProbe = new IntentPolicyProbe();
+var rejectedContext = new UserContext().WithRequestPolicy(policyProbe)
+    .DisableQuerySqlLog().DisableMutationSqlLog();
+await RejectIntent(() => Q.Schools().Purpose("verify missing comment")
+    .ExecuteForListAsync(rejectedContext), "REQUEST_COMMENT_REQUIRED", "comment", "query");
+await RejectIntent(() => Q.Schools().Comment("verify blank purpose").Purpose("\u2003")
+    .ExecuteForOneAsync(rejectedContext), "QUERY_PURPOSE_REQUIRED", "purpose", "query");
+await RejectIntent(() => new School().SaveAsync(rejectedContext),
+    "REQUEST_COMMENT_REQUIRED", "comment", "mutation");
+var callbackCount = 0;
+await RejectIntent(() => rejectedContext.ExecuteGraphSaveAsync("\u2003", graph => {
+    callbackCount++;
+    return Task.FromResult(0);
+}), "REQUEST_COMMENT_REQUIRED", "comment", "mutation");
+Require(policyProbe.Calls == 0 && callbackCount == 0,
+    "Missing intent reached Policy or the graph callback");
+Console.WriteLine("PASS .NET generated required-intent rejection with logs disabled and no provider");
+
+var retainedDatabase = Environment.GetEnvironmentVariable("TEAQL_SCHOOL_BOOTSTRAP_DB");
+var database = retainedDatabase ?? Path.Combine(Path.GetTempPath(), $"teaql-school-dotnet-{Guid.NewGuid():N}.sqlite");
+var bootstrapOnly = retainedDatabase != null;
+var logging = Environment.GetEnvironmentVariable("TEAQL_SCHOOL_BOOTSTRAP_LOGGING") != "off";
 try
 {
     await using var connection = new SqliteConnection($"Data Source={database}");
@@ -22,11 +57,23 @@ try
     var service = new SqlDataServiceExecutor(
         new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
     using var queryLogs = new StringWriter();
+    var bootstrapEvidence = new BootstrapEvidence(new TextDiagnosticSqlLogSink(queryLogs), database);
     var context = module.IntoContext().WithDataService(service)
-        .WithDiagnosticSqlLogSink(new TextDiagnosticSqlLogSink(queryLogs));
+        .WithDiagnosticSqlLogSink(bootstrapEvidence).WithAppAuditEventSink(bootstrapEvidence);
+    context.UserIdentifier = "school-example-user";
+    context.InsertNamedResource("bootstrapCategory", "school-example-category");
+    if (!logging) context.DisableQuerySqlLog().DisableMutationSqlLog();
 
     await context.EnsureSchemaAsync();
+    var fresh = bootstrapEvidence.Audits.Count == 3;
+    Require(fresh || bootstrapEvidence.Audits.Count == 0, "Bootstrap partially seeded its graph");
+    bootstrapEvidence.Verify(fresh ? 3 : 0, logging, fresh ? 6 : 3);
+    Require(context.UserIdentifier == "school-example-user"
+        && context.RequireNamedResource<string>("bootstrapCategory") == "school-example-category",
+        "Generated bootstrap did not restore caller identity");
+    bootstrapEvidence.Clear();
     await context.EnsureSchemaAsync();
+    bootstrapEvidence.Verify(0, logging, 3);
 
     var platforms = await Q.Platforms().Comment("verify seeded root")
         .Purpose("local runtime verification").ExecuteForListAsync(context);
@@ -35,7 +82,8 @@ try
     Require(platforms.Count == 1 && platforms[0].Id == 1, "Platform id 1 was not seeded");
     Require(constants.Count == 2 && constants[0].Id == 1001 && constants[1].Id == 1002,
         "SchoolType constants were not seeded");
-    Require(constants[0].Version == 1 && constants[1].Version == 1,
+    var originalVersion = constants[0].Version;
+    Require(originalVersion >= 1 && constants[1].Version == 1,
         "Repeated ensureSchema was not idempotent");
 
     var drifted = await Q.SchoolTypes().WithIdIs(1001).Comment("load constant for drift simulation")
@@ -43,11 +91,21 @@ try
         ?? throw new InvalidOperationException("Seeded SchoolType 1001 was not found");
     drifted.UpdateName("Drifted Primary");
     await drifted.AuditAs("simulate out-of-band constant drift").SaveAsync(context);
+    bootstrapEvidence.Clear();
     await context.EnsureSchemaAsync();
+    bootstrapEvidence.Verify(1, logging, 4);
     var changed = await Q.SchoolTypes().WithIdIs(1001).Comment("verify constant reconciliation")
         .Purpose("local runtime verification").ExecuteForOneAsync(context);
-    Require(changed?.Name == "Primary" && changed.Version == 3,
+    Require(changed?.Name == "Primary" && changed.Version == originalVersion + 2,
         "Changed constant was not reconciled exactly once");
+    bootstrapEvidence.Clear();
+    await context.EnsureSchemaAsync();
+    bootstrapEvidence.Verify(0, logging, 3);
+    Require(context.UserIdentifier == "school-example-user"
+        && context.RequireNamedResource<string>("bootstrapCategory") == "school-example-category",
+        "Reconciliation leaked bootstrap identity");
+    Console.WriteLine($"PASS .NET generated bootstrap trace logging={logging} fresh={fresh} originalVersion={originalVersion}");
+    if (bootstrapOnly) return;
 
     var school = Q.Schools().Comment("create School Query conformance fixture")
         .Purpose("execute the shared School example").NewEntity(context);
@@ -113,10 +171,16 @@ try
 }
 finally
 {
-    if (File.Exists(database)) File.Delete(database);
+    if (!bootstrapOnly && File.Exists(database)) File.Delete(database);
 }
 
 sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
 {
     public EntityDescriptor? GetEntity(string name) => module.Metadata.GetEntity(name);
+}
+
+sealed class IntentPolicyProbe : IRequestPolicy
+{
+    public int Calls { get; private set; }
+    public SelectQuery Apply(SelectQuery query) { Calls++; return query; }
 }
