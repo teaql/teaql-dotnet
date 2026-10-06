@@ -119,6 +119,14 @@ Shipment NewShipment(string code) => Q.Shipments().Comment("prepare a shipment")
 void ClearEvidence() { capture.Clear(); sink.Clear(); }
 async Task IdentityGuard()
 {
+    // Pure oracle inputs only: these nodes are never supplied to the runtime.
+    TraceNode Sample(string kind) => new("CustomerOrder", 1, "") {
+        Kind = kind, Name = "CustomerOrder", Detail = "submit order"
+    };
+    Verify.Equal("CustomerOrder#1:submit order", Verify.Shape([Sample("auditReason")]), "typed lineage positive control");
+    foreach (var kind in new[] { "comment", "purpose", "entity", "sql" })
+        await Verify.Throws<Exception>(() => { Verify.Shape([Sample(kind)]); return Task.CompletedTask; }, "wrong-kind lineage " + kind);
+    Console.WriteLine("PASS .NET typed lineage oracle rejects correct-text Comment/Purpose/Entity/Sql nodes");
     var expected = new (string, long)[] { ("CustomerOrder", 100), ("OrderItem", 201), ("OrderItem", 202),
         ("Payment", 100), ("PaymentAttempt", 401), ("Shipment", 501) };
     Verify.ExactIdentities(expected, expected, "positive identity control");
@@ -384,7 +392,10 @@ static class Verify
     public static void That(bool condition, string message) { if (!condition) throw new Exception("ASSERT: " + message); }
     public static void Equal<T>(T expected, T actual, string message) => That(EqualityComparer<T>.Default.Equals(expected, actual),
         $"{message}; expected={expected}, actual={actual}");
-    public static string Shape(IEnumerable<TraceNode> nodes) => string.Join(" -> ", nodes.Select(value => $"{value.Name}#{value.EntityId}:{value.Detail}"));
+    public static string Shape(IEnumerable<TraceNode> nodes) => string.Join(" -> ", nodes.Select(value => {
+        That(value.Kind == "auditReason" && value.Comment == "", "lineage requires typed AuditReason nodes with Detail reasons");
+        return $"{value.Name}#{value.EntityId}:{value.Detail}";
+    }));
     public static void ExactIdentities(IEnumerable<(string Entity, long Id)> expected,
         IEnumerable<(string Entity, long Id)> actual, string boundary)
     {

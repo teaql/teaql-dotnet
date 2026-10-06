@@ -19,6 +19,7 @@ for round in 1 2; do
     rg -q "TC-REQ-09 DOTNET GENERATED BOOTSTRAP PASSED logging=$logging first_writes=[01] repeat_writes=0" "$run_log"
   done
   rg -Fq 'PASS .NET graph identity controls: duplicate, missing and equal-ID type collapse rejected' "$run_log"
+  rg -Fxq 'PASS .NET typed lineage oracle rejects correct-text Comment/Purpose/Entity/Sql nodes' "$run_log"
   rg -Fq 'PASS FORWARD_NOTLOADED: generated Q/E retains FK and fails closed on hidden detail' "$run_log"
   rg -Fq 'PASS: .NET generated ownership 4 scenarios' "$run_log"
   rg -Fq 'PASS: .NET generated page count, scope, privacy and independent graph saves' "$run_log"
