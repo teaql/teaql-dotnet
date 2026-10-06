@@ -9,6 +9,41 @@ public class RequestIntentGateTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task QueryTraceOnlyCannotSupplyMissingOwnedCommentBeforePolicyOrProvider(bool logging)
+    {
+        var provider = new CountingProvider();
+        var policy = new CountingPolicy();
+        var audit = new CountingAudit();
+        var context = new UserContext().WithDataService(provider).WithRequestPolicy(policy)
+            .WithAppAuditEventSink(audit).EnableQuerySqlLog(logging).EnableMutationSqlLog(logging);
+        var service = new RuntimeDataService(provider, context);
+        var query = new SelectQuery("Probe").Purpose("declared query purpose");
+        query.TraceChain = new()
+        {
+            new TraceNode("Probe", null, "SECRET-CANARY trace-only comment")
+            { Kind = "comment", Name = "Probe", Detail = "SECRET-CANARY trace-only comment" },
+            new TraceNode("Probe", null, "SECRET-CANARY trace-only purpose")
+            { Kind = "purpose", Name = "Probe", Detail = "SECRET-CANARY trace-only purpose" },
+        };
+        Assert.Null(query.CommentText);
+        Assert.Equal(2, query.TraceChain.Count);
+        Check(Assert.Throws<RequestIntentException>(() => new QueryRequest(query)),
+            "REQUEST_COMMENT_REQUIRED", "comment", "query");
+        Check(Assert.Throws<RequestIntentException>(() => context.ApplyRequestPolicy(query)),
+            "REQUEST_COMMENT_REQUIRED", "comment", "query");
+        Check(await Assert.ThrowsAsync<RequestIntentException>(() =>
+            service.QueryAsync(context.PrepareQueryRequest(new QueryRequest(query)))),
+            "REQUEST_COMMENT_REQUIRED", "comment", "query");
+        Assert.Equal(0, policy.Calls);
+        Assert.Equal(0, provider.Calls);
+        Assert.Equal(0, audit.Calls);
+        Assert.Null(query.CommentText);
+        Assert.Equal(2, query.TraceChain.Count);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task BlankRootIntentCannotReachPolicyProviderOrGraphCallback(bool logging)
     {
         var provider = new CountingProvider();
