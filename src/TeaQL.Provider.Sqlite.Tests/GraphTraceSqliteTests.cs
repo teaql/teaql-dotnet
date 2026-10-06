@@ -111,11 +111,14 @@ public class GraphTraceSqliteTests
         });
     }
 
-    [Fact]
-    public async Task RealAllocatedGraphKeepsBranchDeleteLedgerAndCommittedAuditLineage()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task RealAllocatedGraphKeepsBranchDeleteLedgerAndCommittedAuditLineage(bool logging)
     {
         var fixture = await Fixture(); await using var db = fixture.Db;
         var context = fixture.Context; var sink = fixture.Sink;
+        context.EnableQuerySqlLog(logging).EnableMutationSqlLog(logging);
         await context.RequireResource<IDataService>().MutateAsync(Insert("OrderItem", 202));
         sink.Audit.Clear(); sink.Sql.Clear();
         var expected = new Dictionary<(string, ulong), string>();
@@ -145,6 +148,18 @@ public class GraphTraceSqliteTests
             var result = await graph.MutateAsync(delete, deleted);
             expected[("OrderItem", 202)] = Shape(deleted.Recover());
             Assert.Equal(expected[("OrderItem", 202)], Shape(result.Metadata.MutationLineage));
+            Assert.Equal(2, result.Metadata.Statements.Count); // Soft delete also reads back its tombstone.
+            var deleteSql = result.Metadata.Statements[0];
+            Assert.Equal(DataServiceOperation.Delete, deleteSql.Operation);
+            Assert.Equal(expected[("OrderItem", 202)], Shape(deleteSql.MutationLineage));
+            Assert.Equal("success", deleteSql.ExecutionOutcome);
+            Assert.Equal(1UL, deleteSql.AffectedRows);
+            var deleteReadback = result.Metadata.Statements[1];
+            Assert.Equal(DataServiceOperation.Query, deleteReadback.Operation);
+            Assert.Equal(expected[("OrderItem", 202)], Shape(deleteReadback.MutationLineage));
+            Assert.Equal("success", deleteReadback.ExecutionOutcome);
+            Assert.Equal(1, deleteReadback.ResultCount);
+            Assert.Equal(new Value.U64Value(202), Assert.Single(deleteReadback.Parameters));
             Assert.Empty(sink.Audit);
             Assert.Equal(rootShape, Shape(root.Recover()));
             return true;
@@ -157,13 +172,33 @@ public class GraphTraceSqliteTests
                     ? complete : scope.Recover();
                 expected[(entity, id)] = Shape(wanted);
                 Assert.Equal(expected[(entity, id)], Shape(result.Metadata.MutationLineage));
+                // Inspect the actual INSERT and its SELECT readback separately;
+                // a correct result envelope alone cannot prove physical lineage.
+                Assert.Equal(2, result.Metadata.Statements.Count);
+                for (var index = 0; index < result.Metadata.Statements.Count; index++)
+                {
+                    var physical = result.Metadata.Statements[index];
+                    Assert.Equal(index == 0 ? DataServiceOperation.Insert : DataServiceOperation.Query,
+                        physical.Operation);
+                    Assert.Equal(expected[(entity, id)], Shape(physical.MutationLineage));
+                    Assert.Equal("submit order", physical.AuditReason);
+                    Assert.Equal("success", physical.ExecutionOutcome);
+                    Assert.Equal(index == 0 ? "insert" : "select", physical.TraceChain[^1].Name);
+                    if (index == 0) Assert.Equal(1UL, physical.AffectedRows);
+                    else
+                    {
+                        Assert.Equal(1, physical.ResultCount);
+                        Assert.Equal(new Value.U64Value(id), Assert.Single(physical.Parameters));
+                    }
+                }
                 Assert.Equal("CustomerOrder", result.Metadata.TraceChain[0].Name);
                 Assert.All(result.Metadata.MutationLineage, node => Assert.NotNull(node.EntityId));
                 Assert.Empty(sink.Audit);
             }
         });
         Assert.Equal(6, sink.Audit.Count);
-        Assert.Equal(6, sink.Sql.Count(item => item.Operation != DataServiceOperation.Query));
+        Assert.Equal(logging ? 6 : 0, sink.Sql.Count(item => item.Operation != DataServiceOperation.Query));
+        Assert.Equal(logging ? 12 : 0, sink.Sql.Count);
         foreach (var audit in sink.Audit)
         {
             var key = (audit["entityType"]!.ToString()!, Convert.ToUInt64(audit["entityId"]));
