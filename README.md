@@ -95,9 +95,13 @@ emitted, and root statements are not reported twice.
 Prepared batch/item-index lineage, detached-child and late low-level allocation, complete
 entry-point/privacy coverage and internal Registry replay remain open. A direct
 legacy transaction wrapper is not proof of commit-bound audit. Run
-`dotnet test TeaQL.sln`, the separate `TeaQL.Core.Tests` project and
-`bash scripts/verify-examples.sh` against this checkout before promoting an
-internal candidate.
+`bash scripts/verify-trace-chain-source-tests.sh /tmp/teaql-dotnet-tests-<unique-run>`
+and `bash scripts/verify-examples.sh` against this checkout before promoting an
+internal candidate. The source-test gate discovers projects under both `src/`
+and `tests/`, including `TeaQL.Core.Tests` (which is absent from `TeaQL.sln`).
+It retains separate TRX files, refuses overwrite, and rejects zero, skipped,
+failed or incompletely executed suites. Release CI uses this same gate; append
+`-c Release -p:UseSharedCompilation=false` to exercise its release configuration.
 
 ## Sensitive log data
 

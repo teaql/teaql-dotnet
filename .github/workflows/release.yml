@@ -23,8 +23,8 @@ jobs:
           expected="${GITHUB_REF_NAME#dotnet-v}"
           actual="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props)"
           test "$expected" = "$actual"
-      - run: dotnet test TeaQL.sln -c Release -p:UseSharedCompilation=false
-      - run: dotnet test tests/TeaQL.Streaming.Tests/TeaQL.Streaming.Tests.csproj -c Release -p:UseSharedCompilation=false
+      - name: Verify every source test project (including Core)
+        run: bash scripts/verify-trace-chain-source-tests.sh artifacts/test-results -c Release -p:UseSharedCompilation=false
       - name: Pack public projects
         shell: bash
         run: |
