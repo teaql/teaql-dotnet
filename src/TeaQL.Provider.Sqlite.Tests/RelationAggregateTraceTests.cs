@@ -146,6 +146,9 @@ public class RelationAggregateTraceTests
         Assert.Equal(nested ? 2 : 1, transport.Reads.Count);
         var aggregate = Assert.Single(transport.Reads.Where(read => read.Sql.Contains("COUNT(")));
         Assert.Contains("GROUP BY parent_id, bucket", aggregate.Sql);
+        Assert.False(System.Text.RegularExpressions.Regex.IsMatch(aggregate.Sql,
+            @"(?<![\w])""?id""?\s+(?:ASC|DESC)\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase),
+            "grouped relation must order by group keys, not source-row ID");
         if (!nested) Assert.Contains("PARTITION BY bucket", aggregate.Sql);
         Assert.Contains(aggregate.Params, value => value.TryText() == secret);
         Assert.Equal(transport.Reads.Count, observed.Statements.Count);

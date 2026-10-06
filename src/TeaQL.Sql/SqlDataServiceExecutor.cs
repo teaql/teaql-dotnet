@@ -285,8 +285,16 @@ internal static class RelationQueryLoader
                 childQuery.Projection.Add(relation.ForeignKeyValue);
             }
             var limited = childQuery.Slice?.Limit is > 0;
-            if (limited && !childQuery.OrderByItems.Any(order => order.Field == "id"))
-                childQuery.OrderAsc("id");
+            if (limited)
+            {
+                // Aggregate rows have group identities, not source-row IDs.
+                IEnumerable<string> stableFields = childQuery.GroupByItems.Count > 0
+                    ? childQuery.GroupByItems
+                    : childQuery.AggregateItems.Count == 0 ? new[] { "id" } : Array.Empty<string>();
+                foreach (var field in stableFields)
+                    if (!childQuery.OrderByItems.Any(order => order.Field == field))
+                        childQuery.OrderAsc(field);
+            }
             var threshold = childQuery.TopNProbeThreshold;
             // A selected relation's facets belong to that parent's relation
             // result, not to a combined batch of unrelated parents.
