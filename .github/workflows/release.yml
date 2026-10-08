@@ -1,6 +1,12 @@
 name: Publish .NET packages
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing immutable signed release tag to publish
+        required: true
+        type: string
   push:
     tags:
       - "dotnet-v*"
@@ -12,15 +18,22 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      TEAQL_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+      - name: Install test inventory tools
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
       - name: Verify tag matches package version
         shell: bash
         run: |
-          expected="${GITHUB_REF_NAME#dotnet-v}"
+          [[ "$TEAQL_RELEASE_TAG" =~ ^dotnet-v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          expected="${TEAQL_RELEASE_TAG#dotnet-v}"
           actual="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props)"
           test "$expected" = "$actual"
       - name: Verify every source test project (including Core)
