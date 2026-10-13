@@ -19,6 +19,11 @@ internal static class FacetQueryLoader
         var inheritedIntent = SqlStatementDiagnostics.InheritedIntent(request, compiled);
         foreach (var facet in request.Query.Facets)
         {
+            var parent = facet.Query.RequestScope?.Parent ?? request.Scope.Facet(facet.RelationName, facet.Name, facet.Operation);
+            var relationLabel = parent.Relation ?? facet.RelationName;
+            var aliases = facet.Query.AggregateItems.Where(item => item.Function == AggregateFunction.Count)
+                .Select(item => item.Alias).Distinct().ToArray();
+            var countAlias = aliases.FirstOrDefault() ?? CountAlias;
             var relation = source.RelationByName(facet.RelationName)
                 ?? throw new SqlExecutorException($"SQL compile error: missing relation {source.Name}.{facet.RelationName}");
             var target = schema.GetEntity(relation.TargetEntity)
@@ -33,8 +38,9 @@ internal static class FacetQueryLoader
             membership.RelationLoads.Clear(); membership.RelationAggregates.Clear(); membership.Facets.Clear();
             membership.ChildEnhancements.Clear(); membership.ObjectGroupBys.Clear();
             membership.Slice = null; membership.PartitionBy = null; membership.IdSetPagination = null;
-            membership.Project(relation.LocalKeyValue).GroupBy(relation.LocalKeyValue).Count(CountAlias);
-            var countRequest = request.Derive(membership, facet.RelationName);
+            membership.Project(relation.LocalKeyValue).GroupBy(relation.LocalKeyValue).Count(countAlias);
+            foreach (var alias in aliases.Skip(1)) membership.Count(alias);
+            var countRequest = request.DeriveAt(membership, parent.Helper(membership.Entity, $"aggregate {relationLabel}"), facet.RelationName);
             countRequest.IntentSource = inheritedIntent;
             var countResult = await queryAsync(countRequest);
             var localColumn = source.PropertyByName(relation.LocalKeyValue)?.ColumnNameString ?? relation.LocalKeyValue;
@@ -42,14 +48,22 @@ internal static class FacetQueryLoader
             foreach (var row in countResult.Rows)
                 if ((row.TryGetValue(relation.LocalKeyValue, out var key) || row.TryGetValue(localColumn, out key))
                     && key is not Value.NullValue and not Value.TypedNullValue)
-                    counts[key] = row[CountAlias].TryI64() ?? 0;
+                    counts[key] = row[countAlias].TryI64() ?? 0;
 
             var materialization = facet.Query.CloneForExecution();
             materialization.Entity = relation.TargetEntity;
-            var aliases = materialization.AggregateItems.Where(item => item.Function == AggregateFunction.Count)
-                .Select(item => item.Alias).Distinct().ToArray();
             if (aliases.Length == 0) aliases = new[] { RequestConstants.COUNT_ALIAS };
             materialization.AggregateItems.Clear(); materialization.GroupByItems.Clear();
+            // A reverse facet sum covers the complete authorized outer
+            // membership, not only the page and not unrelated rows in that status.
+            materialization.RelationAggregates = materialization.RelationAggregates.Select(aggregate => {
+                if (schema.GetEntity(materialization.Entity)?.RelationByName(aggregate.RelationName)?.TargetEntity != source.Name) return aggregate;
+                var ids = membership.CloneForExecution();
+                ids.AggregateItems.Clear(); ids.GroupByItems.Clear(); ids.Projection.Clear(); ids.Slice = null;
+                var child = aggregate.Query.CloneForExecution();
+                child.AndFilter(Expr.InSubquery("id", source, ids, "id"));
+                return aggregate with { Query = child };
+            }).ToList();
             if (materialization.Projection.Count > 0 && !materialization.Projection.Contains(relation.ForeignKeyValue))
                 materialization.Projection.Add(relation.ForeignKeyValue);
             if (!facet.IncludeAllFacets)
@@ -57,7 +71,7 @@ internal static class FacetQueryLoader
                 // empty; an explicit false membership also excludes unrelated rows.
                 materialization.AndFilter(counts.Count == 0 ? Expr.Value(new Value.BoolValue(false))
                     : Expr.InList(relation.ForeignKeyValue, counts.Keys.ToList()));
-            var derived = request.Derive(materialization, facet.RelationName);
+            var derived = request.Derive(materialization, facet.RelationName, facet.Operation);
             derived.IntentSource = inheritedIntent;
             var result = await queryAsync(derived);
             var foreignColumn = target.PropertyByName(relation.ForeignKeyValue)?.ColumnNameString ?? relation.ForeignKeyValue;

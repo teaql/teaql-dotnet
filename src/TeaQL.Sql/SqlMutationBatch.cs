@@ -25,6 +25,7 @@ internal static class SqlMutationBatch
             foreach (var child in batch.Requests)
             {
                 var request = child.WithRootIntent(batch.Intent);
+                request.StatementObserver = batch.StatementObserver;
                 request.InheritedIntentValues = child.InheritedIntentValues.Concat(intentValues).ToArray();
                 var previous = request.DiagnosticObserver;
                 request.DiagnosticObserver = observer == null ? null : statements.Add;

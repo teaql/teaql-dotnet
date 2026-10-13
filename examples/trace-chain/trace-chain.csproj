@@ -8,6 +8,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="lib/**" />
+    <Compile Remove="standard-telemetry/**" />
+    <Compile Remove="standard-order/**" />
+    <Compile Remove="standard-graph/**" />
+    <Compile Remove="standard-stream/**" />
     <ProjectReference Include="lib/trace-chain-service-lib.csproj" />
   </ItemGroup>
 </Project>

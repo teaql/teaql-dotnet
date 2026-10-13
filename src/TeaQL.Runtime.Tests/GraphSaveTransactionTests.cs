@@ -6,6 +6,35 @@ namespace TeaQL.Runtime.Tests;
 public class GraphSaveTransactionTests
 {
     [Fact]
+    public async Task TelemetryRootCompletesOnlyAfterTransactionDisposal()
+    {
+        var provider = new RecordingTransactionExecutor(); var telemetry = new RootProbe();
+        var disposed = false;
+        provider.OnDispose = () => { Assert.True(telemetry.Active, "graph root ended before provider cleanup"); disposed = true; };
+        telemetry.OnSuccess = () => Assert.True(disposed);
+        var context = new UserContext().WithDataService(provider).WithRuntimeTelemetry(telemetry);
+        Assert.Equal(42, await context.ExecuteGraphSaveAsync("save complete lifetime", graph => Task.FromResult(42)));
+        Assert.Equal(1, telemetry.Successes); Assert.Equal(0, telemetry.Failures);
+    }
+
+    [Fact]
+    public async Task DisposalFailureClosesFailedRootAndDoesNotPoisonTheNextSave()
+    {
+        var provider = new RecordingTransactionExecutor(); var telemetry = new RootProbe();
+        var injected = new InvalidOperationException("injected transaction cleanup failure"); var disposals = 0;
+        provider.OnDispose = () => { if (++disposals == 1) throw injected; };
+        var context = new UserContext().WithDataService(provider).WithRuntimeTelemetry(telemetry);
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            context.ExecuteGraphSaveAsync("save with failing cleanup", graph => Task.FromResult(42)));
+        Assert.Same(injected, error); Assert.Same(injected, telemetry.LastFailure);
+        Assert.Equal(0, telemetry.Successes); Assert.Equal(1, telemetry.Failures); Assert.False(telemetry.Active);
+        var next = await context.ExecuteGraphSaveAsync("save after cleanup failure", graph => Task.FromResult(43))
+            .WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.Equal(43, next); Assert.Equal(1, telemetry.Successes); Assert.Equal(2, provider.BeginCount);
+        Assert.Equal(new[] { "provider-commit", "provider-commit" }, provider.Events);
+    }
+
+    [Fact]
     public async Task AuditIsNotPublishedBeforeCommitOrAfterRollback()
     {
         var provider = new RecordingTransactionExecutor();
@@ -179,6 +208,7 @@ public class GraphSaveTransactionTests
     {
         public int BeginCount { get; private set; }
         public List<string> Events { get; } = new();
+        public Action? OnDispose { get; set; }
         public DataServiceCapabilities Capabilities { get; } = new() { Transaction = true };
         public Task<QueryResult> QueryAsync(QueryRequest request) => Task.FromResult(new QueryResult());
         public Task<MutationResult> MutateAsync(MutationRequest request) => Task.FromResult(new MutationResult { AffectedRows = 1 });
@@ -195,7 +225,25 @@ public class GraphSaveTransactionTests
             public Task<MutationResult> MutateAsync(MutationRequest request) => owner.MutateAsync(request);
             public Task CommitAsync() { owner.Events.Add("provider-commit"); return Task.CompletedTask; }
             public Task RollbackAsync() { owner.Events.Add("provider-rollback"); return Task.CompletedTask; }
-            public void Dispose() { }
+            public void Dispose() => owner.OnDispose?.Invoke();
+        }
+    }
+
+    private sealed class RootProbe : IRuntimeTelemetry
+    {
+        public bool Active; public int Successes, Failures;
+        public Exception? LastFailure; public Action? OnSuccess;
+        public IRuntimeTelemetryScope Start(RuntimeOperation operation)
+        {
+            Assert.Equal("graph.save", operation.Name); Assert.False(Active); Active = true;
+            return new Scope(this);
+        }
+        private sealed class Scope(RootProbe owner) : IRuntimeTelemetryScope
+        {
+            public void Success(IReadOnlyDictionary<string, object>? attributes = null)
+            { owner.OnSuccess?.Invoke(); owner.Active = false; owner.Successes++; }
+            public void Failure(Exception error)
+            { owner.LastFailure = error; owner.Active = false; owner.Failures++; }
         }
     }
 }

@@ -23,8 +23,12 @@ public class QueryPolicyTests
         Assert.NotNull(authorized.FilterCondition);
         Assert.NotNull(authorized.RelationLoads[0].Query!.FilterCondition);
         Assert.NotNull(authorized.Facets[0].Query.FilterCondition);
-        Assert.Same(authorized.RelationLoads[0].Query, authorized.Facets[0].Query);
-        Assert.Equal(new[] { "Order", "OrderItem" }, policy.Entities);
+        Assert.NotSame(authorized.RelationLoads[0].Query, authorized.Facets[0].Query);
+        Assert.Equal(new[] { "Order", "OrderItem", "OrderItem" }, policy.Entities);
+        Assert.All(policy.Intents, intent => {
+            Assert.False(string.IsNullOrWhiteSpace(intent.Comment));
+            Assert.Equal("verify nested query policy",intent.Purpose);
+        });
     }
 
     [Fact]
@@ -41,7 +45,7 @@ public class QueryPolicyTests
     }
 
     [Fact]
-    public void ReplacementPolicyPreservesSharedQueryIdentity()
+    public void ReplacementPolicyForksReusableQueriesForDistinctAttachments()
     {
         var shared = new SelectQuery("OrderItem");
         var root = new SelectQuery("Order").Comment("load order graph").Purpose("verify shared query identity after policy");
@@ -51,17 +55,23 @@ public class QueryPolicyTests
         var authorized = new UserContext().WithRequestPolicy(new ReplacementPolicy())
             .ApplyRequestPolicy(root);
 
-        Assert.Same(authorized.RelationLoads[0].Query, authorized.Facets[0].Query);
+        Assert.NotSame(authorized.RelationLoads[0].Query, authorized.Facets[0].Query);
         Assert.Contains("authorized", authorized.RelationLoads[0].Query!.Projection);
+        var relation = new TeaQL.DataService.QueryRequest(authorized.RelationLoads[0].Query!);
+        var facet = new TeaQL.DataService.QueryRequest(authorized.Facets[0].Query);
+        Assert.NotSame(relation.Scope.Parent,facet.Scope.Parent);
+        Assert.Same(relation.Scope.Root,facet.Scope.Root);
     }
 
     private sealed class TenantPolicy : IRequestPolicy
     {
         public List<string> Entities { get; } = new();
+        public List<(string? Comment,string? Purpose)> Intents { get; } = new();
 
         public SelectQuery Apply(SelectQuery query)
         {
             Entities.Add(query.Entity);
+            Intents.Add((query.CommentText,query.PurposeText));
             query.AndFilter(Expr.Eq("tenant_id", 7));
             return query;
         }

@@ -27,6 +27,7 @@ public class RuntimeTelemetryTests
         Assert.Equal("timeout", RuntimeErrorClassifier.Category("DatabaseTimeoutException"));
         Assert.Equal("authorization", RuntimeErrorClassifier.Category("PermissionException"));
         Assert.Equal("internal", RuntimeErrorClassifier.Category("UnknownTeaQLError"));
+        Assert.Equal("cancelled", RuntimeErrorClassifier.Category("OperationCanceledException"));
     }
 
     [Fact]

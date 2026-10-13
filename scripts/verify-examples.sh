@@ -31,4 +31,8 @@ TEAQL_ORDER_MANAGEMENT_DB="$order_management_tmp/order.db" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/task_board/TaskBoardExample/TaskBoardExample.csproj"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-trace-chain-example.sh"
 bash "$repo/examples/facet-trace/verify.sh"
+bash "$repo/examples/trace-chain/verify-standard-telemetry.sh"
+bash "$repo/examples/trace-chain/verify-standard-order.sh"
+bash "$repo/examples/trace-chain/verify-standard-graph.sh"
+bash "$repo/examples/trace-chain/verify-standard-stream.sh"
 echo "PASS: all .NET examples"

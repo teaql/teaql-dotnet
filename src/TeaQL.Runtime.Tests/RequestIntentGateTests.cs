@@ -70,6 +70,10 @@ public class RequestIntentGateTests
                     .Purpose(missingComment ? "render SECRET-CANARY" : blank!);
                 var code = missingComment ? "REQUEST_COMMENT_REQUIRED" : "QUERY_PURPOSE_REQUIRED";
                 var field = missingComment ? "comment" : "purpose";
+                var child = new SelectQuery("Probe").Comment("load related probes").Purpose("render related probes");
+                query.RelationLoads.Add(new("children", child));
+                Assert.Equal("load related probes", child.CommentText);
+                Assert.Equal("render related probes", child.PurposeText);
                 Check(Assert.Throws<RequestIntentException>(() => context.ApplyRequestPolicy(query)), code, field, "query");
                 // Construction is itself the terminal gate: provider entry is unreachable.
                 Check(await Assert.ThrowsAsync<RequestIntentException>(() =>
@@ -89,6 +93,13 @@ public class RequestIntentGateTests
         Assert.Equal(0, graphCalls);
         Assert.Equal(0, provider.Calls);
         Assert.Equal(0, audit.Calls);
+        var valid = new SelectQuery("Probe").Comment("load validation control").Purpose("verify live provider probes");
+        var control = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.QueryAsync(context.PrepareQueryRequest(new QueryRequest(valid))));
+        Assert.Equal("unexpected provider query", control.Message);
+        Assert.True(policy.Calls > 0);
+        Assert.Equal(1, provider.Calls);
+        Console.WriteLine($"RTC_COM_01_PASS logging={logging.ToString().ToLowerInvariant()} fields=comment,purpose invalid_provider=0 invalid_policy=0 annotated_child=true live_control=true");
     }
 
     private static void Check(RequestIntentException error, string code, string field, string kind)

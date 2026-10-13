@@ -162,7 +162,8 @@ public class RelationAggregateTraceTests
                 statement.TraceChain.Select(node => node.Name));
             Assert.Equal(new[] { "operation", "request" }.Concat(edges.Select(_ => "relation"))
                 .Concat(new[] { "provider", "sql" }), statement.TraceChain.Select(node => node.Kind));
-            Assert.Equal("count numeric groups " + secret, statement.Comment);
+            Assert.Equal("count numeric groups " + secret, statement.RequestTraceChain[1].Comment);
+            Assert.Equal(statement.RequestTraceChain[^1].Comment, statement.Comment);
             Assert.Equal("render numeric partitions " + secret, statement.Purpose);
             Assert.Equal("success", statement.ExecutionOutcome);
         }

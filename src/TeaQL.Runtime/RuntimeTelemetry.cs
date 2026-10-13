@@ -16,6 +16,7 @@ public static class RuntimeErrorClassifier
     public static string Category(string errorType)
     {
         var type = errorType.ToLowerInvariant();
+        if (Contains(type, "cancel")) return "cancelled";
         if (Contains(type, "timeout", "deadline")) return "timeout";
         if (Contains(type, "authentication", "authorization", "unauthorized", "forbidden", "permission")) return "authorization";
         if (Contains(type, "validation", "invalidargument", "valueerror", "parse", "format")) return "validation";
@@ -63,6 +64,7 @@ public interface IRuntimeTelemetryScope
 {
     void Success(IReadOnlyDictionary<string, object>? attributes = null);
     void Failure(Exception error);
+    void Failure(Exception error, IReadOnlyDictionary<string, object>? attributes) => Failure(error);
 }
 
 public interface IRuntimeTelemetry
@@ -138,6 +140,8 @@ public static class RuntimeTelemetryExtensions
         public void Success(IReadOnlyDictionary<string, object>? attributes = null) =>
             Finish(scope => scope.Success(attributes));
         public void Failure(Exception error) => Finish(scope => scope.Failure(error));
+        public void Failure(Exception error, IReadOnlyDictionary<string, object>? attributes) =>
+            Finish(scope => scope.Failure(error, attributes));
         private void Finish(Action<IRuntimeTelemetryScope> action)
         {
             var scope = System.Threading.Interlocked.Exchange(ref _delegate, null);
@@ -262,18 +266,22 @@ public sealed class OpenTelemetryRuntimeTelemetry : IRuntimeTelemetry, IDisposab
             Finish("success");
         }
 
-        public void Failure(Exception error)
+        public void Failure(Exception error) => Failure(error, null);
+        public void Failure(Exception error, IReadOnlyDictionary<string, object>? attributes)
         {
+            foreach (var pair in attributes ?? new Dictionary<string, object>())
+                if (pair.Key is "teaql.result.cardinality") _activity?.SetTag(pair.Key, pair.Value);
             var category = RuntimeErrorClassifier.Category(error);
             _activity?.SetTag("teaql.error.type", error.GetType().Name);
             _activity?.SetTag("teaql.error.category", category);
             _activity?.SetStatus(ActivityStatusCode.Error);
-            Finish("failure", category);
+            Finish(error is OperationCanceledException ? "cancelled" : "failure", category);
         }
 
         private void Finish(string outcome, string? errorCategory = null)
         {
             var activity = System.Threading.Interlocked.Exchange(ref _activity, null);
+            activity?.SetTag("teaql.operation.outcome", outcome);
             var tags = new TagList
             {
                 { "teaql.operation.family", _operation.Family },

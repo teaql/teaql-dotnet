@@ -76,6 +76,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
         if (request.DiagnosticObserver != null)
             request.IntentSource = SqlStatementDiagnostics.CaptureQueryIntent(Dialect, SchemaProvider, request, compiled);
+        using var statement = SqlExecutionObservation.Start(request, Dialect.Kind.ToString().ToLowerInvariant(), DataServiceOperation.Query);
         var start = DateTimeOffset.UtcNow;
         List<Record> rows;
         try
@@ -84,11 +85,13 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         }
         catch (Exception ex)
         {
-            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            statement.Failure(ex);
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, correlation: statement.Correlation);
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
-        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
+        statement.Success();
+        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count, correlation: statement.Correlation);
         SqlStatementDiagnostics.QuerySucceeded(request, metadata);
         request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
@@ -159,6 +162,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
         }
 
+        using var statement = SqlExecutionObservation.Start(request, Dialect.Kind.ToString().ToLowerInvariant(), SqlStatementDiagnostics.Operation(request));
         var start = DateTimeOffset.UtcNow;
         ulong affectedRows;
         try
@@ -167,11 +171,13 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         }
         catch (Exception ex)
         {
-            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc);
+            statement.Failure(ex);
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc, statement.Correlation);
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
         var end = DateTimeOffset.UtcNow;
+        statement.Success();
 
         var operation = request switch
         {
@@ -184,6 +190,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
 
         var metadata = new ExecutionMetadata
         {
+            SqlCorrelation = statement.Correlation,
             Backend = Dialect.Kind.ToString().ToLowerInvariant(),
             Operation = operation,
             StartedAt = start,
@@ -330,7 +337,7 @@ internal static class RelationQueryLoader
                     : new[] { (Key: (Value?)null, Query: childQuery) };
                 foreach (var executionQuery in queries)
                 {
-                    var derived = request.Derive(executionQuery.Query, load.Name);
+                    var derived = request.Derive(executionQuery.Query, load.Name, load.Operation);
                     derived.IntentSource = inheritedIntent;
                     derived.CaptureRelationKeys = rows =>
                         childKeys.AddRange(SnapshotKeys(rows, relation.ForeignKeyValue));
@@ -397,7 +404,7 @@ internal static class RelationQueryLoader
             if (!childQuery.GroupByItems.Contains(relation.ForeignKeyValue))
                 childQuery.GroupByItems.Add(relation.ForeignKeyValue);
             childQuery.AndFilter(Expr.InList(relation.ForeignKeyValue, parentIds));
-            var derived = request.Derive(childQuery, aggregate.RelationName);
+            var derived = request.DeriveAggregate(childQuery, aggregate.RelationName, aggregate.Operation);
             derived.IntentSource = inheritedIntent;
             var result = await queryAsync(derived);
             var childDescriptor = schemaProvider.GetEntity(relation.TargetEntity);
@@ -563,6 +570,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
         if (request.DiagnosticObserver != null)
             request.IntentSource = SqlStatementDiagnostics.CaptureQueryIntent(Dialect, SchemaProvider, request, compiled);
+        using var statement = SqlExecutionObservation.Start(request, Dialect.Kind.ToString().ToLowerInvariant(), DataServiceOperation.Query);
         var start = DateTimeOffset.UtcNow;
         List<Record> rows;
         try
@@ -571,11 +579,13 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         }
         catch (Exception ex)
         {
-            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex);
+            statement.Failure(ex);
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, correlation: statement.Correlation);
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
-        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count);
+        statement.Success();
+        var metadata = SqlStatementDiagnostics.Metadata(Dialect, request, compiled, start, "success", rows.Count, correlation: statement.Correlation);
         SqlStatementDiagnostics.QuerySucceeded(request, metadata);
         request.CaptureRelationKeys?.Invoke(rows);
         await RelationQueryLoader.EnhanceAsync(Dialect, SchemaProvider, QueryAsync, rows, request, compiled);
@@ -629,6 +639,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
         }
 
+        using var statement = SqlExecutionObservation.Start(request, Dialect.Kind.ToString().ToLowerInvariant(), SqlStatementDiagnostics.Operation(request));
         var start = DateTimeOffset.UtcNow;
         ulong affectedRows;
         try
@@ -637,11 +648,13 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         }
         catch (Exception ex)
         {
-            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc);
+            statement.Failure(ex);
+            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc, statement.Correlation);
             if (ex is OperationCanceledException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
         var end = DateTimeOffset.UtcNow;
+        statement.Success();
 
         var operation = request switch
         {
@@ -654,6 +667,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
         var metadata = new ExecutionMetadata
         {
+            SqlCorrelation = statement.Correlation,
             Backend = Dialect.Kind.ToString().ToLowerInvariant(),
             Operation = operation,
             StartedAt = start,

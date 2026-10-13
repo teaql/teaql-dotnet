@@ -86,7 +86,9 @@ static class AggregateMembershipChecks
                 }
                 expected.Add(("provider", "sqlite", "")); expected.Add(("sql", "select", ""));
                 Verify.That(sql.TraceChain.Select(node => (node.Kind, node.Name, node.Detail)).SequenceEqual(expected), "complete physical relation ancestry");
-                Verify.Equal("inspect [REDACTED]", sql.Comment, "future private binding redacts parent intent");
+                Verify.That(sql.RequestTraceChain.Count >= 2, "aggregate retains business ancestry");
+                Verify.Equal("inspect [REDACTED]", sql.RequestTraceChain[1].Detail, "future private binding redacts parent intent");
+                Verify.Equal(sql.RequestTraceChain[^1].Detail, sql.Comment, "aggregate diagnostic owns its local comment");
                 Verify.Equal(purpose, sql.Purpose, "original root purpose");
                 Verify.Equal("success", sql.ExecutionOutcome, "actual SQL succeeded");
                 Verify.That(!JsonSerializer.Serialize(sql).Contains(secret), "safe diagnostics never expose private binding");

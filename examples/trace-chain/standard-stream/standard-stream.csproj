@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><IsPackable>false</IsPackable>
+    <TeaQLGraphGeneratedRoot Condition="'$(TeaQLGraphGeneratedRoot)' == ''">$(MSBuildThisFileDirectory)../standard-graph/lib</TeaQLGraphGeneratedRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(TeaQLGraphGeneratedRoot)/trace-chain-service-lib.csproj" />
+    <ProjectReference Include="../../../src/TeaQL.Telemetry.OpenTelemetry/TeaQL.Telemetry.OpenTelemetry.csproj" />
+  </ItemGroup>
+</Project>

@@ -11,11 +11,16 @@ internal static class SqlMutationReadback
         CompiledQuery? compiled = null;
         DateTimeOffset started = default;
         int? count = null;
+        ISqlExecutionObservation? statement = null;
+        SqlExecutionCorrelation? correlation = null;
         try
         {
             compiled = dialect.CompileSelect(entity, refresh);
+            statement = SqlExecutionObservation.Start(QueryRequest.Readback(refresh, request), dialect.Kind.ToString().ToLowerInvariant(), DataServiceOperation.Query);
+            correlation = statement.Correlation;
             started = DateTimeOffset.UtcNow;
             var rows = await transport.FetchAllSqlAsync(compiled);
+            statement.Success();
             count = rows.Count;
             var row = rows.SingleOrDefault()
                 ?? throw new SqlExecutorException($"Authoritative persisted row not found for {refresh.Entity}");
@@ -23,6 +28,7 @@ internal static class SqlMutationReadback
         }
         catch (Exception error)
         {
+            if (!count.HasValue) statement?.Failure(error);
             if (request.DiagnosticObserver is { } observer)
             {
                 Report(observer, write);
@@ -36,11 +42,12 @@ internal static class SqlMutationReadback
             }
             throw;
         }
+        finally { statement?.Dispose(); }
 
         ExecutionMetadata ReadMetadata(string outcome)
         {
             var query = QueryRequest.Readback(refresh, request);
-            var read = SqlStatementDiagnostics.Metadata(dialect, query, compiled!, started, outcome, count);
+            var read = SqlStatementDiagnostics.Metadata(dialect, query, compiled!, started, outcome, count, correlation: correlation);
             read.AuditReason = write.AuditReason;
             read.MutationLineage = write.MutationLineage;
             read.IntentSource = write;

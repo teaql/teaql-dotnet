@@ -31,27 +31,105 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public DataServiceCapabilities Capabilities => _provider.Capabilities;
 
+    /// <summary>Execute one authorized page snapshot. Generated libraries bind
+    /// native operation metadata and hydrate rows; this runtime owns counting.</summary>
+    public static Task<SmartList<Record>> FetchPageAsync(IDataService service, UserContext context, QueryRequest request) =>
+        context.RuntimeTelemetry.ObserveAsync(
+            RuntimeOperation.Create("query", $"{request.Query.Entity}.list",
+                new Dictionary<string, object> { ["teaql.entity.type"] = request.Query.Entity }),
+            () => FetchCountedListCoreAsync(service, context, request),
+            result => new Dictionary<string, object> { ["teaql.result.cardinality"] = result.Count });
+
+    private static async Task<SmartList<Record>> FetchCountedListCoreAsync(IDataService service, UserContext context, QueryRequest request)
+    {
+        // The explicit count and list are branches of one generated invocation.
+        // Dispatch only these owned branches beneath that root, rather than
+        // suppressing arbitrary nested/concurrent queries via ambient state.
+        Task<QueryResult> QueryBranchAsync(QueryRequest branch) =>
+            service is RuntimeDataService runtime && ReferenceEquals(runtime._context, context)
+                ? runtime.ExecuteOwnedQueryAsync(branch) : service.QueryAsync(branch);
+        var source = request.Query.CloneForExecution();
+        var operation = source.PageCountOperation;
+        var alias = operation?.Alias ?? RequestConstants.COUNT_ALIAS;
+        if (operation != null)
+            source.AggregateItems.RemoveAll(item => item.Function == AggregateFunction.Count && item.Alias == alias);
+        source.PrepareForList();
+        async Task<long> CountAsync()
+        {
+            var count = source.ForExactCount();
+            count.AggregateItems.Clear(); count.CountField("id", alias);
+            var scope = operation == null ? request.Scope.Helper(source.Entity, "count matching rows")
+                : request.Scope.DeriveOperation(operation);
+            var result = await QueryBranchAsync(request.DeriveAt(count, scope));
+            if (result.Rows.Count != 1 || result.Rows[0][alias].TryI64() is not long total)
+                throw new InvalidOperationException("Exact entity count did not return one integer result");
+            return total;
+        }
+        QueryResult rows;
+        long total;
+        if (source.IdSetPagination != null)
+        {
+            rows = await QueryBranchAsync(request.WithQuery(source));
+            total = context.IdSetCountAccuracy == "EXACT" ? checked((long)context.IdSetCount) : await CountAsync();
+        }
+        else
+        {
+            total = await CountAsync();
+            rows = await QueryBranchAsync(request.WithQuery(source));
+        }
+        var page = new SmartList<Record>(rows.Rows) { TotalCount = total, Facets = rows.Facets };
+        if (operation?.Alias != null) page.Aggregations[alias] = new Value.I64Value(total);
+        return page;
+    }
+
     public IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize,
         System.Threading.CancellationToken cancellationToken = default)
+        => RuntimeStream.Chunks(_context.RuntimeTelemetry, request.WithQuery(request.Query),
+            (captured, token) => QueryStreamCoreAsync(captured, chunkSize, token), cancellationToken);
+
+    private IAsyncEnumerable<StreamChunk> QueryStreamCoreAsync(QueryRequest request, int chunkSize,
+        System.Threading.CancellationToken cancellationToken)
     {
         if (_provider is not IStreamQueryExecutor streaming)
             throw new NotSupportedException("The installed provider does not support streaming queries");
         var execution = CopyRequest(request, request.Query.CloneForExecution());
         execution.DiagnosticObserver = _context.RecordExecutionMetadata;
+        execution.StatementObserver = _context.RuntimeTelemetry is IRuntimeSqlTelemetry telemetry ? telemetry.StartStatement : null;
         return streaming.QueryStreamAsync(execution, chunkSize, cancellationToken);
+    }
+
+    /// <summary>Generated-library bridge: capture a typed stream now, execute
+    /// lazily, own one logical root and acknowledge each delivered entity.</summary>
+    public static IAsyncEnumerable<T> StreamEntities<T>(UserContext context, QueryRequest request,
+        Func<Record, T> materialize, int chunkSize, System.Threading.CancellationToken cancellationToken = default)
+    {
+        if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
+        var service = context.RequireResource<IDataService>();
+        if (service is not IStreamQueryExecutor streaming)
+            throw new NotSupportedException("The configured data service does not provide a local streaming cursor");
+        var captured = request.WithQuery(request.Query);
+        return RuntimeStream.Entities(context.RuntimeTelemetry, captured, materialize,
+            (execution, token) => service is RuntimeDataService runtime && ReferenceEquals(runtime._context, context)
+                ? runtime.QueryStreamCoreAsync(execution, chunkSize, token) : streaming.QueryStreamAsync(execution, chunkSize, token),
+            cancellationToken);
     }
 
     public Task<QueryResult> QueryAsync(QueryRequest request)
     {
-        request.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry);
         return _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("query", $"{request.Query.Entity}.list",
                 new Dictionary<string, object> { ["teaql.entity.type"] = request.Query.Entity }),
-            () => ExecuteQueryAsync(request),
+            () => ExecuteOwnedQueryAsync(request),
             result => new Dictionary<string, object>
             {
                 ["teaql.result.cardinality"] = result.Rows.Count
             });
+    }
+
+    private Task<QueryResult> ExecuteOwnedQueryAsync(QueryRequest request)
+    {
+        request.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry);
+        return ExecuteQueryAsync(request);
     }
 
     private async Task<QueryResult> ExecuteQueryAsync(QueryRequest request)
@@ -107,7 +185,9 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
                     idQuery.Slice = new Slice(options.MaxIds == ulong.MaxValue ? ulong.MaxValue : options.MaxIds + 1, 0);
                     idQuery.HardLimit(options.MaxIds == ulong.MaxValue ? ulong.MaxValue : options.MaxIds + 1);
                     idQuery.IdSetPagination = null;
-                    var idResult = await ObserveProviderQueryAsync(CopyRequest(request, idQuery)).ConfigureAwait(false);
+                    var helper = request.DeriveAt(idQuery, request.Scope.Helper(idQuery.Entity,
+                        $"collect {idQuery.Entity} IDs for pagination"));
+                    var idResult = await ObserveProviderQueryAsync(helper).ConfigureAwait(false);
                     var ids = new List<ulong>(idResult.Rows.Count);
                     foreach (var row in idResult.Rows)
                     {
@@ -354,6 +434,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     private async Task<QueryResult> ObserveProviderQueryAsync(QueryRequest request)
     {
         request.DiagnosticObserver = _context.RecordExecutionMetadata;
+        request.StatementObserver = _context.RuntimeTelemetry is IRuntimeSqlTelemetry telemetry ? telemetry.StartStatement : null;
         var result = await _context.RuntimeTelemetry.ObserveAsync(
             RuntimeOperation.Create("provider", "data-service.query",
                 new Dictionary<string, object>
@@ -373,7 +454,9 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     private async Task<MutationResult> ObserveProviderMutationAsync(MutationRequest request)
     {
         var previous = request.DiagnosticObserver;
+        var previousStatement = request.StatementObserver;
         request.DiagnosticObserver = _context.RecordExecutionMetadata;
+        request.StatementObserver = _context.RuntimeTelemetry is IRuntimeSqlTelemetry telemetry ? telemetry.StartStatement : null;
         try
         {
         var result = await _context.RuntimeTelemetry.ObserveAsync(
@@ -391,7 +474,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         _context.RecordExecutionMetadata(result.Metadata);
         return result;
         }
-        finally { request.DiagnosticObserver = previous; }
+        finally { request.DiagnosticObserver = previous; request.StatementObserver = previousStatement; }
     }
 
     private static string EntityName(MutationRequest request) => request switch

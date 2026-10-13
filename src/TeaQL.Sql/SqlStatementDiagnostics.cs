@@ -6,6 +6,11 @@ namespace TeaQL.Sql;
 
 internal static class SqlStatementDiagnostics
 {
+    internal static DataServiceOperation Operation(MutationRequest request) => request switch {
+        InsertMutationRequest => DataServiceOperation.Insert, UpdateMutationRequest => DataServiceOperation.Update,
+        DeleteMutationRequest => DataServiceOperation.Delete, RecoverMutationRequest => DataServiceOperation.Recover,
+        _ => DataServiceOperation.Batch
+    };
     // Parent SQL can finish before a descendant does. Capture declared child
     // bindings/policies before emitting parent prose, without executing a query,
     // changing caller builders, or sharing provenance through Context.
@@ -80,7 +85,7 @@ internal static class SqlStatementDiagnostics
     }
 
     internal static ExecutionMetadata Metadata(SqlDialect dialect, object request, CompiledQuery compiled,
-        DateTimeOffset start, string outcome, int? count = null, EntityDescriptor? descriptor = null)
+        DateTimeOffset start, string outcome, int? count = null, EntityDescriptor? descriptor = null, SqlExecutionCorrelation? correlation = null)
     {
         var query = request as QueryRequest;
         var mutation = request as MutationRequest;
@@ -101,6 +106,7 @@ internal static class SqlStatementDiagnostics
             _ => "unknown"
         };
         return new ExecutionMetadata {
+            SqlCorrelation = correlation,
             Backend = dialect.Kind.ToString().ToLowerInvariant(), Operation = operation,
             ExecutionOutcome = outcome, StartedAt = start, EndedAt = DateTimeOffset.UtcNow,
             ResultCount = count, ParameterizedQuery = compiled.Sql, Parameters = compiled.Params.ToList(),
@@ -109,6 +115,7 @@ internal static class SqlStatementDiagnostics
             IntentValues = mutation == null ? Array.Empty<Value>() : MutationTargetIds(mutation, descriptor),
             Comment = query?.Comment ?? mutation?.Comment, Purpose = query?.Purpose, AuditReason = mutation?.Comment,
             MutationLineage = mutation?.AuditLineage(entity) ?? Array.Empty<TraceNode>(),
+            RequestTraceChain = query?.Scope.Recover() ?? Array.Empty<TraceNode>(),
             TraceChain = query != null ? SqlDataServiceTransaction.QueryTracePath(query, dialect.Kind.ToString())
                 : SqlDataServiceTransaction.MutationTracePath(mutation!, entity, operation, dialect.Kind.ToString())
         };
@@ -147,8 +154,8 @@ internal static class SqlStatementDiagnostics
     }
 
     internal static void Failure(SqlDialect dialect, object request, CompiledQuery compiled,
-        DateTimeOffset start, Exception error, EntityDescriptor? descriptor = null) => Record(request, Metadata(dialect, request, compiled, start,
-            error is OperationCanceledException ? "cancelled" : "failure", descriptor: descriptor));
+        DateTimeOffset start, Exception error, EntityDescriptor? descriptor = null, SqlExecutionCorrelation? correlation = null) => Record(request, Metadata(dialect, request, compiled, start,
+            error is OperationCanceledException ? "cancelled" : "failure", descriptor: descriptor, correlation: correlation));
 
     internal static IAsyncEnumerable<StreamChunk> Stream(SqlDialect dialect, ISqlTransport transport,
         ISchemaProvider schema, QueryRequest request, int chunkSize, CancellationToken cancellationToken)
@@ -175,8 +182,10 @@ internal static class SqlStatementDiagnostics
         var compiled = dialect.CompileSelect(entity, request.Query);
         if (request.DiagnosticObserver != null)
             request.IntentSource = CaptureQueryIntent(dialect, schema, request, compiled);
+        using var statement = SqlExecutionObservation.Start(request, dialect.Kind.ToString().ToLowerInvariant(), DataServiceOperation.Query);
         var start = DateTimeOffset.UtcNow;
         var outcome = "cancelled";
+        Exception? terminalError = null;
         int delivered = 0, index = 0;
         IAsyncEnumerator<Record>? cursor = null;
         var current = new List<Record>();
@@ -187,12 +196,12 @@ internal static class SqlStatementDiagnostics
                 cancellationToken.ThrowIfCancellationRequested();
                 return await cursor!.MoveNextAsync().ConfigureAwait(false);
             }
-            catch (Exception ex) { outcome = ex is OperationCanceledException ? "cancelled" : "failure"; throw; }
+            catch (Exception ex) { terminalError = ex; outcome = ex is OperationCanceledException ? "cancelled" : "failure"; throw; }
         }
         try
         {
             try { cursor = streaming.StreamSqlAsync(compiled, cancellationToken).GetAsyncEnumerator(cancellationToken); }
-            catch (Exception ex) { outcome = ex is OperationCanceledException ? "cancelled" : "failure"; throw; }
+            catch (Exception ex) { terminalError = ex; outcome = ex is OperationCanceledException ? "cancelled" : "failure"; throw; }
             while (await MoveNext().ConfigureAwait(false))
             {
                 current.Add(cursor.Current);
@@ -226,11 +235,22 @@ internal static class SqlStatementDiagnostics
             try { if (cursor != null) await cursor.DisposeAsync().ConfigureAwait(false); }
             catch (Exception ex) {
                 if (outcome == "success") {
+                    terminalError = ex;
                     outcome = ex is OperationCanceledException ? "cancelled" : "failure";
                     throw;
                 }
             }
-            finally { Record(request, Metadata(dialect, request, compiled, start, outcome, delivered)); }
+            finally {
+                if (request.StreamDelivery is { } acknowledged) {
+                    delivered = acknowledged.Count;
+                    if (acknowledged.Error is { } consumerError) {
+                        terminalError = consumerError;
+                        outcome = consumerError is OperationCanceledException ? "cancelled" : "failure";
+                    }
+                }
+                Record(request, Metadata(dialect, request, compiled, start, outcome, delivered, correlation: statement.Correlation));
+                if (outcome == "success") statement.Success(); else statement.Failure(terminalError ?? new OperationCanceledException());
+            }
         }
     }
 }

@@ -168,6 +168,10 @@ internal static class LogPrivacy
                 Comment = Scrub(node.Comment)!, Detail = Scrub(node.Detail)!, Name = Scrub(node.Name)!,
                 EntityType = Scrub(node.EntityType)!, Kind = Scrub(node.Kind)!
             }).ToList(),
+            RequestTraceChain = Array.AsReadOnly(source.RequestTraceChain.Select(node => node with {
+                Comment = Scrub(node.Comment)!, Detail = Scrub(node.Detail)!, Name = Scrub(node.Name)!,
+                EntityType = Scrub(node.EntityType)!, Kind = Scrub(node.Kind)!
+            }).ToArray()),
             MutationLineage = Array.AsReadOnly(source.MutationLineage.Select(node => node with {
                 Comment = Scrub(node.Comment)!, Detail = Scrub(node.Detail)!, Name = Scrub(node.Name)!,
                 EntityType = Scrub(node.EntityType)!, Kind = Scrub(node.Kind)!
