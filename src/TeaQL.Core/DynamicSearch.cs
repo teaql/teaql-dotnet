@@ -29,7 +29,7 @@ public sealed record DynamicSearchResult(SelectQuery Query, IReadOnlyList<Dynami
 /// Native bindings are application-owned and must preserve related-query authorization.
 /// This API does not relax the federation protocol's validation.
 /// </summary>
-public static class DynamicSearch
+public static partial class DynamicSearch
 {
     private static readonly HashSet<string> Operators = new(StringComparer.Ordinal)
         { "$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$notIn", "$contains" };
@@ -81,6 +81,7 @@ public static class DynamicSearch
                         warnings.Add(new(entity, "FILTER", property.Name));
                         continue;
                     }
+                    if (kind == "unsupported") throw Invalid("Unsupported known-field type");
                     if (op == "$contains" && kind != "string")
                         throw Invalid("String operator requires a string field");
                     if (value.ValueKind == JsonValueKind.Array)
@@ -100,7 +101,9 @@ public static class DynamicSearch
                         || direction.ValueKind != JsonValueKind.String || direction.GetString() is not ("asc" or "desc"))
                         throw Invalid("Invalid dynamic search ordering");
                     var path = field.GetString()!;
-                    if (FieldType(path, entity, models) == null) warnings.Add(new(entity, "ORDER_BY", path));
+                    var kind = FieldType(path, entity, models);
+                    if (kind == "unsupported") throw Invalid("Unsupported known-field type");
+                    if (kind == null) warnings.Add(new(entity, "ORDER_BY", path));
                     else resultOrders.Add(new(path, direction.GetString()!));
                 }
             Emit(warnings, warn);

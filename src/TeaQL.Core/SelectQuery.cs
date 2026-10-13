@@ -46,10 +46,14 @@ public record Slice(ulong? Limit, ulong Offset);
 
 public record RelationLoad(string Name, SelectQuery? Query = null)
 {
+    [JsonIgnore] public QueryOperation? Operation { get; init; }
     public static RelationLoad WithQuery(string name, SelectQuery query) => new(name, query);
 }
 
-public record RelationAggregate(string RelationName, string Alias, SelectQuery Query, bool SingleResult);
+public record RelationAggregate(string RelationName, string Alias, SelectQuery Query, bool SingleResult)
+{
+    [JsonIgnore] public QueryOperation? Operation { get; init; }
+}
 
 public record RawSqlProjection(string PropertyName, string RawSqlSegment);
 
@@ -103,6 +107,8 @@ public sealed class FilterExpression
 
 public record SelectQuery
 {
+    internal QueryRequestScope? RequestScope { get; set; }
+    [JsonIgnore] public QueryOperation? PageCountOperation { get; set; }
     public const ulong DefaultHardLimit = 10_000;
     [JsonIgnore]
     public ulong HardLimitValue { get; set; } = DefaultHardLimit;
@@ -121,7 +127,7 @@ public record SelectQuery
     public List<RelationAggregate> RelationAggregates { get; set; } = new();
     public AggregationCacheOptions? AggregationCache { get; set; }
     public string? CommentText { get; set; }
-    public List<TraceNode> TraceChain { get; set; } = new();
+    [JsonIgnore] public List<TraceNode> TraceChain { get; set; } = new();
     public string? RawSqlText { get; set; }
     public List<string> RawSqlSearchCriteriaItems { get; set; } = new();
     public List<RawSqlProjection> DynamicProperties { get; set; } = new();

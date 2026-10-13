@@ -119,6 +119,15 @@ public class TraceChainSqliteTests
     [InlineData(false)]
     [InlineData(true)]
     public async Task TwoLiveGraphsKeepIntentAndPhysicalPathsIsolated(bool logging)
+        => await VerifyTwoLiveGraphs(logging, false);
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task SharedTemplateConcurrentParentsKeepSeparateOwners(bool logging)
+        => await VerifyTwoLiveGraphs(logging, true);
+
+    private async Task VerifyTwoLiveGraphs(bool logging, bool sharedTemplate)
     {
         PausedRoots? barrier = null;
         var fixture = await Fixture(inner => barrier = new PausedRoots(inner));
@@ -147,10 +156,22 @@ public class TraceChainSqliteTests
             AssertResources(typedResourcesBefore, ContextResources<Type>(fixture.Context, "_typedResources"));
             AssertResources(namedResourcesBefore, ContextResources<string>(fixture.Context, "_namedResources"));
         }
-        QueryRequest Request(string label) => new(new SelectQuery("School").Limit(1)
-            .RelationQuery("platform", new SelectQuery("Platform").Project("organizationId").Limit(1)
+        SelectQuery ChildTemplate() => new SelectQuery("Platform").Project("organizationId").Limit(1)
                 .RelationQuery("organization", new SelectQuery("Organization").Project("regionId").Limit(1)
-                    .RelationQuery("region", new SelectQuery("Region").Limit(1))))
+                    .RelationQuery("region", new SelectQuery("Region").Limit(1)));
+        var template = ChildTemplate();
+        var templateBefore = System.Text.Json.JsonSerializer.Serialize(template);
+        void AssertTemplateUnchanged()
+        {
+            Assert.Equal(templateBefore, System.Text.Json.JsonSerializer.Serialize(template));
+            for (var query = template; query != null; query = query.RelationLoads.FirstOrDefault()?.Query)
+            {
+                Assert.Null(query.CommentText); Assert.Null(query.PurposeText);
+                Assert.Throws<RequestIntentException>(() => new QueryRequest(query));
+            }
+        }
+        QueryRequest Request(string label) => new(new SelectQuery("School").Limit(1)
+            .RelationQuery("platform", sharedTemplate ? template : ChildTemplate())
             .Comment($"load {label} graph").Purpose($"render {label} graph"));
         var pending = new[] { service.QueryAsync(Request("alpha")), service.QueryAsync(Request("beta")) };
         var completed = Task.WhenAll(pending);
@@ -166,6 +187,7 @@ public class TraceChainSqliteTests
             Assert.Equal(new[] { "render alpha graph", "render beta graph" }, observer.Requests.Select(r => r.Purpose));
             Assert.All(observer.Requests, request => Assert.Empty(request.TraceChain));
             AssertContextUnchanged();
+            AssertTemplateUnchanged();
             barrier.Release.TrySetResult(true);
             var results = await completed.WaitAsync(TimeSpan.FromSeconds(5));
             foreach (var result in results)
@@ -178,10 +200,11 @@ public class TraceChainSqliteTests
             Assert.Equal(8, observer.Statements.Count);
             Assert.Equal(logging ? 8 : 0, fixture.Log.Entries.Count);
             AssertContextUnchanged();
+            AssertTemplateUnchanged();
             foreach (var entries in new[] { observer.Statements, fixture.Log.Entries })
             foreach (var label in new[] { "alpha", "beta" })
             {
-                var own = entries.Where(e => e.Comment == $"load {label} graph").ToArray();
+                var own = entries.Where(e => e.RequestTraceChain.Count > 1 && e.RequestTraceChain[1].Comment == $"load {label} graph").ToArray();
                 Assert.Equal(ReferenceEquals(entries, observer.Statements) || logging ? 4 : 0, own.Length);
                 for (var depth = 0; depth < own.Length; depth++)
                 {
@@ -247,7 +270,8 @@ public class TraceChainSqliteTests
         Assert.All(failed.TraceChain, node => Assert.Equal("", node.Comment));
         Assert.Equal(new[] { "School.platform", "Platform.organization", "Organization.region" },
             failed.TraceChain.Where(node => node.Kind == "relation").Select(node => node.Detail));
-        Assert.Equal("load school graph", failed.Comment);
+        Assert.Equal("load school graph", failed.RequestTraceChain[1].Comment);
+        Assert.Equal(failed.RequestTraceChain[^1].Comment, failed.Comment);
         Assert.Equal("verify inherited failure route", failed.Purpose);
     }
 
@@ -267,7 +291,8 @@ public class TraceChainSqliteTests
         Assert.All(fixture.Log.Entries, entry => {
             Assert.Equal("School", entry.TraceChain[0].Name);
             Assert.Equal("success", entry.ExecutionOutcome);
-            Assert.Equal("load school graph", entry.Comment);
+            Assert.Equal("load school graph", entry.RequestTraceChain[1].Comment);
+            Assert.Equal(entry.RequestTraceChain[^1].Comment, entry.Comment);
             Assert.Equal("observe every physical statement", entry.Purpose);
         });
     }
@@ -288,6 +313,9 @@ public class TraceChainSqliteTests
         var actualRegion=Assert.IsType<Value.ObjectValue>(organization["region"]).Value;
         Assert.Equal(1L,actualRegion["id"].TryI64());
         Assert.Equal(4,fixture.Log.Entries.Count);
-        Assert.All(fixture.Log.Entries,entry=>Assert.Equal("captured graph",entry.Comment));
+        Assert.All(fixture.Log.Entries,entry=> {
+            Assert.Equal("captured graph",entry.RequestTraceChain[1].Comment);
+            Assert.Equal(entry.RequestTraceChain[^1].Comment,entry.Comment);
+        });
     }
 }

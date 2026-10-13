@@ -64,6 +64,7 @@ internal static class SqlLogProjectionState
         StartedAt = source.StartedAt, EndedAt = source.EndedAt,
         AffectedRows = source.AffectedRows, ResultCount = source.ResultCount,
         TraceChain = source.TraceChain.Select(node => node with { }).ToList(),
+        RequestTraceChain = Array.AsReadOnly(source.RequestTraceChain.Select(node => node with { }).ToArray()),
         MutationLineage = Array.AsReadOnly(source.MutationLineage.Select(node => node with { }).ToArray()),
         Comment = source.Comment, Purpose = source.Purpose, AuditReason = source.AuditReason,
         BackendRequestId = source.BackendRequestId, ParameterizedQuery = source.ParameterizedQuery,

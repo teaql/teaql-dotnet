@@ -272,6 +272,7 @@ async Task ThreeLevelQuery((CustomerOrder Order, Payment Payment, PaymentAttempt
     Verify.Equal(graph.Order.Id, E.CustomerOrder(order).Id().Eval(), "related order identity");
     Verify.Equal(4, sink.Sql.Count, "root plus three relation SQL statements");
     var expectedRelations = new[] { "PaymentAttempt.Payment", "Payment.CustomerOrder", "CustomerOrder.Platform" };
+    var expectedComments = new[] { "load attempt detail", "nested payment prose", "nested order prose", "nested platform prose" };
     for (var depth = 0; depth < sink.Sql.Count; depth++)
     {
         var statement = sink.Sql[depth];
@@ -280,8 +281,12 @@ async Task ThreeLevelQuery((CustomerOrder Order, Payment Payment, PaymentAttempt
             "each derived statement retains Operation and Request root");
         Verify.That(statement.TraceChain.Where(node => node.Kind == "relation").Select(node => node.Detail)
             .SequenceEqual(expectedRelations.Take(depth)), "each derived statement retains its exact relation prefix");
-        Verify.Equal("load attempt detail", statement.Comment, "each derived statement inherits root comment");
+        Verify.Equal(expectedComments[depth], statement.Comment, "each derived statement owns its local comment");
         Verify.Equal("render a governed three-level graph", statement.Purpose, "each derived statement inherits root purpose");
+        Verify.Equal(2 + 2 * depth, statement.RequestTraceChain.Count, "business chain retains root and both nodes at each relation level");
+        Verify.Equal("render a governed three-level graph", statement.RequestTraceChain[0].Detail, "business chain purpose");
+        Verify.Equal("load attempt detail", statement.RequestTraceChain[1].Detail, "business chain root comment");
+        Verify.Equal(expectedComments[depth], statement.RequestTraceChain[^1].Detail, "business chain local comment");
         var canonical = new List<(string Kind, string Name, string Detail)>
         {
             ("operation", "PaymentAttempt", "query"), ("request", "PaymentAttempt", "")
@@ -298,7 +303,7 @@ async Task ThreeLevelQuery((CustomerOrder Order, Payment Payment, PaymentAttempt
     Verify.Equal("PaymentAttempt", deepest.TraceChain[0].Name, "query origin retained through all levels");
     Verify.Equal("PaymentAttempt.Payment -> Payment.CustomerOrder -> CustomerOrder.Platform",
         string.Join(" -> ", deepest.TraceChain.Where(value => value.Kind == "relation").Select(value => value.Detail)), "qualified relation frames");
-    Verify.Equal("load attempt detail", deepest.Comment, "root query comment");
+    Verify.Equal("nested platform prose", deepest.Comment, "deepest request owns its explicit comment");
     Verify.Equal("render a governed three-level graph", deepest.Purpose, "root query purpose");
     var projected = (await Q.PaymentAttemptsWithMinimalFields().WithIdIs(graph.Attempt.Id!.Value).Limit(1)
         .Comment("check incomplete projection").Purpose("ensure E fails closed").ExecuteForListAsync(context))[0];

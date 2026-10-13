@@ -52,7 +52,7 @@ internal sealed class QuerySnapshot
         _=>throw new NotSupportedException($"Unsupported query expression {source.GetType().Name}")
     });
 
-    private Value Data(Value source)=>Capture(source,()=>source switch {
+    internal Value Data(Value source)=>Capture(source,()=>source switch {
         Value.ListValue item=>item with {Values=item.Values.Select(Data).ToList()},
         Value.ObjectValue item=>item with {Value=Record(item.Value)},
         Value.JsonValue item=>item with {Value=item.Value?.DeepClone()},

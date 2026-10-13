@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <TeaQLOrderGeneratedRoot Condition="'$(TeaQLOrderGeneratedRoot)' == ''">$(MSBuildThisFileDirectory)lib</TeaQLOrderGeneratedRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="lib/**" />
+    <ProjectReference Include="$(TeaQLOrderGeneratedRoot)/request-tree-order-service-lib.csproj" />
+    <ProjectReference Include="../../../src/TeaQL.Telemetry.OpenTelemetry/TeaQL.Telemetry.OpenTelemetry.csproj" />
+  </ItemGroup>
+</Project>

@@ -45,7 +45,7 @@ jobs:
             TeaQL.Core TeaQL.DataService TeaQL.Sql TeaQL.Runtime
             TeaQL.Provider.Sqlite TeaQL.Provider.PostgreSql TeaQL.Provider.MySql
             TeaQL.Provider.SqlServer TeaQL.CacheIntegration.Redis
-            TeaQL.WebIntegration.AspNetCore TeaQL.TfpEndpoint
+            TeaQL.WebIntegration.AspNetCore TeaQL.TfpEndpoint TeaQL.Telemetry.OpenTelemetry
           )
           for project in "${projects[@]}"; do
             dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore \

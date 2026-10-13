@@ -10,6 +10,33 @@ Run from the repository root:
 bash scripts/verify-trace-chain-example.sh
 ```
 
+The optional standard OpenTelemetry module also has two application-owned gates:
+`bash examples/trace-chain/verify-standard-telemetry.sh` verifies startup and
+audited root seeding; `bash examples/trace-chain/verify-standard-order.sh`
+verifies a complete generated Order list with explicit count, forward status,
+bounded reverse previews and status facets. The latter uses its checked-in
+generated library and runs twice on one retained SQLite file, without a generator
+checkout or remote service. All runtime dependencies resolve to local repository code.
+The application does not create SDK providers or manual spans. The standard Order
+demo marks its private order number through the normal metadata masking seam.
+
+`bash examples/trace-chain/verify-standard-graph.sh` covers a three-entity
+CustomerOrder → Payment → PaymentAttempt save and a six-mutation mixed graph:
+updates, new children and version-backed deletion. The model declares its private
+fields; the application uses generated mutation and Q/E APIs without manual SDK
+spans. Local child reasons and inherited grandchild reasons remain distinct.
+Same numeric IDs in CustomerOrder and Payment start with versions 2 and 1, then
+advance independently to 3 and 2. The verifier runs twice on a retained SQLite
+database, checking audited seeding and unchanged generated library files.
+
+`bash examples/trace-chain/verify-standard-stream.sh` uses that same generated
+snapshot. Its scalar streams complete, stop early, and receive token cancellation
+with chunk size two; each enumeration owns its own runtime observation and exact
+typed delivery counter. Changing a builder after stream creation cannot change
+the captured query. An intervening ordinary query must not inherit a suspended
+stream's activation. Both replays retain SQLite data and generated hashes;
+ordinary SQL logging is disabled without disabling the standard telemetry module.
+
 The script runs twice on `examples/.local/trace-chain.sqlite`, never deletes the
 database, uses unique run labels, and checks all generated C# and project hashes
 after each run. `TEAQL_TRACE_CHAIN_DB` selects another persistent file. All runtime

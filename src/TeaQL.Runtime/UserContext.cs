@@ -52,7 +52,7 @@ public class UserContext
     public string? Timezone { get; set; } = "UTC";
     
     public IServiceProvider? ServiceProvider { get; set; }
-    public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = NoopRuntimeTelemetry.Instance;
+    public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = TelemetryStartup.Default();
     public IDiagnosticSqlLogSink? DiagnosticSqlLogSink { get; private set; } = new TextDiagnosticSqlLogSink();
     public ISensitiveDiagnosticSqlLogSink? SensitiveDiagnosticSqlLogSink { get; private set; }
     public bool QuerySqlLogEnabled { get; private set; } = true;
@@ -152,6 +152,9 @@ public class UserContext
     {
         if (metadata?.Statements.Count > 0) { foreach (var child in metadata.Statements) RecordExecutionMetadata(child); return; }
         if (metadata == null) return;
+        if (RuntimeTelemetry is IRuntimeSqlTelemetry sqlTelemetry && metadata.SqlCorrelation is { } correlation)
+            try { sqlTelemetry.RecordDiagnostic(RuntimeSqlTelemetry.Project(LogPrivacy.Project(metadata), correlation)); }
+            catch (Exception error) when (error is not OutOfMemoryException) { }
         var query = metadata.Operation == DataServiceOperation.Query;
         if ((query && !QuerySqlLogEnabled) || (!query && !MutationSqlLogEnabled)) return;
         // Diagnostic projection and application-owned sinks are fail-open.
@@ -204,6 +207,12 @@ public class UserContext
     public async Task<T> ExecuteGraphSaveAsync<T>(string comment, Func<GraphMutationSession, Task<T>> work)
     {
         var intent = new MutationIntent(comment); // Must precede callbacks and transaction allocation.
+        return await RuntimeTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
+            () => ExecuteGraphSaveCoreAsync(intent, work)).ConfigureAwait(false);
+    }
+
+    private async Task<T> ExecuteGraphSaveCoreAsync<T>(MutationIntent intent, Func<GraphMutationSession, Task<T>> work)
+    {
         await _graphSaveGate.WaitAsync().ConfigureAwait(false);
         ITransaction? transaction = null;
         GraphMutationSession? session = null;
@@ -238,8 +247,11 @@ public class UserContext
             _activeGraphSave = null;
             _mutationPolicy.EndGraph();
             _graphFixTime = null;
-            transaction?.Dispose();
-            _graphSaveGate.Release();
+            // A custom provider's cleanup may fail after commit. Release the
+            // Context gate even then; the outer telemetry observation closes
+            // only after cleanup and sees the same error returned to callers.
+            try { transaction?.Dispose(); }
+            finally { _graphSaveGate.Release(); }
         }
     }
 
@@ -404,22 +416,23 @@ public class UserContext
         if (prepared.TryGetValue(query, out var existing)) return existing;
         var authorized = policy.Apply(query)
             ?? throw new InvalidOperationException("Request policy returned a null query");
+        authorized.RequestScope = query.RequestScope;
+        authorized.PageCountOperation = query.PageCountOperation;
+        if (query.RequestScope is { } owner) authorized.CommentText = owner.Comment;
+        if (query.RequestScope is { } purposeOwner) authorized.Purpose(purposeOwner.Purpose);
         prepared[query] = authorized;
         prepared[authorized] = authorized;
         authorized.RelationLoads = authorized.RelationLoads
-            .Select(load => new RelationLoad(load.Name,
-                load.Query == null ? null : ApplyRequestPolicyTree(load.Query, policy, prepared))).ToList();
+            .Select(load => load with { Query = load.Query == null ? null : ApplyRequestPolicyTree(load.Query, policy, prepared) }).ToList();
         authorized.RelationAggregates = authorized.RelationAggregates
-            .Select(aggregate => new RelationAggregate(aggregate.RelationName, aggregate.Alias,
-                ApplyRequestPolicyTree(aggregate.Query, policy, prepared), aggregate.SingleResult)).ToList();
+            .Select(aggregate => aggregate with { Query = ApplyRequestPolicyTree(aggregate.Query, policy, prepared) }).ToList();
         authorized.ObjectGroupBys = authorized.ObjectGroupBys
             .Select(group => new ObjectGroupBy(group.PropertyName, group.StorageField,
                 ApplyRequestPolicyTree(group.Query, policy, prepared))).ToList();
         authorized.ChildEnhancements = authorized.ChildEnhancements
             .Select(child => ApplyRequestPolicyTree(child, policy, prepared)).ToList();
         authorized.Facets = authorized.Facets
-            .Select(facet => new FacetRequest(facet.FacetName, facet.RelationName,
-                ApplyRequestPolicyTree(facet.Query, policy, prepared), facet.IncludeAllFacets)).ToList();
+            .Select(facet => facet with { Query = ApplyRequestPolicyTree(facet.Query, policy, prepared) }).ToList();
         return authorized;
     }
 
@@ -430,19 +443,16 @@ public class UserContext
         var clone = source.CloneForExecution();
         clones[source] = clone;
         clone.RelationLoads = source.RelationLoads
-            .Select(load => new RelationLoad(load.Name,
-                load.Query == null ? null : CloneQueryTree(load.Query, clones))).ToList();
+            .Select(load => load with { Query = load.Query == null ? null : CloneQueryTree(load.Query, clones) }).ToList();
         clone.RelationAggregates = source.RelationAggregates
-            .Select(aggregate => new RelationAggregate(aggregate.RelationName, aggregate.Alias,
-                CloneQueryTree(aggregate.Query, clones), aggregate.SingleResult)).ToList();
+            .Select(aggregate => aggregate with { Query = CloneQueryTree(aggregate.Query, clones) }).ToList();
         clone.ObjectGroupBys = source.ObjectGroupBys
             .Select(group => new ObjectGroupBy(group.PropertyName, group.StorageField,
                 CloneQueryTree(group.Query, clones))).ToList();
         clone.ChildEnhancements = source.ChildEnhancements
             .Select(child => CloneQueryTree(child, clones)).ToList();
         clone.Facets = source.Facets
-            .Select(facet => new FacetRequest(facet.FacetName, facet.RelationName,
-                CloneQueryTree(facet.Query, clones), facet.IncludeAllFacets)).ToList();
+            .Select(facet => facet with { Query = CloneQueryTree(facet.Query, clones) }).ToList();
         return clone;
     }
 

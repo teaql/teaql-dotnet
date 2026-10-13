@@ -47,6 +47,62 @@ public class FacetTraceSqliteTests
         .Property(PropertyDescriptor.New("version", DataType.I64).Version());
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task NestedSiblingFacetCommentsKeepNativeOperationParents(bool logging)
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:"); await connection.OpenAsync();
+        var attempt = Entity("Attempt").Property(PropertyDescriptor.New("payment_id",DataType.I64))
+            .Relation(RelationDescriptor.New("payment","Payment").LocalKey("payment_id").ForeignKey("id"));
+        var payment = Entity("Payment").Property(PropertyDescriptor.New("order_id",DataType.I64))
+            .Relation(RelationDescriptor.New("order","CustomerOrder").LocalKey("order_id").ForeignKey("id"));
+        var order = Entity("CustomerOrder");
+        var descriptors = new[]{attempt,payment,order};
+        var transport = new Transport(new SqliteTransport(connection));
+        var provider = new SqlDataServiceExecutor(new SqliteDialect(),transport,
+            new MetadataSchemaProvider(name=>descriptors.SingleOrDefault(entity=>entity.Name==name)));
+        var sink = new Sink();
+        var context = new RuntimeModule().Entity(attempt).Entity(payment).Entity(order).IntoContext()
+            .WithDataService(provider).WithDiagnosticSqlLogSink(sink);
+        await context.EnsureSchemaAsync();
+        var service = context.RequireResource<IDataService>();
+        foreach (var entity in descriptors)
+        {
+            var command = new InsertCommand(entity.Name).Value("id",Value.FromObject(1L)).Value("version",Value.FromObject(1L));
+            if (entity.Name=="Attempt") command.Value("payment_id",Value.FromObject(1L));
+            if (entity.Name=="Payment") command.Value("order_id",Value.FromObject(1L));
+            await service.MutateAsync(new InsertMutationRequest(command,"seed nested siblings"));
+        }
+        var query = new SelectQuery("Attempt").Limit(10).Comment("load branches").Purpose("render branches");
+        foreach (var alias in new[]{"left","right"})
+        {
+            var orders = new SelectQuery("CustomerOrder").Limit(10).Count("paymentCount").Comment("load "+alias+" orders");
+            var payments = new SelectQuery("Payment").Limit(10).Count("attemptCount").Comment("load "+alias+" payments");
+            payments.Facets.Add(new("orders","order",orders,true) { Operation = new("facet","FacetByOrderAs","orders","order") });
+            query.Facets.Add(new(alias,"payment",payments,true) { Operation = new("facet","FacetByPaymentAs",alias,"payment") });
+        }
+        sink.Entries.Clear(); transport.Reads.Clear(); context.EnableQuerySqlLog(logging);
+        var result = await service.QueryAsync(new QueryRequest(query));
+        Assert.Single(result.Rows); Assert.Equal(9,transport.Reads.Count);
+        Assert.Equal(logging?9:0,sink.Entries.Count);
+        foreach (var alias in new[]{"left","right"})
+        {
+            Assert.Equal(1L,Assert.Single(result.Facets[alias])["attemptCount"].TryI64());
+            Assert.Equal(1L,Assert.Single(result.Facets[alias].Facets["orders"])["paymentCount"].TryI64());
+            if (!logging) continue;
+            var prefix = new[]{"render branches","load branches","FacetByPaymentAs(\""+alias+"\")"};
+            var chains = sink.Entries.Select(entry=>entry.RequestTraceChain.Select(node=>node.Comment).ToArray())
+                .Where(chain=>chain.Length>2 && chain[2]==prefix[2]).ToList();
+            Assert.Equal(4,chains.Count);
+            foreach (var suffix in new[]{new[]{"aggregate payment"},new[]{"load "+alias+" payments"},
+                new[]{"load "+alias+" payments","FacetByOrderAs(\"orders\")","aggregate order"},
+                new[]{"load "+alias+" payments","FacetByOrderAs(\"orders\")","load "+alias+" orders"}})
+                Assert.Contains(chains,chain=>chain.SequenceEqual(prefix.Concat(suffix)));
+        }
+        Console.WriteLine($"RTC_COM_06_PASS logging={logging.ToString().ToLowerInvariant()} nested=true siblings=true");
+    }
+
+    [Theory]
     [InlineData(false, false)]
     [InlineData(false, true)]
     [InlineData(true, false)]
@@ -95,7 +151,8 @@ public class FacetTraceSqliteTests
                 sink.Entries.Select(entry => string.Join("/", entry.TraceChain.Where(node => node.Kind == "relation").Select(node => node.Name))));
             Assert.All(sink.Entries, entry => {
                 Assert.Equal("Attempt", entry.TraceChain[0].Name);
-                Assert.Equal("empty [REDACTED]", entry.Comment);
+                Assert.Equal("empty [REDACTED]", entry.RequestTraceChain[1].Comment);
+                Assert.Equal(entry.RequestTraceChain[^1].Comment, entry.Comment);
                 Assert.DoesNotContain(secret, JsonSerializer.Serialize(entry));
             });
         }

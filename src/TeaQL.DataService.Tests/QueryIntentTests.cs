@@ -53,6 +53,7 @@ public class QueryIntentTests
         var child = root.WithQuery(new SelectQuery("Platform").Comment("child override").Purpose("child override"));
         Assert.Same(root.Intent, child.Intent);
         Assert.Equal("load school graph", child.Comment);
+        Assert.Equal("load school graph", child.Scope.Root.Comment);
         Assert.Equal("show school", child.Purpose);
     }
 
@@ -67,7 +68,8 @@ public class QueryIntentTests
         var path = SqlTraceChain.Canonical(child.TraceSource, "sqlite", "select").TracePath;
         Assert.Equal(new[] { "School", "School", "platform", "sqlite", "select" }, path.Select(node => node.Name));
         Assert.Equal("School.platform", path[2].Detail);
-        Assert.Equal("load school graph", child.Comment);
+        Assert.Equal("load Platform", child.Comment);
+        Assert.Equal("load school graph", child.Scope.Root.Comment);
     }
 
     [Fact]

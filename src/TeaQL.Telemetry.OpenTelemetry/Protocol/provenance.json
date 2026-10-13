@@ -1,0 +1,12 @@
+{
+  "upstream": "https://github.com/open-telemetry/opentelemetry-proto",
+  "tag": "v1.9.0",
+  "commit": "a8951735f7801e8adfaec5c0ace9262771cfec6e",
+  "license": "Apache-2.0",
+  "compiler": "libprotoc 3.12.4",
+  "runtime": "Google.Protobuf 3.31.1",
+  "regenerate": "bash scripts/generate-otlp-protocol.sh",
+  "outputVisibility": "internal",
+  "postProcessing": "#nullable disable and CS8981 suppression only for generated protocol bindings",
+  "domainLibraryGeneration": false
+}

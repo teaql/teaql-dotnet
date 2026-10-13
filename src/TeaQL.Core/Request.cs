@@ -154,6 +154,7 @@ public record BuilderRelationAggregate(string RelationName, string Alias, QueryS
 
 public record FacetRequest(string FacetName, string RelationName, SelectQuery Query, bool IncludeAllFacets)
 {
+    [System.Text.Json.Serialization.JsonIgnore] public QueryOperation? Operation { get; init; }
     public string Name => FacetName;
     public FacetRequest(string name, string relationName, QuerySelection query, bool includeAllFacets)
         : this(name, relationName, query.IntoQuery(), includeAllFacets) { }

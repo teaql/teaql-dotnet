@@ -98,6 +98,17 @@ public class GraphTraceSqliteTests
             return true;
         });
         Assert.Equal(blanks.Length + 1, sink.Audit.Count);
+        Assert.Equal(Enumerable.Range(400,blanks.Length).Select(id=>("PaymentAttempt",(ulong)id))
+            .Append(("Shipment",301UL)).ToArray(),sink.Audit.Select(item=>
+                (item["entityType"]!.ToString()!,Convert.ToUInt64(item["entityId"]))).ToArray());
+        await using (var persisted = db.CreateCommand())
+        {
+            persisted.CommandText = "SELECT id FROM paymentattempt_data ORDER BY id";
+            await using var reader = await persisted.ExecuteReaderAsync();
+            var ids = new List<long>();
+            while (await reader.ReadAsync()) ids.Add(reader.GetInt64(0));
+            Assert.Equal(Enumerable.Range(400,blanks.Length).Select(id=>(long)id),ids);
+        }
         Assert.All(sink.Audit, audit => {
             Assert.Equal("submit order", audit["reason"]);
             var nodes = Assert.IsAssignableFrom<IEnumerable<TraceNode>>(audit["traceChain"]);

@@ -92,8 +92,11 @@ foreach (var includeAll in new[] { false, true }) {
     Check(observed.Statements.All(statement => statement.Comment == comment && statement.Purpose == purpose), "root intent changed");
     foreach (var statement in sink.Entries) {
         Check(statement.ExecutionOutcome == "success", "physical SQL failed");
-        Check(statement.Comment == "load [REDACTED]" + (nested ? " via [REDACTED]" : "")
-            && statement.Purpose == purpose, "physical inherited safe intent changed");
+        Check(statement.RequestTraceChain.Count >= 2
+            && statement.RequestTraceChain[0].Detail == purpose
+            && statement.RequestTraceChain[1].Detail == "load [REDACTED]" + (nested ? " via [REDACTED]" : "")
+            && statement.Comment == statement.RequestTraceChain[^1].Detail
+            && statement.Purpose == purpose, "physical safe request ancestry changed");
         var route = statement.TraceChain.Where(node => node.Kind == "relation").Select(node => node.Name).ToArray();
         var allowed = mode == "loaded"
             ? new[] { "", "SchoolList", "SchoolList/SchoolType", "SchoolList/SchoolType/Platform" }

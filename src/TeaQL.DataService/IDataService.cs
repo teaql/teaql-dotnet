@@ -21,6 +21,10 @@ public class DataServiceCapabilities
 
 public class QueryRequest
 {
+    // Execution-local acknowledgement for typed streaming. Never serialized or
+    // shared by two enumerations; raw chunk consumers retain chunk semantics.
+    internal StreamDelivery? StreamDelivery { get; set; }
+    internal Func<string, DataServiceOperation, ISqlExecutionObservation>? StatementObserver { get; set; }
     // Execution-local callback, never part of a serialized request.
     internal Action<ExecutionMetadata>? DiagnosticObserver { get; set; }
     // Bind provenance for inherited intent on derived queries, not shared context state.
@@ -29,51 +33,127 @@ public class QueryRequest
     // Not inherited by descendants, serialized, or exposed in result records.
     internal Action<IReadOnlyList<Record>>? CaptureRelationKeys { get; set; }
     public SelectQuery Query { get; }
-    public List<TraceNode> TraceChain { get; set; } = new();
+    [System.Text.Json.Serialization.JsonIgnore] public List<TraceNode> TraceChain { get; set; } = new();
     // Immutable runtime-owned source. Public diagnostic frames are not provenance.
     internal IReadOnlyList<TraceNode> TraceSource { get; private init; }
     public QueryIntent Intent { get; }
+    [System.Text.Json.Serialization.JsonIgnore] public QueryRequestScope Scope { get; }
     public string Comment => Intent.Comment;
     public string Purpose => Intent.Purpose;
     /// <summary>Runtime-only observer; providers must not serialize it.</summary>
     public IRelationLoadObserver? RelationLoadObserver { get; set; }
     public QueryRequest(SelectQuery query)
-        : this(query, new QueryIntent(query.CommentText, query.PurposeText)) { }
+        : this(query, query.RequestScope ?? new QueryRequestScope(query.Entity, new QueryIntent(query.CommentText, query.PurposeText))) { }
 
     public QueryRequest(SelectQuery query, QueryIntent intent)
+        : this(query, new QueryRequestScope(query.Entity, intent), intent) { }
+
+    private QueryRequest(SelectQuery query, QueryRequestScope scope, QueryIntent? capturedIntent = null)
     {
         ArgumentNullException.ThrowIfNull(query);
-        ArgumentNullException.ThrowIfNull(intent);
-        Intent = intent;
+        Scope = scope;
+        Intent = capturedIntent ?? new QueryIntent(scope.Comment, scope.Purpose);
         Query = query.CloneForExecution();
+        BindTree(Query, scope);
         TraceSource = Array.AsReadOnly(new[] {
-            new TraceNode(query.Entity, null, "") { Kind = "comment", Detail = intent.Comment },
-            new TraceNode(query.Entity, null, "") { Kind = "purpose", Detail = intent.Purpose }
+            new TraceNode(scope.Root.Entity, null, "") { Kind = "comment", Detail = scope.Root.Comment },
+            new TraceNode(scope.Root.Entity, null, "") { Kind = "purpose", Detail = scope.Purpose }
         });
     }
 
     /// <summary>Derived work inherits validated root intent, not nested builder prose.</summary>
-    public QueryRequest WithQuery(SelectQuery query) => new(query, Intent)
+    public QueryRequest WithQuery(SelectQuery query)
     {
-        TraceChain = new List<TraceNode>(TraceChain), IntentSource = IntentSource,
-        TraceSource = TraceSource,
-        RelationLoadObserver = RelationLoadObserver, DiagnosticObserver = DiagnosticObserver
-    };
+        if (query.RequestScope is { } previous && !ReferenceEquals(previous.Root, Scope.Root))
+            throw new InvalidOperationException("QUERY_SCOPE_OWNER_MISMATCH: replacement belongs to another query invocation");
+        return new(query, Scope, Intent)
+        {
+            TraceChain = new List<TraceNode>(TraceChain), IntentSource = IntentSource,
+            TraceSource = TraceSource,
+            RelationLoadObserver = RelationLoadObserver, DiagnosticObserver = DiagnosticObserver, StatementObserver = StatementObserver,
+            StreamDelivery = StreamDelivery
+        };
+    }
 
-    internal QueryRequest Derive(SelectQuery query, string relation) => new(query, Intent)
+    public QueryRequest Derive(SelectQuery query, string relation, QueryOperation? operation = null) => new(query,
+        ReusableChildScope(query) ?? ChildScope(Scope, query, relation, operation))
     {
         TraceSource = Array.AsReadOnly(TraceSource.Append(
             new TraceNode(query.Entity, null, "") { Kind = "relation", Name = relation,
                 Detail = $"{Query.Entity}.{relation}" }).ToArray()),
         IntentSource = IntentSource, RelationLoadObserver = RelationLoadObserver,
-        DiagnosticObserver = DiagnosticObserver
+        DiagnosticObserver = DiagnosticObserver, StatementObserver = StatementObserver
     };
+
+    public QueryRequest DeriveAggregate(SelectQuery query, string relation, QueryOperation? operation = null)
+    {
+        var scope = ReusableChildScope(query) ?? AggregateScope(Scope, query, relation, operation);
+        return DerivedAt(query, scope!, relation);
+    }
+
+    public QueryRequest DeriveAt(SelectQuery query, QueryRequestScope scope, string? relation = null) => relation != null
+        ? DerivedAt(query, scope, relation) : new(query, scope) {
+        TraceSource = TraceSource, IntentSource = IntentSource,
+        RelationLoadObserver = RelationLoadObserver, DiagnosticObserver = DiagnosticObserver, StatementObserver = StatementObserver
+    };
+
+    private QueryRequestScope? ReusableChildScope(SelectQuery query)
+    {
+        var child = query.RequestScope;
+        if (child == null || child == Scope || child.Root != Scope.Root) return null;
+        for (var parent = child.Parent; parent != null; parent = parent.Parent)
+            if (parent == Scope) return child;
+        // Reverse facet aggregation is a sibling of value materialization.
+        return Scope.Parent?.IsFacetOperation == true && child.Parent == Scope.Parent ? child : null;
+    }
+
+    private QueryRequest DerivedAt(SelectQuery query, QueryRequestScope scope, string relation) => new(query, scope) {
+        TraceSource = Array.AsReadOnly(TraceSource.Append(new TraceNode(query.Entity, null, "") {
+            Kind = "relation", Name = relation, Detail = $"{Query.Entity}.{relation}" }).ToArray()),
+        IntentSource = IntentSource, RelationLoadObserver = RelationLoadObserver, DiagnosticObserver = DiagnosticObserver, StatementObserver = StatementObserver
+    };
+
+    private static string? LocalComment(SelectQuery query) => query.RequestScope?.ExplicitComment ??
+        (query.RequestScope == null ? query.CommentText : null);
+    private static QueryRequestScope ChildScope(QueryRequestScope parent, SelectQuery query, string relation, QueryOperation? operation) =>
+        (operation == null ? parent.Helper(parent.Entity, $"select relation {relation}") : parent.DeriveOperation(operation))
+            .Child(query.Entity, LocalComment(query));
+    private static QueryRequestScope AggregateScope(QueryRequestScope parent, SelectQuery query, string relation, QueryOperation? operation)
+    {
+        var scope = parent.Parent?.IsFacetOperation == true
+            ? parent.Parent.Helper(query.Entity, $"aggregate {parent.Parent.Relation}")
+            : operation == null ? parent.Helper(query.Entity, $"aggregate {relation}") : parent.DeriveOperation(operation);
+        return LocalComment(query) is { } comment ? scope.Child(query.Entity, comment) : scope;
+    }
+
+    // Fork every attachment. Sharing a builder in two branches must not make
+    // the second attachment overwrite the first branch's execution headers.
+    private static void BindTree(SelectQuery query, QueryRequestScope scope)
+    {
+        query.RequestScope = scope; query.CommentText = scope.Comment; query.Purpose(scope.Purpose);
+        query.RelationLoads = query.RelationLoads.Select(load => {
+            if (load.Query == null) return load;
+            var child = load.Query.CloneForExecution(); BindTree(child, ChildScope(scope, child, load.Name, load.Operation));
+            return load with { Query = child };
+        }).ToList();
+        query.Facets = query.Facets.Select(facet => {
+            var child = facet.Query.CloneForExecution();
+            var parent = scope.Facet(facet.RelationName, facet.Name, facet.Operation);
+            BindTree(child, parent.Child(child.Entity, LocalComment(child)));
+            return facet with { Query = child };
+        }).ToList();
+        query.RelationAggregates = query.RelationAggregates.Select(aggregate => {
+            var child = aggregate.Query.CloneForExecution(); BindTree(child, AggregateScope(scope, child, aggregate.RelationName, aggregate.Operation));
+            return aggregate with { Query = child };
+        }).ToList();
+    }
 
     internal static QueryRequest Readback(SelectQuery query, MutationRequest mutation)
     {
         var intent = mutation.Intent.ReadbackIntent();
         var root = mutation.AuditLineage(query.Entity).FirstOrDefault()?.Name ?? query.Entity;
         return new QueryRequest(query, intent) {
+            StatementObserver = mutation.StatementObserver,
             TraceSource = Array.AsReadOnly(new[] {
                 new TraceNode(root, null, "") { Kind = "comment", Detail = intent.Comment },
                 new TraceNode(root, null, "") { Kind = "purpose", Detail = intent.Purpose }
@@ -97,6 +177,7 @@ public class QueryResult
 
 public abstract class MutationRequest
 {
+    internal Func<string, DataServiceOperation, ISqlExecutionObservation>? StatementObserver { get; set; }
     internal LoadedScalarSnapshot? LoadedSnapshot { get; private set; }
     /// <summary>Generated hydration provenance; never a JSON field or mutation payload.</summary>
     public MutationRequest WithLoadedSnapshot(LoadedScalarSnapshot snapshot)
@@ -170,6 +251,7 @@ public abstract class MutationRequest
             _ => throw new NotSupportedException("Unknown mutation request kind")
         };
         request.DiagnosticObserver = DiagnosticObserver;
+        request.StatementObserver = StatementObserver;
         request.InheritedIntentValues = InheritedIntentValues;
         request.LoadedSnapshot = LoadedSnapshot;
         request.GraphOwner = GraphOwner;
@@ -289,6 +371,7 @@ public enum DataServiceOperation
 
 public class ExecutionMetadata
 {
+    [System.Text.Json.Serialization.JsonIgnore] public SqlExecutionCorrelation? SqlCorrelation { get; set; }
     // A result envelope keeps business totals while carrying ordered physical
     // statements. Do not mutate a leaf into its own parent (or create a cycle
     // through inherited intent provenance).
@@ -313,7 +396,8 @@ public class ExecutionMetadata
     public DateTimeOffset EndedAt { get; set; }
     public ulong? AffectedRows { get; set; }
     public int? ResultCount { get; set; }
-    public List<TraceNode> TraceChain { get; set; } = new();
+    [System.Text.Json.Serialization.JsonPropertyName("tracePath")] public List<TraceNode> TraceChain { get; set; } = new();
+    [System.Text.Json.Serialization.JsonPropertyName("traceChain")] public IReadOnlyList<TraceNode> RequestTraceChain { get; set; } = Array.Empty<TraceNode>();
     public string? Comment { get; set; }
     public IReadOnlyList<TraceNode> MutationLineage { get; set; } = Array.Empty<TraceNode>();
     public string? Purpose { get; set; }
@@ -346,6 +430,14 @@ public class StreamChunk
     public List<Record> Rows { get; set; } = new();
     public int ChunkIndex { get; set; }
     public bool IsLast { get; set; }
+}
+
+internal sealed class StreamDelivery
+{
+    private int _count;
+    internal int Count => System.Threading.Volatile.Read(ref _count);
+    internal Exception? Error { get; set; }
+    internal void Delivered() => System.Threading.Interlocked.Increment(ref _count);
 }
 
 public interface IStreamQueryExecutor : IDataService

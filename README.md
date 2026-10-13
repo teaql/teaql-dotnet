@@ -330,3 +330,84 @@ Debug output is explicitly labeled. Credentials and unknown bindings remain
 protected; the flag does not erase old files or govern application/driver
 prints outside TeaQL. Restrict access and retention, then unset it and restart.
 See the [runtime guide](RUNTIME_GUIDE.md) for log switches and extension details.
+
+## Optional standard telemetry
+
+The local `TeaQL.Telemetry.OpenTelemetry` project provides an optional standard
+module. Add it once at application assembly time; generated business queries and
+mutations do not need SDK setup or handwritten spans.
+
+```bash
+export TEAQL_TELEMETRY_ENABLED=true
+export TEAQL_TELEMETRY_SERVICE_NAME=my-application
+export TEAQL_TELEMETRY_OTLP_ENDPOINT=http://localhost:4318
+```
+
+Context startup announces whether telemetry is disabled, starting, enabled or
+unavailable. Disabled startup reports these three variables without initializing
+the SDK. Enabled mode records all supported safe traces, metrics and logs through
+private providers, without replacing the customer's global SDK. Ordinary SQL
+logging switches remain independent. SQL uses the existing field masking policy;
+application-defined sensitive fields must be declared in that policy.
+
+The owned HTTP boundary also prevents Collector text and original transport
+exceptions from reaching customer-enabled SDK diagnostics. Private exporter
+clients reject redirects and bound streamed responses at four MiB and complete
+attempts at three seconds. Official protocol bindings validate each actual
+request's acknowledgement, distinguish partial rejection from warnings and keep
+remote explanations out of logs. Failed metrics count Metric objects; receiver
+rejection counts data points. Its local gate has 703 solution passes, 36 SDK
+cases, fifteen actual three-signal receiver scenarios and all ten example groups,
+including generated Q/E graph replays under failing HTTP. Exact record identities
+keep queued, staged and exporting records within the default 2,048-record budget.
+Flush waits for actual export completion; concurrent shutdown callers join one
+cleanup. Four 1,500-query pressure replays verify recovered capacity, about
+5.9-second backlogged shutdown, separate failed-attempt/retirement counts and zero
+active HTTP after all three transports close. Typed Q/E and audited saves still
+work after shutdown. Advanced graph/stream and internal artifacts remain open.
+
+The [complete Order example](examples/trace-chain/standard-order/Program.cs) uses
+generated Q/E, `Offset/Limit + ExecuteForListAsync`, explicit count, relationship
+previews and facets. Count and data statements share one list-operation root.
+Its source gate uses the checked-in generated library and runs twice on one
+SQLite database, checking audited seeds and unchanged generated sources. It
+requires no generator checkout or remote generation service:
+
+```bash
+bash examples/trace-chain/verify-standard-order.sh
+```
+
+These are local source-module gates, not a claim that a new public package has
+been released. Collector failures cannot substitute for or disable durable
+business audit delivery.
+
+The [standard graph example](examples/trace-chain/standard-graph/Program.cs)
+also verifies inherited and explicit per-entity reasons, mixed create/update/
+version-backed delete, independent same-ID entity versions and four-level E
+traversal. Its generated library is checked in, with runtime dependencies bound
+to repository sources:
+
+```bash
+bash examples/trace-chain/verify-standard-graph.sh
+```
+
+The graph operation remains active through commit callbacks and provider cleanup.
+If provider cleanup fails, telemetry records failure and the Context save gate
+is released so later saves can proceed; no already committed transaction is
+rolled back by telemetry.
+
+The [standard scalar-stream example](examples/trace-chain/standard-stream/Program.cs)
+uses the same checked-in graph library. It verifies lazy enumeration, immutable
+request capture, three-row completion, one-row early close and cancellation
+inside a prefetched two-row chunk. Only entities delivered to the caller count
+as results; prefetched rows do not. A normal query between stream polls keeps an
+independent trace. The runtime owns the logical root through cursor disposal,
+and generated code delegates hydration without SDK setup:
+
+```bash
+bash examples/trace-chain/verify-standard-stream.sh
+```
+
+Scalar streams reject unsupported relation/facet enhancement rather than
+silently changing query semantics. Application-owned telemetry scopes retain
+their existing failure contract through the completion-metadata default method.

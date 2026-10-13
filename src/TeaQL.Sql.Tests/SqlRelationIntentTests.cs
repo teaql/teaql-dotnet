@@ -134,13 +134,14 @@ public class SqlRelationIntentTests
             Assert.DoesNotContain("PASSWORD-CANARY", safeJson);
             Assert.DoesNotContain("DRIVER-CANARY", safeJson);
             if (shape == "nested") Assert.DoesNotContain("Lakeside", safeJson);
-            Assert.Contains("what: load", safe.Comment);
+            Assert.Contains("what: load", safe.RequestTraceChain[1].Comment);
+            Assert.Equal(safe.RequestTraceChain[^1].Comment, safe.Comment);
             Assert.Equal("why: verify relation failure intent", safe.Purpose);
             Assert.Equal("failure", safe.ExecutionOutcome);
             Assert.Contains(shape == "nested" ? "line_data" : "order_data", safe.DebugQuery);
             Assert.DoesNotContain("IntentSource", safeJson);
             var debugEntry = Assert.Single(sensitive.Entries.Where(entry => entry.ExecutionOutcome == "failure"));
-            Assert.Equal(debug, debugEntry.Comment!.Contains("Riverside"));
+            Assert.Equal(debug, debugEntry.RequestTraceChain[1].Comment.Contains("Riverside"));
             Assert.DoesNotContain("PASSWORD-CANARY", JsonSerializer.Serialize(debugEntry));
             foreach (var entry in normal.Entries)
             {
