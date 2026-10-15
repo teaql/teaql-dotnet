@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../TeaQL.Runtime/TeaQL.Runtime.csproj" /><PackageReference Include="AWSSDK.S3" Version="4.0.104.3" /></ItemGroup>
+</Project>
