@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-expected=(business-id conformance facet-trace mutation-policy order-management runtime-logging school-management security-foundations task_board trace-chain)
+expected=(business-id conformance facet-trace mutation-policy object-storage order-management runtime-logging school-management security-foundations task_board trace-chain)
 mapfile -t actual < <(find "$repo/examples" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n' | sort)
 if [[ "${actual[*]}" != "${expected[*]}" ]]; then
   echo "example inventory changed; update scripts/verify-examples.sh: ${actual[*]}" >&2
@@ -17,6 +17,7 @@ if ((${#embedded_runtime_files[@]})); then
 fi
 
 runtime_source_root="${TeaQLRuntimeSourceRoot:-$repo}"
+bash "$repo/examples/object-storage/verify.sh"
 order_management_tmp="$(mktemp -d)"
 trap 'rm -rf "$order_management_tmp"' EXIT
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/conformance/runtime-example-conformance-service-console.csproj"
