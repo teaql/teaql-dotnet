@@ -456,17 +456,20 @@ public interface ITransactionExecutor : IDataService
     Task<ITransaction> BeginTransactionAsync();
 }
 
-internal class SchemaRequest
+/// <summary>A context-owned request to reconcile one modeled entity's schema.</summary>
+public class SchemaRequest
 {
     public string EntityName { get; set; } = string.Empty;
 }
 
-internal class SchemaResult
+/// <summary>The result of one schema reconciliation operation.</summary>
+public class SchemaResult
 {
     public bool Changed { get; set; }
 }
 
-internal interface ISchemaExecutor : IDataService
+/// <summary>Replaceable schema execution capability; applications invoke it through UserContext.</summary>
+public interface ISchemaExecutor
 {
     Task<SchemaResult> EnsureSchemaAsync(SchemaRequest request);
 }

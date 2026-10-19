@@ -311,6 +311,7 @@ Request JSON is not allowed to replace those trusted capabilities.
 
 - [Runtime guide: modules, SPI and advanced verification](RUNTIME_GUIDE.md)
 - [School bootstrap example](examples/school-management/README.md)
+- [Context-owned Schema SPI example](examples/schema-customization/README.md)
 - [Mutation Policy example](examples/mutation-policy)
 - [Facet example](examples/facet-trace/README.md)
 - [Trace Chain example](examples/trace-chain/README.md)
