@@ -33,6 +33,8 @@ public class UserContext
     private GraphMutationSession? _activeGraphSave;
     private DateTimeOffset? _graphFixTime;
     private IBusinessClock _businessClock = SystemBusinessClock.Instance;
+    private ISchemaExecutor? _dataServiceSchemaExecutor;
+    private ISchemaExecutor? _schemaExecutorOverride;
     private List<FixEvidence> _currentFixEvidence = new();
     private IReadOnlyList<FixEvidence> _lastFixEvidence = Array.Empty<FixEvidence>();
     public IReadOnlyList<FixEvidence> LastFixEvidence => _lastFixEvidence;
@@ -167,11 +169,21 @@ public class UserContext
 
     public UserContext WithDataService(IDataService provider)
     {
+        ArgumentNullException.ThrowIfNull(provider);
         InsertResource<IDataService>(new RuntimeDataService(provider, this));
         if (provider is ITransactionExecutor transactionExecutor)
             InsertResource<ITransactionExecutor>(transactionExecutor);
-        if (provider is ISchemaExecutor schemaExecutor)
-            InsertResource<ISchemaExecutor>(schemaExecutor);
+        _dataServiceSchemaExecutor = provider as ISchemaExecutor;
+        return this;
+    }
+
+    /// <summary>
+    /// Installs schema execution independently of the query/mutation data service.
+    /// EnsureSchemaAsync remains the application entry point and also runs generated bootstrap.
+    /// </summary>
+    public UserContext WithSchemaExecutor(ISchemaExecutor executor)
+    {
+        _schemaExecutorOverride = executor ?? throw new ArgumentNullException(nameof(executor));
         return this;
     }
 
@@ -483,7 +495,9 @@ public class UserContext
 
     public async Task EnsureSchemaAsync()
     {
-        var provider = RequireResource<ISchemaExecutor>();
+        var provider = _schemaExecutorOverride ?? _dataServiceSchemaExecutor
+            ?? GetResource<ISchemaExecutor>()
+            ?? throw new InvalidOperationException("Missing resource of type ISchemaExecutor");
         var metadata = Metadata ?? throw new InvalidOperationException("Missing metadata");
         foreach (var entity in metadata.GetAllEntities())
             await provider.EnsureSchemaAsync(new SchemaRequest { EntityName = entity.Name });
