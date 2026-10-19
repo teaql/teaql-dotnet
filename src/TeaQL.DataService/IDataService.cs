@@ -178,6 +178,8 @@ public class QueryResult
 public abstract class MutationRequest
 {
     internal Func<string, DataServiceOperation, ISqlExecutionObservation>? StatementObserver { get; set; }
+    // Execution-local ID capability installed by UserContext. Never a wire field.
+    internal IInternalIdAllocator? InternalIdAllocator { get; set; }
     internal LoadedScalarSnapshot? LoadedSnapshot { get; private set; }
     /// <summary>Generated hydration provenance; never a JSON field or mutation payload.</summary>
     public MutationRequest WithLoadedSnapshot(LoadedScalarSnapshot snapshot)
@@ -252,6 +254,7 @@ public abstract class MutationRequest
         };
         request.DiagnosticObserver = DiagnosticObserver;
         request.StatementObserver = StatementObserver;
+        request.InternalIdAllocator = InternalIdAllocator;
         request.InheritedIntentValues = InheritedIntentValues;
         request.LoadedSnapshot = LoadedSnapshot;
         request.GraphOwner = GraphOwner;
@@ -474,8 +477,15 @@ public interface ISchemaExecutor
     Task<SchemaResult> EnsureSchemaAsync(SchemaRequest request);
 }
 
-public interface IIdGeneratorExecutor : IDataService
+/// <summary>
+/// Context-installable internal ID allocation capability. Implementations must
+/// allocate unique IDs and advance their floor for explicit IDs of each entity type.
+/// Gaps after failed or rolled-back mutations are permitted.
+/// </summary>
+public interface IInternalIdAllocator
 {
     Task<ulong> NextIdAsync(string entity);
     Task EnsureIdFloorAsync(string entity, ulong floor);
 }
+
+public interface IIdGeneratorExecutor : IDataService, IInternalIdAllocator { }

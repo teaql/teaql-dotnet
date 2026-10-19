@@ -455,8 +455,10 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     {
         var previous = request.DiagnosticObserver;
         var previousStatement = request.StatementObserver;
+        var previousAllocator = request.InternalIdAllocator;
         request.DiagnosticObserver = _context.RecordExecutionMetadata;
         request.StatementObserver = _context.RuntimeTelemetry is IRuntimeSqlTelemetry telemetry ? telemetry.StartStatement : null;
+        request.InternalIdAllocator = _context.InternalIdAllocator;
         try
         {
         var result = await _context.RuntimeTelemetry.ObserveAsync(
@@ -474,7 +476,12 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         _context.RecordExecutionMetadata(result.Metadata);
         return result;
         }
-        finally { request.DiagnosticObserver = previous; request.StatementObserver = previousStatement; }
+        finally
+        {
+            request.DiagnosticObserver = previous;
+            request.StatementObserver = previousStatement;
+            request.InternalIdAllocator = previousAllocator;
+        }
     }
 
     private static string EntityName(MutationRequest request) => request switch

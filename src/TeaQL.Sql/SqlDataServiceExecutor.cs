@@ -137,9 +137,11 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
         {
             if (!allocationInsert.Command.Values.TryGetValue(allocationId.Name, out var explicitId))
-                allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(await NextIdAsync(entityName));
+                allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(
+                    await (request.InternalIdAllocator ?? this).NextIdAsync(entityName));
             else
-                await EnsureIdFloorAsync(entityName, OptimisticIdSpace.Floor(explicitId, entityName));
+                await (request.InternalIdAllocator ?? this).EnsureIdFloorAsync(
+                    entityName, OptimisticIdSpace.Floor(explicitId, entityName));
         }
         if (request is InsertMutationRequest versionedInsert && entityDesc.VersionProperty() is { } insertVersion
             && !versionedInsert.Command.Values.ContainsKey(insertVersion.Name))
@@ -614,9 +616,11 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
         {
             if (!allocationInsert.Command.Values.TryGetValue(allocationId.Name, out var explicitId))
-                allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(await NextIdAsync(entityName));
+                allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(
+                    await (request.InternalIdAllocator ?? this).NextIdAsync(entityName));
             else
-                await EnsureIdFloorAsync(entityName, OptimisticIdSpace.Floor(explicitId, entityName));
+                await (request.InternalIdAllocator ?? this).EnsureIdFloorAsync(
+                    entityName, OptimisticIdSpace.Floor(explicitId, entityName));
         }
         if (request is InsertMutationRequest versionedInsert && entityDesc.VersionProperty() is { } insertVersion
             && !versionedInsert.Command.Values.ContainsKey(insertVersion.Name))
