@@ -79,7 +79,7 @@ public sealed class GraphMutationSession
     public Task<ulong> AllocateIdAsync(string entity)
     {
         RequireActive();
-        return (_transaction as IIdGeneratorExecutor
+        return (_context.InternalIdAllocator ?? _transaction as IInternalIdAllocator
             ?? throw new NotSupportedException("Graph provider requires ID allocation support")).NextIdAsync(entity);
     }
 

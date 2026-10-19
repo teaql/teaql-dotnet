@@ -66,6 +66,7 @@ public class UserContext
     public IBusinessIdProfileFactory? BusinessIdProfileFactory { get; private set; }
     public IBusinessIdKeyProvider? BusinessIdKeyProvider { get; private set; }
     public IBusinessIdService? BusinessIdService { get; private set; }
+    internal IInternalIdAllocator? InternalIdAllocator { get; private set; }
     public string IdSetPlan { get; private set; } = "ID_SET_DISABLED";
     public ulong IdSetCount { get; private set; }
     public string IdSetCountAccuracy { get; private set; } = "UNKNOWN";
@@ -174,6 +175,16 @@ public class UserContext
         if (provider is ITransactionExecutor transactionExecutor)
             InsertResource<ITransactionExecutor>(transactionExecutor);
         _dataServiceSchemaExecutor = provider as ISchemaExecutor;
+        return this;
+    }
+
+    /// <summary>
+    /// Installs internal ID allocation independently of the data service. Generated
+    /// graph saves and direct mutations use this capability through the context.
+    /// </summary>
+    public UserContext WithInternalIdAllocator(IInternalIdAllocator allocator)
+    {
+        InternalIdAllocator = allocator ?? throw new ArgumentNullException(nameof(allocator));
         return this;
     }
 

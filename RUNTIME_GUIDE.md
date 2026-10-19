@@ -63,7 +63,8 @@ real SQLite root/three-level failure tests are separate evidence.
 Graph saves explicitly receive an operation-owned `GraphMutationSession`.
 Persistent immutable parent scopes retain sibling and deletion reasons; typed
 ledger traces are complete per-entity replacements. The generated adapter
-allocates IDs through the transaction before constructing a scope. Context does
+allocates IDs through the context-installed `IInternalIdAllocator`, if present,
+or through the transaction before constructing a scope. Context does
 not hold a trace stack or implicitly join nested saves. Untagged active-graph
 mutations, expired capabilities and borrowed parent scopes fail closed.
 
@@ -74,6 +75,22 @@ back. Whole-graph preflight supplies invocation-local sibling redaction values.
 The native SQLite tests exercise allocation, deletion, typed ledger replacement,
 real UNIQUE rollback and two concurrent requests serialized on one Context.
 Shared helper vectors remain separate from that execution proof.
+
+## Internal ID allocation SPI
+
+An application may install `IInternalIdAllocator` with
+`context.WithInternalIdAllocator(allocator)`, independently of its query/mutation
+provider. The same context-owned capability handles generated graph allocation,
+direct and nested batch inserts, and explicit-ID floor reservation. If no
+custom allocator is installed, the SQL provider keeps its existing optimistic
+`teaql_id_space` behavior. A custom allocator failure is propagated; it does
+not silently fall back to provider allocation.
+
+An implementation must maintain unique IDs and a durable per-entity floor
+across processes. A failed transaction may leave an ID gap; it must not reuse
+the allocated ID. The [focused SQLite example](examples/internal-id-customization/README.md)
+uses an in-memory allocator solely to demonstrate composition and verifies all
+four paths. Native SQLite tests additionally check failure and provider fallback.
 
 Regenerate dependent libraries: the adapter callback is now
 `ExecuteGraphSaveAsync(comment, async graph => ...)`, with `graph.Preflight`,
