@@ -129,7 +129,9 @@ public static class SqlLogRenderer
             case Value.BoolValue b: return kind == "sqlserver" ? (b.Value ? "1" : "0") : (b.Value ? "TRUE" : "FALSE");
             case Value.I64Value v: return Number(v.Value);
             case Value.U64Value v: return Number(v.Value);
-            case Value.DecimalValue v: return Number(v.Value);
+            case Value.DecimalValue v:
+                return kind == "sqlite" ? Quote(Number(v.Value)) : Number(v.Value);
+            case Value.TimeValue v: return Quote(v.Value.ToString("c", CultureInfo.InvariantCulture));
             case Value.F64Value v when double.IsFinite(v.Value): return Number(v.Value);
             case Value.TextValue v: return Quote(v.Value);
             case Value.JsonValue v: return Quote(v.Value?.ToJsonString() ?? "null");

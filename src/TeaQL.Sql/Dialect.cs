@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Frozen;
 using System.Linq;
 using TeaQL.Core;
 
@@ -74,6 +75,7 @@ public abstract class SqlDialect
             DataType.F64 => "REAL",
             DataType.Decimal => "NUMERIC",
             DataType.Text => "VARCHAR(255)",
+            DataType.Time => "TIME",
             DataType.LargeText or DataType.Json or DataType.Date or DataType.Timestamp => "TEXT",
             _ => throw SqlCompileException.UnsupportedSchemaType(dataType)
         };
@@ -163,8 +165,14 @@ public abstract class SqlDialect
     {
         var paramsList = SqlLogBindings.Create();
         var sql = CompileSelectSql(entity, query, paramsList);
-        return new CompiledQuery(sql, paramsList, query.CommentText);
+        return new CompiledQuery(sql, paramsList, query.CommentText)
+        {
+            ExactDecimalResultAliases = ExactDecimalResultAliases(entity, query)
+        };
     }
+
+    protected virtual IReadOnlySet<string> ExactDecimalResultAliases(EntityDescriptor entity, SelectQuery query) =>
+        FrozenSet<string>.Empty;
 
     public virtual string CompileSelectSql(EntityDescriptor entity, SelectQuery query, List<Value> paramsList)
     {
@@ -688,7 +696,7 @@ public abstract class SqlDialect
             foreach (var aggregate in query.AggregateItems)
             {
                 var field = ResolveAggregateField(entity, aggregate);
-                var call = AggregateCallSql(aggregate.Function, field);
+                var call = AggregateCallSql(entity, aggregate, field);
                 parts.Add($"{call} AS {QuoteIdent(aggregate.Alias)}");
             }
         }
@@ -701,6 +709,9 @@ public abstract class SqlDialect
         var functionSql = AggregateFunctionSql(function);
         return $"{functionSql}({field})";
     }
+
+    public virtual string AggregateCallSql(EntityDescriptor entity, Aggregate aggregate, string field) =>
+        AggregateCallSql(aggregate.Function, field);
 
     public virtual string AggregateFunctionSql(AggregateFunction function)
     {

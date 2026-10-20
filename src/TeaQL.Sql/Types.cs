@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Frozen;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ public class CompiledQuery
     public string? Comment { get; }
     public IReadOnlyList<SqlParameterLogPolicy> ParameterLogPolicies { get; }
     public bool GeneratedSql { get; }
+    public IReadOnlySet<string> ExactDecimalResultAliases { get; init; } = FrozenSet<string>.Empty;
     internal IReadOnlyList<(Value Value, SqlParameterLogPolicy Policy)> IntentOperands { get; }
 
     public CompiledQuery(string sql, List<Value> @params, string? comment = null)
@@ -75,4 +77,10 @@ public interface ISchemaProvider
 public interface ISchemaIndexInstaller
 {
     Task EnsureSchemaIndexesAsync(SqlDialect dialect, EntityDescriptor entity);
+}
+
+/// <summary>Reject an existing provider schema that cannot preserve modeled values.</summary>
+public interface ISchemaCompatibilityVerifier
+{
+    Task VerifySchemaCompatibilityAsync(SqlDialect dialect, EntityDescriptor entity);
 }
