@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Frozen;
 using TeaQL.Core;
 using TeaQL.Sql;
 
@@ -32,7 +33,7 @@ public class SqliteDialect : SqlDialect
             DataType.F64 => "REAL",
             // TEXT affinity preserves every modeled base-10 digit; the column
             // collation keeps SQL range predicates and ORDER BY numeric.
-            DataType.Decimal => "TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL",
+            DataType.Decimal => ExactDecimalColumn(property),
             DataType.Text => "VARCHAR(255)",
             DataType.LargeText => "TEXT",
             DataType.Json => "JSON",
@@ -41,6 +42,38 @@ public class SqliteDialect : SqlDialect
             DataType.Timestamp => "TIMESTAMP",
             _ => throw SqlCompileException.UnsupportedSchemaType(dataType)
         };
+    }
+
+    private string ExactDecimalColumn(PropertyDescriptor property)
+    {
+        var column = QuoteIdent(property.ColumnNameString);
+        return $"TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL CHECK ({column} IS NULL OR " +
+            $"(typeof({column}) = 'text' AND teaql_decimal_valid({column})))";
+    }
+
+    protected override IReadOnlySet<string> ExactDecimalResultAliases(EntityDescriptor entity, SelectQuery query)
+    {
+        if (!string.IsNullOrEmpty(query.RawSqlText)
+            || (query.Aggregates.Count == 0 && query.ExprProjection.Count == 0))
+            return FrozenSet<string>.Empty;
+        HashSet<string>? aliases = null;
+        foreach (var aggregate in query.Aggregates)
+            if (aggregate.Function is AggregateFunction.Sum or AggregateFunction.Min or AggregateFunction.Max
+                && entity.PropertyByName(aggregate.Field)?.DataType == DataType.Decimal)
+                (aliases ??= new(StringComparer.Ordinal)).Add(aggregate.Alias);
+        foreach (var projection in query.ExprProjection)
+        {
+            var argument = projection.Expr switch
+            {
+                Expr.ColumnExpr column => column,
+                Expr.FunctionExpr { Fn: ExprFunction.Sum or ExprFunction.Min or ExprFunction.Max, Args.Count: 1 } function
+                    => function.Args[0] as Expr.ColumnExpr,
+                _ => null
+            };
+            if (argument is not null && entity.PropertyByName(argument.Name)?.DataType == DataType.Decimal)
+                (aliases ??= new(StringComparer.Ordinal)).Add(projection.Alias);
+        }
+        return aliases is null ? FrozenSet<string>.Empty : aliases.ToFrozenSet(StringComparer.Ordinal);
     }
 
     public override string CompileAddColumn(EntityDescriptor entity, PropertyDescriptor property)
@@ -57,9 +90,9 @@ public class SqliteDialect : SqlDialect
 
         return aggregate.Function switch
         {
-            AggregateFunction.Sum => $"teaql_decimal_sum({field})",
-            AggregateFunction.Min => $"teaql_decimal_result(MIN({field}))",
-            AggregateFunction.Max => $"teaql_decimal_result(MAX({field}))",
+            AggregateFunction.Sum => $"(teaql_decimal_sum({field}) COLLATE TEAQL_DECIMAL)",
+            AggregateFunction.Min => $"(MIN({field}) COLLATE TEAQL_DECIMAL)",
+            AggregateFunction.Max => $"(MAX({field}) COLLATE TEAQL_DECIMAL)",
             AggregateFunction.Avg => throw new SqlCompileException(
                 "SQLite Decimal AVG requires an explicit rounding policy; it cannot use floating-point AVG."),
             AggregateFunction.Stddev or AggregateFunction.StddevPop or
@@ -80,9 +113,9 @@ public class SqliteDialect : SqlDialect
             var field = ColumnSql(entity, column.Name);
             return function switch
             {
-                "SUM" => $"teaql_decimal_sum({field})",
-                "MIN" => $"teaql_decimal_result(MIN({field}))",
-                "MAX" => $"teaql_decimal_result(MAX({field}))",
+                "SUM" => $"(teaql_decimal_sum({field}) COLLATE TEAQL_DECIMAL)",
+                "MIN" => $"(MIN({field}) COLLATE TEAQL_DECIMAL)",
+                "MAX" => $"(MAX({field}) COLLATE TEAQL_DECIMAL)",
                 "AVG" or "STDDEV" or "STDDEV_POP" or "VAR_SAMP" or "VAR_POP" =>
                     throw new SqlCompileException($"SQLite Decimal {function} requires an explicit precision policy."),
                 _ => base.CompileSingleArgFunction(entity, function, args, paramsList)

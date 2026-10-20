@@ -28,7 +28,7 @@ namespace TeaQL.Provider.Sqlite.Tests
         [InlineData(DataType.I64, "INTEGER")]
         [InlineData(DataType.U64, "INTEGER")]
         [InlineData(DataType.F64, "REAL")]
-        [InlineData(DataType.Decimal, "TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL")]
+        [InlineData(DataType.Decimal, "TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL CHECK (test IS NULL OR (typeof(test) = 'text' AND teaql_decimal_valid(test)))")]
         [InlineData(DataType.Text, "VARCHAR(255)")]
         [InlineData(DataType.LargeText, "TEXT")]
         [InlineData(DataType.Json, "JSON")]

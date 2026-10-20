@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Runtime.CompilerServices;
@@ -19,30 +20,20 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
     {
         _connection = connection;
         _connection.CreateCollation("TEAQL_DECIMAL", CompareExactDecimal);
-        _connection.CreateFunction<string?, string?>("teaql_decimal_result", value =>
-            value is null ? null : "__teaql_decimal__:" + ParseExactDecimal(value).ToString(CultureInfo.InvariantCulture),
+        _connection.CreateFunction<string?, bool>("teaql_decimal_valid", ExactDecimal.IsValid,
             isDeterministic: true);
         _connection.CreateAggregate(
             "teaql_decimal_sum",
-            (HasValue: false, Sum: 0m),
-            ((bool HasValue, decimal Sum) state, string? value) =>
-                value is null ? state : (true, checked(state.Sum + ParseExactDecimal(value))),
-            state => state.HasValue
-                ? "__teaql_decimal__:" + state.Sum.ToString(CultureInfo.InvariantCulture)
-                : null);
-    }
-
-    private static decimal ParseExactDecimal(string value)
-    {
-        const NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint;
-        return decimal.Parse(value, styles, CultureInfo.InvariantCulture);
+            default(ExactDecimal.SumState),
+            (ExactDecimal.SumState state, string? value) => value is null ? state : state.Add(value),
+            state => state.Finish());
     }
 
     private static int CompareExactDecimal(string? left, string? right)
     {
         if (left is null) return right is null ? 0 : -1;
         if (right is null) return 1;
-        return ParseExactDecimal(left).CompareTo(ParseExactDecimal(right));
+        return ExactDecimal.Parse(left).CompareTo(ExactDecimal.Parse(right));
     }
 
     public Task EnsureSchemaFunctionsAsync()
@@ -57,16 +48,28 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         if (decimals.Length == 0) return;
         using var command = _connection.CreateCommand();
         command.CommandText = $"PRAGMA table_info({dialect.QuoteIdent(entity.TableNameValue)})";
-        using var reader = await command.ExecuteReaderAsync();
         var types = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        while (await reader.ReadAsync())
-            types[reader.GetString(1)] = reader.GetString(2);
+        using (var reader = await command.ExecuteReaderAsync())
+            while (await reader.ReadAsync())
+                types[reader.GetString(1)] = reader.GetString(2);
+        command.CommandText = "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = @table";
+        command.Parameters.AddWithValue("@table", entity.TableNameValue);
+        var definition = await command.ExecuteScalarAsync() as string ?? "";
         foreach (var property in decimals)
         {
+            var name = property.ColumnNameString;
+            var quoted = "\"" + name.Replace("\"", "\"\"") + "\"";
+            var identifier = $"(?:{Regex.Escape(quoted)}|(?<![\\w]){Regex.Escape(name)}(?![\\w]))";
+            var declaration = $@"{identifier}\s+TEAQL_DECIMAL_TEXT\s+COLLATE\s+TEAQL_DECIMAL\b";
+            var check = $@"CHECK\s*\(\s*{identifier}\s+IS\s+NULL\s+OR\s*\(\s*typeof\(\s*{identifier}\s*\)\s*=\s*'text'\s+AND\s+teaql_decimal_valid\(\s*{identifier}\s*\)\s*\)\s*\)";
+            const RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
             if (!types.TryGetValue(property.ColumnNameString, out var actual)
-                || !string.Equals(actual, "TEAQL_DECIMAL_TEXT", StringComparison.OrdinalIgnoreCase))
+                || !string.Equals(actual, "TEAQL_DECIMAL_TEXT", StringComparison.OrdinalIgnoreCase)
+                || !Regex.IsMatch(definition, declaration, options, TimeSpan.FromSeconds(1))
+                || !Regex.IsMatch(definition, check, options, TimeSpan.FromSeconds(1)))
                 throw new SqlExecutorException($"SQLite Decimal column {entity.TableNameValue}.{property.ColumnNameString} " +
-                    $"has type {actual ?? "<missing>"}; migrate it to TEAQL_DECIMAL_TEXT before continuing. " +
+                    $"has an incompatible definition ({actual ?? "<missing>"}); migrate it to checked " +
+                    "TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL before continuing. " +
                     "Previously rounded NUMERIC/REAL values cannot be recovered automatically.");
         }
     }
@@ -116,7 +119,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 var name = reader.GetName(i);
-                var value = ReadValue(reader, i);
+                var value = ReadValue(reader, i, query);
                 record[name] = value;
             }
             records.Add(record);
@@ -145,7 +148,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         {
             var record = new Record();
             for (var i = 0; i < reader.FieldCount; i++)
-                record[reader.GetName(i)] = ReadValue(reader, i);
+                record[reader.GetName(i)] = ReadValue(reader, i, query);
             yield return record;
         }
     }
@@ -195,7 +198,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             {
                 var record = new Record();
                 for (var index = 0; index < reader.FieldCount; index++)
-                    record[reader.GetName(index)] = _owner.ReadValue(reader, index);
+                    record[reader.GetName(index)] = _owner.ReadValue(reader, index, query);
                 records.Add(record);
             }
             return records;
@@ -272,7 +275,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         }
     }
 
-    private Value ReadValue(DbDataReader reader, int i)
+    private Value ReadValue(DbDataReader reader, int i, CompiledQuery query)
     {
         if (reader.IsDBNull(i))
         {
@@ -281,6 +284,13 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
 
         var typeName = reader.GetDataTypeName(i).ToUpperInvariant();
         var fieldType = reader.GetFieldType(i);
+
+        if (typeName == "TEAQL_DECIMAL_TEXT" || query.ExactDecimalResultAliases.Contains(reader.GetName(i)))
+        {
+            if (fieldType != typeof(string))
+                throw new FormatException("Exact SQLite Decimal result requires text storage.");
+            return new Value.DecimalValue(ExactDecimal.Parse(reader.GetString(i)));
+        }
 
         if (fieldType == typeof(long))
         {
@@ -300,17 +310,6 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         else if (fieldType == typeof(string))
         {
             var str = reader.GetString(i);
-            if (str.StartsWith("__teaql_decimal__:", StringComparison.Ordinal))
-            {
-                return new Value.DecimalValue(ParseExactDecimal(str.Substring("__teaql_decimal__:".Length)));
-            }
-            if (typeName == "TEAQL_DECIMAL_TEXT")
-            {
-                const NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint;
-                if (decimal.TryParse(str, styles, CultureInfo.InvariantCulture, out var dec))
-                    return new Value.DecimalValue(dec);
-                throw new FormatException($"Invalid exact SQLite Decimal in column {reader.GetName(i)}.");
-            }
             if (typeName == "TIME" || typeName == "TEAQL_TIME_TEXT")
             {
                 if (TimeSpan.TryParseExact(str, "c", CultureInfo.InvariantCulture, out var wallClock)

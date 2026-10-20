@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Frozen;
 using System.Linq;
 using TeaQL.Core;
 
@@ -164,8 +165,14 @@ public abstract class SqlDialect
     {
         var paramsList = SqlLogBindings.Create();
         var sql = CompileSelectSql(entity, query, paramsList);
-        return new CompiledQuery(sql, paramsList, query.CommentText);
+        return new CompiledQuery(sql, paramsList, query.CommentText)
+        {
+            ExactDecimalResultAliases = ExactDecimalResultAliases(entity, query)
+        };
     }
+
+    protected virtual IReadOnlySet<string> ExactDecimalResultAliases(EntityDescriptor entity, SelectQuery query) =>
+        FrozenSet<string>.Empty;
 
     public virtual string CompileSelectSql(EntityDescriptor entity, SelectQuery query, List<Value> paramsList)
     {

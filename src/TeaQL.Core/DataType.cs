@@ -11,6 +11,6 @@ public enum DataType
     LargeText,
     Json,
     Date,
-    Time,
-    Timestamp
+    Timestamp,
+    Time
 }
