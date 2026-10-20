@@ -438,6 +438,30 @@ namespace TeaQL.Provider.Sqlite.Tests
         }
 
         [Fact]
+        public async Task TimeValue_BindsAsInvariantTextAndRoundTripsAcrossPreparedAndTransactionalWrites()
+        {
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "CREATE TABLE time_probe (id INTEGER PRIMARY KEY, value TEXT)", new List<Value>()));
+            var time = new TimeSpan(12, 30, 45).Add(TimeSpan.FromTicks(1234567));
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "INSERT INTO time_probe VALUES (@p0, @p1)",
+                new List<Value> { new Value.I64Value(1), new Value.TimeValue(time) }));
+            using (var transaction = await _transport.BeginSqlAsync())
+            {
+                await transaction.ExecuteSqlAsync(new CompiledQuery(
+                    "INSERT INTO time_probe VALUES (@p0, @p1)",
+                    new List<Value> { new Value.I64Value(2), new Value.TimeValue(time) }));
+                await transaction.CommitSqlAsync();
+            }
+            var rows = await _transport.FetchAllSqlAsync(new CompiledQuery(
+                "SELECT value FROM time_probe ORDER BY id", new List<Value>()));
+            Assert.Equal(2, rows.Count);
+            Assert.All(rows, row => Assert.Equal(
+                time.ToString("c", System.Globalization.CultureInfo.InvariantCulture),
+                ((Value.TextValue)row["value"]).Value));
+        }
+
+        [Fact]
         public async Task NullValues_AreHandled()
         {
             var create = new CompiledQuery("CREATE TABLE nulls (id INTEGER, v TEXT)", new List<Value>());

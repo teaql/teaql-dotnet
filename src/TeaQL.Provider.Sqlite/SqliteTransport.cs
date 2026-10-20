@@ -214,6 +214,11 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             case Value.DateValue d:
                 p.Value = d.Value.ToString("yyyy-MM-dd");
                 break;
+            case Value.TimeValue t:
+                // RuntimeModule models a time-only field as TEXT; use one
+                // culture-independent representation for binds and readback.
+                p.Value = t.Value.ToString("c", System.Globalization.CultureInfo.InvariantCulture);
+                break;
             case Value.TimestampValue t:
                 p.Value = t.Milliseconds;
                 break;
