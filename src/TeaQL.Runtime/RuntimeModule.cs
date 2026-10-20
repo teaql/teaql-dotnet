@@ -58,6 +58,7 @@ public class RuntimeModule
         Value.DecimalValue => DataType.Decimal,
         Value.JsonValue => DataType.Json,
         Value.DateValue => DataType.Date,
+        Value.TimeValue => DataType.Time,
         Value.TimestampValue or Value.DateTimeValue => DataType.Timestamp,
         _ => DataType.Text
     };

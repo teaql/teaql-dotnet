@@ -74,6 +74,7 @@ public abstract class SqlDialect
             DataType.F64 => "REAL",
             DataType.Decimal => "NUMERIC",
             DataType.Text => "VARCHAR(255)",
+            DataType.Time => "TIME",
             DataType.LargeText or DataType.Json or DataType.Date or DataType.Timestamp => "TEXT",
             _ => throw SqlCompileException.UnsupportedSchemaType(dataType)
         };
@@ -688,7 +689,7 @@ public abstract class SqlDialect
             foreach (var aggregate in query.AggregateItems)
             {
                 var field = ResolveAggregateField(entity, aggregate);
-                var call = AggregateCallSql(aggregate.Function, field);
+                var call = AggregateCallSql(entity, aggregate, field);
                 parts.Add($"{call} AS {QuoteIdent(aggregate.Alias)}");
             }
         }
@@ -701,6 +702,9 @@ public abstract class SqlDialect
         var functionSql = AggregateFunctionSql(function);
         return $"{functionSql}({field})";
     }
+
+    public virtual string AggregateCallSql(EntityDescriptor entity, Aggregate aggregate, string field) =>
+        AggregateCallSql(aggregate.Function, field);
 
     public virtual string AggregateFunctionSql(AggregateFunction function)
     {

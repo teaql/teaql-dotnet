@@ -63,6 +63,7 @@ public abstract record Value
         float item => new F64Value(item),
         double item => new F64Value(item),
         decimal item => new DecimalValue(item),
+        TimeSpan item => new TimeValue(item),
         string item => new TextValue(item),
         DateTime item => new TimestampValue(new DateTimeOffset(item).ToUnixTimeMilliseconds()),
         DateTimeOffset item => new TimestampValue(item.ToUnixTimeMilliseconds()),

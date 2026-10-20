@@ -76,3 +76,9 @@ public interface ISchemaIndexInstaller
 {
     Task EnsureSchemaIndexesAsync(SqlDialect dialect, EntityDescriptor entity);
 }
+
+/// <summary>Reject an existing provider schema that cannot preserve modeled values.</summary>
+public interface ISchemaCompatibilityVerifier
+{
+    Task VerifySchemaCompatibilityAsync(SqlDialect dialect, EntityDescriptor entity);
+}

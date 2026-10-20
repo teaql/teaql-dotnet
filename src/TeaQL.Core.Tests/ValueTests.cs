@@ -13,6 +13,17 @@ public class ValueTests
         Assert.Equal("teaql", new Value.TextValue("teaql").Raw);
         Assert.Null(new Value.NullValue().Raw);
     }
+
+    [Fact]
+    public void TimeSpan_QueryOperandStaysTypedAndSqliteDecimalDiagnosticStaysExact()
+    {
+        var wallClock = new TimeSpan(12, 34, 56) + TimeSpan.FromTicks(1_234_567);
+        Assert.Equal(wallClock, Assert.IsType<Value.TimeValue>(Value.FromObject(wallClock)).Value);
+        Assert.Equal("'12:34:56.1234567'",
+            SqlLogRenderer.Literal(new Value.TimeValue(wallClock), "sqlite"));
+        Assert.Equal("'123456789012.3456789'",
+            SqlLogRenderer.Literal(new Value.DecimalValue(123456789012.3456789m), "sqlite"));
+    }
     [Fact]
     public void Value_TryI64_AcceptsRepresentableNumericVariants()
     {
