@@ -1,0 +1,30 @@
+{
+  "schema": "teaql.generated-example-fixture/v1",
+  "language": "dotnet",
+  "modelSha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
+  "generatedManifestSha256": "081388d2161626c267428c473a3d61ab448e1acf161a7b8b164234556ee399ba",
+  "producerReceiptSha256": "d96c2ac416faaf65064f24c5a50900a30e6788dae1c58636b3d1e28d38b4dc7b",
+  "producerSource": {
+    "commit": "e8924609aa88e88a1ca2af91289de025659205cd",
+    "diff": "966e5e6af31d096935302fc14fab18a5472d33bacdf3ef3247bc766a446cbb3c",
+    "status": "ac3d44d1d8bb7fb1aec308f4a03e418be8ca527822ec188020771b96e2234502",
+    "sourceContentsSha256": "ced56ce22cfc75928b56b3eb890a2ab470c74ab2f065ce79d07f9c6012574e0d"
+  },
+  "evaluatedScope": "dotnet-lib-core",
+  "evaluationErrors": 0,
+  "evaluationWarnings": 4,
+  "files": {
+    "E.cs": "9e21980b53efe0c81080b2bc7d6db9335e4ad2e7ee0da1a8992f92b11044621d",
+    "Requests/TenantRequest.cs": "f279eff038b98911ea35d8e5b540e2ba989fe337c82978d4c6f1eaa46de58536",
+    "Requests/PurchaseOrderRequest.cs": "f3a79c91e1b11efcb45090d6538b5ef402fa9c00c7054c7772230906d18fae70",
+    "Requests/OrderItemRequest.cs": "b8cdfa0d41610b50e184d1486cfa8ec2218fda5633473a169701f2b737fb3782",
+    "Models/Tenant.cs": "7a0816da892eddcc4d562f7520ab44b98a615167ba6a9bbec0a1095b2154a000",
+    "Models/PurchaseOrder.cs": "5821e0396bb704c82df98e72047791fef5672120c200fe8c8bddcdf04c7f7c0e",
+    "Models/OrderItem.cs": "22292ae64fa0f7d2f14ab7e4cb97754860a35c2786441dd37df9e610f54dacdd",
+    "teaql-i18n.json": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014",
+    "GeneratedRuntimeModule.cs": "9901e72a669c662c5a4d63cfcdf62b9769a361a40ef1f802a8c28548c34ddf08",
+    "GeneratedSearchModels.cs": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c",
+    "checker-fix-advanced-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+    "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e"
+  }
+}

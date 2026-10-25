@@ -30,7 +30,10 @@ static (NotLoadedDiagnostic Diagnostic, string Human) Missing(Func<object?> read
 
 var first = new DateTimeOffset(2032, 2, 29, 10, 15, 30, TimeSpan.Zero);
 var second = first.AddHours(25);
-await using var connection = new SqliteConnection("Data Source=:memory:");
+await using var connection = new SqliteConnection(new SqliteConnectionStringBuilder
+{
+    DataSource = Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB") ?? ":memory:"
+}.ToString());
 await connection.OpenAsync();
 var module = GeneratedRuntimeModule.Module;
 var service = new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
