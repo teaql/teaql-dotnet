@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Runtime.CompilerServices;
@@ -9,19 +11,67 @@ using TeaQL.Sql;
 
 namespace TeaQL.Provider.Sqlite;
 
-public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport, ISchemaConnectionInitializer
+public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransactionTransport,
+    ISchemaConnectionInitializer, ISchemaCompatibilityVerifier
 {
     private readonly SqliteConnection _connection;
 
     public SqliteTransport(SqliteConnection connection)
     {
         _connection = connection;
+        _connection.CreateCollation("TEAQL_DECIMAL", CompareExactDecimal);
+        _connection.CreateFunction<string?, bool>("teaql_decimal_valid", ExactDecimal.IsValid,
+            isDeterministic: true);
+        _connection.CreateAggregate(
+            "teaql_decimal_sum",
+            default(ExactDecimal.SumState),
+            (ExactDecimal.SumState state, string? value) => value is null ? state : state.Add(value),
+            state => state.Finish());
+    }
+
+    private static int CompareExactDecimal(string? left, string? right)
+    {
+        if (left is null) return right is null ? 0 : -1;
+        if (right is null) return 1;
+        return ExactDecimal.Parse(left).CompareTo(ExactDecimal.Parse(right));
     }
 
     public Task EnsureSchemaFunctionsAsync()
     {
         _connection.CreateFunction<string?, string>("soundex", Soundex, isDeterministic: true);
         return Task.CompletedTask;
+    }
+
+    public async Task VerifySchemaCompatibilityAsync(SqlDialect dialect, EntityDescriptor entity)
+    {
+        var decimals = entity.Properties.Where(property => property.DataType == DataType.Decimal).ToArray();
+        if (decimals.Length == 0) return;
+        using var command = _connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info({dialect.QuoteIdent(entity.TableNameValue)})";
+        var types = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        using (var reader = await command.ExecuteReaderAsync())
+            while (await reader.ReadAsync())
+                types[reader.GetString(1)] = reader.GetString(2);
+        command.CommandText = "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = @table";
+        command.Parameters.AddWithValue("@table", entity.TableNameValue);
+        var definition = await command.ExecuteScalarAsync() as string ?? "";
+        foreach (var property in decimals)
+        {
+            var name = property.ColumnNameString;
+            var quoted = "\"" + name.Replace("\"", "\"\"") + "\"";
+            var identifier = $"(?:{Regex.Escape(quoted)}|(?<![\\w]){Regex.Escape(name)}(?![\\w]))";
+            var declaration = $@"{identifier}\s+TEAQL_DECIMAL_TEXT\s+COLLATE\s+TEAQL_DECIMAL\b";
+            var check = $@"CHECK\s*\(\s*{identifier}\s+IS\s+NULL\s+OR\s*\(\s*typeof\(\s*{identifier}\s*\)\s*=\s*'text'\s+AND\s+teaql_decimal_valid\(\s*{identifier}\s*\)\s*\)\s*\)";
+            const RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+            if (!types.TryGetValue(property.ColumnNameString, out var actual)
+                || !string.Equals(actual, "TEAQL_DECIMAL_TEXT", StringComparison.OrdinalIgnoreCase)
+                || !Regex.IsMatch(definition, declaration, options, TimeSpan.FromSeconds(1))
+                || !Regex.IsMatch(definition, check, options, TimeSpan.FromSeconds(1)))
+                throw new SqlExecutorException($"SQLite Decimal column {entity.TableNameValue}.{property.ColumnNameString} " +
+                    $"has an incompatible definition ({actual ?? "<missing>"}); migrate it to checked " +
+                    "TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL before continuing. " +
+                    "Previously rounded NUMERIC/REAL values cannot be recovered automatically.");
+        }
     }
 
     private static string Soundex(string? value)
@@ -69,7 +119,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 var name = reader.GetName(i);
-                var value = ReadValue(reader, i);
+                var value = ReadValue(reader, i, query);
                 record[name] = value;
             }
             records.Add(record);
@@ -98,7 +148,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         {
             var record = new Record();
             for (var i = 0; i < reader.FieldCount; i++)
-                record[reader.GetName(i)] = ReadValue(reader, i);
+                record[reader.GetName(i)] = ReadValue(reader, i, query);
             yield return record;
         }
     }
@@ -148,7 +198,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             {
                 var record = new Record();
                 for (var index = 0; index < reader.FieldCount; index++)
-                    record[reader.GetName(index)] = _owner.ReadValue(reader, index);
+                    record[reader.GetName(index)] = _owner.ReadValue(reader, index, query);
                 records.Add(record);
             }
             return records;
@@ -201,9 +251,12 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
                 p.Value = f.Value;
                 break;
             case Value.DecimalValue d:
-                // Let SQLite NUMERIC affinity interpret the decimal text. A
-                // tagged sentinel is text and breaks ordered SQL predicates.
-                p.Value = d.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                p.Value = d.Value.ToString(CultureInfo.InvariantCulture);
+                break;
+            case Value.TimeValue t:
+                if (t.Value < TimeSpan.Zero || t.Value >= TimeSpan.FromDays(1))
+                    throw new ArgumentOutOfRangeException(nameof(value), "Time must be a wall-clock value in [00:00, 24:00).");
+                p.Value = t.Value.ToString("c", CultureInfo.InvariantCulture);
                 break;
             case Value.TextValue t:
                 p.Value = t.Value;
@@ -214,11 +267,6 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             case Value.DateValue d:
                 p.Value = d.Value.ToString("yyyy-MM-dd");
                 break;
-            case Value.TimeValue t:
-                // RuntimeModule models a time-only field as TEXT; use one
-                // culture-independent representation for binds and readback.
-                p.Value = t.Value.ToString("c", System.Globalization.CultureInfo.InvariantCulture);
-                break;
             case Value.TimestampValue t:
                 p.Value = t.Milliseconds;
                 break;
@@ -227,7 +275,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         }
     }
 
-    private Value ReadValue(DbDataReader reader, int i)
+    private Value ReadValue(DbDataReader reader, int i, CompiledQuery query)
     {
         if (reader.IsDBNull(i))
         {
@@ -237,33 +285,41 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         var typeName = reader.GetDataTypeName(i).ToUpperInvariant();
         var fieldType = reader.GetFieldType(i);
 
+        if (typeName == "TEAQL_DECIMAL_TEXT" || query.ExactDecimalResultAliases.Contains(reader.GetName(i)))
+        {
+            if (fieldType != typeof(string))
+                throw new FormatException("Exact SQLite Decimal result requires text storage.");
+            return new Value.DecimalValue(ExactDecimal.Parse(reader.GetString(i)));
+        }
+
         if (fieldType == typeof(long))
         {
             long v = reader.GetInt64(i);
             if (typeName == "BOOLEAN" || typeName == "BOOL") return new Value.BoolValue(v != 0);
             if (typeName == "TIMESTAMP" || typeName == "DATETIME") return new Value.TimestampValue(v);
-            if (typeName == "NUMERIC" || typeName == "DECIMAL") return new Value.DecimalValue(v);
+            if (typeName == "NUMERIC" || typeName == "DECIMAL")
+                throw new InvalidOperationException("Legacy SQLite NUMERIC Decimal data may have lost precision; migrate the column to TEAQL_DECIMAL_TEXT.");
             return new Value.I64Value(v);
         }
         else if (fieldType == typeof(double))
         {
             if (typeName == "NUMERIC" || typeName == "DECIMAL")
-                return new Value.DecimalValue(Convert.ToDecimal(
-                    reader.GetDouble(i), System.Globalization.CultureInfo.InvariantCulture));
+                throw new InvalidOperationException("Legacy SQLite NUMERIC Decimal data may have lost precision; migrate the column to TEAQL_DECIMAL_TEXT.");
             return new Value.F64Value(reader.GetDouble(i));
         }
         else if (fieldType == typeof(string))
         {
             var str = reader.GetString(i);
-            if (str.StartsWith("__teaql_decimal__:"))
+            if (typeName == "TIME" || typeName == "TEAQL_TIME_TEXT")
             {
-                if (decimal.TryParse(str.Substring("__teaql_decimal__:".Length), out var dec))
-                    return new Value.DecimalValue(dec);
+                if (TimeSpan.TryParseExact(str, "c", CultureInfo.InvariantCulture, out var wallClock)
+                    && wallClock >= TimeSpan.Zero && wallClock < TimeSpan.FromDays(1))
+                    return new Value.TimeValue(wallClock);
+                throw new FormatException($"Invalid SQLite wall-clock Time in column {reader.GetName(i)}.");
             }
             if (typeName == "NUMERIC" || typeName == "DECIMAL")
             {
-                if (decimal.TryParse(str, out var dec))
-                    return new Value.DecimalValue(dec);
+                throw new InvalidOperationException("Legacy SQLite NUMERIC Decimal data may have lost precision; migrate the column to TEAQL_DECIMAL_TEXT.");
             }
             else if (typeName == "JSON")
             {

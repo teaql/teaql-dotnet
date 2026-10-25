@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace TeaQL.Runtime;
@@ -75,9 +74,16 @@ public sealed class TeaQLNotLoadedException : InvalidOperationException
     public ExpressionPath Path { get; }
     public string BreakPoint { get; }
     public TeaQLNotLoadedException(ExpressionPath path, string breakPoint)
-        : base("TeaQLNotLoadedError: " + path.Render(true) + "\ndiagnostic: " + JsonSerializer.Serialize(path.Diagnostic(breakPoint)))
+        : base(Describe(path.Diagnostic(breakPoint)))
     { Path = path; BreakPoint = breakPoint; }
     public TeaQLNotLoadedException WithPath(ExpressionPath path) => new(path.WithFailureFrom(Path), BreakPoint);
     public TeaQLNotLoadedException Terminal(string call) => new(Path.Operation(call), BreakPoint);
     public NotLoadedDiagnostic ToWire() => Path.Diagnostic(BreakPoint);
+    private static string Describe(NotLoadedDiagnostic diagnostic)
+    {
+        var location = diagnostic.Location.Aggregate(ObjectLocation.Root(), (current, segment) =>
+            segment.Kind == "index" ? current.Index(segment.Index!.Value) : current.PropertyAt(segment.Name!));
+        return $"TeaQLNotLoadedError: access_path={location.NativePath} break_point={diagnostic.BreakPoint}"
+            + $" — select the missing field or relation expression={diagnostic.ExpressionWithBrokenPoint}";
+    }
 }

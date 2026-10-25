@@ -405,7 +405,7 @@ namespace TeaQL.Provider.Sqlite.Tests
         [Fact]
         public async Task FetchAllSqlAsync_ReadsVariousTypes()
         {
-            var create = new CompiledQuery("CREATE TABLE types (id INTEGER, b BOOLEAN, f REAL, s TEXT, d DATE, t TIMESTAMP, dec NUMERIC, j JSON)", new List<Value>());
+            var create = new CompiledQuery("CREATE TABLE types (id INTEGER, b BOOLEAN, f REAL, s TEXT, d DATE, t TIMESTAMP, dec TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL, j JSON)", new List<Value>());
             await _transport.ExecuteSqlAsync(create);
 
             var insert = new CompiledQuery(
@@ -476,6 +476,94 @@ namespace TeaQL.Provider.Sqlite.Tests
             var results = await _transport.FetchAllSqlAsync(select);
             var record = results[0];
             Assert.IsType<Value.NullValue>(record["v"]);
+        }
+
+        [Fact]
+        public async Task TimeValue_RoundTripsAsWallClockWithoutDate()
+        {
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "CREATE TABLE wall_clock (v TEAQL_TIME_TEXT NOT NULL)", new List<Value>()));
+            var expected = new TimeSpan(12, 34, 56) + TimeSpan.FromTicks(1_234_567);
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "INSERT INTO wall_clock (v) VALUES (@p0)",
+                new List<Value> { new Value.TimeValue(expected) }));
+
+            var rows = await _transport.FetchAllSqlAsync(new CompiledQuery(
+                "SELECT v FROM wall_clock", new List<Value>()));
+            Assert.Equal(expected, Assert.IsType<Value.TimeValue>(Assert.Single(rows)["v"]).Value);
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _transport.ExecuteSqlAsync(
+                new CompiledQuery("INSERT INTO wall_clock (v) VALUES (@p0)",
+                    new List<Value> { new Value.TimeValue(TimeSpan.FromDays(1)) })));
+        }
+
+        [Fact]
+        public async Task DecimalValue_UsesExactTextWithNumericPredicatesAndOrdering()
+        {
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "CREATE TABLE amounts (v TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL NOT NULL)",
+                new List<Value>()));
+            foreach (var amount in new[] { 123456789012.3456789m, 3.50m, -0.0000001m })
+                await _transport.ExecuteSqlAsync(new CompiledQuery(
+                    "INSERT INTO amounts (v) VALUES (@p0)",
+                    new List<Value> { new Value.DecimalValue(amount) }));
+
+            var rows = await _transport.FetchAllSqlAsync(new CompiledQuery(
+                "SELECT v, typeof(v) AS storage_type FROM amounts WHERE v > @p0 ORDER BY v ASC",
+                new List<Value> { new Value.DecimalValue(0.1m) }));
+            Assert.Equal(new[] { 3.50m, 123456789012.3456789m },
+                rows.Select(row => Assert.IsType<Value.DecimalValue>(row["v"]).Value));
+            Assert.All(rows, row => Assert.Equal("text",
+                Assert.IsType<Value.TextValue>(row["storage_type"]).Value));
+        }
+
+        [Fact]
+        public async Task DecimalAggregatesKeepExactSumAndExtremaWithoutFloatingPointFallback()
+        {
+            var entity = EntityDescriptor.New("Amount").TableName("amount_data")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("amount", DataType.Decimal));
+            var module = new RuntimeModule().Entity(entity);
+            var executor = new SqlDataServiceExecutor(
+                new SqliteDialect(), _transport, new ModuleSchemaProvider(module));
+            var context = module.IntoContext().WithDataService(executor);
+            await context.EnsureSchemaAsync();
+            foreach (var (id, amount) in new[] { (1L, 123456789012.3456789m), (2L, 0.0000001m), (3L, -3.5m) })
+                await _transport.ExecuteSqlAsync(new CompiledQuery(
+                    "INSERT INTO amount_data(id,amount) VALUES (@p0,@p1)",
+                    [new Value.I64Value(id), new Value.DecimalValue(amount)]));
+
+            var query = new SelectQuery("Amount")
+                .Sum("amount", "total")
+                .Aggregate(Aggregate.Min("amount", "smallest"))
+                .Aggregate(Aggregate.Max("amount", "largest"));
+            var rows = (await executor.QueryAsync(new QueryRequest(query,
+                new QueryIntent("load exact Decimal aggregates", "verify non-floating aggregation")))).Rows;
+            var row = Assert.Single(rows);
+            Assert.Equal(123456789008.8456790m, Assert.IsType<Value.DecimalValue>(row["total"]).Value);
+            Assert.Equal(-3.5m, Assert.IsType<Value.DecimalValue>(row["smallest"]).Value);
+            Assert.Equal(123456789012.3456789m, Assert.IsType<Value.DecimalValue>(row["largest"]).Value);
+
+            var avg = new SelectQuery("Amount").Avg("amount", "average");
+            var failure = await Assert.ThrowsAsync<SqlExecutorException>(() => executor.QueryAsync(
+                new QueryRequest(avg, new QueryIntent("load Decimal average", "verify fail-closed precision policy"))));
+            Assert.Contains("rounding policy", failure.Message);
+        }
+
+        [Fact]
+        public async Task EnsureSchema_RejectsLegacyNumericDecimalColumns()
+        {
+            var entity = EntityDescriptor.New("Amount").TableName("amount_data")
+                .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+                .Property(PropertyDescriptor.New("amount", DataType.Decimal));
+            var module = new RuntimeModule().Entity(entity);
+            var context = module.IntoContext().WithDataService(new SqlDataServiceExecutor(
+                new SqliteDialect(), _transport, new ModuleSchemaProvider(module)));
+            await _transport.ExecuteSqlAsync(new CompiledQuery(
+                "CREATE TABLE amount_data (id INTEGER PRIMARY KEY, amount NUMERIC)", new List<Value>()));
+
+            var error = await Assert.ThrowsAsync<SqlExecutorException>(() => context.EnsureSchemaAsync());
+            Assert.Contains("amount_data.amount", error.Message);
+            Assert.Contains("migrate", error.Message);
         }
 
         [Fact]

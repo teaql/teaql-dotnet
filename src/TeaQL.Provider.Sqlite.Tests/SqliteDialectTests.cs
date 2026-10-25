@@ -28,11 +28,12 @@ namespace TeaQL.Provider.Sqlite.Tests
         [InlineData(DataType.I64, "INTEGER")]
         [InlineData(DataType.U64, "INTEGER")]
         [InlineData(DataType.F64, "REAL")]
-        [InlineData(DataType.Decimal, "NUMERIC")]
+        [InlineData(DataType.Decimal, "TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL CHECK (test IS NULL OR (typeof(test) = 'text' AND teaql_decimal_valid(test)))")]
         [InlineData(DataType.Text, "VARCHAR(255)")]
         [InlineData(DataType.LargeText, "TEXT")]
         [InlineData(DataType.Json, "JSON")]
         [InlineData(DataType.Date, "DATE")]
+        [InlineData(DataType.Time, "TEAQL_TIME_TEXT")]
         [InlineData(DataType.Timestamp, "TIMESTAMP")]
         public void SchemaTypeSql_ReturnsExpectedType(DataType dataType, string expectedSql)
         {

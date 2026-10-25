@@ -20,6 +20,8 @@ public class ExpressionPathTests
         Assert.Equal("E.Node(<root>).Parent()<broken>.Parent().UserUrl().Eval()", wire.ExpressionWithBrokenPoint);
         Assert.Equal(0, wire.BreakPointIndex);
         Assert.Equal(wire.Location, wire.SuggestedFix.Location);
+        Assert.Equal("TeaQLNotLoadedError: access_path=Parent break_point=parent — select the missing field or relation expression="
+            + wire.ExpressionWithBrokenPoint, error.Message);
     }
 
     [Theory]

@@ -11,7 +11,7 @@ static void Require(bool condition, string message)
     if (!condition) throw new InvalidOperationException(message);
 }
 
-static NotLoadedDiagnostic Missing(Func<object?> read, string location, string attempted, string expression)
+static (NotLoadedDiagnostic Diagnostic, string Human) Missing(Func<object?> read, string location, string attempted, string expression)
 {
     try { read(); }
     catch (TeaQLNotLoadedException error)
@@ -23,7 +23,7 @@ static NotLoadedDiagnostic Missing(Func<object?> read, string location, string a
         Require(wire.ExpressionWithBrokenPoint == expression, "Wrong native expression or positional breakpoint");
         Require(!error.Message.Contains("PRIVATE-FALLBACK"), "Diagnostics must not export argument values");
         Require(error.Message.Contains("<broken>"), "Native error text must show the breakpoint");
-        return wire;
+        return (wire, error.Message);
     }
     throw new InvalidOperationException("NotLoaded must not become a null or fallback result");
 }
@@ -51,7 +51,7 @@ var rows = await Q.PurchaseOrdersWithMinimalFields().WithIdIs(orderId).Limit(1)
     .Purpose("Verify complete E diagnostics without implicit loading").ExecuteForListAsync(context);
 Require(rows.Count == 1, "Missing saved order");
 var partial = rows[0];
-var diagnostics = new List<NotLoadedDiagnostic>
+var results = new[]
 {
     Missing(() => E.PurchaseOrder(partial).Tenant().Name().Eval(), "/tenant", "/tenant/name",
         "E.PurchaseOrder(<root>).Tenant()<broken>.Name().Eval()"),
@@ -80,9 +80,12 @@ var persisted = rows[0];
 Require(E.PurchaseOrder(persisted).CreateTime().Eval() == first.UtcDateTime, "Create time was not preserved");
 Require(E.PurchaseOrder(persisted).UpdateTime().Eval() == second.UtcDateTime, "Update time did not advance to T1");
 Require(E.PurchaseOrder(persisted).ContactPhone().Eval() == "5550101", "Business input was not updated");
+await LoadingProbe.Verify(context, orderId);
+await OwnershipProbe.Verify(context);
 Console.WriteLine("FIX_E_EXAMPLE=" + JsonSerializer.Serialize(new {
     language = "dotnet", passed = true, normalGeneratedSave = true, createTimePreserved = true,
-    updateTimeAdvanced = true, declaredContextRootInjected = true, diagnostics
+    updateTimeAdvanced = true, declaredContextRootInjected = true,
+    diagnostics = results.Select(result => result.Diagnostic), humanMessages = results.Select(result => result.Human)
 }));
 
 sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider

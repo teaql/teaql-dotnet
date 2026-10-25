@@ -49,6 +49,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             await Transport.ExecuteSqlAsync(new CompiledQuery(statement, new List<Value>()));
         await Transport.ExecuteSqlAsync(new CompiledQuery(
             Dialect.CompileCreateTable(entity), new List<Value>()));
+        if (Transport is ISchemaCompatibilityVerifier verifier)
+            await verifier.VerifySchemaCompatibilityAsync(Dialect, entity);
         if (Transport is ISchemaIndexInstaller installer)
             await installer.EnsureSchemaIndexesAsync(Dialect, entity);
         else
