@@ -17,11 +17,15 @@ if ((${#embedded_runtime_files[@]})); then
 fi
 
 runtime_source_root="${TeaQLRuntimeSourceRoot:-$repo}"
+inventory_evidence="${TEAQL_EXAMPLES_EVIDENCE_DIR:-$(mktemp -d -t teaql-dotnet-examples-evidence.XXXXXXXX)}"
+mkdir -p "$inventory_evidence"
+export TEAQL_CONFORMANCE_DB="$inventory_evidence/conformance.sqlite"
+export DOTNET_CLI_USE_MSBUILD_SERVER=0
+export MSBUILDDISABLENODEREUSE=1
+export UseSharedCompilation=false
 node "$repo/examples/fix-e-alignment/verify-local.cjs"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify.sh"
 bash "$repo/examples/object-storage/verify.sh"
-order_management_tmp="$(mktemp -d)"
-trap 'rm -rf "$order_management_tmp"' EXIT
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/conformance/runtime-example-conformance-service-console.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/business-id/business-id.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/runtime-logging/runtime-logging.csproj"
@@ -31,7 +35,7 @@ dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/school-management/school-management-service-lib.csproj"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-school-bootstrap-example.sh"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/security-foundations/security-foundations.csproj"
-TEAQL_ORDER_MANAGEMENT_DB="$order_management_tmp/order.db" \
+TEAQL_ORDER_MANAGEMENT_DB="$inventory_evidence/order.db" \
   dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/order-management/dotnet-app-console/dotnet-app-console.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/task_board/TaskBoardExample/TaskBoardExample.csproj"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-trace-chain-example.sh"
@@ -41,3 +45,4 @@ bash "$repo/examples/trace-chain/verify-standard-order.sh"
 bash "$repo/examples/trace-chain/verify-standard-graph.sh"
 bash "$repo/examples/trace-chain/verify-standard-stream.sh"
 echo "PASS: all .NET examples"
+echo "Retained compact example evidence: $inventory_evidence"

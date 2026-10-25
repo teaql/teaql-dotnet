@@ -4,6 +4,7 @@ using Generated.Models;
 using TeaQL.Core;
 using TeaQL.Runtime;
 using TeaQL.Sql;
+using TeaQLNotLoadedException = Generated.TeaQLNotLoadedException;
 
 // Field Assist supplies selection/count APIs; generated source stays read-only.
 static class AggregateMembershipChecks

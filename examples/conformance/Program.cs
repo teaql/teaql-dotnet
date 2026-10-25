@@ -28,8 +28,10 @@ Console.WriteLine("PASS Mutation ledger identity (same ID, different entity type
 var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
 var directory = Path.Combine(projectRoot, ".local");
 Directory.CreateDirectory(directory);
-var database = Path.Combine(directory, "conformance.sqlite");
-File.Delete(database);
+var database = Environment.GetEnvironmentVariable("TEAQL_CONFORMANCE_DB")
+    ?? Path.Combine(directory, $"conformance-{Guid.NewGuid():N}.sqlite");
+if (File.Exists(database)) throw new InvalidOperationException("Use a fresh conformance database; existing data is never deleted");
+Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(database))!);
 
 await using var connection = new SqliteConnection($"Data Source={database}");
 await connection.OpenAsync();
@@ -89,7 +91,9 @@ try
     _ = E.WorkItem(minimal).Title().Eval();
     throw new InvalidOperationException("E treated not-loaded title as null");
 }
-catch (TeaQLNotLoadedException) { }
+// This frozen legacy fixture owns its E exception. Current generated examples
+// use TeaQL.Runtime.TeaQLNotLoadedException; do not confuse the two contracts.
+catch (Generated.TeaQLNotLoadedException) { }
 Console.WriteLine("PASS E API (loaded, null fallback, and not-loaded are distinct)");
 
 var oldVersion = queried.Version.Value;

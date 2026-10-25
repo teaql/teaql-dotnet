@@ -7,6 +7,9 @@ using TeaQL.DataService;
 using TeaQL.Provider.Sqlite;
 using TeaQL.Runtime;
 using TeaQL.Sql;
+// This retained library predates the runtime-owned E diagnostic. Keep its
+// exception explicit; the current generated contract is verified in fix-e-alignment.
+using TeaQLNotLoadedException = Generated.TeaQLNotLoadedException;
 
 var database = args.Length == 2 && args[0] == "--database" ? Path.GetFullPath(args[1])
     : throw new ArgumentException("Use --database <persistent SQLite file>; the verifier never deletes it.");
