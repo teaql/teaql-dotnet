@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="JsonRoundtrip.cs" />
     <Compile Include="generated/**/*.cs" Exclude="generated/**/bin/**;generated/**/obj/**" />
     <Using Include="TeaQL.Core" />
     <Using Include="TeaQL.DataService" />

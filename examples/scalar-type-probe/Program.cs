@@ -101,6 +101,7 @@ Require(audit.Events.Any(e => e.TryGetValue("changedFields", out var fields)
     && fields is string[] names && names.Contains("optional_decimal")), "canonical mutation audit missing");
 Console.WriteLine($"PASS .NET generated scalar Decimal fresh={fresh} rows=3 version={reloaded!.Version} "
     + $"exact={precise.ToString(CultureInfo.InvariantCulture)} Q=PASS E=PASS Checker=PASS Mutation=PASS");
+await EntityJsonExample.RunAsync(database + ".json.sqlite");
 
 ScalarTypeProbe NewProbe(string name, decimal amount) => Q.ScalarTypeProbes()
     .Comment("prepare one generated scalar fixture").Purpose("verify exact provider storage").NewEntity(context)

@@ -1,4 +1,4 @@
-# Generated scalar fixture: exact SQLite Decimal
+# Generated scalar fixture: exact SQLite values and typed entity JSON
 
 Run from the repository root:
 
@@ -16,12 +16,47 @@ alternates between `0.10` and null while its version advances. The small fixture
 also carries the existing scalar types, including nullable typed Time.
 
 The 10 files under `generated/` are unchanged output from local generator commit
-`e8924609` (validated `CoreScalarFixtureExportTest`), scope `dotnet-lib-core` and
+`217e5483` (validated `CoreScalarFixtureExportTest`), scope `dotnet-lib-core` and
 canonical `scalar_type_probe.xml`. The model and generated-file hashes are checked before
 and after every run. No generator service is needed to run the example; change
 the model and regenerate if that library needs to change. `Program.cs` and the
 outer project are application-owned. The retained generated project is evidence;
 the outer project explicitly compiles the generated sources against this repo.
+`generated-provenance.json` records the exact producer source, receipt and model
+hashes. Regeneration is mechanical; application code does not edit the library.
+
+## Typed entity JSON
+
+`JsonRoundtrip.cs` uses generated `ToJson()` / `FromJson(payload)` and typed
+Q/E/Mutation APIs, not a handwritten DTO or reflection. The runtime owns the
+codec; the generated library supplies selected-field access and immutable
+model-specific type/name metadata. It runs twice on a separate retained
+`<scalar database>.json.sqlite` file so it cannot change the three-row Decimal
+example's assertions.
+
+Each run checks all 21 business scalar fields, ID/version, FK and managed
+timestamps in camelCase, snake_case and PascalCase. Long/ID/version/Decimal use
+exact JSON strings; Integer remains a number. Decimal scale is culture-neutral,
+Time preserves .NET ticks within a day, and DateTime uses UTC milliseconds.
+Unsupported precision, nonfinite numbers, unknown/private fields and ambiguous
+duplicates are rejected rather than rounded or silently coerced.
+
+Omitted fields remain NotLoaded, explicit null remains loaded null, and nested
+forward/reverse trees retain sparse projections without provider calls. A known
+FK survives a filtered target detail, whose missing name remains NotLoaded.
+A null FK is a known null target. Cycles fail explicitly instead of overflowing
+or performing implicit database reads.
+
+A modified partial JSON entity is rejected before query, mutation, transaction
+begin or ID allocation. Two decoded full copies retain independent ledgers:
+the first audited save succeeds; the second stale save is rejected and cannot
+clear pending changes or overwrite committed state. The generic stale-save
+diagnostic is not claimed as a complete conflict-error taxonomy.
+
+Compact `entity-json-*.report.json` files retain the assertions and calibrated
+provider counters. Entity JSON does not include query/facet envelope metadata
+and does not replace permissions or the context-bound reference adapter at an
+external boundary. Public runtime/package versions are unchanged.
 
 SQLite Decimal columns use `TEAQL_DECIMAL_TEXT COLLATE TEAQL_DECIMAL` plus a
 connection-local validation CHECK. SQLite comparisons and ordering remain numeric.

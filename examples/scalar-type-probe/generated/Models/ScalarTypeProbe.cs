@@ -7,16 +7,170 @@ using TeaQL.Core;
 namespace Generated.Models
 {
 
-    public class ScalarTypeProbe
+    public class ScalarTypeProbe : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("ScalarTypeProbe", new global::TeaQL.Runtime.EntityJsonField[] {
+            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
+            new global::TeaQL.Runtime.EntityJsonField("type_platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "type_platform", () => global::Generated.Models.TypePlatform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("required_string", global::TeaQL.Runtime.EntityJsonKind.Text, "required_string"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_string", global::TeaQL.Runtime.EntityJsonKind.Text, "optional_string"),
+            new global::TeaQL.Runtime.EntityJsonField("large_text", global::TeaQL.Runtime.EntityJsonKind.Text, "large_text"),
+            new global::TeaQL.Runtime.EntityJsonField("required_boolean", global::TeaQL.Runtime.EntityJsonKind.Boolean, "required_boolean"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_boolean", global::TeaQL.Runtime.EntityJsonKind.Boolean, "optional_boolean"),
+            new global::TeaQL.Runtime.EntityJsonField("required_integer", global::TeaQL.Runtime.EntityJsonKind.Integer, "required_integer"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_integer", global::TeaQL.Runtime.EntityJsonKind.Integer, "optional_integer"),
+            new global::TeaQL.Runtime.EntityJsonField("required_long", global::TeaQL.Runtime.EntityJsonKind.Long, "required_long"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_long", global::TeaQL.Runtime.EntityJsonKind.Long, "optional_long"),
+            new global::TeaQL.Runtime.EntityJsonField("required_decimal", global::TeaQL.Runtime.EntityJsonKind.Decimal, "required_decimal"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_decimal", global::TeaQL.Runtime.EntityJsonKind.Decimal, "optional_decimal"),
+            new global::TeaQL.Runtime.EntityJsonField("required_float", global::TeaQL.Runtime.EntityJsonKind.Float, "required_float"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_float", global::TeaQL.Runtime.EntityJsonKind.Float, "optional_float"),
+            new global::TeaQL.Runtime.EntityJsonField("required_double", global::TeaQL.Runtime.EntityJsonKind.Double, "required_double"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_double", global::TeaQL.Runtime.EntityJsonKind.Double, "optional_double"),
+            new global::TeaQL.Runtime.EntityJsonField("required_date", global::TeaQL.Runtime.EntityJsonKind.Date, "required_date"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_date", global::TeaQL.Runtime.EntityJsonKind.Date, "optional_date"),
+            new global::TeaQL.Runtime.EntityJsonField("required_time", global::TeaQL.Runtime.EntityJsonKind.Time, "required_time"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_time", global::TeaQL.Runtime.EntityJsonKind.Time, "optional_time"),
+            new global::TeaQL.Runtime.EntityJsonField("required_datetime", global::TeaQL.Runtime.EntityJsonKind.DateTime, "required_datetime"),
+            new global::TeaQL.Runtime.EntityJsonField("optional_datetime", global::TeaQL.Runtime.EntityJsonKind.DateTime, "optional_datetime"),
+            new global::TeaQL.Runtime.EntityJsonField("create_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "create_time"),
+            new global::TeaQL.Runtime.EntityJsonField("update_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "update_time"),
+            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+
+        global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
+
+        public string ToJson(global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) => _teaqlJsonSchema.Serialize(this, profile);
+
+        public static ScalarTypeProbe FromJson(string payload, global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) =>
+            FromRecord(_teaqlJsonSchema.Parse(payload, profile));
+
+        IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
+        {
+            if (IsLoaded("Id"))
+            {
+                yield return new KeyValuePair<string, object?>("id", Id);
+            }
+            if (IsLoaded("TypePlatform"))
+            {
+                object? jsonTypePlatform = IsLoaded("TypePlatformEntity") && TypePlatformEntity != null && TypePlatformEntity.Id == TypePlatform
+                    ? TypePlatformEntity : TypePlatform;
+                yield return new KeyValuePair<string, object?>("type_platform", jsonTypePlatform);
+            }
+            if (IsLoaded("RequiredString"))
+            {
+                yield return new KeyValuePair<string, object?>("required_string", RequiredString);
+            }
+            if (IsLoaded("OptionalString"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_string", OptionalString);
+            }
+            if (IsLoaded("LargeText"))
+            {
+                yield return new KeyValuePair<string, object?>("large_text", LargeText);
+            }
+            if (IsLoaded("RequiredBoolean"))
+            {
+                yield return new KeyValuePair<string, object?>("required_boolean", RequiredBoolean);
+            }
+            if (IsLoaded("OptionalBoolean"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_boolean", OptionalBoolean);
+            }
+            if (IsLoaded("RequiredInteger"))
+            {
+                yield return new KeyValuePair<string, object?>("required_integer", RequiredInteger);
+            }
+            if (IsLoaded("OptionalInteger"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_integer", OptionalInteger);
+            }
+            if (IsLoaded("RequiredLong"))
+            {
+                yield return new KeyValuePair<string, object?>("required_long", RequiredLong);
+            }
+            if (IsLoaded("OptionalLong"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_long", OptionalLong);
+            }
+            if (IsLoaded("RequiredDecimal"))
+            {
+                yield return new KeyValuePair<string, object?>("required_decimal", RequiredDecimal);
+            }
+            if (IsLoaded("OptionalDecimal"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_decimal", OptionalDecimal);
+            }
+            if (IsLoaded("RequiredFloat"))
+            {
+                yield return new KeyValuePair<string, object?>("required_float", RequiredFloat);
+            }
+            if (IsLoaded("OptionalFloat"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_float", OptionalFloat);
+            }
+            if (IsLoaded("RequiredDouble"))
+            {
+                yield return new KeyValuePair<string, object?>("required_double", RequiredDouble);
+            }
+            if (IsLoaded("OptionalDouble"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_double", OptionalDouble);
+            }
+            if (IsLoaded("RequiredDate"))
+            {
+                yield return new KeyValuePair<string, object?>("required_date", RequiredDate);
+            }
+            if (IsLoaded("OptionalDate"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_date", OptionalDate);
+            }
+            if (IsLoaded("RequiredTime"))
+            {
+                yield return new KeyValuePair<string, object?>("required_time", RequiredTime);
+            }
+            if (IsLoaded("OptionalTime"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_time", OptionalTime);
+            }
+            if (IsLoaded("RequiredDatetime"))
+            {
+                yield return new KeyValuePair<string, object?>("required_datetime", RequiredDatetime);
+            }
+            if (IsLoaded("OptionalDatetime"))
+            {
+                yield return new KeyValuePair<string, object?>("optional_datetime", OptionalDatetime);
+            }
+            if (IsLoaded("CreateTime"))
+            {
+                yield return new KeyValuePair<string, object?>("create_time", CreateTime);
+            }
+            if (IsLoaded("UpdateTime"))
+            {
+                yield return new KeyValuePair<string, object?>("update_time", UpdateTime);
+            }
+            if (IsLoaded("Version"))
+            {
+                yield return new KeyValuePair<string, object?>("version", Version);
+            }
+        }
+
         public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
+        private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("ScalarTypeProbe", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
-        internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; }  }
+        internal void AttachRoot(EntityRoot root, bool hydration = false)
+        {
+            var key = TeaqlEntityKey();
+            if (!ReferenceEquals(root, _entityRoot) && (hydration || _entityRoot.HasPending(key)))
+            {
+                root.MergeEntityFrom(_entityRoot, key);
+                _entityRoot = root;
+            }
+        }
         private static Value TeaqlValue(object? value) => value switch {
             null => new Value.NullValue(), string v => new Value.TextValue(v), bool v => new Value.BoolValue(v),
             double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.TimestampValue(new DateTimeOffset(v).ToUnixTimeMilliseconds()), TimeSpan v => new Value.TimeValue(v),
@@ -94,7 +248,7 @@ namespace Generated.Models
 
         public ScalarTypeProbe AuditAs(string comment)
         {
-            _comment = comment;
+            _comment = new MutationIntent(comment).Comment;
             return this;
         }
 
@@ -107,12 +261,16 @@ namespace Generated.Models
 
         public static ScalarTypeProbe Refer(long id)
         {
-            return new ScalarTypeProbe { Id = id }.MarkLoadedOnly("Id");
+            var entity = new ScalarTypeProbe();
+            entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
+            entity.Id = id;
+            return entity.MarkLoadedOnly("Id");
         }
 
         public static ScalarTypeProbe FromRecord(Record record)
         {
             var entity = new ScalarTypeProbe().MarkLoadedOnly();
+            entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {
                         entity.MarkLoaded("Id");
@@ -139,6 +297,8 @@ namespace Generated.Models
                                 break;
                             }
                         }
+                        else if (typePlatformValue.Raw == null)
+                            entity.MarkLoaded("TypePlatformEntity");
                         else if (typePlatformValue.Raw != null)
                             entity.TypePlatform = Convert.ToInt64(typePlatformValue.Raw);
                     }
@@ -293,29 +453,37 @@ namespace Generated.Models
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
+            entity._loadedSnapshot = entity.TeaqlScalarSnapshot();
             return entity;
         }
 
         internal static ScalarTypeProbe FromRecord(Record record, EntityRoot root)
         {
             var entity = FromRecord(record);
-            entity.AttachRoot(root);
+            entity.AttachRoot(root, hydration: true);
             return entity;
         }
 
-        public async Task<ScalarTypeProbe> SaveAsync(UserContext context)
+        public async global::System.Threading.Tasks.Task<ScalarTypeProbe> SaveAsync(UserContext context)
         {
-            return await context.ExecuteGraphSaveAsync(_comment!, async graph =>
+            var intent = new MutationIntent(_comment);
+            return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
+                graph.DeclareRootEntity("ScalarTypeProbe");
                 if (!Id.HasValue || _teaqlForceCreate)
                 {
                 }
+                TeaqlPrepareInputGraph(context, graph);
+                await global::System.Threading.Tasks.Task.CompletedTask;
+            }, async graph =>
+            {
+                await TeaqlReserveGraphIdentitiesAsync(graph);
                 TeaqlPreflightGraph(context, graph);
                 return await TeaqlSaveWithinGraphAsync(context, graph);
             });
         }
 
-        internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
+        internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
@@ -381,19 +549,24 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 ((UpdateCommand)command).Values = _entityRoot.Change(TeaqlEntityKey());
-                if (Version.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(Version.Value);
+                var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
+                if (originalVersion.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            graph.Preflight(TeaqlMutationRequest(command, string.IsNullOrWhiteSpace(_comment) ? graph.Intent.Comment : _comment!));
+            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment));
             }
         }
 
-        internal async Task<ScalarTypeProbe> TeaqlSaveWithinGraphAsync(UserContext context, GraphMutationSession graph, MutationTraceScope? parentScope = null)
+        internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
-            var scope = graph.Scope("ScalarTypeProbe", Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
-            if (Id.HasValue && !_teaqlForceCreate && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
+            if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+                graph.PreflightPrepared(this);
+        }
+
+        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        {
+            var creating = !Id.HasValue || _teaqlForceCreate;
+            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
             {
-                return this;
-            }
             var teaqlOriginalKey = TeaqlEntityKey();
             var teaqlOriginalLedgerId = _ledgerId;
             var teaqlOriginalMarkedForDeletion = _markedForDeletion;
@@ -467,21 +640,38 @@ namespace Generated.Models
                 _entityRoot.ClearEntity(TeaqlEntityKey());
                 if (Version.HasValue) _entityRoot.AcceptCommittedVersion(TeaqlEntityKey(), Version.Value);
             });
-            var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
-            var cmd = _markedForDeletion ? (object)ToDeleteCommand()
-                : creating ? (object)ToInsertCommand()
-                : (object)ToUpdateCommand();
-            if (!creating && !_markedForDeletion) {
-                ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
-                if (Version.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(Version.Value);
+            if (creating)
+            {
+                var allocationKey = TeaqlEntityKey();
+                Id = checked((long)await graph.ReservePreparedIdAsync(this));
+                _teaqlForceCreate = true;
+                _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
             }
-            var req = TeaqlMutationRequest(cmd, scope.Node.Detail!);
-            var mutationResult = await graph.MutateAsync(req, scope);
+            }
+            await global::System.Threading.Tasks.Task.CompletedTask;
+        }
+
+        internal async global::System.Threading.Tasks.Task<ScalarTypeProbe> TeaqlSaveWithinGraphAsync(UserContext context,
+            GraphMutationSession graph, MutationTraceScope? parentScope = null)
+        {
+            var creating = !this.Id.HasValue || _teaqlForceCreate;
+            if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
+            {
+                var cleanScope = graph.Scope("ScalarTypeProbe",
+                    Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
+                await TeaqlSaveChildrenAsync(context, graph, cleanScope);
+                return this;
+            }
+            var scope = graph.Scope("ScalarTypeProbe",
+                Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
+            var mutationResult = await graph.MutatePreparedAsync(this, scope);
             if (mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for ScalarTypeProbe");
             var saved = FromRecord(mutationResult.PersistedRecord);
+            var committedSnapshot = saved._loadedSnapshot;
+            graph.AfterCommit(() => _loadedSnapshot = committedSnapshot);
             var oldKey = TeaqlEntityKey();
             this.Id = saved.Id;
             this.TypePlatform = saved.TypePlatform;
@@ -512,16 +702,78 @@ namespace Generated.Models
             _ledgerId = Id ?? _ledgerId;
             _teaqlForceCreate = false;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
+            await TeaqlSaveChildrenAsync(context, graph, scope);
             return saved;
         }
 
-        private MutationRequest TeaqlMutationRequest(object command, string comment) => command switch
+        private async global::System.Threading.Tasks.Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
         {
-            InsertCommand insert => MutationRequest.Create(insert, comment, TeaqlEntityKey(), _entityRoot),
-            UpdateCommand update => MutationRequest.Create(update, comment, TeaqlEntityKey(), _entityRoot),
-            DeleteCommand delete => MutationRequest.Create(delete, comment, TeaqlEntityKey(), _entityRoot),
+            await global::System.Threading.Tasks.Task.CompletedTask;
+        }
+
+        private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
+        {
+            InsertCommand insert => MutationRequest.Create(insert, rootComment, TeaqlEntityKey(), _entityRoot),
+            UpdateCommand update => MutationRequest.Create(update, rootComment, TeaqlEntityKey(), _entityRoot),
+            DeleteCommand delete => MutationRequest.Create(delete, rootComment, TeaqlEntityKey(), _entityRoot),
             _ => throw new InvalidOperationException("Unsupported mutation command")
-        };
+        }).WithLoadedSnapshot(_loadedSnapshot);
+
+        private LoadedScalarSnapshot TeaqlScalarSnapshot()
+        {
+            var record = new Record();
+                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+
+                    if (RequiredString != null) record["required_string"] = new Value.TextValue(RequiredString);
+
+                    if (OptionalString != null) record["optional_string"] = new Value.TextValue(OptionalString);
+
+                    if (LargeText != null) record["large_text"] = new Value.TextValue(LargeText);
+
+                    if (RequiredBoolean.HasValue) record["required_boolean"] = new Value.BoolValue(RequiredBoolean.Value);
+
+                    if (OptionalBoolean.HasValue) record["optional_boolean"] = new Value.BoolValue(OptionalBoolean.Value);
+
+                    if (RequiredInteger.HasValue) record["required_integer"] = new Value.I64Value(RequiredInteger.Value);
+
+                    if (OptionalInteger.HasValue) record["optional_integer"] = new Value.I64Value(OptionalInteger.Value);
+
+                    if (RequiredLong.HasValue) record["required_long"] = new Value.I64Value(RequiredLong.Value);
+
+                    if (OptionalLong.HasValue) record["optional_long"] = new Value.I64Value(OptionalLong.Value);
+
+                    if (RequiredDecimal.HasValue) record["required_decimal"] = new Value.DecimalValue(RequiredDecimal.Value);
+
+                    if (OptionalDecimal.HasValue) record["optional_decimal"] = new Value.DecimalValue(OptionalDecimal.Value);
+
+                    if (RequiredFloat.HasValue) record["required_float"] = new Value.F64Value(RequiredFloat.Value);
+
+                    if (OptionalFloat.HasValue) record["optional_float"] = new Value.F64Value(OptionalFloat.Value);
+
+                    if (RequiredDouble.HasValue) record["required_double"] = new Value.F64Value(RequiredDouble.Value);
+
+                    if (OptionalDouble.HasValue) record["optional_double"] = new Value.F64Value(OptionalDouble.Value);
+
+                    if (RequiredDate.HasValue) record["required_date"] = new Value.DateValue(RequiredDate.Value);
+
+                    if (OptionalDate.HasValue) record["optional_date"] = new Value.DateValue(OptionalDate.Value);
+
+                    if (RequiredTime.HasValue) record["required_time"] = new Value.TimeValue(RequiredTime.Value);
+
+                    if (OptionalTime.HasValue) record["optional_time"] = new Value.TimeValue(OptionalTime.Value);
+
+                    if (RequiredDatetime.HasValue) record["required_datetime"] = new Value.TimestampValue(new DateTimeOffset(RequiredDatetime.Value).ToUnixTimeMilliseconds());
+
+                    if (OptionalDatetime.HasValue) record["optional_datetime"] = new Value.TimestampValue(new DateTimeOffset(OptionalDatetime.Value).ToUnixTimeMilliseconds());
+
+                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+
+                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+
+                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+
+            return new LoadedScalarSnapshot(record);
+        }
 
         public InsertCommand ToInsertCommand()
         {
@@ -637,7 +889,7 @@ namespace Generated.Models
             return new UpdateCommand { 
                 Entity = "ScalarTypeProbe", 
                 Id = this.Id.HasValue ? new Value.I64Value(this.Id.Value) : throw new InvalidOperationException("Update requires a loaded id"),
-                ExpectedVersionValue = this.Version,
+                ExpectedVersionValue = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? this.Version,
                 Values = record 
             };
         }
@@ -649,7 +901,7 @@ namespace Generated.Models
             return new DeleteCommand {
                 Entity = "ScalarTypeProbe",
                 Id = new Value.I64Value(Id.Value),
-                Version = new Value.I64Value(Version.Value)
+                Version = new Value.I64Value(_entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version.Value)
             };
         }
 
