@@ -56,13 +56,23 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         source.PrepareForList();
         async Task<long> CountAsync()
         {
-            var count = source.ForExactCount();
+            var matchingEntities = source.CloneForExecution();
+            matchingEntities.AggregateItems.Clear();
+            var count = matchingEntities.ForExactCount();
             count.AggregateItems.Clear(); count.CountField("id", alias);
             var scope = operation == null ? request.Scope.Helper(source.Entity, "count matching rows")
                 : request.Scope.DeriveOperation(operation);
             var result = await QueryBranchAsync(request.DeriveAt(count, scope));
-            if (result.Rows.Count != 1 || result.Rows[0][alias].TryI64() is not long total)
+            if (result.Rows.Count != 1 || !result.Rows[0].TryGetValue(alias, out var value))
                 throw new InvalidOperationException("Exact entity count did not return one integer result");
+            var exact = value switch {
+                Value.I64Value(var number) when number >= 0 => (long?)number,
+                Value.U64Value(var number) when number <= long.MaxValue => (long)number,
+                Value.DecimalValue(var number) when number >= 0 && number <= long.MaxValue && decimal.Truncate(number) == number => (long)number,
+                _ => null
+            };
+            if (exact is not long total)
+                throw new InvalidOperationException("Exact entity count must be a non-negative integer without rounding");
             return total;
         }
         QueryResult rows;
