@@ -231,19 +231,29 @@ public class UserContext
     {
         var intent = new MutationIntent(comment); // Must precede callbacks and transaction allocation.
         return await RuntimeTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
-            () => ExecuteGraphSaveCoreAsync(intent, work)).ConfigureAwait(false);
+            () => ExecuteGraphSaveCoreAsync(intent, null, work)).ConfigureAwait(false);
     }
 
-    private async Task<T> ExecuteGraphSaveCoreAsync<T>(MutationIntent intent, Func<GraphMutationSession, Task<T>> work)
+    /// <summary>Generated bridge: validate/fix the complete graph before opening its transaction.</summary>
+    public async Task<T> ExecuteGraphSaveAsync<T>(string comment,
+        Func<GraphMutationSession, Task> prepare, Func<GraphMutationSession, Task<T>> work)
+    {
+        ArgumentNullException.ThrowIfNull(prepare);
+        ArgumentNullException.ThrowIfNull(work);
+        var intent = new MutationIntent(comment);
+        return await RuntimeTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
+            () => ExecuteGraphSaveCoreAsync(intent, prepare, work)).ConfigureAwait(false);
+    }
+
+    private async Task<T> ExecuteGraphSaveCoreAsync<T>(MutationIntent intent,
+        Func<GraphMutationSession, Task>? prepare, Func<GraphMutationSession, Task<T>> work)
     {
         await _graphSaveGate.WaitAsync().ConfigureAwait(false);
         ITransaction? transaction = null;
         GraphMutationSession? session = null;
         try
         {
-            transaction = await RequireResource<ITransactionExecutor>()
-                .BeginTransactionAsync().ConfigureAwait(false);
-            session = new GraphMutationSession(this, transaction, intent);
+            session = new GraphMutationSession(this, intent);
             _activeGraphSave = session;
             _mutationPolicy.BeginGraph(intent.Comment);
             _graphFixTime = BusinessTime;
@@ -251,12 +261,16 @@ public class UserContext
             T result;
             try
             {
+                if (prepare != null) await prepare(session).ConfigureAwait(false);
+                transaction = await RequireResource<ITransactionExecutor>()
+                    .BeginTransactionAsync().ConfigureAwait(false);
+                session.AttachTransaction(transaction);
                 result = await work(session).ConfigureAwait(false);
                 await transaction.CommitAsync().ConfigureAwait(false);
             }
             catch
             {
-                try { await transaction.RollbackAsync().ConfigureAwait(false); }
+                try { if (transaction != null) await transaction.RollbackAsync().ConfigureAwait(false); }
                 finally { session.Restore(); }
                 throw;
             }
@@ -550,8 +564,23 @@ public class UserContext
             RecoverMutationRequest recover => recover.Command.Entity,
             _ => ""
         };
-        if (!_checkers.TryGetValue(entity, out var checker)) return;
-        var violations = checker.CheckAndFix(this, request, _graphFixTime ?? BusinessTime).ToList();
+        var violations = _checkers.TryGetValue(entity, out var checker)
+            ? checker.CheckAndFix(this, request, _graphFixTime ?? BusinessTime).ToList()
+            : new List<CheckResult>();
+        // Runtime admission is independent of generated/custom checker presence.
+        // Inspect final values after Fix, allowing a custom checker to repair them.
+        var values = request switch
+        {
+            InsertMutationRequest insert => insert.Command.Values,
+            UpdateMutationRequest update => update.Command.Values,
+            _ => null
+        };
+        if (values != null)
+            foreach (var (field, value) in values)
+                if (value is Value.F64Value number && !double.IsFinite(number.Value))
+                    violations.Add(new CheckResult { RuleId = "invalid_type", EntityType = entity,
+                        Location = ObjectLocation.Property(field),
+                        Message = "Expected a finite Float/Double value" });
         TranslateCheckResults(violations);
         if (violations.Count != 0) throw new CheckException(violations);
     }

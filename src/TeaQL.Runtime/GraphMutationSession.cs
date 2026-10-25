@@ -7,8 +7,8 @@ namespace TeaQL.Runtime;
 public sealed class GraphMutationSession
 {
     private readonly UserContext _context;
-    private readonly ITransaction _transaction;
-    private readonly RuntimeDataService _service;
+    private ITransaction? _transaction;
+    private RuntimeDataService? _service;
     private readonly HashSet<MutationTraceScope> _scopes = new();
     private readonly List<Func<Task>> _commit = new();
     private readonly List<Action> _rollback = new();
@@ -16,10 +16,17 @@ public sealed class GraphMutationSession
     private bool _active = true;
     public MutationIntent Intent { get; }
 
-    internal GraphMutationSession(UserContext context, ITransaction transaction, MutationIntent intent)
+    internal GraphMutationSession(UserContext context, MutationIntent intent)
     {
-        _context = context; _transaction = transaction; Intent = intent;
-        _service = new RuntimeDataService(transaction, context, this);
+        _context = context; Intent = intent;
+    }
+
+    internal void AttachTransaction(ITransaction transaction)
+    {
+        RequireActive();
+        if (_transaction != null) throw new InvalidOperationException("GRAPH_TRANSACTION_ALREADY_ATTACHED");
+        _transaction = transaction;
+        _service = new RuntimeDataService(transaction, _context, this);
     }
 
     internal void Validate(MutationRequest request)
@@ -73,12 +80,17 @@ public sealed class GraphMutationSession
         _intentValues.AddRange(RuntimeDataService.LoadedPrivateValues(captured, _context));
     }
 
-    public Task<MutationResult> MutateAsync(MutationRequest request, MutationTraceScope? scope = null) =>
-        _service.MutateAsync(Request(request, scope));
+    public Task<MutationResult> MutateAsync(MutationRequest request, MutationTraceScope? scope = null)
+    {
+        RequireActive();
+        return (_service ?? throw new InvalidOperationException("GRAPH_PREPARATION_CANNOT_MUTATE"))
+            .MutateAsync(Request(request, scope));
+    }
 
     public Task<ulong> AllocateIdAsync(string entity)
     {
         RequireActive();
+        if (_transaction == null) throw new InvalidOperationException("GRAPH_PREPARATION_CANNOT_ALLOCATE_ID");
         return (_context.InternalIdAllocator ?? _transaction as IInternalIdAllocator
             ?? throw new NotSupportedException("Graph provider requires ID allocation support")).NextIdAsync(entity);
     }

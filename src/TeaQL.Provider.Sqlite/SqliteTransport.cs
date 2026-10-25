@@ -248,6 +248,8 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
                 p.Value = (long)u.Value; // Sqlite doesn't support ulong directly
                 break;
             case Value.F64Value f:
+                if (!double.IsFinite(f.Value))
+                    throw new ArgumentException("SQLite Float/Double bindings must be finite.", nameof(value));
                 p.Value = f.Value;
                 break;
             case Value.DecimalValue d:
@@ -305,7 +307,10 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         {
             if (typeName == "NUMERIC" || typeName == "DECIMAL")
                 throw new InvalidOperationException("Legacy SQLite NUMERIC Decimal data may have lost precision; migrate the column to TEAQL_DECIMAL_TEXT.");
-            return new Value.F64Value(reader.GetDouble(i));
+            var number = reader.GetDouble(i);
+            if (!double.IsFinite(number))
+                throw new FormatException($"Non-finite SQLite Float/Double in column {reader.GetName(i)}.");
+            return new Value.F64Value(number);
         }
         else if (fieldType == typeof(string))
         {
