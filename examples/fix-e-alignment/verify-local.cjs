@@ -21,6 +21,8 @@ if (requested) { assert(path.isAbsolute(requested) && !fs.existsSync(evidence));
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'teaql-dotnet-fix-e-build-'));
 const report = {schema: 'teaql.dotnet-fix-e-example/v1', passed: false, commands: [], sameDatabase: true,
   localRuntime: repo, databaseRetained: true, sharedCacheRemoved: false};
+const {createOwnedRunner, ownedBytes} = require('./owned-command.cjs'), runner = createOwnedRunner();
+async function main() {
 try {
   const disk = fs.statfsSync(scratch); assert(disk.bavail * disk.bsize > 4 * 1024 ** 3);
   const m = fingerprint(); report.modelSha256 = m.modelSha256;
@@ -32,16 +34,17 @@ try {
   fs.writeFileSync(projectPath, project); fs.writeFileSync(path.join(evidence, 'consumer-project.xml'), project);
   const properties = ['-p:UseArtifactsOutput=true', '-p:ArtifactsPath=' + artifacts, '-p:TeaQLRuntimeSourceRoot=' + repo];
   const env = {...process.env, DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER: '1', TEAQL_FIX_E_DB: path.join(evidence, 'fixture.sqlite')};
-  function run(command, log, timeout = 120000) {
+  async function run(command, log, timeout = 120000) {
     const file = path.join(evidence, log), fd = fs.openSync(file, 'w'); let result;
-    try { result = cp.spawnSync(command[0], command.slice(1), {cwd: consumer, env, timeout, stdio: ['ignore', fd, fd]}); }
+    try { result = await runner.run(command, {cwd: consumer, env, timeout, stdio: ['ignore', fd, fd]}); }
     finally { fs.closeSync(fd); }
     const bytes = fs.readFileSync(file);
     report.commands.push({command, exitCode: result.status, signal: result.signal, logSha256: sha(bytes)});
+    if (result.status !== 0) process.exitCode = result.status || 1;
     assert.equal(result.status, 0, bytes.toString().slice(-12000)); return bytes.toString();
   }
-  run(['dotnet', 'build', projectPath, '--disable-build-servers', '-m:2', '--verbosity', 'minimal', ...properties], 'build.log', 300000);
-  const executable = run(['dotnet', 'msbuild', projectPath, '-nologo', '-getProperty:TargetPath', ...properties], 'target-path.log').trim();
+  await run(['dotnet', 'build', projectPath, '--disable-build-servers', '-m:2', '--verbosity', 'minimal', ...properties], 'build.log', 300000);
+  const executable = (await run(['dotnet', 'msbuild', projectPath, '-nologo', '-getProperty:TargetPath', ...properties], 'target-path.log')).trim();
   assert(executable.startsWith(artifacts + path.sep) && fs.existsSync(executable), 'execute the actual owned build, not a default bin fallback');
   const deps = JSON.parse(fs.readFileSync(executable.replace(/\.dll$/, '.deps.json')));
   for (const name of ['TeaQL.Core', 'TeaQL.Runtime', 'TeaQL.DataService', 'TeaQL.Sql', 'TeaQL.Provider.Sqlite']) {
@@ -50,7 +53,7 @@ try {
   }
   report.binarySha256 = sha(fs.readFileSync(executable)); report.localProjectDependencies = true;
   for (const round of [1, 2]) {
-    const log = run(['dotnet', executable], 'round-' + round + '.log');
+    const log = await run(['dotnet', executable], 'round-' + round + '.log');
     for (const marker of ['FIX_E_EXAMPLE=', 'CORE_LOAD_EXAMPLE=', 'CORE_MUTATION_OWNERSHIP=', 'CORE_MUTATION_PAGING=']) {
       const values = log.split(/\r?\n/).filter(line => line.startsWith(marker)).map(line => JSON.parse(line.slice(marker.length)));
       assert.equal(values.length, 1, marker); assert.equal(values[0].passed, true, marker);
@@ -59,10 +62,14 @@ try {
   }
   report.databaseSha256 = sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite'))); report.passed = true;
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
-} catch (error) { console.error(error.stack); process.exitCode = 1; }
+} catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {
-  report.disposedOwnedBytes = Number(cp.execFileSync('du', ['-sb', scratch], {encoding: 'utf8'}).split(/\s/)[0]);
-  fs.rmSync(scratch, {recursive: true}); report.scratchRemoved = !fs.existsSync(scratch);
+  report.disposedOwnedBytes = runner.safeToClean ? ownedBytes(scratch) : 0;
+  if (runner.safeToClean) fs.rmSync(scratch, {recursive: true});
+  else report.unsafeBuildRetention = {path: scratch, processGroup: runner.unsafeGroup};
+  report.scratchRemoved = !fs.existsSync(scratch); runner.dispose();
   fs.writeFileSync(path.join(evidence, 'receipt.json'), JSON.stringify(report, null, 2) + '\n');
   console.log('Retained compact example evidence: ' + evidence);
 }
+}
+main().catch(error => { console.error(error.stack); process.exitCode ||= 1; });
