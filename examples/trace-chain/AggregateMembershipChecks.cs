@@ -4,11 +4,13 @@ using Generated.Models;
 using TeaQL.Core;
 using TeaQL.Runtime;
 using TeaQL.Sql;
-using TeaQLNotLoadedException = Generated.TeaQLNotLoadedException;
 
 // Field Assist supplies selection/count APIs; generated source stays read-only.
 static class AggregateMembershipChecks
 {
+    private static Value RequiredProperty(CustomerOrder entity, string name) =>
+        entity.DynamicProperties.Get(name) ?? throw new Exception("Selected dynamic property is absent: " + name);
+
     public static async Task RunAsync(UserContext context, CapturingExecutor capture,
         EvidenceSink sink, FaultTransport transport)
     {
@@ -48,9 +50,10 @@ static class AggregateMembershipChecks
             }
             else loaded = (await selected.Comment("inspect " + secret).Purpose(purpose)
                 .ExecuteForListAsync(context)).Single();
-            Verify.That(loaded.HasQueryProjection("member_count"), "count alias is present");
-            Verify.Equal(1L, loaded.QueryProjection("member_count").TryI64(), "count is independent of selected forward detail");
-            await Verify.Throws<KeyNotFoundException>(() => { loaded.QueryProjection("missing"); return Task.CompletedTask; }, "missing alias is not zero");
+            Verify.That(loaded.DynamicProperties.Contains("member_count"), "count alias is present");
+            Verify.Equal(1L, RequiredProperty(loaded, "member_count").TryI64(), "count is independent of selected forward detail");
+            Verify.That(!loaded.DynamicProperties.Contains("missing") && loaded.DynamicProperties.Get("missing") is null,
+                "absent dynamic property returns null, not zero or an exception");
             Verify.Equal(2, E.CustomerOrder(loaded).OrderItemList().Size().Eval(), "loaded child list size");
             var items = loaded.OrderItemList.OrderBy(item => E.OrderItem(item).Id().Eval()).ToArray();
             Verify.That(items.Select(item => E.OrderItem(item).Id().Eval()!.Value).SequenceEqual(itemIds), "loaded membership retains both actual children");
@@ -113,7 +116,7 @@ static class AggregateMembershipChecks
                 foreach (var parent in refs)
                     await Verify.Throws<TeaQLNotLoadedException>(() => { E.CustomerOrder(parent).Description().Eval(); return Task.CompletedTask; }, "independent read does not widen old projection");
             Console.WriteLine("DOTNET_AGGREGATE_MEMBERSHIP " + JsonSerializer.Serialize(new {
-                nested, logging, filtered, id, itemIds, count = loaded.QueryProjection("member_count").TryI64(),
+                nested, logging, filtered, id, itemIds, count = RequiredProperty(loaded, "member_count").TryI64(),
                 foreignIDs = items.Select(item => E.OrderItem(item).CustomerOrderId().Eval()), physical, safe,
                 detailStates, independentDetail = E.CustomerOrder(complete).Description().Eval(),
                 oldDetailStates = refs.Select(Detail), commands, audits

@@ -39,8 +39,8 @@ internal static class GeneratedSearchModels
                        ["name"] = "string",
                        ["code"] = "string",
                        ["color"] = "string",
-                       ["display_order"] = "integer",
-                       ["displayOrder"] = "integer",
+                       ["display_order"] = "decimal",
+                       ["displayOrder"] = "decimal",
                        ["version"] = "integer",
                     }),
                     new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(StringComparer.Ordinal)

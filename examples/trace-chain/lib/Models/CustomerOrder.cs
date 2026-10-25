@@ -9,12 +9,10 @@ namespace Generated.Models
 
     public class CustomerOrder
     {
+        public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
-        private QueryProjectionSnapshot _queryProjections = QueryProjectionSnapshot.Empty;
-        public Value QueryProjection(string alias) => _queryProjections.Get(alias);
-        public bool HasQueryProjection(string alias) => _queryProjections.Contains(alias);
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("CustomerOrder", Id ?? _ledgerId);
@@ -51,9 +49,9 @@ namespace Generated.Models
                 public string? Description { get; set; }
                 public long? Version { get; set; }
                 public Platform? PlatformEntity { get; set; }
-                public List<OrderItem> OrderItemList { get; } = new List<OrderItem>();
-                public List<Payment> PaymentList { get; } = new List<Payment>();
-                public List<Shipment> ShipmentList { get; } = new List<Shipment>();
+                public SmartList<OrderItem> OrderItemList { get; } = SmartList<OrderItem>.Empty();
+                public SmartList<Payment> PaymentList { get; } = SmartList<Payment>.Empty();
+                public SmartList<Shipment> ShipmentList { get; } = SmartList<Shipment>.Empty();
 
         private string? _comment;
         private bool _markedForDeletion;
@@ -112,16 +110,6 @@ namespace Generated.Models
         public static CustomerOrder FromRecord(Record record)
         {
             var entity = new CustomerOrder().MarkLoadedOnly();
-            entity._queryProjections = new QueryProjectionSnapshot(record, new[] {
-                "Id", "id",
-                "Platform", "platform",
-                "OrderNumber", "order_number",
-                "Description", "description",
-                "Version", "version",
-                "OrderItemList", "order_item_list",
-                "PaymentList", "payment_list",
-                "ShipmentList", "shipment_list",
-            });
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {
@@ -173,24 +161,44 @@ namespace Generated.Models
                         if (record.TryGetValue("OrderItemList", out var orderItemListValue))
                         {
                             entity.MarkLoaded("OrderItemList");
+                            entity.OrderItemList.IsLoaded = true;
                             if (orderItemListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.OrderItemList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.OrderItemList.Add(global::Generated.Models.OrderItem.FromRecord(row.Value));
+                            }
                         }
                         if (record.TryGetValue("PaymentList", out var paymentListValue))
                         {
                             entity.MarkLoaded("PaymentList");
+                            entity.PaymentList.IsLoaded = true;
                             if (paymentListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.PaymentList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.PaymentList.Add(global::Generated.Models.Payment.FromRecord(row.Value));
+                            }
                         }
                         if (record.TryGetValue("ShipmentList", out var shipmentListValue))
                         {
                             entity.MarkLoaded("ShipmentList");
+                            entity.ShipmentList.IsLoaded = true;
                             if (shipmentListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.ShipmentList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.ShipmentList.Add(global::Generated.Models.Shipment.FromRecord(row.Value));
+                            }
                         }
+            entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
+                "id", "platform", "order_number", "description", "version",
+                "Id", "Platform", "OrderNumber", "Description", "Version",
+                "OrderItemList", "PaymentList", "ShipmentList"
+            });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
@@ -221,7 +229,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
-            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            if (changed)
             {
             if (!creating && !_markedForDeletion)
             {

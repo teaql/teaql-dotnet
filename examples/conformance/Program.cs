@@ -91,9 +91,7 @@ try
     _ = E.WorkItem(minimal).Title().Eval();
     throw new InvalidOperationException("E treated not-loaded title as null");
 }
-// This frozen legacy fixture owns its E exception. Current generated examples
-// use TeaQL.Runtime.TeaQLNotLoadedException; do not confuse the two contracts.
-catch (Generated.TeaQLNotLoadedException) { }
+catch (TeaQLNotLoadedException) { }
 Console.WriteLine("PASS E API (loaded, null fallback, and not-loaded are distinct)");
 
 var oldVersion = queried.Version.Value;

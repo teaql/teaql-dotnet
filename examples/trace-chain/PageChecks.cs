@@ -45,11 +45,12 @@ static class PageChecks
             context.WithRequestPolicy(policy);
             var page = await Q.CustomerOrders().WithOrderNumberStartingWith(prefix)
                 .SelectOrderItemListWith(Q.OrderItems().WithNameIs(secret).OrderByIdAscending().Limit(10))
-                .OrderByIdAscending().Comment("load page " + secret).Purpose("inspect page " + secret)
-                .ExecuteForPageAsync(context, 1, 2);
+                .OrderByIdAscending().Offset(1).Limit(2).Count()
+                .Comment("load page " + secret).Purpose("inspect page " + secret)
+                .ExecuteForListAsync(context);
             Verify.Equal(3L, page.TotalCount, "count excludes policy-denied root and ignores page offset");
             Verify.Equal(1, policy.RootCalls, "count and rows reuse one prepared scope");
-            rows = page.Rows.ToList();
+            rows = page.ToList();
             Verify.Equal(2, rows.Count, "bounded page size");
             Verify.Equal(originals[1].Id, E.CustomerOrder(rows[0]).Id().Eval(), "stable page first ID");
             Verify.Equal(originals[2].Id, E.CustomerOrder(rows[1]).Id().Eval(), "stable page second ID");

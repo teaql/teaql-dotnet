@@ -17,6 +17,7 @@ if ((${#embedded_runtime_files[@]})); then
 fi
 
 runtime_source_root="${TeaQLRuntimeSourceRoot:-$repo}"
+node "$repo/scripts/verify-generated-fixtures.cjs"
 inventory_evidence="${TEAQL_EXAMPLES_EVIDENCE_DIR:-$(mktemp -d -t teaql-dotnet-examples-evidence.XXXXXXXX)}"
 mkdir -p "$inventory_evidence"
 export TEAQL_CONFORMANCE_DB="$inventory_evidence/conformance.sqlite"
@@ -42,6 +43,7 @@ TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-trace-c
 bash "$repo/examples/facet-trace/verify.sh"
 bash "$repo/examples/trace-chain/verify-standard-telemetry.sh"
 bash "$repo/examples/trace-chain/verify-standard-order.sh"
+node "$repo/scripts/verify-generated-fixtures.cjs"
 bash "$repo/examples/trace-chain/verify-standard-graph.sh"
 bash "$repo/examples/trace-chain/verify-standard-stream.sh"
 echo "PASS: all .NET examples"

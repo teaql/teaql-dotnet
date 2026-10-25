@@ -9,12 +9,10 @@ namespace Generated.Models
 
     public class PaymentAttempt
     {
+        public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
-        private QueryProjectionSnapshot _queryProjections = QueryProjectionSnapshot.Empty;
-        public Value QueryProjection(string alias) => _queryProjections.Get(alias);
-        public bool HasQueryProjection(string alias) => _queryProjections.Contains(alias);
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("PaymentAttempt", Id ?? _ledgerId);
@@ -105,12 +103,6 @@ namespace Generated.Models
         public static PaymentAttempt FromRecord(Record record)
         {
             var entity = new PaymentAttempt().MarkLoadedOnly();
-            entity._queryProjections = new QueryProjectionSnapshot(record, new[] {
-                "Id", "id",
-                "Payment", "payment",
-                "ReferenceCode", "reference_code",
-                "Version", "version",
-            });
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {
@@ -153,6 +145,10 @@ namespace Generated.Models
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
+            entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
+                "id", "payment", "reference_code", "version",
+                "Id", "Payment", "ReferenceCode", "Version",
+            });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
@@ -183,7 +179,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
-            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            if (changed)
             {
             if (!creating && !_markedForDeletion)
             {

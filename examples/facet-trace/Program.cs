@@ -70,7 +70,7 @@ foreach (var includeAll in new[] { false, true }) {
             results.Add(new { parentId = parent.Id, visibleRows = list.Count,
                 facets = DescribeChoices(list.Facets["types"], true) });
             await parent.AuditAs("retain read-only Facet state").SaveAsync(context);
-            Check(!parent.HasQueryProjection("types"), "Facet became a scalar query alias");
+            Check(!parent.DynamicProperties.Contains("types"), "Facet became a scalar query alias");
             Check(!JsonSerializer.Serialize(parent.ToUpdateCommand().Values).Contains("schoolCount"), "Facet became persistent values");
         }
     } else {

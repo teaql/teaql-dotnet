@@ -1,0 +1,94 @@
+{
+  "schema": "teaql.retained-example-fixture/v1",
+  "modelSource": "examples/trace-chain/standard-order/model.xml",
+  "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c",
+  "evaluatedScope": "dotnet-lib-core",
+  "evaluationErrors": 0,
+  "evaluationWarnings": 0,
+  "producerSource": {
+    "commit": "bef094a1d932d2ef22260b8c77db92665ddbf8ae",
+    "diff": "e13e65f56c7e737fcfebf0acb9aa202846d0f0064494d47b70bbfb2b1e2699e4",
+    "status": "5525f4a3e20a013bb870ac399395b95201c60c9e009423222c0dabe40a58568f",
+    "sourceContentsSha256": "7a9943de76bb3d8fc9fdd2d5e1c503095523bcc2402e501cb30afba734ff79f8",
+    "retainedModels": [
+      {
+        "id": "conformance",
+        "model": "examples/conformance/model.xml",
+        "target": "examples/conformance",
+        "language": "dotnet",
+        "scope": "dotnet-lib-core",
+        "modelSha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7"
+      },
+      {
+        "id": "trace-chain",
+        "model": "examples/trace-chain/model.xml",
+        "target": "examples/trace-chain/lib",
+        "language": "dotnet",
+        "scope": "dotnet-lib-core",
+        "modelSha256": "916a6851b84c8c9b3345c2330c597481270767dca02cd4194587f80a700698e0"
+      },
+      {
+        "id": "facet-trace",
+        "model": "examples/facet-trace/model.xml",
+        "target": "examples/facet-trace/lib",
+        "language": "dotnet",
+        "scope": "dotnet-lib-core",
+        "modelSha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e"
+      },
+      {
+        "id": "school-management",
+        "model": "examples/school-management/models/school-model.xml",
+        "target": "examples/school-management",
+        "language": "dotnet",
+        "scope": "dotnet-lib-core",
+        "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4"
+      },
+      {
+        "id": "order-management",
+        "model": "examples/order-management/model.xml",
+        "target": "examples/order-management/dotnet-lib-core",
+        "language": "dotnet",
+        "scope": "dotnet-lib-core",
+        "modelSha256": "8b11ee844c2be184e194d8116994fb5fe95299dd593bfed83ec06d71ada0411d"
+      },
+      {
+        "id": "standard-graph",
+        "model": "examples/trace-chain/standard-graph/model.xml",
+        "target": "examples/trace-chain/standard-graph/lib",
+        "language": "dotnet",
+        "scope": "dotnet-lib-core",
+        "modelSha256": "a788850d6cf55c1ffca665122d953b0a04edff0c22e8cd4a55d6996e2b289a1c"
+      },
+      {
+        "id": "standard-order",
+        "model": "examples/trace-chain/standard-order/model.xml",
+        "target": "examples/trace-chain/standard-order/lib",
+        "language": "dotnet",
+        "scope": "dotnet-lib-core",
+        "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c"
+      }
+    ],
+    "exporterProbeSha256": "bbe1f21bbafc5da0f69be05830dc69627e1bbb4a4cee3290e5a3a3178eec0ccc"
+  },
+  "producerReceiptSha256": "ea6d63923b91344d6e726a86a8a56a596c1f143ea33ba74ae5a5b8b0a5ec12c4",
+  "generatedManifestSha256": "095a85dbd970a541f066bfcb4da8e713096c50a6c804cf799454fc1cc69936ff",
+  "files": {
+    "Q.cs": "7c9cdcea15557409e9e69b7957fd8dc43d15369dc63b8c3addc86f66b84fd530",
+    "E.cs": "5969a7f827838184105341b1db28dbfbfb0937bdf984a7c63707e2bb554aeda7",
+    "teaql-i18n.json": "ee5dc28e916a8907555d5d5a4d0e3cf2fa37aad047af37abed0800582af18d96",
+    "GeneratedSearchModels.cs": "9048fb8f3e24d4cad00ebff0d626589d6e57c066d1dfa75b97063b355b1191c0",
+    "request-tree-order-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+    "Models/Platform.cs": "31359a172502659eab7e3b8ac5ce298725492b3762e12ec7cda68e017ae20ad9",
+    "Models/OrderStatus.cs": "da2b8fa937d43bb13852bdb03317c7f7cfd9454cf3fcfcc55085a3b5b14c4104",
+    "Models/Customer.cs": "19915560cf510fd93330daa3278e0a393906e711ef1741162e4c3463c68748dd",
+    "Models/CustomerOrder.cs": "1cb93189cae75b72c93be4434f2b04b21481121736825b86f98adf064b46e1e6",
+    "Models/OrderItem.cs": "f1e78d0d9e11de3b4c7a392cb1b6831507ab4c1bcbcd539f8f26d6cb207b031a",
+    "GeneratedRuntimeModule.cs": "07998efdeecf66a361e797799846b1031b21100c76d5e24e7869860143bf767f",
+    "Requests/PlatformRequest.cs": "2cd95f9205f88f65f8d216c8970fb49627e5911494ba82722688ba40ae6030c4",
+    "Requests/OrderStatusRequest.cs": "235e956adaed929936840fbd5a378820e6ec63782975d47e085cf6624030fdca",
+    "Requests/CustomerRequest.cs": "c31abb789d1dc3d58e3c2f7463753c0044f38536bb35b631115eb9ef9490efbc",
+    "Requests/CustomerOrderRequest.cs": "472705dee85abfeb2a13222bd6f4fc01dc5ac53c3912232eaf0bc07d4bd6633b",
+    "Requests/OrderItemRequest.cs": "16c8b0562b32be61d3b9f7439a640efc3d035fc839eacc186753f6879e044c11"
+  },
+  "previousFixtureManifestSha256": "f92cd84bbde0503ab9a10fd06eaa706091b0de30cf13f2e3c447ca9a96705cfd"
+}

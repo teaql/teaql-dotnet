@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using TeaQL.Core;
+using TeaQL.Runtime;
 using Generated.Models;
 
 namespace Generated.Requests
@@ -14,6 +15,8 @@ namespace Generated.Requests
         private SelectQuery _query;
         private string? _purpose;
         private string? _comment;
+        private bool _countRequested;
+        private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
                 ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
@@ -28,6 +31,16 @@ namespace Generated.Requests
         }
 
         public SelectQuery GetQuery() => _query;
+
+        public SchoolRequest FilterByJson(string source, Action<DynamicSearchWarning>? warn = null)
+        {
+            var result = DynamicSearch.MergeGeneratedScalar(_query, source, GeneratedSearchModels.Models, warn);
+            _query = result.Query;
+            _dynamicSearchWarnings.AddRange(result.Warnings);
+            return this;
+        }
+
+        public IReadOnlyList<DynamicSearchWarning> DynamicSearchWarnings => _dynamicSearchWarnings.ToArray();
 
         public SchoolRequest WithDeletedRows()
         {
@@ -57,7 +70,7 @@ namespace Generated.Requests
             return new ExecutableSchoolRequest(
                 ExecuteForListInternalAsync,
                 ExecuteForOneInternalAsync,
-                ExecuteForPageInternalAsync,
+                ExecuteForListWithMetadataInternalAsync,
                 ExecuteForStreamInternalAsync,
                 c => Comment(c),
                 EnsureIntent);
@@ -186,6 +199,9 @@ namespace Generated.Requests
                 {
                     _query.Project("platform");
                     _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
+                    _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
+                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: "Platform")
+                    };
                     return this;
                 }
                 public SchoolRequest SelectSchoolType()
@@ -197,6 +213,9 @@ namespace Generated.Requests
                 {
                     _query.Project("school_type");
                     _query.ForwardRelationQuery("SchoolType", "SchoolType", "school_type", related.GetQuery());
+                    _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
+                        Operation = new QueryOperation("relation", "SelectSchoolTypeWith", Relation: "SchoolType")
+                    };
                     return this;
                 }
                 public SchoolRequest WithPlatformMatching(PlatformRequest related)
@@ -338,6 +357,12 @@ namespace Generated.Requests
                 public SchoolRequest WithSchoolTypeIsPrimary()
                 {
                     _query.AndFilter(Expr.Eq("school_type", 1001L));
+                    return this;
+                }
+
+                public SchoolRequest WithSchoolTypeIsSecondary()
+                {
+                    _query.AndFilter(Expr.Eq("school_type", 1002L));
                     return this;
                 }
 
@@ -1068,13 +1093,14 @@ namespace Generated.Requests
 
         public SchoolRequest Count()
         {
-            _query.Aggregate("Count", "id", "count");
-            return this;
+            return CountAs("count");
         }
 
         public SchoolRequest CountAs(string retName)
         {
+            _countRequested = true;
             _query.Aggregate("Count", "id", retName);
+            _query.PageCountOperation = new QueryOperation("count", "CountAs", retName);
             return this;
         }
 
@@ -1284,7 +1310,9 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Platform", request.GetQuery(), includeAllFacets));
+                        name, "Platform", request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, "platform")
+                    });
                     return this;
                 }
 
@@ -1293,7 +1321,9 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "SchoolType", request.GetQuery(), includeAllFacets));
+                        name, "SchoolType", request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetBySchoolTypeAs", name, "school_type")
+                    });
                     return this;
                 }
 
@@ -1317,35 +1347,17 @@ namespace Generated.Requests
             return await service.QueryAsync(req);
         }
 
-        private async Task<SchoolPage> ExecuteForPageInternalAsync(
-            UserContext context, int offset, int limit)
+        private async Task<SmartList<Record>> ExecuteForListWithMetadataInternalAsync(
+            UserContext context)
         {
             EnsureIntent();
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
-            if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
-            query.Offset(offset);
-            query.Limit(limit);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var authorized = req.Query;
-            var result = await service.QueryAsync(req);
-            long totalCount;
-            if (authorized.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
-            {
-                totalCount = checked((long)context.IdSetCount);
-            }
-            else
-            {
-                var countQuery = authorized.ForExactCount();
-                var countResult = await service.QueryAsync(req.WithQuery(countQuery));
-                totalCount = countResult.Rows.Count == 0
-                    ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
-            }
-            var rows = new SmartList<Generated.Models.School>();
-            foreach (var row in result.Rows)
-                rows.Add(Generated.Models.School.FromRecord(row, new EntityRoot()));
-            return new SchoolPage(rows, totalCount);
+            var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (_countRequested)
+                return await RuntimeDataService.FetchPageAsync(service, context, request);
+            var result = await service.QueryAsync(request);
+            return new SmartList<Record>(result.Rows) { Facets = result.Facets };
         }
 
         private IAsyncEnumerable<Generated.Models.School> ExecuteForStreamInternalAsync(
@@ -1357,20 +1369,10 @@ namespace Generated.Requests
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
-            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
-            var captured = streaming.QueryStreamAsync(req, chunkSize, cancellationToken);
-            return HydrateStream(captured, cancellationToken);
-        }
-
-        private static async IAsyncEnumerable<Generated.Models.School> HydrateStream(
-            IAsyncEnumerable<StreamChunk> captured,
-            [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            await foreach (var chunk in captured.WithCancellation(cancellationToken))
-            {
-                foreach (var row in chunk.Rows)
-                    yield return Generated.Models.School.FromRecord(row, new EntityRoot());
-            }
+            var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            return RuntimeDataService.StreamEntities(context, request,
+                row => Generated.Models.School.FromRecord(row, new EntityRoot()),
+                chunkSize, cancellationToken);
         }
 
         private void EnsureIntent()
@@ -1384,7 +1386,7 @@ namespace Generated.Requests
     {
         private readonly Func<UserContext, Task<QueryResult>> _executeForRows;
         private readonly Func<UserContext, Task<QueryResult>> _executeForOne;
-        private readonly Func<UserContext, int, int, Task<SchoolPage>> _executeForPage;
+        private readonly Func<UserContext, Task<SmartList<Record>>> _executeForList;
         private readonly Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.School>> _executeForStream;
         private readonly Action<string> _comment;
         private readonly Action _ensureIntent;
@@ -1392,14 +1394,14 @@ namespace Generated.Requests
         internal ExecutableSchoolRequest(
             Func<UserContext, Task<QueryResult>> executeForRows,
             Func<UserContext, Task<QueryResult>> executeForOne,
-            Func<UserContext, int, int, Task<SchoolPage>> executeForPage,
+            Func<UserContext, Task<SmartList<Record>>> executeForList,
             Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.School>> executeForStream,
             Action<string> comment,
             Action ensureIntent)
         {
             _executeForRows = executeForRows;
             _executeForOne = executeForOne;
-            _executeForPage = executeForPage;
+            _executeForList = executeForList;
             _executeForStream = executeForStream;
             _comment = comment;
             _ensureIntent = ensureIntent;
@@ -1422,17 +1424,16 @@ namespace Generated.Requests
 
         public async Task<SmartList<Generated.Models.School>> ExecuteForListAsync(UserContext context)
         {
-            var result = await ExecuteForRowsAsync(context);
-            var entities = new SmartList<Generated.Models.School>();
-            foreach (var row in result.Rows)
+            var result = await _executeForList(context);
+            var entities = new SmartList<Generated.Models.School>() {
+                TotalCount = result.TotalCount, Aggregations = result.Aggregations,
+                Summary = result.Summary, Facets = result.Facets
+            };
+            foreach (var row in result)
                 entities.Add(Generated.Models.School.FromRecord(row, new EntityRoot()));
             entities.Facets = result.Facets;
             return entities;
         }
-
-        public Task<SchoolPage> ExecuteForPageAsync(
-            UserContext context, int offset, int limit)
-            => _executeForPage(context, offset, limit);
 
         public IAsyncEnumerable<Generated.Models.School> ExecuteForStreamAsync(
             UserContext context,
@@ -1450,12 +1451,4 @@ namespace Generated.Requests
         }
     }
 
-    public sealed class SchoolPage
-    {
-        public SmartList<Generated.Models.School> Rows { get; }
-        public long TotalCount { get; }
-        public SchoolPage(
-            SmartList<Generated.Models.School> rows, long totalCount)
-        { Rows = rows; TotalCount = totalCount; }
-    }
 }

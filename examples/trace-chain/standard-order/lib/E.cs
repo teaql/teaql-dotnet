@@ -1,32 +1,9 @@
 using System;
 using System.Collections.Generic;
+using TeaQL.Runtime;
 
 namespace Generated
 {
-    public sealed class TeaQLNotLoadedException : InvalidOperationException
-    {
-        public string Root { get; }
-        public string AccessPath { get; }
-        public string BreakPoint { get; }
-        public string SuggestedFix { get; }
-
-        public TeaQLNotLoadedException(string root, string accessPath, string breakPoint)
-            : base($"TeaQLNotLoadedError: root={root} access_path={accessPath} break_point={breakPoint} " +
-                   $"suggested_fix=Select{breakPoint}(...) human_message=访问 {root}.{accessPath} 时缺少预加载")
-        {
-            Root = root;
-            AccessPath = accessPath;
-            BreakPoint = breakPoint;
-            SuggestedFix = $"Select{breakPoint}(...)";
-        }
-    }
-
-    internal static class ExpressionPath
-    {
-        internal static string Append(string prefix, string field) =>
-            string.IsNullOrEmpty(prefix) ? field : $"{prefix}.{field}";
-    }
-
     public sealed class ValueExpression<T>
     {
         private readonly T _value;
@@ -37,7 +14,7 @@ namespace Generated
         {
             get
             {
-                if (_notLoaded != null) throw _notLoaded;
+                if (_notLoaded != null) throw _notLoaded.Terminal("HasValue");
                 return _hasValue;
             }
         }
@@ -51,13 +28,14 @@ namespace Generated
 
         public T Eval()
         {
-            if (_notLoaded != null) throw _notLoaded;
+            if (_notLoaded != null) throw _notLoaded.Terminal("Eval()");
             return _value;
         }
 
         public T OrIfNull(T fallback)
         {
-            var value = Eval();
+            if (_notLoaded != null) throw _notLoaded.Terminal("OrIfNull(<fallback>)");
+            var value = _value;
             return _hasValue && value is not null ? value : fallback;
         }
 
@@ -69,54 +47,54 @@ namespace Generated
     {
         private readonly Generated.Models.Platform? _value;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public PlatformExpression(
             Generated.Models.Platform? value,
             string root = "Platform(null)",
-            string path = "",
+            ExpressionPath? path = null,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.Platform(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _notLoaded = notLoaded;
         }
 
         public Generated.Models.Platform? Eval()
         {
-            if (_notLoaded != null) throw _notLoaded;
+            if (_notLoaded != null) throw _notLoaded.Terminal("Eval()");
             return _value;
         }
 
         public ValueExpression<long?> Id()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("id", "Id");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Id");
             if (!_value.IsLoaded("Id"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Id"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "id"));
             return new ValueExpression<long?>(_value.Id);
         }
 
         public ValueExpression<string?> Name()
         {
-            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            var path = _path.Member("name", "Name");
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<string?>.Missing();
-            var path = ExpressionPath.Append(_path, "Name");
             if (!_value.IsLoaded("Name"))
-                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "name"));
             return new ValueExpression<string?>(_value.Name);
         }
 
         public ValueExpression<long?> Version()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("version", "Version");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Version");
             if (!_value.IsLoaded("Version"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Version"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "version"));
             return new ValueExpression<long?>(_value.Version);
         }
 
@@ -124,23 +102,23 @@ namespace Generated
 
         public OrderStatusListExpression OrderStatusList()
         {
-            var path = ExpressionPath.Append(_path, "OrderStatusList");
-            if (_notLoaded != null) return new OrderStatusListExpression(null, _root, path, false, _notLoaded);
+            var path = _path.Member("order_status_list", "OrderStatusList");
+            if (_notLoaded != null) return new OrderStatusListExpression(null, _root, path, false, _notLoaded.WithPath(path));
             if (_value is null) return OrderStatusListExpression.Missing(_root, path);
             if (!_value.IsLoaded("OrderStatusList"))
                 return new OrderStatusListExpression(null, _root, path, false,
-                    new TeaQLNotLoadedException(_root, path, "OrderStatusList"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "order_status_list"));
             return new OrderStatusListExpression(_value.OrderStatusList, _root, path);
         }
 
         public CustomerListExpression CustomerList()
         {
-            var path = ExpressionPath.Append(_path, "CustomerList");
-            if (_notLoaded != null) return new CustomerListExpression(null, _root, path, false, _notLoaded);
+            var path = _path.Member("customer_list", "CustomerList");
+            if (_notLoaded != null) return new CustomerListExpression(null, _root, path, false, _notLoaded.WithPath(path));
             if (_value is null) return CustomerListExpression.Missing(_root, path);
             if (!_value.IsLoaded("CustomerList"))
                 return new CustomerListExpression(null, _root, path, false,
-                    new TeaQLNotLoadedException(_root, path, "CustomerList"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer_list"));
             return new CustomerListExpression(_value.CustomerList, _root, path);
         }
     }
@@ -149,116 +127,116 @@ namespace Generated
     {
         private readonly Generated.Models.OrderStatus? _value;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public OrderStatusExpression(
             Generated.Models.OrderStatus? value,
             string root = "OrderStatus(null)",
-            string path = "",
+            ExpressionPath? path = null,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.OrderStatus(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _notLoaded = notLoaded;
         }
 
         public Generated.Models.OrderStatus? Eval()
         {
-            if (_notLoaded != null) throw _notLoaded;
+            if (_notLoaded != null) throw _notLoaded.Terminal("Eval()");
             return _value;
         }
 
         public ValueExpression<long?> Id()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("id", "Id");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Id");
             if (!_value.IsLoaded("Id"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Id"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "id"));
             return new ValueExpression<long?>(_value.Id);
         }
 
         public ValueExpression<string?> Name()
         {
-            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            var path = _path.Member("name", "Name");
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<string?>.Missing();
-            var path = ExpressionPath.Append(_path, "Name");
             if (!_value.IsLoaded("Name"))
-                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "name"));
             return new ValueExpression<string?>(_value.Name);
         }
 
         public ValueExpression<string?> Code()
         {
-            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            var path = _path.Member("code", "Code");
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<string?>.Missing();
-            var path = ExpressionPath.Append(_path, "Code");
             if (!_value.IsLoaded("Code"))
-                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Code"));
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "code"));
             return new ValueExpression<string?>(_value.Code);
         }
 
         public ValueExpression<string?> Color()
         {
-            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            var path = _path.Member("color", "Color");
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<string?>.Missing();
-            var path = ExpressionPath.Append(_path, "Color");
             if (!_value.IsLoaded("Color"))
-                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Color"));
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "color"));
             return new ValueExpression<string?>(_value.Color);
         }
 
-        public ValueExpression<long?> DisplayOrder()
+        public ValueExpression<decimal?> DisplayOrder()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
-            if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "DisplayOrder");
+            var path = _path.Member("display_order", "DisplayOrder");
+            if (_notLoaded != null) return ValueExpression<decimal?>.NotLoaded(_notLoaded.WithPath(path));
+            if (_value is null) return ValueExpression<decimal?>.Missing();
             if (!_value.IsLoaded("DisplayOrder"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "DisplayOrder"));
-            return new ValueExpression<long?>(_value.DisplayOrder);
+                return ValueExpression<decimal?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "display_order"));
+            return new ValueExpression<decimal?>(_value.DisplayOrder);
         }
 
         public ValueExpression<long?> Version()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("version", "Version");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Version");
             if (!_value.IsLoaded("Version"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Version"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "version"));
             return new ValueExpression<long?>(_value.Version);
         }
 
         public ValueExpression<long?> PlatformId()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("platform", "PlatformId");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Platform");
             if (!_value.IsLoaded("Platform"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Platform"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new ValueExpression<long?>(_value.Platform);
         }
 
         public PlatformExpression Platform()
         {
-            var path = ExpressionPath.Append(_path, "Platform");
-            if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded);
+            var path = _path.Member("platform", "Platform");
+            if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new PlatformExpression(null, _root, path);
             if (!_value.IsLoaded("PlatformEntity"))
                 return new PlatformExpression(null, _root, path,
-                    new TeaQLNotLoadedException(_root, path, "Platform"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new PlatformExpression(_value.PlatformEntity, _root, path);
         }
 
         public CustomerOrderListExpression CustomerOrderList()
         {
-            var path = ExpressionPath.Append(_path, "CustomerOrderList");
-            if (_notLoaded != null) return new CustomerOrderListExpression(null, _root, path, false, _notLoaded);
+            var path = _path.Member("customer_order_list", "CustomerOrderList");
+            if (_notLoaded != null) return new CustomerOrderListExpression(null, _root, path, false, _notLoaded.WithPath(path));
             if (_value is null) return CustomerOrderListExpression.Missing(_root, path);
             if (!_value.IsLoaded("CustomerOrderList"))
                 return new CustomerOrderListExpression(null, _root, path, false,
-                    new TeaQLNotLoadedException(_root, path, "CustomerOrderList"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer_order_list"));
             return new CustomerOrderListExpression(_value.CustomerOrderList, _root, path);
         }
     }
@@ -267,86 +245,86 @@ namespace Generated
     {
         private readonly Generated.Models.Customer? _value;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public CustomerExpression(
             Generated.Models.Customer? value,
             string root = "Customer(null)",
-            string path = "",
+            ExpressionPath? path = null,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.Customer(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _notLoaded = notLoaded;
         }
 
         public Generated.Models.Customer? Eval()
         {
-            if (_notLoaded != null) throw _notLoaded;
+            if (_notLoaded != null) throw _notLoaded.Terminal("Eval()");
             return _value;
         }
 
         public ValueExpression<long?> Id()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("id", "Id");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Id");
             if (!_value.IsLoaded("Id"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Id"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "id"));
             return new ValueExpression<long?>(_value.Id);
         }
 
         public ValueExpression<string?> Name()
         {
-            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            var path = _path.Member("name", "Name");
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<string?>.Missing();
-            var path = ExpressionPath.Append(_path, "Name");
             if (!_value.IsLoaded("Name"))
-                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Name"));
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "name"));
             return new ValueExpression<string?>(_value.Name);
         }
 
         public ValueExpression<long?> Version()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("version", "Version");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Version");
             if (!_value.IsLoaded("Version"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Version"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "version"));
             return new ValueExpression<long?>(_value.Version);
         }
 
         public ValueExpression<long?> PlatformId()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("platform", "PlatformId");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Platform");
             if (!_value.IsLoaded("Platform"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Platform"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new ValueExpression<long?>(_value.Platform);
         }
 
         public PlatformExpression Platform()
         {
-            var path = ExpressionPath.Append(_path, "Platform");
-            if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded);
+            var path = _path.Member("platform", "Platform");
+            if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new PlatformExpression(null, _root, path);
             if (!_value.IsLoaded("PlatformEntity"))
                 return new PlatformExpression(null, _root, path,
-                    new TeaQLNotLoadedException(_root, path, "Platform"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new PlatformExpression(_value.PlatformEntity, _root, path);
         }
 
         public CustomerOrderListExpression CustomerOrderList()
         {
-            var path = ExpressionPath.Append(_path, "CustomerOrderList");
-            if (_notLoaded != null) return new CustomerOrderListExpression(null, _root, path, false, _notLoaded);
+            var path = _path.Member("customer_order_list", "CustomerOrderList");
+            if (_notLoaded != null) return new CustomerOrderListExpression(null, _root, path, false, _notLoaded.WithPath(path));
             if (_value is null) return CustomerOrderListExpression.Missing(_root, path);
             if (!_value.IsLoaded("CustomerOrderList"))
                 return new CustomerOrderListExpression(null, _root, path, false,
-                    new TeaQLNotLoadedException(_root, path, "CustomerOrderList"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer_order_list"));
             return new CustomerOrderListExpression(_value.CustomerOrderList, _root, path);
         }
     }
@@ -355,127 +333,127 @@ namespace Generated
     {
         private readonly Generated.Models.CustomerOrder? _value;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public CustomerOrderExpression(
             Generated.Models.CustomerOrder? value,
             string root = "CustomerOrder(null)",
-            string path = "",
+            ExpressionPath? path = null,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.CustomerOrder(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _notLoaded = notLoaded;
         }
 
         public Generated.Models.CustomerOrder? Eval()
         {
-            if (_notLoaded != null) throw _notLoaded;
+            if (_notLoaded != null) throw _notLoaded.Terminal("Eval()");
             return _value;
         }
 
         public ValueExpression<long?> Id()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("id", "Id");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Id");
             if (!_value.IsLoaded("Id"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Id"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "id"));
             return new ValueExpression<long?>(_value.Id);
         }
 
         public ValueExpression<string?> OrderNumber()
         {
-            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            var path = _path.Member("order_number", "OrderNumber");
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<string?>.Missing();
-            var path = ExpressionPath.Append(_path, "OrderNumber");
             if (!_value.IsLoaded("OrderNumber"))
-                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "OrderNumber"));
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "order_number"));
             return new ValueExpression<string?>(_value.OrderNumber);
         }
 
         public ValueExpression<System.DateTime?> OrderDate()
         {
-            if (_notLoaded != null) return ValueExpression<System.DateTime?>.NotLoaded(_notLoaded);
+            var path = _path.Member("order_date", "OrderDate");
+            if (_notLoaded != null) return ValueExpression<System.DateTime?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<System.DateTime?>.Missing();
-            var path = ExpressionPath.Append(_path, "OrderDate");
             if (!_value.IsLoaded("OrderDate"))
-                return ValueExpression<System.DateTime?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "OrderDate"));
+                return ValueExpression<System.DateTime?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "order_date"));
             return new ValueExpression<System.DateTime?>(_value.OrderDate);
         }
 
         public ValueExpression<decimal?> TotalAmount()
         {
-            if (_notLoaded != null) return ValueExpression<decimal?>.NotLoaded(_notLoaded);
+            var path = _path.Member("total_amount", "TotalAmount");
+            if (_notLoaded != null) return ValueExpression<decimal?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<decimal?>.Missing();
-            var path = ExpressionPath.Append(_path, "TotalAmount");
             if (!_value.IsLoaded("TotalAmount"))
-                return ValueExpression<decimal?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "TotalAmount"));
+                return ValueExpression<decimal?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "total_amount"));
             return new ValueExpression<decimal?>(_value.TotalAmount);
         }
 
         public ValueExpression<long?> Version()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("version", "Version");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Version");
             if (!_value.IsLoaded("Version"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Version"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "version"));
             return new ValueExpression<long?>(_value.Version);
         }
 
         public ValueExpression<long?> CustomerId()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("customer", "CustomerId");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Customer");
             if (!_value.IsLoaded("Customer"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Customer"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "customer"));
             return new ValueExpression<long?>(_value.Customer);
         }
 
         public ValueExpression<long?> StatusId()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("status", "StatusId");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Status");
             if (!_value.IsLoaded("Status"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Status"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "status"));
             return new ValueExpression<long?>(_value.Status);
         }
 
         public CustomerExpression Customer()
         {
-            var path = ExpressionPath.Append(_path, "Customer");
-            if (_notLoaded != null) return new CustomerExpression(null, _root, path, _notLoaded);
+            var path = _path.Member("customer", "Customer");
+            if (_notLoaded != null) return new CustomerExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CustomerExpression(null, _root, path);
             if (!_value.IsLoaded("CustomerEntity"))
                 return new CustomerExpression(null, _root, path,
-                    new TeaQLNotLoadedException(_root, path, "Customer"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer"));
             return new CustomerExpression(_value.CustomerEntity, _root, path);
         }
 
         public OrderStatusExpression Status()
         {
-            var path = ExpressionPath.Append(_path, "Status");
-            if (_notLoaded != null) return new OrderStatusExpression(null, _root, path, _notLoaded);
+            var path = _path.Member("status", "Status");
+            if (_notLoaded != null) return new OrderStatusExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new OrderStatusExpression(null, _root, path);
             if (!_value.IsLoaded("StatusEntity"))
                 return new OrderStatusExpression(null, _root, path,
-                    new TeaQLNotLoadedException(_root, path, "Status"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "status"));
             return new OrderStatusExpression(_value.StatusEntity, _root, path);
         }
 
         public OrderItemListExpression OrderItemList()
         {
-            var path = ExpressionPath.Append(_path, "OrderItemList");
-            if (_notLoaded != null) return new OrderItemListExpression(null, _root, path, false, _notLoaded);
+            var path = _path.Member("order_item_list", "OrderItemList");
+            if (_notLoaded != null) return new OrderItemListExpression(null, _root, path, false, _notLoaded.WithPath(path));
             if (_value is null) return OrderItemListExpression.Missing(_root, path);
             if (!_value.IsLoaded("OrderItemList"))
                 return new OrderItemListExpression(null, _root, path, false,
-                    new TeaQLNotLoadedException(_root, path, "OrderItemList"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "order_item_list"));
             return new OrderItemListExpression(_value.OrderItemList, _root, path);
         }
     }
@@ -484,95 +462,95 @@ namespace Generated
     {
         private readonly Generated.Models.OrderItem? _value;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public OrderItemExpression(
             Generated.Models.OrderItem? value,
             string root = "OrderItem(null)",
-            string path = "",
+            ExpressionPath? path = null,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _value = value;
             _root = root;
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.OrderItem(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _notLoaded = notLoaded;
         }
 
         public Generated.Models.OrderItem? Eval()
         {
-            if (_notLoaded != null) throw _notLoaded;
+            if (_notLoaded != null) throw _notLoaded.Terminal("Eval()");
             return _value;
         }
 
         public ValueExpression<long?> Id()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("id", "Id");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Id");
             if (!_value.IsLoaded("Id"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Id"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "id"));
             return new ValueExpression<long?>(_value.Id);
         }
 
         public ValueExpression<string?> ProductName()
         {
-            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded);
+            var path = _path.Member("product_name", "ProductName");
+            if (_notLoaded != null) return ValueExpression<string?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<string?>.Missing();
-            var path = ExpressionPath.Append(_path, "ProductName");
             if (!_value.IsLoaded("ProductName"))
-                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "ProductName"));
+                return ValueExpression<string?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "product_name"));
             return new ValueExpression<string?>(_value.ProductName);
         }
 
         public ValueExpression<long?> Quantity()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("quantity", "Quantity");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Quantity");
             if (!_value.IsLoaded("Quantity"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Quantity"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "quantity"));
             return new ValueExpression<long?>(_value.Quantity);
         }
 
         public ValueExpression<decimal?> UnitPrice()
         {
-            if (_notLoaded != null) return ValueExpression<decimal?>.NotLoaded(_notLoaded);
+            var path = _path.Member("unit_price", "UnitPrice");
+            if (_notLoaded != null) return ValueExpression<decimal?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<decimal?>.Missing();
-            var path = ExpressionPath.Append(_path, "UnitPrice");
             if (!_value.IsLoaded("UnitPrice"))
-                return ValueExpression<decimal?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "UnitPrice"));
+                return ValueExpression<decimal?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "unit_price"));
             return new ValueExpression<decimal?>(_value.UnitPrice);
         }
 
         public ValueExpression<long?> Version()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("version", "Version");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "Version");
             if (!_value.IsLoaded("Version"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "Version"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "version"));
             return new ValueExpression<long?>(_value.Version);
         }
 
         public ValueExpression<long?> CustomerOrderId()
         {
-            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded);
+            var path = _path.Member("customer_order", "CustomerOrderId");
+            if (_notLoaded != null) return ValueExpression<long?>.NotLoaded(_notLoaded.WithPath(path));
             if (_value is null) return ValueExpression<long?>.Missing();
-            var path = ExpressionPath.Append(_path, "CustomerOrder");
             if (!_value.IsLoaded("CustomerOrder"))
-                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(_root, path, "CustomerOrder"));
+                return ValueExpression<long?>.NotLoaded(new TeaQLNotLoadedException(path.MarkMissing(), "customer_order"));
             return new ValueExpression<long?>(_value.CustomerOrder);
         }
 
         public CustomerOrderExpression CustomerOrder()
         {
-            var path = ExpressionPath.Append(_path, "CustomerOrder");
-            if (_notLoaded != null) return new CustomerOrderExpression(null, _root, path, _notLoaded);
+            var path = _path.Member("customer_order", "CustomerOrder");
+            if (_notLoaded != null) return new CustomerOrderExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CustomerOrderExpression(null, _root, path);
             if (!_value.IsLoaded("CustomerOrderEntity"))
                 return new CustomerOrderExpression(null, _root, path,
-                    new TeaQLNotLoadedException(_root, path, "CustomerOrder"));
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer_order"));
             return new CustomerOrderExpression(_value.CustomerOrderEntity, _root, path);
         }
 
@@ -582,39 +560,44 @@ namespace Generated
     {
         private readonly IReadOnlyList<Generated.Models.Platform> _items;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly bool _present;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public PlatformListExpression(
             IReadOnlyList<Generated.Models.Platform>? items,
             string? root = "Platform(null)",
-            string path = "",
+            ExpressionPath? path = null,
             bool present = true,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.Platform>();
             _root = root ?? "Platform(null)";
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.entity(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static PlatformListExpression Missing(string? root = null, string path = "") =>
+        public static PlatformListExpression Missing(string? root = null, ExpressionPath? path = null) =>
             new(new List<Generated.Models.Platform>(), root, path, false);
 
         public ValueExpression<int> Size()
         {
-            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded);
+            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded.WithPath(_path.Operation("Size()")));
             return _present ? new ValueExpression<int>(_items.Count) : ValueExpression<int>.Missing();
         }
 
-        public PlatformExpression First() => Get(0);
+        public PlatformExpression First() => Item(0, true);
 
         public PlatformExpression Get(int index)
         {
-            var itemPath = ExpressionPath.Append(_path, $"Get({index})");
-            if (_notLoaded != null) return new PlatformExpression(null, _root, itemPath, _notLoaded);
+            return Item(index, false);
+        }
+
+        private PlatformExpression Item(int index, bool first)
+        {
+            var itemPath = _path.At(index, first);
+            if (_notLoaded != null) return new PlatformExpression(null, _root, itemPath, _notLoaded.WithPath(itemPath));
             return !_present || index < 0 || index >= _items.Count
                 ? new PlatformExpression(null, _root, itemPath)
                 : new PlatformExpression(_items[index], _root, itemPath);
@@ -625,39 +608,44 @@ namespace Generated
     {
         private readonly IReadOnlyList<Generated.Models.OrderStatus> _items;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly bool _present;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public OrderStatusListExpression(
             IReadOnlyList<Generated.Models.OrderStatus>? items,
             string? root = "OrderStatus(null)",
-            string path = "",
+            ExpressionPath? path = null,
             bool present = true,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.OrderStatus>();
             _root = root ?? "OrderStatus(null)";
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.entity(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static OrderStatusListExpression Missing(string? root = null, string path = "") =>
+        public static OrderStatusListExpression Missing(string? root = null, ExpressionPath? path = null) =>
             new(new List<Generated.Models.OrderStatus>(), root, path, false);
 
         public ValueExpression<int> Size()
         {
-            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded);
+            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded.WithPath(_path.Operation("Size()")));
             return _present ? new ValueExpression<int>(_items.Count) : ValueExpression<int>.Missing();
         }
 
-        public OrderStatusExpression First() => Get(0);
+        public OrderStatusExpression First() => Item(0, true);
 
         public OrderStatusExpression Get(int index)
         {
-            var itemPath = ExpressionPath.Append(_path, $"Get({index})");
-            if (_notLoaded != null) return new OrderStatusExpression(null, _root, itemPath, _notLoaded);
+            return Item(index, false);
+        }
+
+        private OrderStatusExpression Item(int index, bool first)
+        {
+            var itemPath = _path.At(index, first);
+            if (_notLoaded != null) return new OrderStatusExpression(null, _root, itemPath, _notLoaded.WithPath(itemPath));
             return !_present || index < 0 || index >= _items.Count
                 ? new OrderStatusExpression(null, _root, itemPath)
                 : new OrderStatusExpression(_items[index], _root, itemPath);
@@ -668,39 +656,44 @@ namespace Generated
     {
         private readonly IReadOnlyList<Generated.Models.Customer> _items;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly bool _present;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public CustomerListExpression(
             IReadOnlyList<Generated.Models.Customer>? items,
             string? root = "Customer(null)",
-            string path = "",
+            ExpressionPath? path = null,
             bool present = true,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.Customer>();
             _root = root ?? "Customer(null)";
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.entity(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static CustomerListExpression Missing(string? root = null, string path = "") =>
+        public static CustomerListExpression Missing(string? root = null, ExpressionPath? path = null) =>
             new(new List<Generated.Models.Customer>(), root, path, false);
 
         public ValueExpression<int> Size()
         {
-            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded);
+            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded.WithPath(_path.Operation("Size()")));
             return _present ? new ValueExpression<int>(_items.Count) : ValueExpression<int>.Missing();
         }
 
-        public CustomerExpression First() => Get(0);
+        public CustomerExpression First() => Item(0, true);
 
         public CustomerExpression Get(int index)
         {
-            var itemPath = ExpressionPath.Append(_path, $"Get({index})");
-            if (_notLoaded != null) return new CustomerExpression(null, _root, itemPath, _notLoaded);
+            return Item(index, false);
+        }
+
+        private CustomerExpression Item(int index, bool first)
+        {
+            var itemPath = _path.At(index, first);
+            if (_notLoaded != null) return new CustomerExpression(null, _root, itemPath, _notLoaded.WithPath(itemPath));
             return !_present || index < 0 || index >= _items.Count
                 ? new CustomerExpression(null, _root, itemPath)
                 : new CustomerExpression(_items[index], _root, itemPath);
@@ -711,39 +704,44 @@ namespace Generated
     {
         private readonly IReadOnlyList<Generated.Models.CustomerOrder> _items;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly bool _present;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public CustomerOrderListExpression(
             IReadOnlyList<Generated.Models.CustomerOrder>? items,
             string? root = "CustomerOrder(null)",
-            string path = "",
+            ExpressionPath? path = null,
             bool present = true,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.CustomerOrder>();
             _root = root ?? "CustomerOrder(null)";
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.entity(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static CustomerOrderListExpression Missing(string? root = null, string path = "") =>
+        public static CustomerOrderListExpression Missing(string? root = null, ExpressionPath? path = null) =>
             new(new List<Generated.Models.CustomerOrder>(), root, path, false);
 
         public ValueExpression<int> Size()
         {
-            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded);
+            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded.WithPath(_path.Operation("Size()")));
             return _present ? new ValueExpression<int>(_items.Count) : ValueExpression<int>.Missing();
         }
 
-        public CustomerOrderExpression First() => Get(0);
+        public CustomerOrderExpression First() => Item(0, true);
 
         public CustomerOrderExpression Get(int index)
         {
-            var itemPath = ExpressionPath.Append(_path, $"Get({index})");
-            if (_notLoaded != null) return new CustomerOrderExpression(null, _root, itemPath, _notLoaded);
+            return Item(index, false);
+        }
+
+        private CustomerOrderExpression Item(int index, bool first)
+        {
+            var itemPath = _path.At(index, first);
+            if (_notLoaded != null) return new CustomerOrderExpression(null, _root, itemPath, _notLoaded.WithPath(itemPath));
             return !_present || index < 0 || index >= _items.Count
                 ? new CustomerOrderExpression(null, _root, itemPath)
                 : new CustomerOrderExpression(_items[index], _root, itemPath);
@@ -754,39 +752,44 @@ namespace Generated
     {
         private readonly IReadOnlyList<Generated.Models.OrderItem> _items;
         private readonly string _root;
-        private readonly string _path;
+        private readonly ExpressionPath _path;
         private readonly bool _present;
         private readonly TeaQLNotLoadedException? _notLoaded;
 
         public OrderItemListExpression(
             IReadOnlyList<Generated.Models.OrderItem>? items,
             string? root = "OrderItem(null)",
-            string path = "",
+            ExpressionPath? path = null,
             bool present = true,
             TeaQLNotLoadedException? notLoaded = null)
         {
             _items = items ?? new List<Generated.Models.OrderItem>();
             _root = root ?? "OrderItem(null)";
-            _path = path;
+            _path = path ?? ExpressionPath.Root("E.entity(<root>)", JsonFieldNamingProfiles.Parse("camelCase"));
             _present = present;
             _notLoaded = notLoaded;
         }
 
-        public static OrderItemListExpression Missing(string? root = null, string path = "") =>
+        public static OrderItemListExpression Missing(string? root = null, ExpressionPath? path = null) =>
             new(new List<Generated.Models.OrderItem>(), root, path, false);
 
         public ValueExpression<int> Size()
         {
-            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded);
+            if (_notLoaded != null) return ValueExpression<int>.NotLoaded(_notLoaded.WithPath(_path.Operation("Size()")));
             return _present ? new ValueExpression<int>(_items.Count) : ValueExpression<int>.Missing();
         }
 
-        public OrderItemExpression First() => Get(0);
+        public OrderItemExpression First() => Item(0, true);
 
         public OrderItemExpression Get(int index)
         {
-            var itemPath = ExpressionPath.Append(_path, $"Get({index})");
-            if (_notLoaded != null) return new OrderItemExpression(null, _root, itemPath, _notLoaded);
+            return Item(index, false);
+        }
+
+        private OrderItemExpression Item(int index, bool first)
+        {
+            var itemPath = _path.At(index, first);
+            if (_notLoaded != null) return new OrderItemExpression(null, _root, itemPath, _notLoaded.WithPath(itemPath));
             return !_present || index < 0 || index >= _items.Count
                 ? new OrderItemExpression(null, _root, itemPath)
                 : new OrderItemExpression(_items[index], _root, itemPath);
@@ -797,27 +800,27 @@ namespace Generated
     {
         public static PlatformExpression Platform(Generated.Models.Platform? value)
         {
-            return new PlatformExpression(value, $"Platform(id={value?.Id})");
+            return new PlatformExpression(value, "Platform");
         }
 
         public static OrderStatusExpression OrderStatus(Generated.Models.OrderStatus? value)
         {
-            return new OrderStatusExpression(value, $"OrderStatus(id={value?.Id})");
+            return new OrderStatusExpression(value, "OrderStatus");
         }
 
         public static CustomerExpression Customer(Generated.Models.Customer? value)
         {
-            return new CustomerExpression(value, $"Customer(id={value?.Id})");
+            return new CustomerExpression(value, "Customer");
         }
 
         public static CustomerOrderExpression CustomerOrder(Generated.Models.CustomerOrder? value)
         {
-            return new CustomerOrderExpression(value, $"CustomerOrder(id={value?.Id})");
+            return new CustomerOrderExpression(value, "CustomerOrder");
         }
 
         public static OrderItemExpression OrderItem(Generated.Models.OrderItem? value)
         {
-            return new OrderItemExpression(value, $"OrderItem(id={value?.Id})");
+            return new OrderItemExpression(value, "OrderItem");
         }
     }
 }

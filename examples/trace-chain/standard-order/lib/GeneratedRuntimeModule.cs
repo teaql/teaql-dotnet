@@ -144,7 +144,7 @@ public static class GeneratedRuntimeModule
             ["name"] = new Value.TextValue(""),
             ["code"] = new Value.TextValue(""),
             ["color"] = new Value.TextValue(""),
-            ["display_order"] = new Value.I64Value(0),
+            ["display_order"] = new Value.DecimalValue(0),
             ["version"] = new Value.I64Value(0)
         },
        ["Customer"] = new Record {
@@ -273,7 +273,7 @@ public static class GeneratedRuntimeModule
             created.UpdateName("New");
             created.UpdateCode("NEW");
             created.UpdateColor("#94A3B8");
-            created.UpdateDisplayOrder(1L);
+            created.UpdateDisplayOrder(decimal.Parse("1", System.Globalization.CultureInfo.InvariantCulture));
             try { constantOrderStatus1001 = await created.AuditAs("create model constant OrderStatus(1001)").SaveAsync(context); }
             catch { constantOrderStatus1001 = await Q.OrderStatuses().WithIdIs(1001).Comment("what: recover concurrent constant bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (constantOrderStatus1001 == null) throw; }
         }
@@ -300,9 +300,9 @@ public static class GeneratedRuntimeModule
                 constantOrderStatus1001.UpdateColor("#94A3B8");
                 changed = true;
             }
-            if (!object.Equals(constantOrderStatus1001.DisplayOrder, 1L))
+            if (!object.Equals(constantOrderStatus1001.DisplayOrder, decimal.Parse("1", System.Globalization.CultureInfo.InvariantCulture)))
             {
-                constantOrderStatus1001.UpdateDisplayOrder(1L);
+                constantOrderStatus1001.UpdateDisplayOrder(decimal.Parse("1", System.Globalization.CultureInfo.InvariantCulture));
                 changed = true;
             }
             if (changed) constantOrderStatus1001 = await constantOrderStatus1001.AuditAs("reconcile model constant OrderStatus(1001)").SaveAsync(context);
@@ -316,7 +316,7 @@ public static class GeneratedRuntimeModule
             created.UpdateName("Paid");
             created.UpdateCode("PAID");
             created.UpdateColor("#22C55E");
-            created.UpdateDisplayOrder(2L);
+            created.UpdateDisplayOrder(decimal.Parse("2", System.Globalization.CultureInfo.InvariantCulture));
             try { constantOrderStatus1002 = await created.AuditAs("create model constant OrderStatus(1002)").SaveAsync(context); }
             catch { constantOrderStatus1002 = await Q.OrderStatuses().WithIdIs(1002).Comment("what: recover concurrent constant bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (constantOrderStatus1002 == null) throw; }
         }
@@ -343,9 +343,9 @@ public static class GeneratedRuntimeModule
                 constantOrderStatus1002.UpdateColor("#22C55E");
                 changed = true;
             }
-            if (!object.Equals(constantOrderStatus1002.DisplayOrder, 2L))
+            if (!object.Equals(constantOrderStatus1002.DisplayOrder, decimal.Parse("2", System.Globalization.CultureInfo.InvariantCulture)))
             {
-                constantOrderStatus1002.UpdateDisplayOrder(2L);
+                constantOrderStatus1002.UpdateDisplayOrder(decimal.Parse("2", System.Globalization.CultureInfo.InvariantCulture));
                 changed = true;
             }
             if (changed) constantOrderStatus1002 = await constantOrderStatus1002.AuditAs("reconcile model constant OrderStatus(1002)").SaveAsync(context);
@@ -359,7 +359,7 @@ public static class GeneratedRuntimeModule
             created.UpdateName("Cancelled");
             created.UpdateCode("CANCELLED");
             created.UpdateColor("#EF4444");
-            created.UpdateDisplayOrder(3L);
+            created.UpdateDisplayOrder(decimal.Parse("3", System.Globalization.CultureInfo.InvariantCulture));
             try { constantOrderStatus1003 = await created.AuditAs("create model constant OrderStatus(1003)").SaveAsync(context); }
             catch { constantOrderStatus1003 = await Q.OrderStatuses().WithIdIs(1003).Comment("what: recover concurrent constant bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (constantOrderStatus1003 == null) throw; }
         }
@@ -386,9 +386,9 @@ public static class GeneratedRuntimeModule
                 constantOrderStatus1003.UpdateColor("#EF4444");
                 changed = true;
             }
-            if (!object.Equals(constantOrderStatus1003.DisplayOrder, 3L))
+            if (!object.Equals(constantOrderStatus1003.DisplayOrder, decimal.Parse("3", System.Globalization.CultureInfo.InvariantCulture)))
             {
-                constantOrderStatus1003.UpdateDisplayOrder(3L);
+                constantOrderStatus1003.UpdateDisplayOrder(decimal.Parse("3", System.Globalization.CultureInfo.InvariantCulture));
                 changed = true;
             }
             if (changed) constantOrderStatus1003 = await constantOrderStatus1003.AuditAs("reconcile model constant OrderStatus(1003)").SaveAsync(context);

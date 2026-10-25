@@ -8,6 +8,9 @@ using TeaQL.Sql;
 // APIs discovered through current entity/field Assist, not generated sources.
 static class AggregateChecks
 {
+    private static Value RequiredProperty(CustomerOrder entity, string name) =>
+        entity.DynamicProperties.Get(name) ?? throw new Exception("Selected dynamic property is absent: " + name);
+
     public static async Task RunAsync(UserContext context, CapturingExecutor capture, EvidenceSink sink, FaultTransport transport)
     {
         var secret = "PRIVATE-AGGREGATE-" + Guid.NewGuid().ToString("N");
@@ -49,11 +52,12 @@ static class AggregateChecks
                 var loaded = await Load(nested, secret);
                 Verify.Equal(orderId, E.CustomerOrder(loaded).Id().Eval(), "aggregate identity");
                 Verify.Equal(2, E.CustomerOrder(loaded).OrderItemList().Size().Eval(), "loaded items");
-                Verify.That(loaded.HasQueryProjection("filtered_count"), "projection is present");
-                Verify.Equal(1L, loaded.QueryProjection("filtered_count").TryI64(), "filtered count");
-                Verify.Equal(2L, loaded.QueryProjection("SaveAsync").TryI64(), "total count alias");
-                Verify.That(!loaded.HasQueryProjection("id") && !loaded.HasQueryProjection("OrderItemList"), "modeled values excluded");
-                await Verify.Throws<KeyNotFoundException>(() => { loaded.QueryProjection("missing"); return Task.CompletedTask; }, "missing is not zero");
+                Verify.That(loaded.DynamicProperties.Contains("filtered_count"), "projection is present");
+                Verify.Equal(1L, RequiredProperty(loaded, "filtered_count").TryI64(), "filtered count");
+                Verify.Equal(2L, RequiredProperty(loaded, "SaveAsync").TryI64(), "total count alias");
+                Verify.That(!loaded.DynamicProperties.Contains("id") && !loaded.DynamicProperties.Contains("OrderItemList"), "modeled values excluded");
+                Verify.That(!loaded.DynamicProperties.Contains("missing") && loaded.DynamicProperties.Get("missing") is null,
+                    "absent dynamic property returns null, not zero or an exception");
                 Verify.Equal(nested ? 5 : 4, transport.QueryReads.Count, "actual physical aggregate reads");
                 Verify.Equal(0, capture.Commands.Count, "query emits no mutation");
                 Verify.Equal(0, sink.Audit.Count, "query emits no mutation audit");
@@ -71,20 +75,20 @@ static class AggregateChecks
                 }
                 else Verify.Equal(0, sink.Sql.Count, "logging disabled, valid query still executes");
                 Console.WriteLine("AGGREGATE QUERY " + JsonSerializer.Serialize(new { nested, logging,
-                    count = loaded.QueryProjection("filtered_count").TryI64(), reads = transport.QueryReads.Count, sql = sink.Sql }));
+                    count = RequiredProperty(loaded, "filtered_count").TryI64(), reads = transport.QueryReads.Count, sql = sink.Sql }));
                 Clear();
                 var updated = "saved aggregate " + Guid.NewGuid().ToString("N");
                 await loaded.UpdateDescription(updated).AuditAs("save modeled field without aliases").SaveAsync(context);
                 Verify.Equal(1, capture.Commands.Count, "only root mutation");
                 Verify.Equal(1, sink.Audit.Count, "one committed audit");
                 Verify.That(capture.ChangedFields.Single().SequenceEqual(new[] { "description" }), "query aliases not persisted");
-                Verify.Equal(2L, loaded.QueryProjection("SaveAsync").TryI64(), "save method remains callable and snapshot intact");
+                Verify.Equal(2L, RequiredProperty(loaded, "SaveAsync").TryI64(), "save method remains callable and snapshot intact");
                 Console.WriteLine("AGGREGATE SAVE " + JsonSerializer.Serialize(new { nested, logging,
                     writes = capture.Commands.Count, audits = sink.Audit.Count, fields = capture.ChangedFields.Single() }));
                 var fresh = await Load(nested, "no match " + Guid.NewGuid().ToString("N"));
                 Verify.Equal(updated, E.CustomerOrder(fresh).Description().Eval(), "saved description reloads");
-                Verify.That(fresh.HasQueryProjection("filtered_count"), "zero count is present");
-                Verify.Equal(0L, fresh.QueryProjection("filtered_count").TryI64(), "empty aggregate is zero");
+                Verify.That(fresh.DynamicProperties.Contains("filtered_count"), "zero count is present");
+                Verify.Equal(0L, RequiredProperty(fresh, "filtered_count").TryI64(), "empty aggregate is zero");
             }
             Clear(); transport.FailAggregateQuery = true;
             try { await Verify.Throws<SqlExecutorException>(async () => { await Load(false, secret); }, "count failure propagates"); }

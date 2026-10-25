@@ -6,7 +6,7 @@
     <OutputType Condition="!Exists('Program.cs')">Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.3.0</TeaQLRuntimeVersion>
+    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.3.1</TeaQLRuntimeVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TeaQLRuntimeSourceRoot)' == ''">
     <PackageReference Include="TeaQL.Core" Version="[$(TeaQLRuntimeVersion)]" />

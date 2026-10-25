@@ -64,8 +64,7 @@ namespace Generated.Requests
 
         public ExecutableOrderItemRequest Purpose(string p)
         {
-            if (string.IsNullOrWhiteSpace(p))
-                throw new ArgumentException("query purpose must not be empty", nameof(p));
+            p = QueryIntent.RequirePurpose(p);
             _query.Purpose(p);
             _purpose = p;
             return new ExecutableOrderItemRequest(
@@ -546,8 +545,9 @@ namespace Generated.Requests
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
-            var request = context.PrepareQueryRequest(new QueryRequest(_query));
-            return await service.QueryAsync(request);
+            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            // The runtime owns authorized membership, recursive Facets and SQL provenance.
+            return await service.QueryAsync(req);
         }
 
         private async Task<QueryResult> ExecuteForOneInternalAsync(UserContext context)
@@ -556,7 +556,8 @@ namespace Generated.Requests
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
             query.Limit(1);
-            return await service.QueryAsync(context.PrepareQueryRequest(new QueryRequest(query)));
+            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            return await service.QueryAsync(req);
         }
 
         private async Task<SmartList<Record>> ExecuteForListWithMetadataInternalAsync(
@@ -565,7 +566,7 @@ namespace Generated.Requests
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
-            var request = context.PrepareQueryRequest(new QueryRequest(query));
+            var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
             if (_countRequested)
                 return await RuntimeDataService.FetchPageAsync(service, context, request);
             var result = await service.QueryAsync(request);
@@ -581,7 +582,7 @@ namespace Generated.Requests
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
-            var request = context.PrepareQueryRequest(new QueryRequest(_query));
+            var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
             return RuntimeDataService.StreamEntities(context, request,
                 row => Generated.Models.OrderItem.FromRecord(row, new EntityRoot()),
                 chunkSize, cancellationToken);
@@ -589,8 +590,7 @@ namespace Generated.Requests
 
         private void EnsureIntent()
         {
-            if (string.IsNullOrWhiteSpace(_purpose) || string.IsNullOrWhiteSpace(_comment))
-                throw new Exception("Security audit failure: Comment() and Purpose() must be non-empty before execution or NewEntity()");
+            _ = new QueryIntent(_comment, _purpose);
         }
 
     }
@@ -642,9 +642,8 @@ namespace Generated.Requests
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
                 Summary = result.Summary, Facets = result.Facets
             };
-            var queryRoot = new EntityRoot();
             foreach (var row in result)
-                entities.Add(Generated.Models.OrderItem.FromRecord(row, queryRoot));
+                entities.Add(Generated.Models.OrderItem.FromRecord(row, new EntityRoot()));
             entities.Facets = result.Facets;
             return entities;
         }

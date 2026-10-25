@@ -9,8 +9,10 @@ namespace Generated.Models
 
     public class Product
     {
+        public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
+        private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("Product", Id ?? _ledgerId);
@@ -48,7 +50,7 @@ namespace Generated.Models
                 public DateTime? UpdateTime { get; set; }
                 public long? Version { get; set; }
                 public CommercePlatform? CommercePlatformEntity { get; set; }
-                public List<OrderLine> OrderLineList { get; } = new List<OrderLine>();
+                public SmartList<OrderLine> OrderLineList { get; } = SmartList<OrderLine>.Empty();
 
         private string? _comment;
         private bool _markedForDeletion;
@@ -176,13 +178,24 @@ namespace Generated.Models
                         if (record.TryGetValue("OrderLineList", out var orderLineListValue))
                         {
                             entity.MarkLoaded("OrderLineList");
+                            entity.OrderLineList.IsLoaded = true;
                             if (orderLineListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.OrderLineList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.OrderLineList.Add(global::Generated.Models.OrderLine.FromRecord(row.Value));
+                            }
                         }
+            entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
+                "id", "name", "sku", "image_url", "commerce_platform", "create_time", "update_time", "version",
+                "Id", "Name", "Sku", "ImageUrl", "CommercePlatform", "CreateTime", "UpdateTime", "Version",
+                "OrderLineList"
+            });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
+            entity._loadedSnapshot = entity.TeaqlScalarSnapshot();
             return entity;
         }
 
@@ -209,7 +222,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
-            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            if (changed)
             {
             if (!creating && !_markedForDeletion)
             {
@@ -326,6 +340,8 @@ namespace Generated.Models
             if (mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for Product");
             var saved = FromRecord(mutationResult.PersistedRecord);
+            var committedSnapshot = saved._loadedSnapshot;
+            graph.AfterCommit(() => _loadedSnapshot = committedSnapshot);
             var oldKey = TeaqlEntityKey();
             this.Id = saved.Id;
             this.Name = saved.Name;
@@ -360,13 +376,33 @@ namespace Generated.Models
             await Task.CompletedTask;
         }
 
-        private MutationRequest TeaqlMutationRequest(object command, string rootComment) => command switch
+        private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
         {
             InsertCommand insert => MutationRequest.Create(insert, rootComment, TeaqlEntityKey(), _entityRoot),
             UpdateCommand update => MutationRequest.Create(update, rootComment, TeaqlEntityKey(), _entityRoot),
             DeleteCommand delete => MutationRequest.Create(delete, rootComment, TeaqlEntityKey(), _entityRoot),
             _ => throw new InvalidOperationException("Unsupported mutation command")
-        };
+        }).WithLoadedSnapshot(_loadedSnapshot);
+
+        private LoadedScalarSnapshot TeaqlScalarSnapshot()
+        {
+            var record = new Record();
+                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+
+                    if (Name != null) record["name"] = new Value.TextValue(Name);
+
+                    if (Sku != null) record["sku"] = new Value.TextValue(Sku);
+
+                    if (ImageUrl != null) record["image_url"] = new Value.TextValue(ImageUrl);
+
+                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+
+                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+
+                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+
+            return new LoadedScalarSnapshot(record);
+        }
 
         public InsertCommand ToInsertCommand()
         {

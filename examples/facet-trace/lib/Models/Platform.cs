@@ -9,12 +9,10 @@ namespace Generated.Models
 
     public class Platform
     {
+        public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
-        private QueryProjectionSnapshot _queryProjections = QueryProjectionSnapshot.Empty;
-        public Value QueryProjection(string alias) => _queryProjections.Get(alias);
-        public bool HasQueryProjection(string alias) => _queryProjections.Contains(alias);
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("Platform", Id ?? _ledgerId);
@@ -110,16 +108,6 @@ namespace Generated.Models
         public static Platform FromRecord(Record record)
         {
             var entity = new Platform().MarkLoadedOnly();
-            entity._queryProjections = new QueryProjectionSnapshot(record, new[] {
-                "Id", "id",
-                "Name", "name",
-                "BaseUrl", "base_url",
-                "CreateTime", "create_time",
-                "UpdateTime", "update_time",
-                "Version", "version",
-                "SchoolTypeList", "school_type_list",
-                "SchoolList", "school_list",
-            });
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {
@@ -181,6 +169,11 @@ namespace Generated.Models
                                     entity.SchoolList.Add(global::Generated.Models.School.FromRecord(row.Value));
                             }
                         }
+            entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
+                "id", "name", "base_url", "create_time", "update_time", "version",
+                "Id", "Name", "BaseUrl", "CreateTime", "UpdateTime", "Version",
+                "SchoolTypeList", "SchoolList"
+            });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
@@ -211,7 +204,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
-            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            if (changed)
             {
             if (!creating && !_markedForDeletion)
             {

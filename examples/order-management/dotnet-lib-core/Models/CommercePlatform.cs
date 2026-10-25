@@ -9,8 +9,10 @@ namespace Generated.Models
 
     public class CommercePlatform
     {
+        public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
+        private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("CommercePlatform", Id ?? _ledgerId);
@@ -49,12 +51,12 @@ namespace Generated.Models
                 public DateTime? CreateTime { get; set; }
                 public DateTime? UpdateTime { get; set; }
                 public long? Version { get; set; }
-                public List<Customer> CustomerList { get; } = new List<Customer>();
-                public List<OrderStatus> OrderStatusList { get; } = new List<OrderStatus>();
-                public List<CustomerOrder> CustomerOrderList { get; } = new List<CustomerOrder>();
-                public List<Product> ProductList { get; } = new List<Product>();
-                public List<OrderLine> OrderLineList { get; } = new List<OrderLine>();
-                public List<OrderSearchPreset> OrderSearchPresetList { get; } = new List<OrderSearchPreset>();
+                public SmartList<Customer> CustomerList { get; } = SmartList<Customer>.Empty();
+                public SmartList<OrderStatus> OrderStatusList { get; } = SmartList<OrderStatus>.Empty();
+                public SmartList<CustomerOrder> CustomerOrderList { get; } = SmartList<CustomerOrder>.Empty();
+                public SmartList<Product> ProductList { get; } = SmartList<Product>.Empty();
+                public SmartList<OrderLine> OrderLineList { get; } = SmartList<OrderLine>.Empty();
+                public SmartList<OrderSearchPreset> OrderSearchPresetList { get; } = SmartList<OrderSearchPreset>.Empty();
 
         private string? _comment;
         private bool _markedForDeletion;
@@ -147,48 +149,84 @@ namespace Generated.Models
                         if (record.TryGetValue("CustomerList", out var customerListValue))
                         {
                             entity.MarkLoaded("CustomerList");
+                            entity.CustomerList.IsLoaded = true;
                             if (customerListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.CustomerList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.CustomerList.Add(global::Generated.Models.Customer.FromRecord(row.Value));
+                            }
                         }
                         if (record.TryGetValue("OrderStatusList", out var orderStatusListValue))
                         {
                             entity.MarkLoaded("OrderStatusList");
+                            entity.OrderStatusList.IsLoaded = true;
                             if (orderStatusListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.OrderStatusList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.OrderStatusList.Add(global::Generated.Models.OrderStatus.FromRecord(row.Value));
+                            }
                         }
                         if (record.TryGetValue("CustomerOrderList", out var customerOrderListValue))
                         {
                             entity.MarkLoaded("CustomerOrderList");
+                            entity.CustomerOrderList.IsLoaded = true;
                             if (customerOrderListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.CustomerOrderList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.CustomerOrderList.Add(global::Generated.Models.CustomerOrder.FromRecord(row.Value));
+                            }
                         }
                         if (record.TryGetValue("ProductList", out var productListValue))
                         {
                             entity.MarkLoaded("ProductList");
+                            entity.ProductList.IsLoaded = true;
                             if (productListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.ProductList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.ProductList.Add(global::Generated.Models.Product.FromRecord(row.Value));
+                            }
                         }
                         if (record.TryGetValue("OrderLineList", out var orderLineListValue))
                         {
                             entity.MarkLoaded("OrderLineList");
+                            entity.OrderLineList.IsLoaded = true;
                             if (orderLineListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.OrderLineList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.OrderLineList.Add(global::Generated.Models.OrderLine.FromRecord(row.Value));
+                            }
                         }
                         if (record.TryGetValue("OrderSearchPresetList", out var orderSearchPresetListValue))
                         {
                             entity.MarkLoaded("OrderSearchPresetList");
+                            entity.OrderSearchPresetList.IsLoaded = true;
                             if (orderSearchPresetListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.OrderSearchPresetList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.OrderSearchPresetList.Add(global::Generated.Models.OrderSearchPreset.FromRecord(row.Value));
+                            }
                         }
+            entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
+                "id", "name", "create_time", "update_time", "version",
+                "Id", "Name", "CreateTime", "UpdateTime", "Version",
+                "CustomerList", "OrderStatusList", "CustomerOrderList", "ProductList", "OrderLineList", "OrderSearchPresetList"
+            });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
+            entity._loadedSnapshot = entity.TeaqlScalarSnapshot();
             return entity;
         }
 
@@ -215,7 +253,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
-            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            if (changed)
             {
             if (!creating && !_markedForDeletion)
             {
@@ -385,6 +424,8 @@ namespace Generated.Models
             if (mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for CommercePlatform");
             var saved = FromRecord(mutationResult.PersistedRecord);
+            var committedSnapshot = saved._loadedSnapshot;
+            graph.AfterCommit(() => _loadedSnapshot = committedSnapshot);
             var oldKey = TeaqlEntityKey();
             this.Id = saved.Id;
             this.Name = saved.Name;
@@ -481,13 +522,29 @@ namespace Generated.Models
             await Task.CompletedTask;
         }
 
-        private MutationRequest TeaqlMutationRequest(object command, string rootComment) => command switch
+        private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
         {
             InsertCommand insert => MutationRequest.Create(insert, rootComment, TeaqlEntityKey(), _entityRoot),
             UpdateCommand update => MutationRequest.Create(update, rootComment, TeaqlEntityKey(), _entityRoot),
             DeleteCommand delete => MutationRequest.Create(delete, rootComment, TeaqlEntityKey(), _entityRoot),
             _ => throw new InvalidOperationException("Unsupported mutation command")
-        };
+        }).WithLoadedSnapshot(_loadedSnapshot);
+
+        private LoadedScalarSnapshot TeaqlScalarSnapshot()
+        {
+            var record = new Record();
+                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+
+                    if (Name != null) record["name"] = new Value.TextValue(Name);
+
+                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+
+                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+
+                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+
+            return new LoadedScalarSnapshot(record);
+        }
 
         public InsertCommand ToInsertCommand()
         {

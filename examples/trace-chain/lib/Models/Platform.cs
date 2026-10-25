@@ -9,12 +9,10 @@ namespace Generated.Models
 
     public class Platform
     {
+        public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
-        private QueryProjectionSnapshot _queryProjections = QueryProjectionSnapshot.Empty;
-        public Value QueryProjection(string alias) => _queryProjections.Get(alias);
-        public bool HasQueryProjection(string alias) => _queryProjections.Contains(alias);
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("Platform", Id ?? _ledgerId);
@@ -46,7 +44,7 @@ namespace Generated.Models
                 public long? Id { get; set; }
                 public string? Name { get; set; }
                 public long? Version { get; set; }
-                public List<CustomerOrder> CustomerOrderList { get; } = new List<CustomerOrder>();
+                public SmartList<CustomerOrder> CustomerOrderList { get; } = SmartList<CustomerOrder>.Empty();
 
         private string? _comment;
         private bool _markedForDeletion;
@@ -105,12 +103,6 @@ namespace Generated.Models
         public static Platform FromRecord(Record record)
         {
             var entity = new Platform().MarkLoadedOnly();
-            entity._queryProjections = new QueryProjectionSnapshot(record, new[] {
-                "Id", "id",
-                "Name", "name",
-                "Version", "version",
-                "CustomerOrderList", "customer_order_list",
-            });
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {
@@ -133,10 +125,20 @@ namespace Generated.Models
                         if (record.TryGetValue("CustomerOrderList", out var customerOrderListValue))
                         {
                             entity.MarkLoaded("CustomerOrderList");
+                            entity.CustomerOrderList.IsLoaded = true;
                             if (customerOrderListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.CustomerOrderList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.CustomerOrderList.Add(global::Generated.Models.CustomerOrder.FromRecord(row.Value));
+                            }
                         }
+            entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
+                "id", "name", "version",
+                "Id", "Name", "Version",
+                "CustomerOrderList"
+            });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
@@ -167,7 +169,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
-            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            if (changed)
             {
             if (!creating && !_markedForDeletion)
             {

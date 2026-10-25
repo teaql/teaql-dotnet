@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using TeaQL.Core;
+using TeaQL.Runtime;
 using Generated.Models;
 
 namespace Generated.Requests
@@ -14,6 +15,8 @@ namespace Generated.Requests
         private SelectQuery _query;
         private string? _purpose;
         private string? _comment;
+        private bool _countRequested;
+        private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
                 ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
@@ -28,6 +31,16 @@ namespace Generated.Requests
         }
 
         public SelectQuery GetQuery() => _query;
+
+        public PaymentAttemptRequest FilterByJson(string source, Action<DynamicSearchWarning>? warn = null)
+        {
+            var result = DynamicSearch.MergeGeneratedScalar(_query, source, GeneratedSearchModels.Models, warn);
+            _query = result.Query;
+            _dynamicSearchWarnings.AddRange(result.Warnings);
+            return this;
+        }
+
+        public IReadOnlyList<DynamicSearchWarning> DynamicSearchWarnings => _dynamicSearchWarnings.ToArray();
 
         public PaymentAttemptRequest WithDeletedRows()
         {
@@ -57,7 +70,7 @@ namespace Generated.Requests
             return new ExecutablePaymentAttemptRequest(
                 ExecuteForListInternalAsync,
                 ExecuteForOneInternalAsync,
-                ExecuteForPageInternalAsync,
+                ExecuteForListWithMetadataInternalAsync,
                 ExecuteForStreamInternalAsync,
                 c => Comment(c),
                 EnsureIntent);
@@ -142,6 +155,9 @@ namespace Generated.Requests
                 {
                     _query.Project("payment");
                     _query.ForwardRelationQuery("Payment", "Payment", "payment", related.GetQuery());
+                    _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
+                        Operation = new QueryOperation("relation", "SelectPaymentWith", Relation: "Payment")
+                    };
                     return this;
                 }
                 public PaymentAttemptRequest WithPaymentMatching(PaymentRequest related)
@@ -458,13 +474,14 @@ namespace Generated.Requests
 
         public PaymentAttemptRequest Count()
         {
-            _query.Aggregate("Count", "id", "count");
-            return this;
+            return CountAs("count");
         }
 
         public PaymentAttemptRequest CountAs(string retName)
         {
+            _countRequested = true;
             _query.Aggregate("Count", "id", retName);
+            _query.PageCountOperation = new QueryOperation("count", "CountAs", retName);
             return this;
         }
 
@@ -517,7 +534,9 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "payment", request.GetQuery(), includeAllFacets));
+                        name, "Payment", request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPaymentAs", name, "payment")
+                    });
                     return this;
                 }
 
@@ -527,45 +546,8 @@ namespace Generated.Requests
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
-            var authorized = req.Query;
-            var result = await service.QueryAsync(req);
-            foreach (var facet in authorized.Facets)
-            {
-                var membership = authorized.CloneForExecution();
-                membership.Facets.Clear();
-                membership.Relations.Clear();
-                membership.Orders.Clear();
-                membership.Aggregates.Clear();
-                membership.GroupFields.Clear();
-                membership.Projections.Clear();
-                membership.Project(facet.RelationName);
-                var membershipRows = (await service.QueryAsync(req.WithQuery(membership))).Rows;
-                var counts = membershipRows
-                    .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
-                    .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw)!)
-                    .ToDictionary(group => group.Key, group => group.Count());
-
-                var nested = facet.Query.CloneForExecution();
-                nested.Facets.Clear();
-                var countAliases = nested.Aggregates
-                    .Where(aggregate => aggregate.Function == AggregateFunction.Count)
-                    .Select(aggregate => aggregate.Alias).ToArray();
-                nested.Aggregates.Clear();
-                nested.GroupFields.Clear();
-                var facetRows = (await service.QueryAsync(req.WithQuery(nested))).Rows;
-                var decorated = new SmartList<Record>();
-                foreach (var row in facetRows)
-                {
-                    var key = row.TryGetValue("id", out var id) ? Convert.ToString(id.Raw) : null;
-                    var count = key != null && counts.TryGetValue(key, out var value) ? value : 0;
-                    if (!facet.IncludeAllFacets && count == 0) continue;
-                    foreach (var alias in countAliases.Length == 0 ? new[] { "count" } : countAliases)
-                        row[alias] = new Value.I64Value(count);
-                    decorated.Add(row);
-                }
-                result.Facets[facet.Name] = decorated;
-            }
-            return result;
+            // The runtime owns authorized membership, recursive Facets and SQL provenance.
+            return await service.QueryAsync(req);
         }
 
         private async Task<QueryResult> ExecuteForOneInternalAsync(UserContext context)
@@ -578,35 +560,17 @@ namespace Generated.Requests
             return await service.QueryAsync(req);
         }
 
-        private async Task<PaymentAttemptPage> ExecuteForPageInternalAsync(
-            UserContext context, int offset, int limit)
+        private async Task<SmartList<Record>> ExecuteForListWithMetadataInternalAsync(
+            UserContext context)
         {
             EnsureIntent();
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
-            if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
-            query.Offset(offset);
-            query.Limit(limit);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var authorized = req.Query;
-            var result = await service.QueryAsync(req);
-            long totalCount;
-            if (authorized.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
-            {
-                totalCount = checked((long)context.IdSetCount);
-            }
-            else
-            {
-                var countQuery = authorized.ForExactCount();
-                var countResult = await service.QueryAsync(req.WithQuery(countQuery));
-                totalCount = countResult.Rows.Count == 0
-                    ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
-            }
-            var rows = new SmartList<Generated.Models.PaymentAttempt>();
-            foreach (var row in result.Rows)
-                rows.Add(Generated.Models.PaymentAttempt.FromRecord(row, new EntityRoot()));
-            return new PaymentAttemptPage(rows, totalCount);
+            var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (_countRequested)
+                return await RuntimeDataService.FetchPageAsync(service, context, request);
+            var result = await service.QueryAsync(request);
+            return new SmartList<Record>(result.Rows) { Facets = result.Facets };
         }
 
         private IAsyncEnumerable<Generated.Models.PaymentAttempt> ExecuteForStreamInternalAsync(
@@ -618,20 +582,10 @@ namespace Generated.Requests
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
-            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
-            var captured = streaming.QueryStreamAsync(req, chunkSize, cancellationToken);
-            return HydrateStream(captured, cancellationToken);
-        }
-
-        private static async IAsyncEnumerable<Generated.Models.PaymentAttempt> HydrateStream(
-            IAsyncEnumerable<StreamChunk> captured,
-            [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            await foreach (var chunk in captured.WithCancellation(cancellationToken))
-            {
-                foreach (var row in chunk.Rows)
-                    yield return Generated.Models.PaymentAttempt.FromRecord(row, new EntityRoot());
-            }
+            var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            return RuntimeDataService.StreamEntities(context, request,
+                row => Generated.Models.PaymentAttempt.FromRecord(row, new EntityRoot()),
+                chunkSize, cancellationToken);
         }
 
         private void EnsureIntent()
@@ -645,7 +599,7 @@ namespace Generated.Requests
     {
         private readonly Func<UserContext, Task<QueryResult>> _executeForRows;
         private readonly Func<UserContext, Task<QueryResult>> _executeForOne;
-        private readonly Func<UserContext, int, int, Task<PaymentAttemptPage>> _executeForPage;
+        private readonly Func<UserContext, Task<SmartList<Record>>> _executeForList;
         private readonly Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.PaymentAttempt>> _executeForStream;
         private readonly Action<string> _comment;
         private readonly Action _ensureIntent;
@@ -653,14 +607,14 @@ namespace Generated.Requests
         internal ExecutablePaymentAttemptRequest(
             Func<UserContext, Task<QueryResult>> executeForRows,
             Func<UserContext, Task<QueryResult>> executeForOne,
-            Func<UserContext, int, int, Task<PaymentAttemptPage>> executeForPage,
+            Func<UserContext, Task<SmartList<Record>>> executeForList,
             Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.PaymentAttempt>> executeForStream,
             Action<string> comment,
             Action ensureIntent)
         {
             _executeForRows = executeForRows;
             _executeForOne = executeForOne;
-            _executeForPage = executeForPage;
+            _executeForList = executeForList;
             _executeForStream = executeForStream;
             _comment = comment;
             _ensureIntent = ensureIntent;
@@ -683,17 +637,16 @@ namespace Generated.Requests
 
         public async Task<SmartList<Generated.Models.PaymentAttempt>> ExecuteForListAsync(UserContext context)
         {
-            var result = await ExecuteForRowsAsync(context);
-            var entities = new SmartList<Generated.Models.PaymentAttempt>();
-            foreach (var row in result.Rows)
+            var result = await _executeForList(context);
+            var entities = new SmartList<Generated.Models.PaymentAttempt>() {
+                TotalCount = result.TotalCount, Aggregations = result.Aggregations,
+                Summary = result.Summary, Facets = result.Facets
+            };
+            foreach (var row in result)
                 entities.Add(Generated.Models.PaymentAttempt.FromRecord(row, new EntityRoot()));
             entities.Facets = result.Facets;
             return entities;
         }
-
-        public Task<PaymentAttemptPage> ExecuteForPageAsync(
-            UserContext context, int offset, int limit)
-            => _executeForPage(context, offset, limit);
 
         public IAsyncEnumerable<Generated.Models.PaymentAttempt> ExecuteForStreamAsync(
             UserContext context,
@@ -711,12 +664,4 @@ namespace Generated.Requests
         }
     }
 
-    public sealed class PaymentAttemptPage
-    {
-        public SmartList<Generated.Models.PaymentAttempt> Rows { get; }
-        public long TotalCount { get; }
-        public PaymentAttemptPage(
-            SmartList<Generated.Models.PaymentAttempt> rows, long totalCount)
-        { Rows = rows; TotalCount = totalCount; }
-    }
 }

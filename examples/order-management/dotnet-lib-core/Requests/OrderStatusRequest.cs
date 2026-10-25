@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using TeaQL.Core;
+using TeaQL.Runtime;
 using Generated.Models;
 
 namespace Generated.Requests
@@ -14,6 +15,8 @@ namespace Generated.Requests
         private SelectQuery _query;
         private string? _purpose;
         private string? _comment;
+        private bool _countRequested;
+        private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
                 ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
@@ -28,6 +31,16 @@ namespace Generated.Requests
         }
 
         public SelectQuery GetQuery() => _query;
+
+        public OrderStatusRequest FilterByJson(string source, Action<DynamicSearchWarning>? warn = null)
+        {
+            var result = DynamicSearch.MergeGeneratedScalar(_query, source, GeneratedSearchModels.Models, warn);
+            _query = result.Query;
+            _dynamicSearchWarnings.AddRange(result.Warnings);
+            return this;
+        }
+
+        public IReadOnlyList<DynamicSearchWarning> DynamicSearchWarnings => _dynamicSearchWarnings.ToArray();
 
         public OrderStatusRequest WithDeletedRows()
         {
@@ -57,7 +70,7 @@ namespace Generated.Requests
             return new ExecutableOrderStatusRequest(
                 ExecuteForListInternalAsync,
                 ExecuteForOneInternalAsync,
-                ExecuteForPageInternalAsync,
+                ExecuteForListWithMetadataInternalAsync,
                 ExecuteForStreamInternalAsync,
                 c => Comment(c),
                 EnsureIntent);
@@ -163,6 +176,9 @@ namespace Generated.Requests
                 {
                     _query.Project("commerce_platform");
                     _query.ForwardRelationQuery("CommercePlatform", "CommercePlatform", "commerce_platform", related.GetQuery());
+                    _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
+                        Operation = new QueryOperation("relation", "SelectCommercePlatformWith", Relation: "CommercePlatform")
+                    };
                     return this;
                 }
                 public OrderStatusRequest WithCommercePlatformMatching(CommercePlatformRequest related)
@@ -793,13 +809,14 @@ namespace Generated.Requests
 
         public OrderStatusRequest Count()
         {
-            _query.Aggregate("Count", "id", "count");
-            return this;
+            return CountAs("count");
         }
 
         public OrderStatusRequest CountAs(string retName)
         {
+            _countRequested = true;
             _query.Aggregate("Count", "id", retName);
+            _query.PageCountOperation = new QueryOperation("count", "CountAs", retName);
             return this;
         }
 
@@ -968,6 +985,9 @@ namespace Generated.Requests
                 public OrderStatusRequest SelectCustomerOrderListWith(CustomerOrderRequest child)
                 {
                     _query.RelationQuery("CustomerOrderList", "CustomerOrder", "status", true, child.GetQuery());
+                    _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
+                        Operation = new QueryOperation("relation", "SelectCustomerOrderListWith", Relation: "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest HaveCustomerOrders()
@@ -991,12 +1011,22 @@ namespace Generated.Requests
                     => CountCustomerOrdersAs("countCustomerOrders");
 
                 public OrderStatusRequest CountCustomerOrdersAs(string alias)
-                    => CountCustomerOrdersWith(alias, new CustomerOrderRequest());
+                {
+                    CountCustomerOrdersWith(alias, new CustomerOrderRequest());
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("count", "CountCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
+                    return this;
+                }
 
                 public OrderStatusRequest CountCustomerOrdersWith(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("Count", "id", alias);
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.CountField("id", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("count", "CountCustomerOrdersWith", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
 
@@ -1005,8 +1035,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest MinTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("min", "total_amount", "min_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("min", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "MinTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest MaxTotalAmountOfCustomerOrders()
@@ -1014,8 +1048,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest MaxTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("max", "total_amount", "max_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("max", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "MaxTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest SumTotalAmountOfCustomerOrders()
@@ -1023,8 +1061,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SumTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("sum", "total_amount", "sum_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("sum", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "SumTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest AvgTotalAmountOfCustomerOrders()
@@ -1032,8 +1074,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest AvgTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("avg", "total_amount", "avg_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("avg", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "AvgTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest StandardDeviationTotalAmountOfCustomerOrders()
@@ -1041,8 +1087,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest StandardDeviationTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("stddev", "total_amount", "standardDeviation_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("stddev", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "StandardDeviationTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest SquareRootOfPopulationStandardDeviationTotalAmountOfCustomerOrders()
@@ -1050,8 +1100,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SquareRootOfPopulationStandardDeviationTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("stddev_pop", "total_amount", "squareRootOfPopulationStandardDeviation_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("stddev_pop", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "SquareRootOfPopulationStandardDeviationTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest SampleVarianceTotalAmountOfCustomerOrders()
@@ -1059,8 +1113,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SampleVarianceTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("var_samp", "total_amount", "sampleVariance_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("var_samp", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "SampleVarianceTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest SamplePopulationVarianceTotalAmountOfCustomerOrders()
@@ -1068,8 +1126,12 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SamplePopulationVarianceTotalAmountOfCustomerOrdersAs(string alias, CustomerOrderRequest child)
                 {
-                    child.GetQuery().Aggregate("var_pop", "total_amount", "samplePopulationVariance_total_amount");
-                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, child.GetQuery(), true);
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.Aggregate("var_pop", "total_amount", alias);
+                    _query.RelationAggregate("CustomerOrderList", "CustomerOrder", "status", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("aggregate", "SamplePopulationVarianceTotalAmountOfCustomerOrdersAs", alias, "CustomerOrderList")
+                    };
                     return this;
                 }
                 public OrderStatusRequest FacetByCommercePlatformAs(
@@ -1077,7 +1139,9 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "commerce_platform", request.GetQuery(), includeAllFacets));
+                        name, "CommercePlatform", request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCommercePlatformAs", name, "commerce_platform")
+                    });
                     return this;
                 }
 
@@ -1087,45 +1151,8 @@ namespace Generated.Requests
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
-            var authorized = req.Query;
-            var result = await service.QueryAsync(req);
-            foreach (var facet in authorized.Facets)
-            {
-                var membership = authorized.CloneForExecution();
-                membership.Facets.Clear();
-                membership.Relations.Clear();
-                membership.Orders.Clear();
-                membership.Aggregates.Clear();
-                membership.GroupFields.Clear();
-                membership.Projections.Clear();
-                membership.Project(facet.RelationName);
-                var membershipRows = (await service.QueryAsync(req.WithQuery(membership))).Rows;
-                var counts = membershipRows
-                    .Where(row => row.TryGetValue(facet.RelationName, out var value) && value.Raw != null)
-                    .GroupBy(row => Convert.ToString(row[facet.RelationName].Raw)!)
-                    .ToDictionary(group => group.Key, group => group.Count());
-
-                var nested = facet.Query.CloneForExecution();
-                nested.Facets.Clear();
-                var countAliases = nested.Aggregates
-                    .Where(aggregate => aggregate.Function == AggregateFunction.Count)
-                    .Select(aggregate => aggregate.Alias).ToArray();
-                nested.Aggregates.Clear();
-                nested.GroupFields.Clear();
-                var facetRows = (await service.QueryAsync(req.WithQuery(nested))).Rows;
-                var decorated = new SmartList<Record>();
-                foreach (var row in facetRows)
-                {
-                    var key = row.TryGetValue("id", out var id) ? Convert.ToString(id.Raw) : null;
-                    var count = key != null && counts.TryGetValue(key, out var value) ? value : 0;
-                    if (!facet.IncludeAllFacets && count == 0) continue;
-                    foreach (var alias in countAliases.Length == 0 ? new[] { "count" } : countAliases)
-                        row[alias] = new Value.I64Value(count);
-                    decorated.Add(row);
-                }
-                result.Facets[facet.Name] = decorated;
-            }
-            return result;
+            // The runtime owns authorized membership, recursive Facets and SQL provenance.
+            return await service.QueryAsync(req);
         }
 
         private async Task<QueryResult> ExecuteForOneInternalAsync(UserContext context)
@@ -1138,65 +1165,32 @@ namespace Generated.Requests
             return await service.QueryAsync(req);
         }
 
-        private async Task<OrderStatusPage> ExecuteForPageInternalAsync(
-            UserContext context, int offset, int limit)
+        private async Task<SmartList<Record>> ExecuteForListWithMetadataInternalAsync(
+            UserContext context)
         {
             EnsureIntent();
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
-            if (limit is < 1 or > 10_000) throw new ArgumentOutOfRangeException(nameof(limit));
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
-            query.Offset(offset);
-            query.Limit(limit);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var authorized = req.Query;
-            var result = await service.QueryAsync(req);
-            long totalCount;
-            if (authorized.IdSetPagination != null && context.IdSetCountAccuracy == "EXACT")
-            {
-                totalCount = checked((long)context.IdSetCount);
-            }
-            else
-            {
-                var countQuery = authorized.CloneForExecution();
-                countQuery.Projection.Clear();
-                countQuery.ExprProjection.Clear();
-                countQuery.RelationLoads.Clear();
-                countQuery.RelationAggregates.Clear();
-                countQuery.OrderByItems.Clear();
-                countQuery.GroupByItems.Clear();
-                countQuery.AggregateItems.Clear();
-                countQuery.Slice = null;
-                countQuery.IdSetPagination = null;
-                countQuery.Aggregate("Count", "id", "count");
-                var countResult = await service.QueryAsync(req.WithQuery(countQuery));
-                totalCount = countResult.Rows.Count == 0
-                    ? 0L : Convert.ToInt64(countResult.Rows[0]["count"].Raw);
-            }
-            var rows = new SmartList<Generated.Models.OrderStatus>();
-            var queryRoot = new EntityRoot();
-            foreach (var row in result.Rows)
-                rows.Add(Generated.Models.OrderStatus.FromRecord(row, queryRoot));
-            return new OrderStatusPage(rows, totalCount);
+            var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (_countRequested)
+                return await RuntimeDataService.FetchPageAsync(service, context, request);
+            var result = await service.QueryAsync(request);
+            return new SmartList<Record>(result.Rows) { Facets = result.Facets };
         }
 
-        private async IAsyncEnumerable<Generated.Models.OrderStatus> ExecuteForStreamInternalAsync(
+        private IAsyncEnumerable<Generated.Models.OrderStatus> ExecuteForStreamInternalAsync(
             UserContext context,
             int chunkSize,
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
-            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
-            await foreach (var chunk in streaming.QueryStreamAsync(
-                req, chunkSize, cancellationToken).WithCancellation(cancellationToken))
-            {
-                var queryRoot = new EntityRoot();
-                foreach (var row in chunk.Rows)
-                    yield return Generated.Models.OrderStatus.FromRecord(row, queryRoot);
-            }
+            var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            return RuntimeDataService.StreamEntities(context, request,
+                row => Generated.Models.OrderStatus.FromRecord(row, new EntityRoot()),
+                chunkSize, cancellationToken);
         }
 
         private void EnsureIntent()
@@ -1210,7 +1204,7 @@ namespace Generated.Requests
     {
         private readonly Func<UserContext, Task<QueryResult>> _executeForRows;
         private readonly Func<UserContext, Task<QueryResult>> _executeForOne;
-        private readonly Func<UserContext, int, int, Task<OrderStatusPage>> _executeForPage;
+        private readonly Func<UserContext, Task<SmartList<Record>>> _executeForList;
         private readonly Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.OrderStatus>> _executeForStream;
         private readonly Action<string> _comment;
         private readonly Action _ensureIntent;
@@ -1218,14 +1212,14 @@ namespace Generated.Requests
         internal ExecutableOrderStatusRequest(
             Func<UserContext, Task<QueryResult>> executeForRows,
             Func<UserContext, Task<QueryResult>> executeForOne,
-            Func<UserContext, int, int, Task<OrderStatusPage>> executeForPage,
+            Func<UserContext, Task<SmartList<Record>>> executeForList,
             Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.OrderStatus>> executeForStream,
             Action<string> comment,
             Action ensureIntent)
         {
             _executeForRows = executeForRows;
             _executeForOne = executeForOne;
-            _executeForPage = executeForPage;
+            _executeForList = executeForList;
             _executeForStream = executeForStream;
             _comment = comment;
             _ensureIntent = ensureIntent;
@@ -1248,18 +1242,16 @@ namespace Generated.Requests
 
         public async Task<SmartList<Generated.Models.OrderStatus>> ExecuteForListAsync(UserContext context)
         {
-            var result = await ExecuteForRowsAsync(context);
-            var entities = new SmartList<Generated.Models.OrderStatus>();
-            var queryRoot = new EntityRoot();
-            foreach (var row in result.Rows)
-                entities.Add(Generated.Models.OrderStatus.FromRecord(row, queryRoot));
+            var result = await _executeForList(context);
+            var entities = new SmartList<Generated.Models.OrderStatus>() {
+                TotalCount = result.TotalCount, Aggregations = result.Aggregations,
+                Summary = result.Summary, Facets = result.Facets
+            };
+            foreach (var row in result)
+                entities.Add(Generated.Models.OrderStatus.FromRecord(row, new EntityRoot()));
             entities.Facets = result.Facets;
             return entities;
         }
-
-        public Task<OrderStatusPage> ExecuteForPageAsync(
-            UserContext context, int offset, int limit)
-            => _executeForPage(context, offset, limit);
 
         public IAsyncEnumerable<Generated.Models.OrderStatus> ExecuteForStreamAsync(
             UserContext context,
@@ -1277,12 +1269,4 @@ namespace Generated.Requests
         }
     }
 
-    public sealed class OrderStatusPage
-    {
-        public SmartList<Generated.Models.OrderStatus> Rows { get; }
-        public long TotalCount { get; }
-        public OrderStatusPage(
-            SmartList<Generated.Models.OrderStatus> rows, long totalCount)
-        { Rows = rows; TotalCount = totalCount; }
-    }
 }

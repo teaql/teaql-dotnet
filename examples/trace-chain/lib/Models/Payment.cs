@@ -9,12 +9,10 @@ namespace Generated.Models
 
     public class Payment
     {
+        public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
-        private QueryProjectionSnapshot _queryProjections = QueryProjectionSnapshot.Empty;
-        public Value QueryProjection(string alias) => _queryProjections.Get(alias);
-        public bool HasQueryProjection(string alias) => _queryProjections.Contains(alias);
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("Payment", Id ?? _ledgerId);
@@ -48,7 +46,7 @@ namespace Generated.Models
                 public string? ReferenceCode { get; set; }
                 public long? Version { get; set; }
                 public CustomerOrder? CustomerOrderEntity { get; set; }
-                public List<PaymentAttempt> PaymentAttemptList { get; } = new List<PaymentAttempt>();
+                public SmartList<PaymentAttempt> PaymentAttemptList { get; } = SmartList<PaymentAttempt>.Empty();
 
         private string? _comment;
         private bool _markedForDeletion;
@@ -107,13 +105,6 @@ namespace Generated.Models
         public static Payment FromRecord(Record record)
         {
             var entity = new Payment().MarkLoadedOnly();
-            entity._queryProjections = new QueryProjectionSnapshot(record, new[] {
-                "Id", "id",
-                "CustomerOrder", "customer_order",
-                "ReferenceCode", "reference_code",
-                "Version", "version",
-                "PaymentAttemptList", "payment_attempt_list",
-            });
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {
@@ -159,10 +150,20 @@ namespace Generated.Models
                         if (record.TryGetValue("PaymentAttemptList", out var paymentAttemptListValue))
                         {
                             entity.MarkLoaded("PaymentAttemptList");
+                            entity.PaymentAttemptList.IsLoaded = true;
                             if (paymentAttemptListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.PaymentAttemptList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.PaymentAttemptList.Add(global::Generated.Models.PaymentAttempt.FromRecord(row.Value));
+                            }
                         }
+            entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
+                "id", "customer_order", "reference_code", "version",
+                "Id", "CustomerOrder", "ReferenceCode", "Version",
+                "PaymentAttemptList"
+            });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
@@ -193,7 +194,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
-            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            if (changed)
             {
             if (!creating && !_markedForDeletion)
             {
