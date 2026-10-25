@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.Json.Nodes;
 
 namespace TeaQL.Core;
 
@@ -11,6 +12,9 @@ public sealed class DynamicPropertySnapshot
     public static DynamicPropertySnapshot Empty { get; } = new(new ReadOnlyDictionary<string,Value>(new Dictionary<string,Value>()));
     public Value? Get(string name) => values.TryGetValue(name,out var value) ? new QuerySnapshot().Data(value) : null;
     public bool Contains(string name) => values.ContainsKey(name);
+    /// <summary>A detached JSON view of query aliases, including explicit nulls.</summary>
+    public JsonObject ToJson() => new(values.Select(item =>
+        new KeyValuePair<string,JsonNode?>(item.Key,item.Value.ToJsonValue())));
     public static DynamicPropertySnapshot Capture(Record record,IEnumerable<string> modelFields)
     {
         var fixedFields = new HashSet<string>(modelFields,StringComparer.Ordinal);
