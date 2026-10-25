@@ -133,7 +133,13 @@ static class CheckerOverlapChecks
         good.OrderItemList.Add(goodChild); bad.OrderItemList.Add(badChild);
         if (!logging) context.DisableQuerySqlLog().DisableMutationSqlLog();
         Clear(capture, sink, transport);
-        var pause = capture.PauseNextBegin();
+        // Instrument the installed runtime clock, not a generated API. Restore
+        // the identical configured clock; never replace it with system time.
+        var originalClock = (IBusinessClock)(typeof(UserContext)
+            .GetField("_businessClock", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(context)
+            ?? throw new Exception("Runtime business clock instrumentation missing"));
+        using var pause = new CheckerOverlapClock(originalClock);
+        context.WithBusinessClock(pause);
         var callers = new ConcurrentQueue<UserContext>();
         async Task<CheckException?> Save(CustomerOrder entity, string reason)
         {
@@ -142,7 +148,7 @@ static class CheckerOverlapChecks
             catch (CheckException failure) { return failure; }
         }
         Task<CheckException?> first; Task<CheckException?> second;
-        first = Save(rejectedFirst ? bad : good, rejectedFirst ? "reject incomplete graph" : "accept checked graph");
+        first = Task.Run(() => Save(rejectedFirst ? bad : good, rejectedFirst ? "reject incomplete graph" : "accept checked graph"));
         try
         {
             await pause.Entered.Task.WaitAsync(TimeSpan.FromSeconds(10));
@@ -150,9 +156,9 @@ static class CheckerOverlapChecks
             Verify.That(!first.IsCompleted && !second.IsCompleted, "two public saves overlap on the same Context");
             Verify.Equal(2, callers.Count, "both public SaveAsync calls started");
             Verify.That(callers.All(value => ReferenceEquals(value, context)), "both public calls use original Context identity");
-            Verify.Equal(1, capture.BeginCount, "second save waits on the Context transaction/checker gate");
+            Verify.Equal(0, capture.BeginCount, "input admission precedes every transaction, including the accepted graph");
         }
-        finally { pause.Release.TrySetResult(); }
+        finally { pause.Release(); context.WithBusinessClock(originalClock); }
         var results = await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(15));
         var accepted = results[rejectedFirst ? 1 : 0];
         var rejected = results[rejectedFirst ? 0 : 1];
@@ -163,9 +169,9 @@ static class CheckerOverlapChecks
         Verify.That(rejected.Violations.Any(value => value.RuleId.Equals("required", StringComparison.OrdinalIgnoreCase)
             && value.Location.Segments.LastOrDefault() is ObjectLocationSegment.Property { Name: "name" }),
             "real generated required-name rule rejects missing child input");
-        Verify.Equal(2, capture.BeginCount, "both serialized graph transactions were reached");
+        Verify.Equal(1, capture.BeginCount, "only the accepted graph opens a transaction");
         Verify.Equal(1, capture.CommitCount, "only accepted transaction commits");
-        Verify.Equal(1, capture.RollbackCount, "rejected Checker transaction rolls back");
+        Verify.Equal(0, capture.RollbackCount, "input rejection has no transaction to roll back");
         Verify.Equal(0, capture.ActiveTransactions, "both transactions finish before assertions");
         AssertAccepted(capture, sink, transport, logging, good, goodChild, "accept checked graph", "accept checked child", goodVersion);
         Verify.That(Ledger(good).IsEmpty && !Ledger(bad).IsEmpty, "accepted ledger clears while rejected changes remain pending");

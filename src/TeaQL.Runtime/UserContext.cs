@@ -592,6 +592,8 @@ public class UserContext
         _mutationPolicy.RecordPreflight(request);
     }
 
+    internal void DeclareGraphMutationRoot(string entityType) => _mutationPolicy.DeclareGraphRoot(entityType);
+
     internal IDisposable EnterMutationPolicyExecution(MutationRequest request) =>
         _mutationPolicy.EnterMutation(this, request);
 

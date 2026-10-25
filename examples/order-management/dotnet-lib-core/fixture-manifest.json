@@ -6,10 +6,10 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 8,
   "producerSource": {
-    "commit": "bef094a1d932d2ef22260b8c77db92665ddbf8ae",
-    "diff": "e13e65f56c7e737fcfebf0acb9aa202846d0f0064494d47b70bbfb2b1e2699e4",
-    "status": "5525f4a3e20a013bb870ac399395b95201c60c9e009423222c0dabe40a58568f",
-    "sourceContentsSha256": "7a9943de76bb3d8fc9fdd2d5e1c503095523bcc2402e501cb30afba734ff79f8",
+    "commit": "ebef725ccbd00f2b5b7119545810cd953b37a386",
+    "diff": "dee8bda8fd1652e516823fd31b0272adb45f02daa4fab42bd98c6e7c3afb50d8",
+    "status": "dc965bac5d04a212ac1a1d7bcc5c66221e0fb179701e9ab94a76362c90b913bc",
+    "sourceContentsSha256": "262f0d7a9ad38553849172884431f02e1f076cb1b4b9d815bf98fc16312b11c5",
     "retainedModels": [
       {
         "id": "conformance",
@@ -68,23 +68,23 @@
         "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c"
       }
     ],
-    "exporterProbeSha256": "bbe1f21bbafc5da0f69be05830dc69627e1bbb4a4cee3290e5a3a3178eec0ccc"
+    "exporterProbeSha256": "28ed6118a3440044db8e7bb519ae1628702d625e819fdf5de9a87b416c8d3177"
   },
-  "producerReceiptSha256": "ea6d63923b91344d6e726a86a8a56a596c1f143ea33ba74ae5a5b8b0a5ec12c4",
-  "generatedManifestSha256": "095a85dbd970a541f066bfcb4da8e713096c50a6c804cf799454fc1cc69936ff",
+  "producerReceiptSha256": "b3420e354a2e8826a8d760341c05ca6477b6f909a238bcac7d4e916ec057b84c",
+  "generatedManifestSha256": "e9cd8c004b235a0985743ff84d3305a6d27f3df6ec79ad384dda4cd1bc88734e",
   "files": {
     "Q.cs": "a8b1d8a5250a7d326bc4ba30f8a0e1e7f1c0278097b81d0c0b2321e33604a7c7",
     "E.cs": "826aa009f8be5ed7f15258c8c965114e96dbcc31ab8ff03fc549237a75758292",
     "teaql-i18n.json": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135",
     "GeneratedSearchModels.cs": "35c79fed4eeaae2d087c9525711a811dd37621df56836850eabae3450d681687",
     "order-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "Models/CommercePlatform.cs": "856e3087a40c723d6590782c9a57eb748590ba6cbdc6680657c19acd48089873",
-    "Models/Customer.cs": "558f05483a75c14545793b51546f14f7d67f4ed3743a293faa49cf593d59236e",
-    "Models/OrderStatus.cs": "d21e704d3a091390d294ade497f7025b76af31c45abd2f51452448c895a4d3d3",
-    "Models/CustomerOrder.cs": "fe10647be80b41ded9ee87b2e8b2131b60ffb59a8b42f20a9c4ed42a732b7329",
-    "Models/Product.cs": "b978e40961003ccfd865c78574451cb5c9478cf5789864fc979328501b7c1aa5",
-    "Models/OrderLine.cs": "4adaaf48288ea8217d8942f1942779a338af5b554de44d213767369077f519ff",
-    "Models/OrderSearchPreset.cs": "d5fd46becbfede1126649f9e3be510f4c6444668e65b16470863f16298856885",
+    "Models/CommercePlatform.cs": "1f0080a4cd782165ad01f480116a5fcf8fba1ee24a4a18db1aa0114f415572e6",
+    "Models/Customer.cs": "0dfc094d60a3c0f1e15b09857caad790f49f524ff75d9906068d0ced80be4d33",
+    "Models/OrderStatus.cs": "149ef3903222c5598ff702440aad425e55373b6676a040e98fb16df7de548ea4",
+    "Models/CustomerOrder.cs": "47d501ec3629728799a0378513b5cd3010a901c2849cf1af990c0ce880b41b66",
+    "Models/Product.cs": "427e4d1bbc6d1c1cccbec051ce9e8726f719e1612ea401e073d0b201bfbf1d6e",
+    "Models/OrderLine.cs": "a2f2dc4bcafe97b9fee51d8ebfb673bb61b2007cb04e74735a2f98783c4f19f9",
+    "Models/OrderSearchPreset.cs": "b5649ff8f2c6c6d85e274933479c64c6c2d015e627ab40ba95ffc85439a2492b",
     "GeneratedRuntimeModule.cs": "a8f7218f51b820ae384064208df00201ea115171ad1d9e776839f68fe3dcc19d",
     "Requests/CommercePlatformRequest.cs": "45474a91142b6b18a8b5e717bdfd47839de2c7024cde1378b1388cea2b8c769e",
     "Requests/CustomerRequest.cs": "001e47e42fbdfc11fa96bce86b8d9db4231fcf48716c4ef84e10a9405c3e167a",
@@ -94,5 +94,5 @@
     "Requests/OrderLineRequest.cs": "06e3f31d9661961c234617e81b0a9ffa25bbcafa8db492415fe7b41427916d5c",
     "Requests/OrderSearchPresetRequest.cs": "034c53ae23e1251fd18908e66e8432205eba9ce74874516fd9b0a4e14f559480"
   },
-  "previousFixtureManifestSha256": "7865574ea81fc9e2c82d3cc901c6f7f45fb1fe4290b1dfaba80d673185fc7df7"
+  "previousFixtureManifestSha256": "01e54a59220061e153bb3b28219e8b132af5c802ed37e10c35ddfe8e872067f2"
 }

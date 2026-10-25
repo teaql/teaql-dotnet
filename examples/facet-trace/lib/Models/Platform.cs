@@ -193,15 +193,21 @@ namespace Generated.Models
             var intent = new MutationIntent(_comment);
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
+                graph.DeclareRootEntity("Platform");
                 if (!Id.HasValue || _teaqlForceCreate)
                 {
                 }
+                TeaqlPrepareInputGraph(context, graph);
+                await Task.CompletedTask;
+            }, async graph =>
+            {
+                await TeaqlReserveGraphIdentitiesAsync(graph);
                 TeaqlPreflightGraph(context, graph);
                 return await TeaqlSaveWithinGraphAsync(context, graph);
             });
         }
 
-        internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
+        internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
@@ -230,14 +236,14 @@ namespace Generated.Models
                 var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
                 if (originalVersion.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            graph.Preflight(TeaqlMutationRequest(command, graph.Intent.Comment));
+            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment));
             }
             for (var index = 0; index < SchoolTypeList.Count; index++)
             {
                 var child = SchoolTypeList[index];
                 child.AttachRoot(_entityRoot);
                 if (child.Platform != (Id ?? _ledgerId)) child.UpdatePlatformId(Id ?? _ledgerId);
-                try { child.TeaqlPreflightGraph(context, graph); }
+                try { child.TeaqlPrepareInputGraph(context, graph); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("school_type_list").Index(index);
@@ -250,7 +256,7 @@ namespace Generated.Models
                 var child = SchoolList[index];
                 child.AttachRoot(_entityRoot);
                 if (child.Platform != (Id ?? _ledgerId)) child.UpdatePlatformId(Id ?? _ledgerId);
-                try { child.TeaqlPreflightGraph(context, graph); }
+                try { child.TeaqlPrepareInputGraph(context, graph); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("school_list").Index(index);
@@ -260,17 +266,37 @@ namespace Generated.Models
             }
         }
 
-        internal async Task<Platform> TeaqlSaveWithinGraphAsync(UserContext context,
-            GraphMutationSession graph, MutationTraceScope? parentScope = null)
+        internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
-            var creating = !this.Id.HasValue || _teaqlForceCreate;
-            if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
+            if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+                graph.PreflightPrepared(this);
+            for (var index = 0; index < SchoolTypeList.Count; index++)
             {
-                var cleanScope = graph.Scope("Platform",
-                    Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
-                await TeaqlSaveChildrenAsync(context, graph, cleanScope);
-                return this;
+                try { SchoolTypeList[index].TeaqlPreflightGraph(context, graph); }
+                catch (CheckException error)
+                {
+                    var prefix = ObjectLocation.Property("school_type_list").Index(index);
+                    throw new CheckException(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                }
             }
+            for (var index = 0; index < SchoolList.Count; index++)
+            {
+                try { SchoolList[index].TeaqlPreflightGraph(context, graph); }
+                catch (CheckException error)
+                {
+                    var prefix = ObjectLocation.Property("school_list").Index(index);
+                    throw new CheckException(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                }
+            }
+        }
+
+        internal async Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        {
+            var creating = !Id.HasValue || _teaqlForceCreate;
+            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            {
             var teaqlOriginalKey = TeaqlEntityKey();
             var teaqlOriginalLedgerId = _ledgerId;
             var teaqlOriginalMarkedForDeletion = _markedForDeletion;
@@ -306,24 +332,33 @@ namespace Generated.Models
             });
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
-            if (creating && !Id.HasValue)
+            if (creating)
             {
                 var allocationKey = TeaqlEntityKey();
-                Id = checked((long)await graph.AllocateIdAsync("Platform"));
+                Id = checked((long)await graph.ReservePreparedIdAsync(this));
+                _teaqlForceCreate = true;
                 _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
+            }
+            }
+            foreach (var child in SchoolTypeList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
+            foreach (var child in SchoolList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
+            await Task.CompletedTask;
+        }
+
+        internal async Task<Platform> TeaqlSaveWithinGraphAsync(UserContext context,
+            GraphMutationSession graph, MutationTraceScope? parentScope = null)
+        {
+            var creating = !this.Id.HasValue || _teaqlForceCreate;
+            if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
+            {
+                var cleanScope = graph.Scope("Platform",
+                    Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
+                await TeaqlSaveChildrenAsync(context, graph, cleanScope);
+                return this;
             }
             var scope = graph.Scope("Platform",
                 Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
-            var cmd = _markedForDeletion ? (object)ToDeleteCommand()
-                : creating ? (object)ToInsertCommand()
-                : (object)ToUpdateCommand();
-            if (!creating && !_markedForDeletion) {
-                ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
-                var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
-                if (originalVersion.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(originalVersion.Value);
-            }
-            var req = TeaqlMutationRequest(cmd, graph.Intent.Comment);
-            var mutationResult = await graph.MutateAsync(req, scope);
+            var mutationResult = await graph.MutatePreparedAsync(this, scope);
             if (mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for Platform");
             var saved = FromRecord(mutationResult.PersistedRecord);

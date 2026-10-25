@@ -4,7 +4,7 @@ using TeaQL.DataService;
 namespace TeaQL.Runtime;
 
 /// <summary>Internal adapter capability explicitly passed to generated graph saves.</summary>
-public sealed class GraphMutationSession
+public sealed partial class GraphMutationSession
 {
     private readonly UserContext _context;
     private ITransaction? _transaction;
@@ -118,7 +118,11 @@ public sealed class GraphMutationSession
         if (errors.Count > 0) throw new AggregateException("Graph rollback callbacks failed", errors);
     }
 
-    internal void Close() => _active = false;
+    internal void Close()
+    {
+        _active = false;
+        ClearPreparedMutations();
+    }
 }
 
 public sealed class GraphCommittedException(IReadOnlyList<Exception> errors)

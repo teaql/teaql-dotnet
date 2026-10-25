@@ -207,6 +207,15 @@ public sealed class MutationPolicyRuntimeState
         _active.Value = null;
     }
 
+    internal void DeclareGraphRoot(string entityType)
+    {
+        if (!_graphActive || _graphReviewed || _preflight.Count != 0 || string.IsNullOrWhiteSpace(entityType))
+            throw new MutationPolicyException("Graph root must be declared before operation preflight");
+        if (_preflightRootEntity != null && _preflightRootEntity != entityType)
+            throw new MutationPolicyException("Graph root cannot change during a save");
+        _preflightRootEntity = entityType;
+    }
+
     internal void RecordPreflight(MutationRequest request)
     {
         if (!_graphActive) return;

@@ -261,7 +261,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
         _context.ValidateGraphMutation(request, _graph);
-        _context.CheckAndFix(request);
+        if (_graph?.ConsumePreparedMutation(request) != true) _context.CheckAndFix(request);
         request.InheritedIntentValues = request.InheritedIntentValues
             .Concat(LoadedPrivateValues(request, _context)).ToArray();
         using var mutationGovernance = _context.EnterMutationPolicyExecution(request);
