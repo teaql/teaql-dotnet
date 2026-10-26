@@ -1,4 +1,4 @@
-# Generated scalar fixture: exact SQLite values and typed entity JSON
+# Generated scalar fixture: exact values, canonical names and typed JSON
 
 Run from the repository root:
 
@@ -19,12 +19,40 @@ The 10 files under `generated/` are byte-exact evaluated output, scope `dotnet-l
 canonical `scalar_type_probe.xml`. The model and generated-file hashes are checked before
 and after every run. No generator service is needed to run the example; change
 the model and regenerate if that library needs to change. `Program.cs` and the
-outer project are application-owned. The retained generated project is evidence;
+outer project and the probe files are application-owned. The retained generated project is evidence;
 the outer project explicitly compiles the generated sources against this repo.
 `generated-provenance.json` records the exact producer source, receipt and model
 hashes. Regeneration is mechanical; application code does not edit the library.
-The latest refresh changes only `GeneratedRuntimeModule.cs`: modeled Integer fields
-carry explicit 32-bit range metadata, without narrowing Long, ID, version or FK.
+Modeled Integer fields carry explicit 32-bit range metadata, without narrowing
+Long, ID, version or FK. The relation-cache refresh changes only
+`Models/ScalarTypeProbe.cs`: relation-ID and constant helpers share the canonical
+setter. Replacing an ID invalidates the previous loaded target; assigning the
+same ID preserves it. The following `E.cs` refresh distinguishes a loaded null FK
+from a known FK whose target detail is missing or belongs to a different ID.
+Provenance records each evaluated producer.
+
+## Canonical names and graph rollback
+
+`CanonicalNames.cs` exercises the eight naming boundaries through actual generated
+Q/E and audited mutation APIs on a separate `<scalar database>.names.sqlite` file.
+Native C# method names and JSON profiles may differ, but the mutation ledger,
+Checker, Policy and audit records use canonical model keys such as
+`required_string` and `type_platform`. A model can explicitly declare a field
+ending in `_id`; there is no blanket suffix prohibition.
+
+Twelve deliberate malformed-ledger create/update inputs must fail before Checker,
+Policy, ID allocation, transaction or SQL. Two required-value failures verify both
+the canonical model path and JSON Pointer. Boundary counters are calibrated with
+successful native operations, not assumed active. Sparse E traversal must remain
+NotLoaded without database access; three JSON naming profiles retain typed targets
+and reject duplicate keys even when their values agree.
+
+For the graph case, a SQLite trigger rejects the second child's UPDATE after the
+first succeeds. The transaction must roll back the first write, emit no committed
+audit, and preserve pending changes. Retrying the same graph must commit both
+typed targets once, with canonical audit keys and the child's local reason.
+Each run prints a `DOTNET_CANONICAL_NAME` report and retains its compact JSON file. This is local-source evidence,
+not a claim of package acceptance or cross-runtime physical-schema compatibility.
 
 ## Exact integral admission and corrupt-read defense
 

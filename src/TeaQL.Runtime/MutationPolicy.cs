@@ -257,6 +257,8 @@ public sealed class MutationPolicyRuntimeState
     internal MutationGovernanceSnapshot Review(UserContext context, MutationPlan plan)
     {
         ValidatePlan(plan);
+        foreach (var operation in plan.Operations)
+            CanonicalMutationFields.Validate(context, operation.Entity, operation.ChangedValues);
         var policy = Registry?.Resolve(plan.RequestKey);
         MutationPolicySource source;
         MutationPolicyIdentity? identity;

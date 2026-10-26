@@ -103,6 +103,7 @@ Console.WriteLine($"PASS .NET generated scalar Decimal fresh={fresh} rows=3 vers
     + $"exact={precise.ToString(CultureInfo.InvariantCulture)} Q=PASS E=PASS Checker=PASS Mutation=PASS");
 await EntityJsonExample.RunAsync(database + ".json.sqlite");
 await IntegralRoundtrip.RunAsync(database + ".integer.sqlite");
+await CanonicalNames.RunAsync(database + ".names.sqlite");
 
 ScalarTypeProbe NewProbe(string name, decimal amount) => Q.ScalarTypeProbes()
     .Comment("prepare one generated scalar fixture").Purpose("verify exact provider storage").NewEntity(context)

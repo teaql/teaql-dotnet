@@ -564,12 +564,14 @@ public class UserContext
             RecoverMutationRequest recover => recover.Command.Entity,
             _ => ""
         };
+        CanonicalMutationFields.Validate(this, request);
         var descriptor = Metadata?.GetEntity(entity);
         var deferredReferences = IntegralScalarAdmission.CaptureDeferred(descriptor, request,
             ReferenceEquals(request.GraphOwner, _activeGraphSave) && _activeGraphSave?.IsPreparing == true);
         var violations = _checkers.TryGetValue(entity, out var checker)
             ? checker.CheckAndFix(this, request, _graphFixTime ?? BusinessTime).ToList()
             : new List<CheckResult>();
+        CanonicalMutationFields.Validate(this, request);
         // Runtime admission is independent of generated/custom checker presence.
         // Inspect final values after Fix, allowing a custom checker to repair them.
         var values = request switch

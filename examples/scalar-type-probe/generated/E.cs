@@ -402,7 +402,12 @@ namespace Generated
             var path = _path.Member("type_platform", "TypePlatform");
             if (_notLoaded != null) return new TypePlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new TypePlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("TypePlatformEntity"))
+            if (!_value.IsLoaded("TypePlatform"))
+                return new TypePlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "type_platform"));
+            if (_value.TypePlatform is null) return new TypePlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("TypePlatformEntity") || _value.TypePlatformEntity is null
+                || _value.TypePlatformEntity.Id != _value.TypePlatform)
                 return new TypePlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "type_platform"));
             return new TypePlatformExpression(_value.TypePlatformEntity, _root, path);

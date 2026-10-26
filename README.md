@@ -311,7 +311,7 @@ Request JSON is not allowed to replace those trusted capabilities.
 
 - [Runtime guide: modules, SPI and advanced verification](RUNTIME_GUIDE.md)
 - [School bootstrap example](examples/school-management/README.md)
-- [Generated scalar fixture and exact SQLite Decimal](examples/scalar-type-probe/README.md)
+- [Generated scalar fixture: exact values, canonical names and typed JSON](examples/scalar-type-probe/README.md)
 - [Context-owned Schema SPI example](examples/schema-customization/README.md)
 - [Context-owned internal ID allocator example](examples/internal-id-customization/README.md)
 - [Mutation Policy example](examples/mutation-policy)
