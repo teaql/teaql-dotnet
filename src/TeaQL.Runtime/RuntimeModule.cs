@@ -22,7 +22,8 @@ public class RuntimeModule
         IReadOnlyDictionary<string, Record> schemaSamples,
         IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> requiredFields,
         IReadOnlyDictionary<string, IReadOnlyList<RelationDescriptor>>? relations = null,
-        IReadOnlyDictionary<string, string>? tableNames = null)
+        IReadOnlyDictionary<string, string>? tableNames = null,
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? integer32Fields = null)
     {
         foreach (var entity in entities)
         {
@@ -39,6 +40,15 @@ public class RuntimeModule
                         property = property.NotNull();
                     if (string.Equals(field, "id", StringComparison.OrdinalIgnoreCase)) property = property.Id();
                     if (string.Equals(field, "version", StringComparison.OrdinalIgnoreCase)) property = property.Version();
+                    if (integer32Fields != null && integer32Fields.TryGetValue(entity, out var integerFields)
+                        && integerFields.Contains(field))
+                    {
+                        if (property.DataType != DataType.I64 || property.IsId || property.IsVersion
+                            || relations != null && relations.TryGetValue(entity, out var forwardRelations)
+                                && forwardRelations.Any(relation => !relation.IsMany && relation.LocalKeyValue == field))
+                            throw new ArgumentException("Integer32 metadata requires a modeled scalar integer field", nameof(integer32Fields));
+                        property = property.Int32();
+                    }
                     descriptor.Property(property);
                 }
             }

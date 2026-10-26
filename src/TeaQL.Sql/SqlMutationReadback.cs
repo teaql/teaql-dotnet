@@ -20,6 +20,8 @@ internal static class SqlMutationReadback
             correlation = statement.Correlation;
             started = DateTimeOffset.UtcNow;
             var rows = await transport.FetchAllSqlAsync(compiled);
+            var validate = SqlIntegralValues.ResultValidator(entity, refresh);
+            foreach (var candidate in rows) validate(candidate);
             statement.Success();
             count = rows.Count;
             var row = rows.SingleOrDefault()

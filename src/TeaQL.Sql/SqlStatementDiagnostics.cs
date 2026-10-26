@@ -180,6 +180,7 @@ internal static class SqlStatementDiagnostics
         request.Query.NormalizeGeneratedFilters().PrepareForList();
         var entity = schema.GetEntity(request.Query.Entity) ?? throw new SqlExecutorException($"unknown entity {request.Query.Entity}");
         var compiled = dialect.CompileSelect(entity, request.Query);
+        var validateIntegral = SqlIntegralValues.ResultValidator(entity, request.Query);
         if (request.DiagnosticObserver != null)
             request.IntentSource = CaptureQueryIntent(dialect, schema, request, compiled);
         using var statement = SqlExecutionObservation.Start(request, dialect.Kind.ToString().ToLowerInvariant(), DataServiceOperation.Query);
@@ -194,7 +195,9 @@ internal static class SqlStatementDiagnostics
         {
             try {
                 cancellationToken.ThrowIfCancellationRequested();
-                return await cursor!.MoveNextAsync().ConfigureAwait(false);
+                var available = await cursor!.MoveNextAsync().ConfigureAwait(false);
+                if (available) validateIntegral(cursor.Current);
+                return available;
             }
             catch (Exception ex) { terminalError = ex; outcome = ex is OperationCanceledException ? "cancelled" : "failure"; throw; }
         }

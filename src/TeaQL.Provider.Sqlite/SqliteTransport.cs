@@ -245,7 +245,9 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
                 p.Value = i.Value;
                 break;
             case Value.U64Value u:
-                p.Value = (long)u.Value; // Sqlite doesn't support ulong directly
+                if (u.Value > long.MaxValue)
+                    throw new ArgumentOutOfRangeException(nameof(value), "SQLite integer binding exceeds signed 64-bit storage.");
+                p.Value = (long)u.Value;
                 break;
             case Value.F64Value f:
                 if (!double.IsFinite(f.Value))

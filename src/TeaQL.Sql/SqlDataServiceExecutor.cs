@@ -84,12 +84,15 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         try
         {
             rows = await Transport.FetchAllSqlAsync(compiled);
+            var validate = SqlIntegralValues.ResultValidator(entityDesc, request.Query);
+            foreach (var row in rows) validate(row);
         }
         catch (Exception ex)
         {
             statement.Failure(ex);
             SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, correlation: statement.Correlation);
             if (ex is OperationCanceledException) throw;
+            if (ex is SqlExecutorException) throw;
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
         statement.Success();

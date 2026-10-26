@@ -17,6 +17,7 @@ if ((${#embedded_runtime_files[@]})); then
 fi
 
 runtime_source_root="${TeaQLRuntimeSourceRoot:-$repo}"
+node "$repo/scripts/verify-test-inventory.cjs"
 node "$repo/scripts/verify-generated-fixtures.cjs"
 inventory_evidence="${TEAQL_EXAMPLES_EVIDENCE_DIR:-$(mktemp -d -t teaql-dotnet-examples-evidence.XXXXXXXX)}"
 mkdir -p "$inventory_evidence"

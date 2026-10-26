@@ -15,8 +15,7 @@ ordering, exact equality, SUM/MIN/MAX and cursor hydration. An optional Decimal
 alternates between `0.10` and null while its version advances. The small fixture
 also carries the existing scalar types, including nullable typed Time.
 
-The 10 files under `generated/` are unchanged output from local generator commit
-`217e5483` (validated `CoreScalarFixtureExportTest`), scope `dotnet-lib-core` and
+The 10 files under `generated/` are byte-exact evaluated output, scope `dotnet-lib-core` and
 canonical `scalar_type_probe.xml`. The model and generated-file hashes are checked before
 and after every run. No generator service is needed to run the example; change
 the model and regenerate if that library needs to change. `Program.cs` and the
@@ -24,6 +23,26 @@ outer project are application-owned. The retained generated project is evidence;
 the outer project explicitly compiles the generated sources against this repo.
 `generated-provenance.json` records the exact producer source, receipt and model
 hashes. Regeneration is mechanical; application code does not edit the library.
+The latest refresh changes only `GeneratedRuntimeModule.cs`: modeled Integer fields
+carry explicit 32-bit range metadata, without narrowing Long, ID, version or FK.
+
+## Exact integral admission and corrupt-read defense
+
+`IntegralRoundtrip.cs` runs forty cases per round through the generated Q/E and
+audited mutation APIs on a separate `<scalar database>.integer.sqlite` file.
+Thirty-two invalid create/update Fix outputs and four native Integer overflows
+must fail before query, mutation, transaction or ID allocation. Four deliberate
+legacy-row corruptions must fail during Q readback with a field-specific,
+value-free error; the fixture restores those fields in `finally`.
+
+Four endpoint records retain exact Integer/Long values, loaded null and version
+one through Q, E and typed JSON, including `9007199254740993`. Each run also saves
+one fresh calibration entity through the generated API, so all provider counters
+are proven live even on the second run. Two runs therefore leave six rows, not
+four, in this dedicated database. This does not reset or alter the Decimal or
+typed-JSON databases. Native SQLite tests additionally cover stream rejection,
+empty aggregates, sparse projections and exact scaled-Decimal integer bindings.
+`DOTNET_INTEGRAL` records the complete case list and calibrated observations.
 
 ## Typed entity JSON
 

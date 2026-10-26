@@ -102,6 +102,7 @@ Require(audit.Events.Any(e => e.TryGetValue("changedFields", out var fields)
 Console.WriteLine($"PASS .NET generated scalar Decimal fresh={fresh} rows=3 version={reloaded!.Version} "
     + $"exact={precise.ToString(CultureInfo.InvariantCulture)} Q=PASS E=PASS Checker=PASS Mutation=PASS");
 await EntityJsonExample.RunAsync(database + ".json.sqlite");
+await IntegralRoundtrip.RunAsync(database + ".integer.sqlite");
 
 ScalarTypeProbe NewProbe(string name, decimal amount) => Q.ScalarTypeProbes()
     .Comment("prepare one generated scalar fixture").Purpose("verify exact provider storage").NewEntity(context)

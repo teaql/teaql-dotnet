@@ -13,6 +13,7 @@ public record PropertyDescriptor(
 )
 {
     public string ColumnNameString { get; init; } = string.IsNullOrEmpty(ColumnNameValue) ? Name : ColumnNameValue;
+    public bool IsInt32 { get; init; }
 
     public static PropertyDescriptor New(string name, DataType dataType)
     {
@@ -23,6 +24,7 @@ public record PropertyDescriptor(
     public PropertyDescriptor NotNull() => this with { Nullable = false };
     public PropertyDescriptor Id() => this with { IsId = true };
     public PropertyDescriptor Version() => this with { IsVersion = true };
+    public PropertyDescriptor Int32() => this with { IsInt32 = true };
 }
 
 public record RelationDescriptor(

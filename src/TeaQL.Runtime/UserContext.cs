@@ -564,6 +564,9 @@ public class UserContext
             RecoverMutationRequest recover => recover.Command.Entity,
             _ => ""
         };
+        var descriptor = Metadata?.GetEntity(entity);
+        var deferredReferences = IntegralScalarAdmission.CaptureDeferred(descriptor, request,
+            ReferenceEquals(request.GraphOwner, _activeGraphSave) && _activeGraphSave?.IsPreparing == true);
         var violations = _checkers.TryGetValue(entity, out var checker)
             ? checker.CheckAndFix(this, request, _graphFixTime ?? BusinessTime).ToList()
             : new List<CheckResult>();
@@ -581,6 +584,7 @@ public class UserContext
                     violations.Add(new CheckResult { RuleId = "invalid_type", EntityType = entity,
                         Location = ObjectLocation.Property(field),
                         Message = "Expected a finite Float/Double value" });
+        violations.AddRange(IntegralScalarAdmission.Check(descriptor, request, deferredReferences));
         TranslateCheckResults(violations);
         if (violations.Count != 0) throw new CheckException(violations);
     }

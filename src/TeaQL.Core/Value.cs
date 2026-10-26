@@ -76,7 +76,7 @@ public abstract record Value
     {
         I64Value(var v) => v,
         U64Value(var v) => v <= long.MaxValue ? (long)v : null,
-        DecimalValue(var v) => (long)v,
+        DecimalValue(var v) when v >= long.MinValue && v <= long.MaxValue && decimal.Truncate(v) == v => (long)v,
         _ => null
     };
 
@@ -84,9 +84,12 @@ public abstract record Value
     {
         U64Value(var v) => v,
         I64Value(var v) => v >= 0 ? (ulong)v : null,
-        DecimalValue(var v) => v >= 0 ? (ulong)v : null,
+        DecimalValue(var v) when v >= 0 && v <= ulong.MaxValue && decimal.Truncate(v) == v => (ulong)v,
         _ => null
     };
+
+    public int? TryI32() => TryI64() is { } value && value >= int.MinValue && value <= int.MaxValue
+        ? (int)value : null;
 
     public decimal? TryDecimal() => this switch
     {
@@ -169,8 +172,8 @@ public abstract record Value
 
     public Value EntityIdValue() => this switch
     {
-        I64Value(var v) => new U64Value((ulong)v),
-        DecimalValue(var v) => new U64Value((ulong)v),
+        I64Value(var v) when v >= 0 => new U64Value((ulong)v),
+        DecimalValue when TryU64() is { } v => new U64Value(v),
         TextValue(var v) => ulong.TryParse(v, out var result) ? new U64Value(result) : this,
         _ => this
     };

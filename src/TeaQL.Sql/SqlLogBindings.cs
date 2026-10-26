@@ -44,7 +44,7 @@ public static class SqlLogBindings
         values.Add(value);
     }
     public static void AddField(List<Value> values, EntityDescriptor entity, PropertyDescriptor property, Value value) =>
-        Add(values, value, Field(entity, property.Name));
+        Add(values, SqlIntegralValues.Bind(property, value), Field(entity, property.Name));
 
     public static SqlParameterLogPolicy Field(EntityDescriptor entity, string name)
     {

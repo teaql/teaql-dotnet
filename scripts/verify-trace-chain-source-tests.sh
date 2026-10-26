@@ -2,6 +2,7 @@
 # Distinct result directories prevent parallel solution TRX files from overwriting each other.
 set -euo pipefail
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+node "$repo/scripts/verify-test-inventory.cjs"
 results="${1:?pass a retained test result directory}"
 shift
 mapfile -t projects < <(rg --files "$repo/src" "$repo/tests" -g '*Tests.csproj' | LC_ALL=C sort)

@@ -15,6 +15,7 @@ public sealed partial class GraphMutationSession
     private readonly List<Value> _intentValues = new();
     private bool _active = true;
     public MutationIntent Intent { get; }
+    internal bool IsPreparing => _active && _transaction == null;
 
     internal GraphMutationSession(UserContext context, MutationIntent intent)
     {
