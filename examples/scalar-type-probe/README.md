@@ -135,6 +135,10 @@ Checker/Fix processing. A proven empty final graph retains its projection,
 version and lineage, and performs no provider call, policy review or mutation
 audit. Raw invalid keys are rejected before normalization; unknown originals
 remain pending instead of being mistaken for loaded nulls.
+Model-declared immutable fields must pass update admission even when their
+supplied value equals the original. Normalization cannot turn a forbidden
+Business ID assignment into an accepted no-op; the generated Business ID
+workspace lifecycle test covers that separate model.
 
 The example also retains a different real edit and fixed Business Clock time,
 Decimal-scale and signed-zero mutation intent, a dirty child beneath a restored

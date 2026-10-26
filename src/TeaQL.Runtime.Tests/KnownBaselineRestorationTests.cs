@@ -79,11 +79,57 @@ public class KnownBaselineRestorationTests
         }));
     }
 
+    [Theory]
+    [InlineData("ORD-1")] [InlineData("ORD-2")]
+    public async Task ImmutableFieldsAreRejectedEvenWhenEqualBeforeDiscardingAnything(string value)
+    {
+        var key = new EntityKey("Probe", 1); var root = new EntityRoot(); root.SetOriginalVersion(key, 7);
+        root.Set(key, "amount", new Value.I64Value(37)); root.Set(key, "business_number", new Value.TextValue(value));
+        var original = Snapshot(key).CopyValues(); original["business_number"] = new Value.TextValue("ORD-1");
+        var error = await Assert.ThrowsAsync<CheckException>(() => Prepare(graph => graph.DiscardRestoredFields(
+            "Probe", root, key, new LoadedScalarSnapshot(key, original))));
+        Assert.Equal("BUSINESS_ID_IMMUTABLE", Assert.Single(error.Violations).RuleId);
+        Assert.Equal(2, root.Change(key).Count);
+    }
+
+    [Fact]
+    public async Task ImmutableAfterCreateStillAllowsNewObjectInitialization()
+    {
+        var key = new EntityKey("Probe", 1); var root = new EntityRoot(); root.MarkAsNew(key);
+        root.Set(key, "business_number", new Value.TextValue("ORD-1"));
+        await Prepare(graph => graph.DiscardRestoredFields("Probe", root, key, Snapshot(key)));
+        Assert.True(root.IsNew(key)); Assert.True(root.Change(key).ContainsKey("business_number"));
+    }
+
+    [Theory]
+    [InlineData("missing")] [InlineData("BusinessNumber")]
+    public void GeneratedImmutableMetadataMustUseCanonicalModeledKeys(string field)
+    {
+        var error = Assert.Throws<ArgumentException>(() => MetadataModule(field));
+        Assert.Equal("immutableUpdateFields", error.ParamName);
+    }
+
+    [Fact]
+    public void GeneratedImmutableMetadataRetainsTheScalarTypeAndRuleIdentity()
+    {
+        var property = MetadataModule("business_number").Metadata.GetEntity("Probe")!.PropertyByName("business_number")!;
+        Assert.Equal(DataType.Text, property.DataType);
+        Assert.Equal("BUSINESS_ID_IMMUTABLE", property.ImmutableAfterCreateRuleId);
+        Assert.Throws<ArgumentException>(() => property.ImmutableAfterCreate(" "));
+    }
+
+    private static RuntimeModule MetadataModule(string field) => new(["Probe"], new Dictionary<string, IEntityChecker>(),
+        new Dictionary<string, Record> { ["Probe"] = new() { ["business_number"] = new Value.TextValue("ORD-1") } },
+        new Dictionary<string, IReadOnlyDictionary<string, bool>>(),
+        immutableUpdateFields: new Dictionary<string, IReadOnlyDictionary<string, string>> {
+            ["Probe"] = new Dictionary<string, string> { [field] = "BUSINESS_ID_IMMUTABLE" } });
+
     private static UserContext Context() => new RuntimeModule().Entity(EntityDescriptor.New("Probe")
         .Property(PropertyDescriptor.New("id", DataType.I64).Id())
         .Property(PropertyDescriptor.New("version", DataType.I64).Version())
         .Property(PropertyDescriptor.New("amount", DataType.I64))
         .Property(PropertyDescriptor.New("name", DataType.Text))
+        .Property(PropertyDescriptor.New("business_number", DataType.Text).ImmutableAfterCreate("BUSINESS_ID_IMMUTABLE"))
         .Property(PropertyDescriptor.New("unknown_original", DataType.Text))).IntoContext();
     private static Task<int> Prepare(Action<GraphMutationSession> prepare) => Context().ExecuteGraphSaveAsync(
         "normalize one trusted generated entity", graph => { prepare(graph); graph.SealPreparedGraph(); return Task.CompletedTask; },

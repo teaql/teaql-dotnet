@@ -23,7 +23,8 @@ public class RuntimeModule
         IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> requiredFields,
         IReadOnlyDictionary<string, IReadOnlyList<RelationDescriptor>>? relations = null,
         IReadOnlyDictionary<string, string>? tableNames = null,
-        IReadOnlyDictionary<string, IReadOnlyList<string>>? integer32Fields = null)
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? integer32Fields = null,
+        IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>? immutableUpdateFields = null)
     {
         foreach (var entity in entities)
         {
@@ -49,11 +50,16 @@ public class RuntimeModule
                             throw new ArgumentException("Integer32 metadata requires a modeled scalar integer field", nameof(integer32Fields));
                         property = property.Int32();
                     }
+                    if (immutableUpdateFields != null && immutableUpdateFields.TryGetValue(entity, out var immutable)
+                        && immutable.TryGetValue(field, out var ruleId)) property = property.ImmutableAfterCreate(ruleId);
                     descriptor.Property(property);
                 }
             }
             if (relations != null && relations.TryGetValue(entity, out var entityRelations))
                 foreach (var relation in entityRelations) descriptor.Relation(relation);
+            if (immutableUpdateFields != null && immutableUpdateFields.TryGetValue(entity, out var declaredImmutable)
+                && declaredImmutable.Keys.Any(field => descriptor.PropertyByName(field) == null))
+                throw new ArgumentException("Immutable metadata requires a canonical modeled field", nameof(immutableUpdateFields));
             Entity(descriptor);
         }
         foreach (var (entity, checker) in checkers) Checker(entity, checker);

@@ -14,6 +14,7 @@ public record PropertyDescriptor(
 {
     public string ColumnNameString { get; init; } = string.IsNullOrEmpty(ColumnNameValue) ? Name : ColumnNameValue;
     public bool IsInt32 { get; init; }
+    public string? ImmutableAfterCreateRuleId { get; init; }
 
     public static PropertyDescriptor New(string name, DataType dataType)
     {
@@ -25,6 +26,11 @@ public record PropertyDescriptor(
     public PropertyDescriptor Id() => this with { IsId = true };
     public PropertyDescriptor Version() => this with { IsVersion = true };
     public PropertyDescriptor Int32() => this with { IsInt32 = true };
+    public PropertyDescriptor ImmutableAfterCreate(string ruleId = "immutable")
+    {
+        if (string.IsNullOrWhiteSpace(ruleId)) throw new ArgumentException("An immutable field requires a rule ID", nameof(ruleId));
+        return this with { ImmutableAfterCreateRuleId = ruleId };
+    }
 }
 
 public record RelationDescriptor(

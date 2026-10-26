@@ -1,10 +1,10 @@
 {
   "schema": "teaql.generated-example-fixture/v1",
   "language": "dotnet",
-  "generatorCommit": "ef9e441931207aa759f4c660c0fe1c2bd865565e",
-  "generatorSourceContentsSha256": "132d5b776a7e9a3f673bf43810b9053710d2942548b207bb4af7963a2d9ac6ee",
+  "generatorCommit": "286b65b66c76c7243549791ad83acc1b155fa0dc",
+  "generatorSourceContentsSha256": "ac61668766336243ffbb6f54b1fd44034751490c14925801835969283a397b7a",
   "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
-  "producerReceiptSha256": "5847d4354ab93edbd88c8fa65b41e03688f73b05d26b8d63b3372ee78107e748",
+  "producerReceiptSha256": "650a94e399402dc534f4d14bf6ea18db1ec1a35dab63ced7253303d79058bb53",
   "producerManifestSha256": "aee85ca7a9354818268a17e0bf49fe9d3fdc6bdbc5f972c6ff60c02181ac7d4e",
   "files": {
     "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28",
