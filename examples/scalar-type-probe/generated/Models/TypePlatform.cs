@@ -194,6 +194,7 @@ namespace Generated.Models
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
+                graph.SealPreparedGraph();
                 await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
@@ -205,6 +206,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            graph.DiscardRestoredFields("TypePlatform", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
             if (changed)
@@ -364,13 +366,10 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
-
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
-
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
-
-            return new LoadedScalarSnapshot(record);
+                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
+                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
+                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
         }
 
         public InsertCommand ToInsertCommand()

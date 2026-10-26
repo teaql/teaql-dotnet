@@ -124,3 +124,22 @@ to an explicit, initially unused path to retain that database elsewhere.
 `TeaQLUseLocalPackages=true` is an opt-in for an isolated package-only
 consumer supplied with a local NuGet configuration; ordinary example runs do
 not use this mode.
+
+## Known-baseline restoration
+
+`BaselineRestoration.cs` uses a separate `<scalar database>.restore.sqlite`
+and executes 11 cases in each of the two rounds. Generated Q captures the
+persisted baseline; generated E verifies values and NotLoaded. Restoring a
+known value or loaded null cancels only that field, before completeness and
+Checker/Fix processing. A proven empty final graph retains its projection,
+version and lineage, and performs no provider call, policy review or mutation
+audit. Raw invalid keys are rejected before normalization; unknown originals
+remain pending instead of being mistaken for loaded nulls.
+
+The example also retains a different real edit and fixed Business Clock time,
+Decimal-scale and signed-zero mutation intent, a dirty child beneath a restored
+parent, and pending deletion. Calibrated provider/policy/audit/SQL counters
+distinguish no-ops from genuine writes; independent readonly SQLite queries
+verify the final rows. Signed-zero intent is not a claim about SQLite retaining
+the sign bit. This example does not qualify persistent dynamic fields, external
+transaction ownership or installed NuGet artifacts.

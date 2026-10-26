@@ -42,6 +42,7 @@ for round in 1 2; do
   fresh=True; version=2
   if [[ "$round" == 2 ]]; then fresh=False; version=3; fi
   rg -Fq "PASS .NET generated scalar Decimal fresh=$fresh rows=3 version=$version" "$evidence/round-$round.log"
+  rg -Fq 'PASS .NET known-baseline restoration cases=11' "$evidence/round-$round.log"
   sha256sum -c generated.sha256
 done
 echo "PASS .NET scalar example twice without cleanup; evidence: $evidence"

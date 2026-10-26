@@ -56,6 +56,20 @@ public sealed class EntityRoot
         lock (_gate) return _changes.TryGetValue(key, out var values) ? new Record(values) : new Record();
     }
 
+    // Runtime normalization discards only validated restored fields. Identity,
+    // optimistic version, lifecycle and lineage remain owned by this ledger.
+    internal void DiscardFields(EntityKey key, IReadOnlyDictionary<string, Value> restored)
+    {
+        lock (_gate)
+        {
+            if (!_changes.TryGetValue(key, out var values)) return;
+            foreach (var (field, expected) in restored)
+                if (values.TryGetValue(field, out var current) && LoadedScalarSnapshot.SameValue(current, expected))
+                    values.TryRemove(field, out _);
+            if (values.IsEmpty) _changes.TryRemove(key, out _);
+        }
+    }
+
     /// <summary>Import only a reached entity; neither drain nor adopt its source graph.</summary>
     public void MergeEntityFrom(EntityRoot other, EntityKey key)
     {

@@ -474,6 +474,7 @@ namespace Generated.Models
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
+                graph.SealPreparedGraph();
                 await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
@@ -485,6 +486,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            graph.DiscardRestoredFields("ScalarTypeProbe", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
             if (changed)
@@ -722,57 +724,33 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
-
-                    if (RequiredString != null) record["required_string"] = new Value.TextValue(RequiredString);
-
-                    if (OptionalString != null) record["optional_string"] = new Value.TextValue(OptionalString);
-
-                    if (LargeText != null) record["large_text"] = new Value.TextValue(LargeText);
-
-                    if (RequiredBoolean.HasValue) record["required_boolean"] = new Value.BoolValue(RequiredBoolean.Value);
-
-                    if (OptionalBoolean.HasValue) record["optional_boolean"] = new Value.BoolValue(OptionalBoolean.Value);
-
-                    if (RequiredInteger.HasValue) record["required_integer"] = new Value.I64Value(RequiredInteger.Value);
-
-                    if (OptionalInteger.HasValue) record["optional_integer"] = new Value.I64Value(OptionalInteger.Value);
-
-                    if (RequiredLong.HasValue) record["required_long"] = new Value.I64Value(RequiredLong.Value);
-
-                    if (OptionalLong.HasValue) record["optional_long"] = new Value.I64Value(OptionalLong.Value);
-
-                    if (RequiredDecimal.HasValue) record["required_decimal"] = new Value.DecimalValue(RequiredDecimal.Value);
-
-                    if (OptionalDecimal.HasValue) record["optional_decimal"] = new Value.DecimalValue(OptionalDecimal.Value);
-
-                    if (RequiredFloat.HasValue) record["required_float"] = new Value.F64Value(RequiredFloat.Value);
-
-                    if (OptionalFloat.HasValue) record["optional_float"] = new Value.F64Value(OptionalFloat.Value);
-
-                    if (RequiredDouble.HasValue) record["required_double"] = new Value.F64Value(RequiredDouble.Value);
-
-                    if (OptionalDouble.HasValue) record["optional_double"] = new Value.F64Value(OptionalDouble.Value);
-
-                    if (RequiredDate.HasValue) record["required_date"] = new Value.DateValue(RequiredDate.Value);
-
-                    if (OptionalDate.HasValue) record["optional_date"] = new Value.DateValue(OptionalDate.Value);
-
-                    if (RequiredTime.HasValue) record["required_time"] = new Value.TimeValue(RequiredTime.Value);
-
-                    if (OptionalTime.HasValue) record["optional_time"] = new Value.TimeValue(OptionalTime.Value);
-
-                    if (RequiredDatetime.HasValue) record["required_datetime"] = new Value.TimestampValue(new DateTimeOffset(RequiredDatetime.Value).ToUnixTimeMilliseconds());
-
-                    if (OptionalDatetime.HasValue) record["optional_datetime"] = new Value.TimestampValue(new DateTimeOffset(OptionalDatetime.Value).ToUnixTimeMilliseconds());
-
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
-
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
-
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
-
-            return new LoadedScalarSnapshot(record);
+                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
+                        if (IsLoaded("TypePlatform")) record["type_platform"] = TeaqlValue(TypePlatform);
+                        if (IsLoaded("RequiredString")) record["required_string"] = TeaqlValue(RequiredString);
+                        if (IsLoaded("OptionalString")) record["optional_string"] = TeaqlValue(OptionalString);
+                        if (IsLoaded("LargeText")) record["large_text"] = TeaqlValue(LargeText);
+                        if (IsLoaded("RequiredBoolean")) record["required_boolean"] = TeaqlValue(RequiredBoolean);
+                        if (IsLoaded("OptionalBoolean")) record["optional_boolean"] = TeaqlValue(OptionalBoolean);
+                        if (IsLoaded("RequiredInteger")) record["required_integer"] = TeaqlValue(RequiredInteger);
+                        if (IsLoaded("OptionalInteger")) record["optional_integer"] = TeaqlValue(OptionalInteger);
+                        if (IsLoaded("RequiredLong")) record["required_long"] = TeaqlValue(RequiredLong);
+                        if (IsLoaded("OptionalLong")) record["optional_long"] = TeaqlValue(OptionalLong);
+                        if (IsLoaded("RequiredDecimal")) record["required_decimal"] = TeaqlValue(RequiredDecimal);
+                        if (IsLoaded("OptionalDecimal")) record["optional_decimal"] = TeaqlValue(OptionalDecimal);
+                        if (IsLoaded("RequiredFloat")) record["required_float"] = TeaqlValue(RequiredFloat);
+                        if (IsLoaded("OptionalFloat")) record["optional_float"] = TeaqlValue(OptionalFloat);
+                        if (IsLoaded("RequiredDouble")) record["required_double"] = TeaqlValue(RequiredDouble);
+                        if (IsLoaded("OptionalDouble")) record["optional_double"] = TeaqlValue(OptionalDouble);
+                        if (IsLoaded("RequiredDate")) record["required_date"] = TeaqlValue(RequiredDate);
+                        if (IsLoaded("OptionalDate")) record["optional_date"] = TeaqlValue(OptionalDate);
+                        if (IsLoaded("RequiredTime")) record["required_time"] = TeaqlValue(RequiredTime);
+                        if (IsLoaded("OptionalTime")) record["optional_time"] = TeaqlValue(OptionalTime);
+                        if (IsLoaded("RequiredDatetime")) record["required_datetime"] = TeaqlValue(RequiredDatetime);
+                        if (IsLoaded("OptionalDatetime")) record["optional_datetime"] = TeaqlValue(OptionalDatetime);
+                        if (IsLoaded("CreateTime")) record["create_time"] = TeaqlValue(CreateTime);
+                        if (IsLoaded("UpdateTime")) record["update_time"] = TeaqlValue(UpdateTime);
+                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
         }
 
         public InsertCommand ToInsertCommand()

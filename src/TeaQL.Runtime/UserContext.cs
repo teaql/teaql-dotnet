@@ -262,11 +262,14 @@ public class UserContext
             try
             {
                 if (prepare != null) await prepare(session).ConfigureAwait(false);
-                transaction = await RequireResource<ITransactionExecutor>()
-                    .BeginTransactionAsync().ConfigureAwait(false);
-                session.AttachTransaction(transaction);
+                if (!session.IsSealedEmpty)
+                {
+                    transaction = await RequireResource<ITransactionExecutor>()
+                        .BeginTransactionAsync().ConfigureAwait(false);
+                    session.AttachTransaction(transaction);
+                }
                 result = await work(session).ConfigureAwait(false);
-                await transaction.CommitAsync().ConfigureAwait(false);
+                if (transaction != null) await transaction.CommitAsync().ConfigureAwait(false);
             }
             catch
             {

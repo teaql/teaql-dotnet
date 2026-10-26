@@ -104,6 +104,7 @@ Console.WriteLine($"PASS .NET generated scalar Decimal fresh={fresh} rows=3 vers
 await EntityJsonExample.RunAsync(database + ".json.sqlite");
 await IntegralRoundtrip.RunAsync(database + ".integer.sqlite");
 await CanonicalNames.RunAsync(database + ".names.sqlite");
+await BaselineRestoration.RunAsync(database + ".restore.sqlite");
 
 ScalarTypeProbe NewProbe(string name, decimal amount) => Q.ScalarTypeProbes()
     .Comment("prepare one generated scalar fixture").Purpose("verify exact provider storage").NewEntity(context)

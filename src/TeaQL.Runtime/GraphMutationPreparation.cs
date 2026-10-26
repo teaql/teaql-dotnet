@@ -17,6 +17,17 @@ public sealed partial class GraphMutationSession
     private readonly Dictionary<object, PreparedMutation> _prepared = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<EntityKey, Value> _assignedIds = new();
     private readonly HashSet<MutationRequest> _preparedDispatch = new(ReferenceEqualityComparer.Instance);
+    private bool _preparedGraphSealed;
+    internal bool IsSealedEmpty => _preparedGraphSealed && _prepared.Count == 0;
+
+    /// <summary>Called only after the generated traversal has visited every reached entity.</summary>
+    public void SealPreparedGraph()
+    {
+        RequireActive();
+        if (_transaction != null || _preparedGraphSealed)
+            throw new InvalidOperationException("GRAPH_INPUT_PREPARATION_CLOSED");
+        _preparedGraphSealed = true;
+    }
 
     /// <summary>The requested graph root is still the policy entry point when only its children change.</summary>
     public void DeclareRootEntity(string entityType)
@@ -31,7 +42,7 @@ public sealed partial class GraphMutationSession
     public void PrepareInput(object entity, MutationRequest request)
     {
         RequireActive(); ArgumentNullException.ThrowIfNull(entity);
-        if (_transaction != null) throw new InvalidOperationException("GRAPH_INPUT_PREPARATION_CLOSED");
+        if (_transaction != null || _preparedGraphSealed) throw new InvalidOperationException("GRAPH_INPUT_PREPARATION_CLOSED");
         if (_prepared.ContainsKey(entity)) throw new InvalidOperationException("GRAPH_ENTITY_ALREADY_PREPARED");
         if (request.LedgerKey == null || request.LedgerRoot == null)
             throw new InvalidOperationException("GRAPH_PREPARATION_REQUIRES_LEDGER");
