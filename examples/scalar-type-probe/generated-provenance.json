@@ -1,21 +1,21 @@
 {
   "schema": "teaql.generated-example-fixture/v1",
   "language": "dotnet",
-  "generatorCommit": "e7a918b84486edf57f23852c865222856ea8354f",
-  "generatorSourceContentsSha256": "aff643be3c869e9bb5a205e1cf19572494fc2207e29863eb6496d9aa5622ab76",
+  "generatorCommit": "650045fd6527cc097e9db1e07cedb5bd8e8e8ac0",
+  "generatorSourceContentsSha256": "0c9dddfcc27b3a25891d7cb7efc80961e9b9a402a3ba54749534bc1976e34c47",
   "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
-  "producerReceiptSha256": "2c996669be03fe0acdc7cee29881a53a6132866652d8fec6e267299f0012bf39",
-  "producerManifestSha256": "fe442d33c6f12fdb6272e5b9e2b7a205ee2a369864f18b9367c98d19302693d7",
+  "producerReceiptSha256": "ce34fe69bad0acd544f02471ef8dd9b615cd49186bd75b62d66e02b448b1e763",
+  "producerManifestSha256": "90d16af2e9b9104a2b86d427180b302a0931dad6ce118917f5a31208a88be57c",
   "files": {
+    "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28",
+    "Models/TypePlatform.cs": "5d6c7ea1190c3900c85a8a5e595d02c9df3951b3c6fc450ecc7e57d337380a24",
+    "Models/ScalarTypeProbe.cs": "5d54289bb9cfbbdb3089dd1c3c12fd329a3a8a9e8cb73b010c4007b84b7bcf72",
+    "GeneratedRuntimeModule.cs": "c8b1074f6da25d7eb5e946f78ff8ef252c1ec3309e285b88c80a74433ba7a389",
+    "E.cs": "3c436326ab27acfec433c379f09dfbdf6403a9c7bcb6e83a4ec12bf1a3d6ea03",
     "Requests/TypePlatformRequest.cs": "bf88131f1b096678f9485e04ba6f3177983b79f10b6068260a0bf4f6f2384e7e",
     "Requests/ScalarTypeProbeRequest.cs": "eb9d05c80ba689722b87a47e96978f82c1e0d50c4abd440d2b3fdfdcaed7649c",
-    "E.cs": "3c436326ab27acfec433c379f09dfbdf6403a9c7bcb6e83a4ec12bf1a3d6ea03",
-    "GeneratedRuntimeModule.cs": "c8b1074f6da25d7eb5e946f78ff8ef252c1ec3309e285b88c80a74433ba7a389",
-    "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
-    "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28",
     "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
     "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "Models/TypePlatform.cs": "5d6c7ea1190c3900c85a8a5e595d02c9df3951b3c6fc450ecc7e57d337380a24",
-    "Models/ScalarTypeProbe.cs": "4e07935e2de77503e202205de30af7743d87ab67c174bf9a6e8aabf35a86ac4c"
+    "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163"
   }
 }

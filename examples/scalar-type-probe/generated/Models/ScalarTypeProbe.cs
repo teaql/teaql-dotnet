@@ -920,6 +920,7 @@ namespace Generated.Models
 
                 public ScalarTypeProbe UpdateTypePlatform(long? value)
                 {
+                    if (this.TypePlatform != value) this.TypePlatformEntity = null;
                     this.TypePlatform = value;
                     MarkLoaded("TypePlatform");
                     _entityRoot.Set(TeaqlEntityKey(), "type_platform", TeaqlValue(value));
@@ -1119,19 +1120,15 @@ namespace Generated.Models
                 }
                 public ScalarTypeProbe UpdateTypePlatform(TypePlatform value)
                 {
-                    this.TypePlatform = value?.Id;
-                    MarkLoaded("TypePlatform");
-                    _entityRoot.Set(TeaqlEntityKey(), "type_platform", TeaqlValue(this.TypePlatform));
+                    UpdateTypePlatform(value?.Id);
+                    this.TypePlatformEntity = value;
                     return this;
                 }
 
 
                 public ScalarTypeProbe UpdateTypePlatformId(long? value)
                 {
-                    this.TypePlatform = value;
-                    MarkLoaded("TypePlatform");
-                    _entityRoot.Set(TeaqlEntityKey(), "type_platform", TeaqlValue(value));
-                    return this;
+                    return UpdateTypePlatform(value);
                 }
 
     }
