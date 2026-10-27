@@ -115,6 +115,12 @@ public class BlobUploadSqliteTests
             var reference = await service.CompleteAsync(actor, session.UploadId);
             Assert.Equal(session.Reference, reference);
             Assert.Equal(1, verifier.Calls);
+            Assert.Equal(reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal(1, verifier.Calls);
+            authorization.Allowed = false;
+            Assert.Equal("BLOB_UPLOAD_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, session.UploadId))).Message);
+            authorization.Allowed = true;
             Assert.Equal("uploaded_unbound", await Scalar(db,
                 "SELECT status FROM teaql_blob_catalog WHERE key=@key", reference.Key));
             await actor.ExecuteGraphSaveAsync("bind verified upload", async graph =>
@@ -130,6 +136,15 @@ public class BlobUploadSqliteTests
             });
             Assert.Equal("available", await Scalar(db,
                 "SELECT status FROM teaql_blob_catalog WHERE key=@key", reference.Key));
+            Assert.Equal(reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal(1, verifier.Calls);
+            var completedKey = await Scalar(db,
+                "SELECT object_key FROM teaql_blob_catalog WHERE key=@key", reference.Key);
+            await actor.ObjectStorage("replace completed generation").PutBytesAsync(new ObjectKey(completedKey),
+                bytes, new ObjectPutOptions(bytes.Length, ObjectWriteMode.Replace, "application/pdf"));
+            Assert.Equal("BLOB_UPLOAD_INCOMPLETE", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, session.UploadId))).Message);
+            Assert.Equal(1, verifier.Calls);
 
             var second = await service.BeginAsync(actor, target, input, "request-2");
             await service.WriteAsync(actor, second.UploadId, new MemoryStream(bytes));

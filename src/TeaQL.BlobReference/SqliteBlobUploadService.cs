@@ -295,6 +295,43 @@ public sealed class SqliteBlobUploadService
     public async Task<BlobRef> CompleteAsync(UserContext actor, string uploadId)
     {
         var row = await Row(actor, uploadId, "Confirm");
+        if (row.State == "completed")
+        {
+            if (row.WrittenSha256 == null || !Regex.IsMatch(row.WrittenSha256, "\\A[0-9a-f]{64}\\z") ||
+                string.IsNullOrEmpty(row.WrittenETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
+            List<Record> records;
+            try { records = await _catalog.Transport.FetchAllSqlAsync(Query("""
+                SELECT object_key,content_version,content_type,size_bytes,status
+                FROM teaql_blob_catalog WHERE key=@p0 AND scope=@p1
+                """, Text(row.Key), Text(row.Scope))); }
+            catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+            if (records.Count != 1) throw Error("BLOB_UPLOAD_INCOMPLETE");
+            var catalog = records[0];
+            var location = catalog.GetValueOrDefault("object_key")?.TryText();
+            var version = catalog.GetValueOrDefault("content_version")?.TryText();
+            var contentType = catalog.GetValueOrDefault("content_type")?.TryText();
+            var size = catalog.GetValueOrDefault("size_bytes")?.TryI64();
+            var status = catalog.GetValueOrDefault("status")?.TryText();
+            var mime = BlobFieldSpec.MimeForExtension(row.Extension);
+            if (location == null || version != row.WrittenETag || contentType != mime ||
+                size != row.DeclaredSize || status is not ("uploaded_unbound" or "available"))
+                throw Error("BLOB_UPLOAD_INCOMPLETE");
+            ObjectKey replayKey;
+            try { replayKey = new ObjectKey(location); }
+            catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+            ObjectStorage replayStore;
+            try { replayStore = actor.ObjectStorage("recheck completed Blob upload"); }
+            catch { throw Error("BLOB_STORE_FAILED"); }
+            ObjectMetadata? metadata;
+            try { metadata = await replayStore.HeadAsync(replayKey); }
+            catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+            if (metadata == null || metadata.Size != row.DeclaredSize || metadata.ETag != version)
+                throw Error("BLOB_UPLOAD_INCOMPLETE");
+            await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Confirm",
+                new BlobUploadInput(row.FileName, row.DeclaredSize, mime), row.Scope);
+            if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
+            return new BlobRef(row.Key);
+        }
         if (row.State != "written" || string.IsNullOrEmpty(row.WrittenSha256) ||
             string.IsNullOrEmpty(row.WrittenETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
         var key = await ObjectKey(row);
