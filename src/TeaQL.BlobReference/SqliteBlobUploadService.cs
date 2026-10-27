@@ -500,6 +500,9 @@ public sealed class SqliteBlobUploadService
                 }
                 finally { reader.Release(); }
             }
+            catch (InvalidOperationException error) when (error.Message is
+                "BLOB_FORMAT_NOT_ALLOWED" or "BLOB_SIZE_EXCEEDED" or
+                "BLOB_VERIFICATION_BUSY" or "BLOB_CAPABILITY_MISSING") { throw; }
             catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
             ObjectMetadata? after;
             try { after = await store.HeadAsync(key); }

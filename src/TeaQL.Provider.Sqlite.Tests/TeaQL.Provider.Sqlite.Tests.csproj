@@ -28,5 +28,8 @@
     <ProjectReference Include="..\TeaQL.BlobReference\TeaQL.BlobReference.csproj" />
     <ProjectReference Include="..\TeaQL.SecureDocumentReference\TeaQL.SecureDocumentReference.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fixtures/sample.jpg;Fixtures/sample.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>

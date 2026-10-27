@@ -10,4 +10,7 @@
     <ProjectReference Include="..\TeaQL.Runtime\TeaQL.Runtime.csproj" />
     <ProjectReference Include="..\TeaQL.Sql\TeaQL.Sql.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="StbImageSharp" Version="2.30.16" />
+  </ItemGroup>
 </Project>

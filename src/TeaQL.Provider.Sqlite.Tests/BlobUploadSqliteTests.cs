@@ -19,9 +19,10 @@ public class BlobUploadSqliteTests
         public string CurrentScope = "tenant-a";
         public bool Allowed = true;
         public bool CheckSqlPolicy;
+        public string[] Extensions = ["pdf"];
         public string Scope(UserContext actor) => CurrentScope;
         public BlobFieldSpec Field(UserContext actor, BlobUploadTarget target) =>
-            new("Asset", "file", ["pdf"], true, "default");
+            new("Asset", "file", Extensions, true, "default");
         public Task<bool> AuthorizeAsync(UserContext actor, BlobUploadTarget target,
             string action, BlobUploadInput input) => Task.FromResult(Allowed &&
                 target.Entity == "Asset" && target.Field == "file" &&
@@ -158,6 +159,99 @@ public class BlobUploadSqliteTests
         command.CommandText = sql;
         command.Parameters.AddWithValue("@key", key);
         return (string)(await command.ExecuteScalarAsync())!;
+    }
+
+    private static byte[] ImageFixture(string extension) => File.ReadAllBytes(
+        Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." +
+            (extension == "jpeg" ? "jpg" : extension)));
+
+    [Theory]
+    [InlineData("jpg", "image/jpeg")]
+    [InlineData("jpeg", "image/jpeg")]
+    [InlineData("png", "image/png")]
+    public async Task RealImageVerifierDecodesFullPixelsAndOriginalDigest(string extension, string mime)
+    {
+        var bytes = ImageFixture(extension);
+        var verifier = new StbImageBlobContentVerifier();
+        var verified = await verifier.VerifyAsync(new MemoryStream(bytes), extension, 100_000);
+        Assert.Equal(bytes.Length, verified.SizeBytes);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(), verified.Sha256);
+        Assert.Equal(mime, verified.ContentType);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes[..^2]), extension, 100_000))).Message);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(ImageFixture(extension == "png" ? "jpg" : "png")),
+                extension, 100_000))).Message);
+        Assert.Equal("BLOB_SIZE_EXCEEDED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), extension, bytes.Length - 1))).Message);
+    }
+
+    [Fact]
+    public async Task RealImageVerifierBoundsPixelsAndConcurrentAdmissions()
+    {
+        var bytes = ImageFixture("png");
+        var verifier = new StbImageBlobContentVerifier(maximumDecodedBytes: 4);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), "png", 100_000))).Message);
+        verifier = new StbImageBlobContentVerifier(concurrentVerifications: 1);
+        var slow = new PausedReadStream(bytes);
+        var first = verifier.VerifyAsync(slow, "png", 100_000);
+        await slow.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal("BLOB_VERIFICATION_BUSY", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), "png", 100_000))).Message);
+        slow.Release.SetResult();
+        Assert.Equal(bytes.Length, (await first).SizeBytes);
+    }
+
+    [Fact]
+    public async Task RealImageVerifierRejectsPngChunkCrcMutation()
+    {
+        var bytes = ImageFixture("png");
+        // The pinned 16x16 fixture starts its IDAT payload at byte 41.
+        bytes[41] ^= 1;
+        var verifier = new StbImageBlobContentVerifier();
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), "png", 100_000))).Message);
+    }
+
+    [Theory]
+    [InlineData("jpg")]
+    [InlineData("png")]
+    public async Task RealImageUploadCompletesOnlyAfterFullDecode(string extension)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-image-upload-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(store);
+            var policy = new UploadAuthorization { Extensions = ["jpg", "png"] };
+            var service = new SqliteBlobUploadService(catalog, policy,
+                new StbImageBlobContentVerifier(), 100_000);
+            var bytes = ImageFixture(extension);
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var input = new BlobUploadInput("sample." + extension, bytes.Length);
+            var session = await service.BeginAsync(actor, target, input, "image-valid");
+            await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes));
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal("uploaded_unbound", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+
+            var corrupt = bytes[..^2];
+            var invalid = await service.BeginAsync(actor, target,
+                new BlobUploadInput("sample." + extension, corrupt.Length), "image-truncated");
+            await service.WriteAsync(actor, invalid.UploadId, new MemoryStream(corrupt));
+            Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, invalid.UploadId))).Message);
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", invalid.Reference.Key));
+        }
+        finally { Directory.Delete(root, recursive: true); }
     }
 
     [Fact]
