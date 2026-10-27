@@ -27,6 +27,15 @@ inaccessible older immutable data generations. This sweep waits for a
 persistent writer lock before taking the manifest lock and preserves the
 current generation; all processes sharing the private root must first run a
 writer-lock-capable version. Scheduling and retry remain host responsibilities.
+For catalog-driven cleanup of those old File generations, the host can
+separately construct `SqliteBlobFileGenerationSweepService` after explicitly
+asserting all writers on the private root have upgraded, then call
+`RunBatchAsync(actor, provider, cursor)` outside graph SQL. It scans only the
+actor's currently authorized scope and `server_stream` catalog rows, including
+terminal `deleted` rows, and rechecks permission per key. The provider must
+be the exact `FileObjectStorage` installed in the actor. Failures report the
+stable `BLOB_STORE_FAILED` code and can be retried from the beginning; the
+service does not start a worker or collect direct-upload objects.
 Keep Blob object keys unique and immutable; direct-upload
 quiescence needs separate implementation.
 
