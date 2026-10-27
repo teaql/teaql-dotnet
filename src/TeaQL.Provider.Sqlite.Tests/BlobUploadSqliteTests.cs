@@ -169,6 +169,20 @@ public class BlobUploadSqliteTests
             Assert.Equal("BLOB_STORE_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
                 () => service.WriteAsync(actor, fifth.UploadId,
                     new MemoryStream(bytes[..^1])))).Message);
+
+            var clock = DateTimeOffset.FromUnixTimeMilliseconds(1_700_000_000_000);
+            var expiring = new SqliteBlobUploadService(catalog, authorization, verifier, 10_000,
+                TimeSpan.FromSeconds(1), () => clock);
+            var old = await expiring.BeginAsync(actor, target, input, "expired-request");
+            Assert.Equal(old.UploadId, (await expiring.BeginAsync(actor, target, input,
+                "expired-request")).UploadId);
+            clock = old.ExpiresAt;
+            Assert.Equal("BLOB_UPLOAD_EXPIRED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => expiring.BeginAsync(actor, target, input, "expired-request"))).Message);
+            var fresh = await expiring.BeginAsync(actor, target, input, "fresh-request");
+            Assert.NotEqual(old.UploadId, fresh.UploadId);
+            Assert.Equal("BLOB_UPLOAD_EXPIRED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => expiring.WriteAsync(actor, old.UploadId, new MemoryStream(bytes)))).Message);
         }
         finally { Directory.Delete(parent, recursive: true); }
     }

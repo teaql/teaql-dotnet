@@ -169,10 +169,13 @@ public sealed class SqliteBlobUploadService
                 if (old.GetValueOrDefault("request_hash")?.TryText() != requestHash)
                     throw Error("BLOB_IDEMPOTENCY_CONFLICT");
                 await Current(actor, target, "Begin", normalized, scope);
-                try { return new BlobUploadSession(old["upload_id"].TryText()!,
+                BlobUploadSession prior;
+                try { prior = new BlobUploadSession(old["upload_id"].TryText()!,
                     new BlobRef(old["key"].TryText()!),
                     DateTimeOffset.FromUnixTimeMilliseconds(old["expires_ms"].TryI64()!.Value)); }
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
+                if (_now() >= prior.ExpiresAt) throw Error("BLOB_UPLOAD_EXPIRED");
+                return prior;
             }
             var reference = new BlobRef("blob_" + Token());
             var uploadId = "bu_" + Token();
@@ -279,11 +282,17 @@ public sealed class SqliteBlobUploadService
             var digest = reader.Digest();
             return await Transaction(async tx =>
             {
+                var nowMs = _now().ToUnixTimeMilliseconds();
+                if (nowMs >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
                 ulong affected;
                 try { affected = await tx.ExecuteSqlAsync(Query("""
                     UPDATE teaql_blob_upload SET state='written',written_sha256=@p0,written_etag=@p1
-                    WHERE upload_id=@p2 AND scope=@p3 AND state='initiated'
-                    """, Text(digest), Text(metadata.ETag), Text(uploadId), Text(row.Scope))); }
+                    WHERE upload_id=@p2 AND scope=@p3 AND state='initiated' AND expires_ms > @p4
+                      AND EXISTS (SELECT 1 FROM teaql_blob_catalog
+                        WHERE key=teaql_blob_upload.key AND scope=teaql_blob_upload.scope
+                          AND status='initiated')
+                    """, Text(digest), Text(metadata.ETag), Text(uploadId), Text(row.Scope),
+                    Number(nowMs))); }
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
                 if (affected != 1) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
                 return reader.Count;
@@ -373,11 +382,15 @@ public sealed class SqliteBlobUploadService
         if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
         await Transaction(async tx =>
         {
+            var nowMs = _now().ToUnixTimeMilliseconds();
+            if (nowMs >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
             ulong affected;
             try { affected = await tx.ExecuteSqlAsync(Query("""
                 UPDATE teaql_blob_upload SET state='completed' WHERE upload_id=@p0 AND scope=@p1
                   AND state='written' AND written_sha256=@p2 AND written_etag=@p3
-                """, Text(uploadId), Text(row.Scope), Text(row.WrittenSha256!), Text(row.WrittenETag!))); }
+                  AND expires_ms > @p4
+                """, Text(uploadId), Text(row.Scope), Text(row.WrittenSha256!),
+                Text(row.WrittenETag!), Number(nowMs))); }
             catch { throw Error("BLOB_CATALOG_FAILED"); }
             if (affected != 1) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
             try { affected = await tx.ExecuteSqlAsync(Query("""
