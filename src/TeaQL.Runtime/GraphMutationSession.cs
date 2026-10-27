@@ -4,7 +4,7 @@ using TeaQL.DataService;
 namespace TeaQL.Runtime;
 
 /// <summary>Internal adapter capability explicitly passed to generated graph saves.</summary>
-public sealed class GraphMutationSession
+public sealed class GraphMutationSession : IPhysicalSqlOwner
 {
     private readonly UserContext _context;
     private readonly ITransaction _transaction;
@@ -14,11 +14,15 @@ public sealed class GraphMutationSession
     private readonly List<Action> _rollback = new();
     private readonly List<Value> _intentValues = new();
     private bool _active = true;
+    private int _rollbackOnly;
     public MutationIntent Intent { get; }
 
     internal GraphMutationSession(UserContext context, ITransaction transaction, MutationIntent intent)
     {
         _context = context; _transaction = transaction; Intent = intent;
+        if (transaction is IBlobMutationOwner blobOwner &&
+            context.GetResource<IBlobMutationParticipant>() is { } participant)
+            blobOwner.InstallBlobMutationParticipant(participant);
         _service = new RuntimeDataService(transaction, context, this);
     }
 
@@ -32,6 +36,14 @@ public sealed class GraphMutationSession
     private void RequireActive()
     {
         if (!_active) throw new InvalidOperationException("GRAPH_CAPABILITY_EXPIRED");
+    }
+
+    internal void Poison() => System.Threading.Volatile.Write(ref _rollbackOnly, 1);
+    internal void EnsureCommittable()
+    {
+        RequireActive();
+        if (System.Threading.Volatile.Read(ref _rollbackOnly) != 0)
+            throw new InvalidOperationException("GRAPH_TRANSACTION_ROLLBACK_ONLY");
     }
 
     /// <summary>Verify the trusted actor is the owner of this exact graph invocation.</summary>

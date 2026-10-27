@@ -82,7 +82,8 @@ public class BlobCatalogSqliteTests
         {
             var upload = new SqliteBlobUploadService(catalog, new ModuleUploadAuthorization(),
                 new ModuleVerifier(), 10_000);
-            var module = new BlobReferenceModule(catalog, upload, new ReadAuthorization(true));
+            var module = new BlobReferenceModule(catalog, upload, new ReadAuthorization(true),
+                new Authorization("tenant-a"));
             module.Install(actor);
             Assert.Same(upload, actor.GetResource<SqliteBlobUploadService>());
             Assert.Same(module.Read, actor.GetResource<IBlobResponseContributor>());

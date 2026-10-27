@@ -534,7 +534,7 @@ internal static class RelationQueryLoader
     }
 }
 
-public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IIdGeneratorExecutor, IPhysicalSqlOwner
+public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IIdGeneratorExecutor, IPhysicalSqlOwner, IBlobMutationOwner
 {
     public SqlDialect Dialect { get; }
     public ISqlTransaction Transport { get; }
@@ -542,12 +542,21 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
     private int _rollbackOnly;
     private int _physicalSqlActive;
     private bool _completed;
+    private bool _mutationStarted;
+    private IBlobMutationParticipant? _blobParticipant;
 
     public SqlDataServiceTransaction(SqlDialect dialect, ISqlTransaction transport, ISchemaProvider schemaProvider)
     {
         Dialect = dialect;
         Transport = transport;
         SchemaProvider = schemaProvider;
+    }
+
+    public void InstallBlobMutationParticipant(IBlobMutationParticipant participant)
+    {
+        if (_completed || _mutationStarted || _blobParticipant != null || participant == null)
+            throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
+        _blobParticipant = participant;
     }
 
     public async Task<T> WithPhysicalSqlAsync<T>(Func<IPhysicalSqlLease, Task<T>> work)
@@ -671,6 +680,12 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
     {
         if (_completed || Volatile.Read(ref _rollbackOnly) != 0)
             throw new InvalidOperationException("GRAPH_TRANSACTION_ROLLBACK_ONLY");
+        if (Volatile.Read(ref _physicalSqlActive) != 0)
+        {
+            Volatile.Write(ref _rollbackOnly, 1);
+            throw new InvalidOperationException("GRAPH_TRANSACTION_ROLLBACK_ONLY");
+        }
+        _mutationStarted = true;
         if (request is BatchMutationRequest batchReq)
             return await SqlMutationBatch.ExecuteAsync(Dialect, batchReq, MutateAsync);
 
@@ -686,116 +701,156 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         var entityDesc = SchemaProvider.GetEntity(entityName)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {entityName}");
 
-        if (entityDesc.HasBlobFields())
+        var modeledBlob = entityDesc.HasBlobFields();
+        if (modeledBlob && (_blobParticipant == null || request is RecoverMutationRequest))
         {
             Volatile.Write(ref _rollbackOnly, 1);
             throw new SqlExecutorException("BLOB_CAPABILITY_MISSING");
         }
 
-        if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
-        {
-            if (!allocationInsert.Command.Values.TryGetValue(allocationId.Name, out var explicitId))
-                allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(
-                    await (request.InternalIdAllocator ?? this).NextIdAsync(entityName));
-            else
-                await (request.InternalIdAllocator ?? this).EnsureIdFloorAsync(
-                    entityName, OptimisticIdSpace.Floor(explicitId, entityName));
-        }
-        if (request is InsertMutationRequest versionedInsert && entityDesc.VersionProperty() is { } insertVersion
-            && !versionedInsert.Command.Values.ContainsKey(insertVersion.Name))
-            versionedInsert.Command.Values[insertVersion.Name] = new Value.I64Value(1);
-
-        CompiledQuery compiled;
         try
         {
-            compiled = request switch
+            var previousBlobRow = modeledBlob
+                ? await AuthoritativeBlobPreimageAsync(request, entityDesc, entityName).ConfigureAwait(false)
+                : null;
+
+            if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
             {
-                InsertMutationRequest i => Dialect.CompileInsert(entityDesc, i.Command),
-                UpdateMutationRequest u => Dialect.CompileUpdate(entityDesc, u.Command),
-                DeleteMutationRequest d => Dialect.CompileDelete(entityDesc, d.Command),
-                RecoverMutationRequest r => Dialect.CompileRecover(entityDesc, r.Command),
+                if (!allocationInsert.Command.Values.TryGetValue(allocationId.Name, out var explicitId))
+                    allocationInsert.Command.Values[allocationId.Name] = new Value.U64Value(
+                        await (request.InternalIdAllocator ?? this).NextIdAsync(entityName));
+                else
+                    await (request.InternalIdAllocator ?? this).EnsureIdFloorAsync(
+                        entityName, OptimisticIdSpace.Floor(explicitId, entityName));
+            }
+            if (request is InsertMutationRequest versionedInsert && entityDesc.VersionProperty() is { } insertVersion
+                && !versionedInsert.Command.Values.ContainsKey(insertVersion.Name))
+                versionedInsert.Command.Values[insertVersion.Name] = new Value.I64Value(1);
+
+            CompiledQuery compiled;
+            try
+            {
+                compiled = request switch
+                {
+                    InsertMutationRequest i => Dialect.CompileInsert(entityDesc, i.Command),
+                    UpdateMutationRequest u => Dialect.CompileUpdate(entityDesc, u.Command),
+                    DeleteMutationRequest d => Dialect.CompileDelete(entityDesc, d.Command),
+                    RecoverMutationRequest r => Dialect.CompileRecover(entityDesc, r.Command),
+                    _ => throw new InvalidOperationException()
+                };
+            }
+            catch (SqlCompileException ex)
+            {
+                throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
+            }
+
+            using var statement = SqlExecutionObservation.Start(request, Dialect.Kind.ToString().ToLowerInvariant(), SqlStatementDiagnostics.Operation(request));
+            var start = DateTimeOffset.UtcNow;
+            ulong affectedRows;
+            try
+            {
+                affectedRows = await Transport.ExecuteSqlAsync(compiled);
+            }
+            catch (Exception ex)
+            {
+                statement.Failure(ex);
+                SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc, statement.Correlation);
+                if (ex is OperationCanceledException) throw;
+                throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
+            }
+            var end = DateTimeOffset.UtcNow;
+            statement.Success();
+
+            var operation = request switch
+            {
+                InsertMutationRequest => DataServiceOperation.Insert,
+                UpdateMutationRequest => DataServiceOperation.Update,
+                DeleteMutationRequest => DataServiceOperation.Delete,
+                RecoverMutationRequest => DataServiceOperation.Recover,
                 _ => throw new InvalidOperationException()
             };
-        }
-        catch (SqlCompileException ex)
-        {
-            throw new SqlExecutorException($"SQL compile error: {ex.Message}", ex);
-        }
 
-        using var statement = SqlExecutionObservation.Start(request, Dialect.Kind.ToString().ToLowerInvariant(), SqlStatementDiagnostics.Operation(request));
-        var start = DateTimeOffset.UtcNow;
-        ulong affectedRows;
-        try
-        {
-            affectedRows = await Transport.ExecuteSqlAsync(compiled);
+            var metadata = new ExecutionMetadata
+            {
+                SqlCorrelation = statement.Correlation,
+                Backend = Dialect.Kind.ToString().ToLowerInvariant(),
+                Operation = operation,
+                StartedAt = start,
+                EndedAt = end,
+                AffectedRows = affectedRows,
+                ExecutionOutcome = "success",
+                ResultCount = null,
+                TraceChain = MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
+                MutationLineage = request.AuditLineage(entityName),
+                Comment = request.Comment,
+                AuditReason = request.Comment,
+                BackendRequestId = null,
+                ParameterizedQuery = compiled.Sql,
+                Parameters = compiled.Params.ToList(),
+                ParameterLogPolicies = compiled.ParameterLogPolicies,
+                GeneratedSql = compiled.GeneratedSql,
+                IntentValues = SqlStatementDiagnostics.MutationTargetIds(request, entityDesc)
+            };
+
+            Record? persistedRecord = null;
+            var physicallyDeleted = request is DeleteMutationRequest deleted && !deleted.Command.SoftDelete;
+            Value? entityId = request switch
+            {
+                InsertMutationRequest insert when entityDesc.IdProperty() is { } idProperty
+                    && insert.Command.Values.TryGetValue(idProperty.Name, out var insertedId) => insertedId,
+                UpdateMutationRequest update => update.Command.Id,
+                DeleteMutationRequest delete => delete.Command.Id,
+                RecoverMutationRequest recover => recover.Command.Id,
+                _ => null
+            };
+            if (affectedRows > 0 && !physicallyDeleted && entityId != null && entityDesc.IdProperty() is { } id)
+            {
+                var readback = await SqlMutationReadback.ExecuteAsync(Dialect, Transport, entityDesc,
+                    new SelectQuery(entityName).Filter(Expr.Eq(id.Name, entityId)), request, metadata);
+                persistedRecord = readback.Row;
+                metadata = metadata.WithStatements(metadata, readback.Read);
+            }
+
+            var result = new MutationResult
+            {
+                AffectedRows = affectedRows,
+                GeneratedValues = new Record(),
+                PersistedRecord = persistedRecord,
+                Metadata = metadata
+            };
+            if (modeledBlob)
+            {
+                if (affectedRows != 1 || request is not DeleteMutationRequest && persistedRecord == null)
+                    throw new SqlExecutorException("BLOB_REFERENCE_INVALID");
+                await _blobParticipant!.ApplyAsync(this, request, entityDesc, previousBlobRow,
+                    persistedRecord).ConfigureAwait(false);
+            }
+            return result;
         }
-        catch (Exception ex)
+        catch
         {
-            statement.Failure(ex);
-            SqlStatementDiagnostics.Failure(Dialect, request, compiled, start, ex, entityDesc, statement.Correlation);
-            if (ex is OperationCanceledException) throw;
-            throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
+            if (modeledBlob) Volatile.Write(ref _rollbackOnly, 1);
+            throw;
         }
-        var end = DateTimeOffset.UtcNow;
-        statement.Success();
+    }
 
-        var operation = request switch
+    private async Task<Record?> AuthoritativeBlobPreimageAsync(MutationRequest request,
+        EntityDescriptor entity, string entityName)
+    {
+        if (request is InsertMutationRequest) return null;
+        var idProperty = entity.IdProperty() ?? throw new SqlExecutorException("BLOB_REFERENCE_INVALID");
+        var id = request switch
         {
-            InsertMutationRequest => DataServiceOperation.Insert,
-            UpdateMutationRequest => DataServiceOperation.Update,
-            DeleteMutationRequest => DataServiceOperation.Delete,
-            RecoverMutationRequest => DataServiceOperation.Recover,
-            _ => throw new InvalidOperationException()
-        };
-
-        var metadata = new ExecutionMetadata
-        {
-            SqlCorrelation = statement.Correlation,
-            Backend = Dialect.Kind.ToString().ToLowerInvariant(),
-            Operation = operation,
-            StartedAt = start,
-            EndedAt = end,
-            AffectedRows = affectedRows,
-            ExecutionOutcome = "success",
-            ResultCount = null,
-            TraceChain = MutationTracePath(request, entityName, operation, Dialect.Kind.ToString()),
-            MutationLineage = request.AuditLineage(entityName),
-            Comment = request.Comment,
-            AuditReason = request.Comment,
-            BackendRequestId = null,
-            ParameterizedQuery = compiled.Sql,
-            Parameters = compiled.Params.ToList(),
-            ParameterLogPolicies = compiled.ParameterLogPolicies,
-            GeneratedSql = compiled.GeneratedSql,
-            IntentValues = SqlStatementDiagnostics.MutationTargetIds(request, entityDesc)
-        };
-
-        Record? persistedRecord = null;
-        var physicallyDeleted = request is DeleteMutationRequest deleted && !deleted.Command.SoftDelete;
-        Value? entityId = request switch
-        {
-            InsertMutationRequest insert when entityDesc.IdProperty() is { } idProperty
-                && insert.Command.Values.TryGetValue(idProperty.Name, out var insertedId) => insertedId,
             UpdateMutationRequest update => update.Command.Id,
             DeleteMutationRequest delete => delete.Command.Id,
-            RecoverMutationRequest recover => recover.Command.Id,
             _ => null
         };
-        if (affectedRows > 0 && !physicallyDeleted && entityId != null && entityDesc.IdProperty() is { } id)
-        {
-            var readback = await SqlMutationReadback.ExecuteAsync(Dialect, Transport, entityDesc,
-                new SelectQuery(entityName).Filter(Expr.Eq(id.Name, entityId)), request, metadata);
-            persistedRecord = readback.Row;
-            metadata = metadata.WithStatements(metadata, readback.Read);
-        }
-
-        return new MutationResult
-        {
-            AffectedRows = affectedRows,
-            GeneratedValues = new Record(),
-            PersistedRecord = persistedRecord,
-            Metadata = metadata
-        };
+        if (id == null) throw new SqlExecutorException("BLOB_REFERENCE_INVALID");
+        var query = new SelectQuery(entityName).Filter(Expr.Eq(idProperty.Name, id));
+        var rows = await Transport.FetchAllSqlAsync(Dialect.CompileSelect(entity, query))
+            .ConfigureAwait(false);
+        if (rows.Count != 1) throw new SqlExecutorException("BLOB_REFERENCE_INVALID");
+        return rows[0];
     }
 
     public async Task CommitAsync()

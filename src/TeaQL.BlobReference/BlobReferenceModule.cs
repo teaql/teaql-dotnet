@@ -1,5 +1,6 @@
 using TeaQL.Runtime;
 using TeaQL.Runtime.Storage;
+using TeaQL.DataService;
 
 namespace TeaQL.BlobReference;
 
@@ -9,8 +10,10 @@ public sealed class BlobReferenceModule
     public SqliteBlobCatalog Catalog { get; }
     public SqliteBlobUploadService Upload { get; }
     public SqlBlobResponseContributor Read { get; }
+    public IBlobBindingAuthorization BindingAuthorization { get; }
 
-    private sealed class BlobCapability(BlobReferenceModule module, UserContext owner) : IRuntimeCapabilityResource
+    private sealed class BlobCapability(BlobReferenceModule module, UserContext owner,
+        IBlobMutationParticipant participant) : IRuntimeCapabilityResource
     {
         public string Capability => "blob.v1";
         public async Task ValidateReadyAsync(UserContext context)
@@ -19,19 +22,39 @@ public sealed class BlobReferenceModule
                 !ReferenceEquals(context.GetResource<SqliteBlobCatalog>(), module.Catalog) ||
                 !ReferenceEquals(context.GetResource<SqliteBlobUploadService>(), module.Upload) ||
                 !ReferenceEquals(context.GetResource<IBlobResponseContributor>(), module.Read) ||
-                context.GetResource<IObjectStorageProvider>() == null)
+                !ReferenceEquals(context.GetResource<IBlobMutationParticipant>(), participant) ||
+                context.GetResource<IObjectStorageProvider>() == null ||
+                context.GetResource<ITransactionExecutor>() is not { } transactions)
                 throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
             await module.Catalog.ValidateSchemaAsync().ConfigureAwait(false);
+            using var transaction = await transactions.BeginTransactionAsync().ConfigureAwait(false);
+            try
+            {
+                if (transaction is not IBlobMutationOwner || transaction is not IPhysicalSqlOwner physical)
+                    throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
+                await physical.WithPhysicalSqlAsync(async lease =>
+                {
+                    await lease.FetchAllAsync("SELECT key,scope,status FROM teaql_blob_catalog WHERE 1 = 0",
+                        Array.Empty<TeaQL.Core.Value>()).ConfigureAwait(false);
+                    await lease.FetchAllAsync("SELECT scope,entity,entity_id,field,key,version FROM teaql_blob_binding WHERE 1 = 0",
+                        Array.Empty<TeaQL.Core.Value>()).ConfigureAwait(false);
+                    return true;
+                }).ConfigureAwait(false);
+            }
+            finally { await transaction.RollbackAsync().ConfigureAwait(false); }
         }
     }
 
     public BlobReferenceModule(SqliteBlobCatalog catalog, SqliteBlobUploadService upload,
-        IBlobReadAuthorization readAuthorization, int maximumUrlSeconds = 600)
+        IBlobReadAuthorization readAuthorization, IBlobBindingAuthorization bindingAuthorization,
+        int maximumUrlSeconds = 600)
     {
         Catalog = catalog ?? throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
         Upload = upload ?? throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
-        if (!ReferenceEquals(upload.Catalog, catalog) || readAuthorization == null)
+        if (!ReferenceEquals(upload.Catalog, catalog) || readAuthorization == null ||
+            bindingAuthorization == null)
             throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
+        BindingAuthorization = bindingAuthorization;
         Read = new SqlBlobResponseContributor(catalog, readAuthorization, maximumUrlSeconds);
     }
 
@@ -40,15 +63,18 @@ public sealed class BlobReferenceModule
         if (context == null || context.GetResource<SqliteBlobCatalog>() != null ||
             context.GetResource<SqliteBlobUploadService>() != null ||
             context.GetResource<IBlobResponseContributor>() != null ||
+            context.GetResource<IBlobMutationParticipant>() != null ||
             context.GetNamedResource<IRuntimeCapabilityResource>("teaql.runtime.capability:blob.v1") != null)
             throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
-        var capability = new BlobCapability(this, context);
+        var participant = new SqliteBlobMutationParticipant(Catalog, BindingAuthorization, context);
+        var capability = new BlobCapability(this, context, participant);
         try { context.InstallRuntimeCapability(capability); }
         catch { throw new InvalidOperationException("BLOB_CAPABILITY_MISSING"); }
         context.InsertNamedResource<IRuntimeCapabilityResource>("teaql.runtime.capability:blob.v1", capability);
         context.InsertResource(Catalog);
         context.InsertResource(Upload);
         context.InsertResource<IBlobResponseContributor>(Read);
+        context.InsertResource<IBlobMutationParticipant>(participant);
     }
 
     public Task ReadyAsync(UserContext context)

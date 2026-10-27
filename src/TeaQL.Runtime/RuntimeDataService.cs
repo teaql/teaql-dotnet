@@ -270,6 +270,8 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
+        try
+        {
         _context.ValidateGraphMutation(request, _graph);
         _context.CheckAndFix(request);
         request.InheritedIntentValues = request.InheritedIntentValues
@@ -290,6 +292,13 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
             }).ConfigureAwait(false);
         await PublishMutationAuditAsync(request, result).ConfigureAwait(false);
         return result;
+        }
+        catch
+        {
+            if (_context.GetEntity(EntityName(request))?.HasBlobFields() == true)
+                _graph?.Poison();
+            throw;
+        }
     }
 
     private async Task PublishMutationAuditAsync(MutationRequest request, MutationResult result)

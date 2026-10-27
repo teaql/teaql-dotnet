@@ -255,6 +255,7 @@ public class UserContext
             try
             {
                 result = await work(session).ConfigureAwait(false);
+                session.EnsureCommittable();
                 await transaction.CommitAsync().ConfigureAwait(false);
             }
             catch

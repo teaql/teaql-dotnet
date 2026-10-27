@@ -127,10 +127,16 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
 
     /// <summary>Bind one target inside the caller's native graph physical transaction.</summary>
     public Task<long> BindInGraphAsync(GraphMutationSession graph, UserContext actor,
+        BlobBindingChange change, IBlobBindingAuthorization authorization)
+    {
+        if (!graph.BelongsTo(actor)) throw Error("BLOB_BIND_DENIED");
+        return BindInOwnerAsync(graph, actor, change, authorization);
+    }
+
+    internal Task<long> BindInOwnerAsync(IPhysicalSqlOwner owner, UserContext actor,
         BlobBindingChange change, IBlobBindingAuthorization authorization) =>
-        graph.WithPhysicalSqlAsync(async lease =>
+        owner.WithPhysicalSqlAsync(async lease =>
         {
-            if (!graph.BelongsTo(actor)) throw Error("BLOB_BIND_DENIED");
             if (change?.Target == null || authorization == null ||
                 !Name(change.Target.Entity) || !Name(change.Target.Field) || !EntityId(change.Target.EntityId) ||
                 change.ExpectedVersion < 0 || change.NextVersion <= change.ExpectedVersion ||
