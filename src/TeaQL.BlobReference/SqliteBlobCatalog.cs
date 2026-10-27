@@ -9,6 +9,8 @@ namespace TeaQL.BlobReference;
 public sealed record BlobBindingTarget(string Entity, string EntityId, string Field);
 public sealed record BlobBindingChange(BlobBindingTarget Target, BlobRef? Next,
     long ExpectedVersion, long NextVersion, string Action);
+public sealed record BlobCatalogRead(string ObjectKey, string ContentVersion,
+    string FileName, string ContentType, long SizeBytes);
 
 public interface IBlobBindingAuthorization
 {
@@ -61,6 +63,42 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
                 throw Error("BLOB_SCHEMA_MISSING");
         }
         catch { throw Error("BLOB_SCHEMA_MISSING"); }
+    }
+
+    /// <summary>Recheck the exact current binding; a stable Key grants no read authority.</summary>
+    public async Task<BlobCatalogRead> CurrentReadAsync(AuthorizedBlobSlot slot)
+    {
+        if (slot == null || !Scope(slot.Scope) || !Name(slot.Entity) ||
+            !EntityId(slot.EntityId) || !Name(slot.Field) || slot.BindingVersion < 1 ||
+            slot.Reference == null)
+            throw Error("BLOB_READ_DENIED");
+        List<Record> rows;
+        try
+        {
+            rows = await transport.FetchAllSqlAsync(Query("""
+                SELECT c.object_key, c.content_version, c.file_name,
+                  c.content_type, c.size_bytes FROM teaql_blob_binding b
+                JOIN teaql_blob_catalog c ON c.key = b.key
+                WHERE b.scope = @p0 AND b.entity = @p1 AND b.entity_id = @p2
+                  AND b.field = @p3 AND b.key = @p4 AND b.version = @p5
+                  AND c.scope = b.scope AND c.status = 'available'
+                """, new Value.TextValue(slot.Scope), new Value.TextValue(slot.Entity),
+                new Value.TextValue(slot.EntityId), new Value.TextValue(slot.Field),
+                new Value.TextValue(slot.Reference.Key), new Value.I64Value(slot.BindingVersion)));
+        }
+        catch { throw Error("BLOB_CATALOG_FAILED"); }
+        if (rows.Count != 1) throw Error("BLOB_READ_DENIED");
+        var row = rows[0];
+        var objectKey = row.GetValueOrDefault("object_key")?.TryText();
+        var version = row.GetValueOrDefault("content_version")?.TryText();
+        var fileName = row.GetValueOrDefault("file_name")?.TryText();
+        var contentType = row.GetValueOrDefault("content_type")?.TryText();
+        var size = row.GetValueOrDefault("size_bytes")?.TryI64();
+        if (string.IsNullOrWhiteSpace(objectKey) || string.IsNullOrWhiteSpace(version) ||
+            string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(contentType) ||
+            size == null || size < 0)
+            throw Error("BLOB_CATALOG_FAILED");
+        return new BlobCatalogRead(objectKey, version, fileName, contentType, size.Value);
     }
 
     private static bool Name(string? value) => !string.IsNullOrWhiteSpace(value) &&

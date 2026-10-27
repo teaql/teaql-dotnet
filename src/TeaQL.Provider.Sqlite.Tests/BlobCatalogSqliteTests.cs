@@ -1,8 +1,10 @@
 using Microsoft.Data.Sqlite;
 using TeaQL.BlobReference;
 using TeaQL.Core;
+using TeaQL.Core.Storage;
 using TeaQL.DataService;
 using TeaQL.Runtime;
+using TeaQL.Runtime.Storage;
 using TeaQL.Sql;
 using Xunit;
 
@@ -15,6 +17,42 @@ public class BlobCatalogSqliteTests
         public string Scope(UserContext context) => scope;
         public Task<bool> AuthorizeAsync(UserContext context, BlobBindingTarget target,
             BlobRef? previous, BlobRef? next, string action) => Task.FromResult(allow);
+    }
+
+    private sealed class ReadAuthorization(bool allow) : IBlobReadAuthorization
+    {
+        public Task<bool> AuthorizeAsync(UserContext context, AuthorizedBlobSlot slot) =>
+            Task.FromResult(allow);
+    }
+
+    private sealed class GraphAuthorizer(AuthorizedResponseGraph graph) : IResponseGraphAuthorizer
+    {
+        public Task<AuthorizedResponseGraph> AuthorizeAsync(UserContext context, object? result,
+            ViewOptions options) => Task.FromResult(graph);
+    }
+
+    private sealed class SignedStore : IObjectStorageProvider
+    {
+        public int Signed;
+        public string? Disposition;
+        public string? Key;
+        public Task<ObjectReadUrl> GetReadUrlAsync(StorageInvocation invocation, ObjectKey key,
+            ObjectReadUrlOptions options)
+        {
+            Signed++;
+            Key = key.Value;
+            Disposition = options.ContentDisposition;
+            return Task.FromResult(new ObjectReadUrl(new Uri("https://example.invalid/opaque-ticket"),
+                DateTimeOffset.UtcNow.AddSeconds(30)));
+        }
+        public Task<ObjectMetadata> PutAsync(StorageInvocation invocation, ObjectKey key,
+            Stream content, ObjectPutOptions options) => throw new NotSupportedException();
+        public Task<ObjectContent> GetAsync(StorageInvocation invocation, ObjectKey key) =>
+            throw new NotSupportedException();
+        public Task<ObjectMetadata?> HeadAsync(StorageInvocation invocation, ObjectKey key) =>
+            throw new NotSupportedException();
+        public Task DeleteAsync(StorageInvocation invocation, ObjectKey key) =>
+            throw new NotSupportedException();
     }
 
     private static readonly BlobBindingTarget Target = new("Asset", "1", "file");
@@ -167,5 +205,60 @@ public class BlobCatalogSqliteTests
         }
         var error = await Assert.ThrowsAsync<InvalidOperationException>(catalog.ValidateSchemaAsync);
         Assert.Equal("BLOB_SCHEMA_MISSING", error.Message);
+    }
+
+    [Fact]
+    public async Task AuthorizedViewRereadsCurrentBindingBeforeSigning()
+    {
+        var (db, actor, catalog) = await Fixture(); await using var lifetime = db;
+        await actor.ExecuteGraphSaveAsync("bind", async graph =>
+        {
+            await catalog.BindInGraphAsync(graph, actor,
+                new BlobBindingChange(Target, Reference, 0, 1, "Create"),
+                new Authorization("tenant-a"));
+            return true;
+        });
+        var slot = new AuthorizedBlobSlot(["document"], "Asset", "1", "file",
+            "tenant-a", 1, Reference);
+        var record = await catalog.CurrentReadAsync(slot);
+        Assert.Equal("objects/abc", record.ObjectKey);
+        Assert.Equal("v1", record.ContentVersion);
+        Assert.Equal(7, record.SizeBytes);
+        foreach (var invalid in new[] {
+            slot with { BindingVersion = 2 },
+            slot with { Scope = "tenant-b" },
+            slot with { Reference = new BlobRef("blob_other") }
+        })
+        {
+            var error = await Assert.ThrowsAsync<InvalidOperationException>(() => catalog.CurrentReadAsync(invalid));
+            Assert.Equal("BLOB_READ_DENIED", error.Message);
+        }
+        var store = new SignedStore();
+        actor.WithObjectStorage(store);
+        actor.InsertResource<IBlobResponseContributor>(new SqlBlobResponseContributor(catalog,
+            new ReadAuthorization(true)));
+        actor.InsertResource<IResponseGraphAuthorizer>(new GraphAuthorizer(
+            new AuthorizedResponseGraph(new Dictionary<string, object?> { ["document"] = Reference }, [slot])));
+        var view = await new ViewPreparationService().PrepareAsync(actor, null,
+            new ViewOptions("ordinary", "read_only", DateTimeOffset.UtcNow.AddSeconds(60)));
+        var presentation = Assert.IsType<Dictionary<string, object?>>(view.Presentation);
+        Assert.Equal("https://example.invalid/opaque-ticket", presentation["document"]);
+        Assert.Equal("objects/abc", store.Key);
+        Assert.Equal("inline; filename=\"report.pdf\"", store.Disposition);
+        Assert.Equal(1, store.Signed);
+
+        actor.InsertResource<IBlobResponseContributor>(new SqlBlobResponseContributor(catalog,
+            new ReadAuthorization(false)));
+        var denied = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+            new ViewPreparationService().PrepareAsync(actor, null,
+                new ViewOptions("ordinary", "read_only", DateTimeOffset.UtcNow.AddSeconds(60))));
+        Assert.Equal("BLOB_READ_DENIED", denied.Code);
+        Assert.Equal(1, store.Signed);
+
+        await using var command = db.CreateCommand();
+        command.CommandText = "UPDATE teaql_blob_catalog SET status = 'deleted' WHERE key = 'blob_abc'";
+        await command.ExecuteNonQueryAsync();
+        var stale = await Assert.ThrowsAsync<InvalidOperationException>(() => catalog.CurrentReadAsync(slot));
+        Assert.Equal("BLOB_READ_DENIED", stale.Message);
     }
 }
