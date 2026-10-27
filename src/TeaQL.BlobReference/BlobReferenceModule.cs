@@ -11,6 +11,7 @@ public sealed class BlobReferenceModule
     public SqliteBlobCatalog Catalog { get; }
     public SqliteBlobUploadService Upload { get; }
     public SqlBlobResponseContributor Read { get; }
+    public SqliteBlobMaintenanceService? Maintenance { get; }
     public IBlobBindingAuthorization BindingAuthorization { get; }
 
     private sealed class BlobCapability(BlobReferenceModule module, UserContext owner,
@@ -24,6 +25,8 @@ public sealed class BlobReferenceModule
                 !ReferenceEquals(context.GetResource<SqliteBlobUploadService>(), module.Upload) ||
                 !ReferenceEquals(context.GetResource<IBlobResponseContributor>(), module.Read) ||
                 !ReferenceEquals(context.GetResource<IBlobMutationParticipant>(), participant) ||
+                module.Maintenance is not null && !ReferenceEquals(
+                    context.GetResource<SqliteBlobMaintenanceService>(), module.Maintenance) ||
                 context.GetResource<IObjectStorageProvider>() == null ||
                 context.GetResource<ITransactionExecutor>() is not SqlDataServiceExecutor transactions ||
                 transactions.Dialect.Kind != DatabaseKind.Sqlite ||
@@ -50,15 +53,17 @@ public sealed class BlobReferenceModule
 
     public BlobReferenceModule(SqliteBlobCatalog catalog, SqliteBlobUploadService upload,
         IBlobReadAuthorization readAuthorization, IBlobBindingAuthorization bindingAuthorization,
-        int maximumUrlSeconds = 600)
+        int maximumUrlSeconds = 600, SqliteBlobMaintenanceService? maintenance = null)
     {
         Catalog = catalog ?? throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
         Upload = upload ?? throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
         if (!ReferenceEquals(upload.Catalog, catalog) || readAuthorization == null ||
-            bindingAuthorization == null)
+            bindingAuthorization == null || maintenance is not null &&
+            !ReferenceEquals(maintenance.Catalog, catalog))
             throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
         BindingAuthorization = bindingAuthorization;
         Read = new SqlBlobResponseContributor(catalog, readAuthorization, maximumUrlSeconds);
+        Maintenance = maintenance;
     }
 
     public void Install(UserContext context)
@@ -67,6 +72,7 @@ public sealed class BlobReferenceModule
             context.GetResource<SqliteBlobUploadService>() != null ||
             context.GetResource<IBlobResponseContributor>() != null ||
             context.GetResource<IBlobMutationParticipant>() != null ||
+            Maintenance is not null && context.GetResource<SqliteBlobMaintenanceService>() != null ||
             context.GetNamedResource<IRuntimeCapabilityResource>("teaql.runtime.capability:blob.v1") != null)
             throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
         var participant = new SqliteBlobMutationParticipant(Catalog, BindingAuthorization, context);
@@ -78,6 +84,7 @@ public sealed class BlobReferenceModule
         context.InsertResource(Upload);
         context.InsertResource<IBlobResponseContributor>(Read);
         context.InsertResource<IBlobMutationParticipant>(participant);
+        if (Maintenance is not null) context.InsertResource(Maintenance);
     }
 
     public Task ReadyAsync(UserContext context)

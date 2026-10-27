@@ -45,6 +45,7 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
               FOREIGN KEY (key) REFERENCES teaql_blob_catalog(key))
             """,
             "CREATE INDEX IF NOT EXISTS teaql_blob_binding_key ON teaql_blob_binding(key)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS teaql_blob_catalog_object_key ON teaql_blob_catalog(object_key)",
             """
             CREATE TABLE IF NOT EXISTS teaql_blob_upload (
               upload_id TEXT PRIMARY KEY, scope TEXT NOT NULL, replay_key TEXT NOT NULL,
@@ -73,6 +74,13 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
             var version = columns.SingleOrDefault(row => row.GetValueOrDefault("name")?.TryText() == "version");
             if (key?.GetValueOrDefault("notnull")?.TryI64() != 0 ||
                 version?.GetValueOrDefault("notnull")?.TryI64() != 1)
+                throw Error("BLOB_SCHEMA_MISSING");
+            var indexes = await transport.FetchAllSqlAsync(Query("PRAGMA index_list(teaql_blob_catalog)"));
+            if (!indexes.Any(row => row.GetValueOrDefault("name")?.TryText() == "teaql_blob_catalog_object_key" &&
+                                    row.GetValueOrDefault("unique")?.TryI64() == 1))
+                throw Error("BLOB_SCHEMA_MISSING");
+            var objectKeyColumns = await transport.FetchAllSqlAsync(Query("PRAGMA index_info(teaql_blob_catalog_object_key)"));
+            if (objectKeyColumns.Count != 1 || objectKeyColumns[0].GetValueOrDefault("name")?.TryText() != "object_key")
                 throw Error("BLOB_SCHEMA_MISSING");
         }
         catch { throw Error("BLOB_SCHEMA_MISSING"); }

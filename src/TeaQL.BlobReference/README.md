@@ -6,6 +6,18 @@ then installs `BlobReferenceModule` into its `UserContext` and calls
 `ReadyAsync` before serving requests. Storage and schema installation remain
 host responsibilities.
 
+The host may also construct `SqliteBlobMaintenanceService` with a current
+scope/permission policy and pass it as `maintenance:` to `BlobReferenceModule`.
+It is passive until the host explicitly calls `RunBatchAsync`. The bounded
+service collects only expired, uncompleted, unbound server-stream uploads. An
+explicit catalog migration adds the unique object-key index required for this
+path. The service claims candidates in SQLite's physical write transaction,
+pins the observed ETag, deletes through the optional S3 version-conditional
+provider API, and retries a failed final catalog acknowledgment. File storage
+is rejected until it has cross-process version fencing. Keep Blob object keys
+unique and immutable; completed unbound and old bound retention, File fencing
+and direct-upload quiescence need separate implementation.
+
 For JPEG/PNG uploads, pass `new StbImageBlobContentVerifier()` to
 `SqliteBlobUploadService`. It accepts only `jpg`, `jpeg` and `png`. The host's
 `BlobFieldSpec` must separately allow those extensions. Input bytes, decoded

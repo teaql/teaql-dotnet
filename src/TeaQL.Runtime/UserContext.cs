@@ -33,6 +33,13 @@ public class UserContext
     private readonly MutationPolicyRuntimeState _mutationPolicy = new();
     private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
     private GraphMutationSession? _activeGraphSave;
+
+    /// <summary>Maintenance cannot wait on this context's own graph SQL owner.</summary>
+    public void RequireNoActiveGraphSql()
+    {
+        if (System.Threading.Volatile.Read(ref _activeGraphSave) is not null)
+            throw new InvalidOperationException("BLOB_TRANSACTION_REQUIRED");
+    }
     private DateTimeOffset? _graphFixTime;
     private IBusinessClock _businessClock = SystemBusinessClock.Instance;
     private ISchemaExecutor? _dataServiceSchemaExecutor;

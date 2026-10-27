@@ -60,6 +60,7 @@ public sealed class ObjectStorage
     private readonly UserContext _context;
     private readonly string _comment;
     private readonly IObjectStorageProvider _provider;
+    public bool SupportsVersionConditionalDelete => _provider is IObjectStorageConditionalDeleter;
     internal ObjectStorage(UserContext context, string comment)
     {
         if (string.IsNullOrWhiteSpace(comment)) throw new StorageException(StorageErrorCode.InvalidInput);

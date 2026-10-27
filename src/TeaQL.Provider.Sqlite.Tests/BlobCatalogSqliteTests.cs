@@ -76,6 +76,11 @@ public class BlobCatalogSqliteTests
         public Task<BlobVerifiedContent> VerifyAsync(Stream _, string __, long ___) =>
             throw new NotSupportedException("No upload occurs in the readiness test");
     }
+    private sealed class MaintenancePermission : IBlobMaintenanceAuthorization
+    {
+        public string Scope(UserContext actor) => "tenant-a";
+        public Task<bool> CanMaintainAsync(UserContext actor, string scope) => Task.FromResult(scope == "tenant-a");
+    }
 
     [Fact]
     public async Task BlobModuleInstallsPassivelyAndRequiresProviderAtExplicitReadiness()
@@ -85,15 +90,23 @@ public class BlobCatalogSqliteTests
         {
             var upload = new SqliteBlobUploadService(catalog, new ModuleUploadAuthorization(),
                 new ModuleVerifier(), 10_000);
+            var maintenance = new SqliteBlobMaintenanceService(catalog, new MaintenancePermission());
             var module = new BlobReferenceModule(catalog, upload, new ReadAuthorization(true),
-                new Authorization("tenant-a"));
+                new Authorization("tenant-a"), maintenance: maintenance);
             module.Install(actor);
             Assert.Same(upload, actor.GetResource<SqliteBlobUploadService>());
+            Assert.Same(maintenance, actor.GetResource<SqliteBlobMaintenanceService>());
             Assert.Same(module.Read, actor.GetResource<IBlobResponseContributor>());
             Assert.Equal("BLOB_CAPABILITY_MISSING", (await Assert.ThrowsAsync<InvalidOperationException>(
                 () => module.ReadyAsync(actor))).Message);
             actor.WithObjectStorage(new SignedStore());
             await module.ReadyAsync(actor);
+            await actor.ExecuteGraphSaveAsync("reject maintenance in graph", async _ =>
+            {
+                Assert.Equal("BLOB_TRANSACTION_REQUIRED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                    () => maintenance.RunBatchAsync(actor))).Message);
+                return true;
+            });
             Assert.Equal("BLOB_CAPABILITY_MISSING", Assert.Throws<InvalidOperationException>(
                 () => module.Install(actor)).Message);
         }
