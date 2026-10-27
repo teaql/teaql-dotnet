@@ -46,6 +46,25 @@ internal static class LogPrivacy
         _ => false
     };
 
+    // BlobRef is an internal typed Key. Collect its exact bytes only for in-memory
+    // scrubbing; generic JSON presentation deliberately rejects it.
+    private static IEnumerable<string> Strings(Value value) => value switch
+    {
+        Value.BlobRefValue(var reference) => [reference.ToSqlText()],
+        Value.ObjectValue(var record) => record.Values.SelectMany(Strings),
+        Value.ListValue(var values) => values.SelectMany(Strings),
+        _ => Strings(value.ToJsonValue())
+    };
+
+    internal static bool HasCredentials(Value value) => value switch
+    {
+        Value.BlobRefValue => true,
+        Value.ObjectValue(var record) => record.Any(pair =>
+            SensitiveLogNames.IsCredential(pair.Key) || HasCredentials(pair.Value)),
+        Value.ListValue(var values) => values.Any(HasCredentials),
+        _ => HasCredentials(value.ToJsonValue())
+    };
+
     internal static Value Copy(Value value) => value switch
     {
         Value.JsonValue v => new Value.JsonValue(v.Value?.DeepClone()),
@@ -57,6 +76,7 @@ internal static class LogPrivacy
     private static Value Mask(Value value) => value switch
     {
         Value.NullValue or Value.TypedNullValue => value,
+        Value.BlobRefValue => new Value.TextValue("[REDACTED]"),
         Value.JsonValue or Value.ObjectValue => new Value.TextValue("[REDACTED]"),
         Value.ListValue v => new Value.ListValue(v.Values.Select(Mask).ToList()),
         _ => new Value.TextValue(MaskAuditValue(value.ToJsonValue()?.ToString() ?? ""))
@@ -98,13 +118,14 @@ internal static class LogPrivacy
             var policy = invalid || invalidMask || policies.Count == 0 ? SqlParameterLogPolicy.Unknown : policies[i];
             if (!Enum.IsDefined(policy)) policy = SqlParameterLogPolicy.Unknown;
             bool forced = statementCredential || policy == SqlParameterLogPolicy.Credential
-                || HasCredentials(raw.ToJsonValue());
+                || HasCredentials(raw);
             bool priorMasked = source.MaskedParameters.Count == source.Parameters.Count && source.MaskedParameters[i];
             bool hide = forced || invalid || invalidMask || priorMasked || policy == SqlParameterLogPolicy.Unknown
                 || (!allowPlaintext && policy != SqlParameterLogPolicy.Plain);
             masked.Add(hide); effective.Add(policy);
-            if (hide) sensitive.AddRange(Strings(raw.ToJsonValue()));
-            values.Add(priorMasked ? Copy(raw) : !hide ? Copy(raw)
+            if (hide) sensitive.AddRange(Strings(raw));
+            values.Add(raw is Value.BlobRefValue ? new Value.TextValue("[REDACTED]")
+                : priorMasked ? Copy(raw) : !hide ? Copy(raw)
                 : raw is Value.NullValue or Value.TypedNullValue ? raw
                 : !forced && policy == SqlParameterLogPolicy.Masked ? Mask(raw) : new Value.TextValue("[REDACTED]"));
         }
@@ -112,10 +133,10 @@ internal static class LogPrivacy
         {
             var safeIntent = Project(intentSource, allowPlaintext);
             for (int i = 0; i < intentSource.Parameters.Count; i++)
-                if (safeIntent.MaskedParameters[i]) sensitive.AddRange(Strings(intentSource.Parameters[i].ToJsonValue()));
-            sensitive.AddRange(intentSource.IntentValues.SelectMany(value => Strings(value.ToJsonValue())));
+                if (safeIntent.MaskedParameters[i]) sensitive.AddRange(Strings(intentSource.Parameters[i]));
+            sensitive.AddRange(intentSource.IntentValues.SelectMany(Strings));
         }
-        sensitive.AddRange(source.IntentValues.SelectMany(value => Strings(value.ToJsonValue())));
+        sensitive.AddRange(source.IntentValues.SelectMany(Strings));
         var secrets = sensitive.Where(s => s.Length > 0).Distinct().OrderByDescending(s => s.Length).ToArray();
         string? Scrub(string? text)
         {
@@ -189,7 +210,7 @@ internal static class LogPrivacy
     {
         if (text == null) return null;
         // Audit intent is not a payload channel, even during SQL troubleshooting.
-        foreach (var value in values.SelectMany(value => Strings(value.ToJsonValue()))
+        foreach (var value in values.SelectMany(Strings)
             .Where(value => value.Length > 0).Distinct().OrderByDescending(value => value.Length))
             text = text.Replace(value, "[REDACTED]", StringComparison.Ordinal);
         return text;

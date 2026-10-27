@@ -373,8 +373,10 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         var descriptor = context.GetEntity(entity);
         return fields.Where(pair => {
             var property = descriptor?.PropertyByName(pair.Key);
-            return property == null || descriptor?.HasExplicitSqlLogPolicyMetadata != true
-                || LogPrivacy.HasCredentials(pair.Value.ToJsonValue())
+            return pair.Value is Value.BlobRefValue
+                || property?.DataType == DataType.BlobRef || property?.BlobSpec != null
+                || property == null || descriptor?.HasExplicitSqlLogPolicyMetadata != true
+                || LogPrivacy.HasCredentials(pair.Value)
                 || SensitiveLogNames.IsCredential(property.Name)
                 || SensitiveLogNames.IsCredential(property.ColumnNameString)
                 || descriptor.AuditMaskFieldList.Contains(property.Name);
