@@ -1,4 +1,6 @@
 using Microsoft.Data.Sqlite;
+using System.Net;
+using System.Security.Cryptography;
 using TeaQL.BlobReference;
 using TeaQL.Core;
 using TeaQL.Core.Storage;
@@ -302,5 +304,49 @@ public class BlobCatalogSqliteTests
         await command.ExecuteNonQueryAsync();
         var stale = await Assert.ThrowsAsync<InvalidOperationException>(() => catalog.CurrentReadAsync(slot));
         Assert.Equal("BLOB_READ_DENIED", stale.Message);
+    }
+
+    [Fact]
+    public async Task AuthorizedViewProjectsARealFileUrlAndDeniesRefreshAfterRevocation()
+    {
+        var (db, actor, catalog) = await Fixture(); await using var lifetime = db;
+        var parent = Path.Combine(Path.GetTempPath(), "teaql-blob-view-file-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(parent);
+        try
+        {
+            await using var store = new FileObjectStorage(Path.Combine(parent, "private"), RandomNumberGenerator.GetBytes(32));
+            store.Start();
+            var bytes = "%PDF-1x"u8.ToArray();
+            actor.WithObjectStorage(store);
+            await actor.ObjectStorage("put current Blob").PutBytesAsync(new ObjectKey("objects/abc"), bytes,
+                new(bytes.Length, ObjectWriteMode.CreateOnly, "application/pdf"));
+            await actor.ExecuteGraphSaveAsync("bind", async graph =>
+            {
+                await catalog.BindInGraphAsync(graph, actor,
+                    new BlobBindingChange(Target, Reference, 0, 1, "Create"), new Authorization("tenant-a"));
+                return true;
+            });
+            var slot = new AuthorizedBlobSlot(["document"], "Asset", "1", "file", "tenant-a", 1, Reference);
+            actor.InsertResource<IBlobResponseContributor>(new SqlBlobResponseContributor(catalog, new ReadAuthorization(true)));
+            actor.InsertResource<IResponseGraphAuthorizer>(new GraphAuthorizer(
+                new AuthorizedResponseGraph(new Dictionary<string, object?> { ["document"] = Reference }, [slot])));
+            var options = new ViewOptions("ordinary", "read_only", DateTimeOffset.UtcNow.AddSeconds(60));
+            var view = await new ViewPreparationService().PrepareAsync(actor, null, options);
+            var link = Assert.IsType<string>(Assert.IsType<Dictionary<string, object?>>(view.Presentation)["document"]);
+            Assert.DoesNotContain("objects/abc", link);
+            using var http = new HttpClient(new HttpClientHandler { UseProxy = false });
+            using (var response = await http.GetAsync(link))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(bytes, await response.Content.ReadAsByteArrayAsync());
+                Assert.Equal("application/pdf", response.Content.Headers.ContentType?.MediaType);
+                Assert.Equal("inline; filename=\"report.pdf\"", response.Content.Headers.ContentDisposition?.ToString());
+            }
+            actor.InsertResource<IBlobResponseContributor>(new SqlBlobResponseContributor(catalog, new ReadAuthorization(false)));
+            var denied = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+                new ViewPreparationService().PrepareAsync(actor, null, options));
+            Assert.Equal("BLOB_READ_DENIED", denied.Code);
+        }
+        finally { Directory.Delete(parent, true); }
     }
 }
