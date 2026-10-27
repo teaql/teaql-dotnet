@@ -152,7 +152,7 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
             if (change.Next != null)
             {
                 List<Record> available;
-                try { available = await lease.FetchAllAsync("SELECT key FROM teaql_blob_catalog WHERE key = @p0 AND scope = @p1 AND status = 'available'",
+                try { available = await lease.FetchAllAsync("SELECT key FROM teaql_blob_catalog WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')",
                     [new Value.TextValue(change.Next.Key), new Value.TextValue(scope)]); }
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
                 if (available.Count != 1) throw Error("BLOB_BIND_DENIED");
@@ -169,6 +169,23 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
             }
             catch { throw Error("BLOB_CATALOG_FAILED"); }
             if (affected != 1) throw Error("BLOB_BIND_DENIED");
+            if (change.Next != null)
+            {
+                ulong promoted;
+                try { promoted = await lease.ExecuteAsync(
+                    "UPDATE teaql_blob_catalog SET status = 'available' WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')",
+                    [new Value.TextValue(change.Next.Key), new Value.TextValue(scope)]); }
+                catch { throw Error("BLOB_CATALOG_FAILED"); }
+                if (promoted != 1) throw Error("BLOB_BIND_DENIED");
+            }
+            if (previous != null && !previous.Equals(change.Next))
+            {
+                try { await lease.ExecuteAsync(
+                    "UPDATE teaql_blob_catalog SET status = 'uploaded_unbound' WHERE key = @p0 AND scope = @p1 AND status = 'available' " +
+                    "AND NOT EXISTS (SELECT 1 FROM teaql_blob_binding WHERE key = @p2)",
+                    [new Value.TextValue(previous.Key), new Value.TextValue(scope), new Value.TextValue(previous.Key)]); }
+                catch { throw Error("BLOB_CATALOG_FAILED"); }
+            }
             return change.NextVersion;
         });
 }

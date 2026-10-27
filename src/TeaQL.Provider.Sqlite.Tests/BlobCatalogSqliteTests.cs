@@ -77,7 +77,7 @@ public class BlobCatalogSqliteTests
         command.CommandText = """
             INSERT INTO teaql_blob_catalog
             (key, scope, object_key, content_version, file_name, content_type, size_bytes, status)
-            VALUES ('blob_abc', 'tenant-a', 'objects/abc', 'v1', 'report.pdf', 'application/pdf', 7, 'available')
+            VALUES ('blob_abc', 'tenant-a', 'objects/abc', 'v1', 'report.pdf', 'application/pdf', 7, 'uploaded_unbound')
             """;
         await command.ExecuteNonQueryAsync();
         return (db, actor, catalog);
@@ -88,6 +88,13 @@ public class BlobCatalogSqliteTests
         await using var command = db.CreateCommand();
         command.CommandText = $"SELECT COUNT(*) FROM {table}";
         return (long)(await command.ExecuteScalarAsync())!;
+    }
+
+    private static async Task<string> CatalogStatus(SqliteConnection db)
+    {
+        await using var command = db.CreateCommand();
+        command.CommandText = "SELECT status FROM teaql_blob_catalog WHERE key = 'blob_abc'";
+        return (string)(await command.ExecuteScalarAsync())!;
     }
 
     private static async Task Insert(GraphMutationSession graph, ulong id)
@@ -112,6 +119,7 @@ public class BlobCatalogSqliteTests
         });
         Assert.Equal(1, await Count(db, "asset"));
         Assert.Equal(1, await Count(db, "teaql_blob_binding"));
+        Assert.Equal("available", await CatalogStatus(db));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => actor.ExecuteGraphSaveAsync(
             "rollback", async graph =>
@@ -155,6 +163,7 @@ public class BlobCatalogSqliteTests
                 new BlobBindingChange(Target, Reference, 0, 1, "Create"), allowed);
             return true;
         });
+        Assert.Equal("available", await CatalogStatus(db));
         foreach (var (change, auth, who) in new[] {
             (new BlobBindingChange(Target, Reference, 0, 2, "Update"), allowed, actor),
             (new BlobBindingChange(Target, Reference, 1, 2, "Update"),
@@ -174,12 +183,14 @@ public class BlobCatalogSqliteTests
                 new BlobBindingChange(Target, null, 1, 2, "Delete"), allowed));
             return true;
         });
+        Assert.Equal("uploaded_unbound", await CatalogStatus(db));
         await actor.ExecuteGraphSaveAsync("rebind", async graph =>
         {
             Assert.Equal(3, await catalog.BindInGraphAsync(graph, actor,
                 new BlobBindingChange(Target, Reference, 2, 3, "Update"), allowed));
             return true;
         });
+        Assert.Equal("available", await CatalogStatus(db));
         await using var command = db.CreateCommand();
         command.CommandText = "SELECT key, version FROM teaql_blob_binding WHERE scope = 'tenant-a'";
         await using var reader = await command.ExecuteReaderAsync();
@@ -187,6 +198,37 @@ public class BlobCatalogSqliteTests
         Assert.Equal(Reference.Key, reader.GetString(0));
         Assert.Equal(3, reader.GetInt64(1));
         Assert.False(await reader.ReadAsync());
+    }
+
+    [Fact]
+    public async Task FinalUnbindAloneReturnsSharedBlobToUnbound()
+    {
+        var (db, actor, catalog) = await Fixture(); await using var lifetime = db;
+        var allowed = new Authorization("tenant-a");
+        var second = new BlobBindingTarget("Asset", "2", "file");
+        await actor.ExecuteGraphSaveAsync("bind two targets", async graph =>
+        {
+            await catalog.BindInGraphAsync(graph, actor,
+                new BlobBindingChange(Target, Reference, 0, 1, "Create"), allowed);
+            await catalog.BindInGraphAsync(graph, actor,
+                new BlobBindingChange(second, Reference, 0, 1, "Create"), allowed);
+            return true;
+        });
+        Assert.Equal("available", await CatalogStatus(db));
+        await actor.ExecuteGraphSaveAsync("clear first", async graph =>
+        {
+            await catalog.BindInGraphAsync(graph, actor,
+                new BlobBindingChange(Target, null, 1, 2, "Delete"), allowed);
+            return true;
+        });
+        Assert.Equal("available", await CatalogStatus(db));
+        await actor.ExecuteGraphSaveAsync("clear final", async graph =>
+        {
+            await catalog.BindInGraphAsync(graph, actor,
+                new BlobBindingChange(second, null, 1, 2, "Delete"), allowed);
+            return true;
+        });
+        Assert.Equal("uploaded_unbound", await CatalogStatus(db));
     }
 
     [Fact]
