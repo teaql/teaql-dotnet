@@ -82,7 +82,7 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
     }
 
     private static ObjectMetadata Metadata(ObjectKey key, Manifest value) =>
-        new(key, value.Size, value.ContentType, value.Sha256, value.Modified, value.Metadata);
+        new(key, value.Size, value.ContentType, value.Sha256 + "." + value.Version, value.Modified, value.Metadata);
 
     private FileStream OpenData(string hash, Manifest value)
     {
@@ -291,7 +291,7 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
             response.Headers["Cache-Control"] = "private, no-store";
             response.Headers["X-Content-Type-Options"] = "nosniff";
             response.Headers["Accept-Ranges"] = "bytes";
-            response.Headers["ETag"] = "\"" + manifest.Sha256 + "\"";
+            response.Headers["ETag"] = "\"" + manifest.Sha256 + "." + manifest.Version + "\"";
             if (ticket.Disposition is not null) response.Headers["Content-Disposition"] = ticket.Disposition;
             var start = 0L; var end = manifest.Size - 1;
             var range = request.Headers["Range"];

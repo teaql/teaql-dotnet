@@ -27,8 +27,13 @@ public class BlobFileObjectStorageTests
             Assert.Equal(StorageErrorCode.NotConfigured, beforeStart.Code);
             Assert.Equal("127.0.0.1", provider.Start().Host);
             Assert.Null(await actor.HeadAsync(key));
-            Assert.Equal(bytes.Length, (await actor.PutBytesAsync(key, bytes,
-                new(bytes.Length, ObjectWriteMode.CreateOnly, "application/pdf"))).Size);
+            var initial = await actor.PutBytesAsync(key, bytes,
+                new(bytes.Length, ObjectWriteMode.CreateOnly, "application/pdf"));
+            Assert.Equal(bytes.Length, initial.Size);
+            var sameBytes = await actor.PutBytesAsync(key, bytes,
+                new(bytes.Length, ObjectWriteMode.Replace, "application/pdf"));
+            Assert.NotEqual(initial.ETag, sameBytes.ETag);
+            Assert.StartsWith(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() + ".", sameBytes.ETag);
             var conflict = await Assert.ThrowsAsync<StorageException>(() => actor.PutBytesAsync(key, bytes,
                 new(bytes.Length, ObjectWriteMode.CreateOnly)));
             Assert.Equal(StorageErrorCode.Conflict, conflict.Code);
@@ -44,6 +49,7 @@ public class BlobFileObjectStorageTests
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(bytes, await response.Content.ReadAsByteArrayAsync());
                 Assert.Equal("application/pdf", response.Content.Headers.ContentType?.MediaType);
+                Assert.Equal($"\"{sameBytes.ETag}\"", response.Headers.ETag?.ToString());
                 Assert.Equal("attachment; filename=\"report.pdf\"", response.Content.Headers.ContentDisposition?.ToString());
                 Assert.True(response.Headers.CacheControl?.Private);
                 Assert.True(response.Headers.CacheControl?.NoStore);
