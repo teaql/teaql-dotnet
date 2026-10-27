@@ -106,21 +106,27 @@ public sealed class SqliteDocumentCommandJournal(ISqlTransport transport)
         if (command == null) throw Error("DOCUMENT_COMMAND_INVALID");
         Text(command.BusinessId, 16384); Text(command.DocumentToken, MaximumBytes);
         Text(command.CommandId, 256);
-        if (command.Body.ValueKind != JsonValueKind.Object) throw Error("DOCUMENT_COMMAND_INVALID");
+        var bodyCopy = CopyBody(command.Body);
+        var body = bodyCopy.GetRawText();
+        if (JsonSerializer.SerializeToUtf8Bytes(new[] { command.BusinessId,
+                command.DocumentToken, command.CommandId, body }).Length > MaximumBytes)
+            throw Error("DOCUMENT_COMMAND_INVALID");
+        return (Hash(command.BusinessId, command.DocumentToken, command.CommandId, body),
+            command with { Body = bodyCopy });
+    }
+
+    internal static JsonElement CopyBody(JsonElement body)
+    {
+        if (body.ValueKind != JsonValueKind.Object) throw Error("DOCUMENT_COMMAND_INVALID");
         using var stream = new MemoryStream();
         using (var writer = new Utf8JsonWriter(stream))
         {
             var remaining = 100000;
-            Canonical(writer, command.Body, ref remaining, 0);
+            Canonical(writer, body, ref remaining, 0);
         }
         if (stream.Length > MaximumBytes) throw Error("DOCUMENT_COMMAND_INVALID");
         using var copied = JsonDocument.Parse(stream.ToArray());
-        var frozen = command with { Body = copied.RootElement.Clone() };
-        var body = Encoding.UTF8.GetString(stream.ToArray());
-        if (JsonSerializer.SerializeToUtf8Bytes(new[] { command.BusinessId,
-                command.DocumentToken, command.CommandId, body }).Length > MaximumBytes)
-            throw Error("DOCUMENT_COMMAND_INVALID");
-        return (Hash(command.BusinessId, command.DocumentToken, command.CommandId, body), frozen);
+        return copied.RootElement.Clone();
     }
 
     private static DocumentCommandReceipt Check(DocumentCommandReceipt receipt)
