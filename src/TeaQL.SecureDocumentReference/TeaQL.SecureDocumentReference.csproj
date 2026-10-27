@@ -7,5 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\TeaQL.Core\TeaQL.Core.csproj" />
     <ProjectReference Include="..\TeaQL.Runtime\TeaQL.Runtime.csproj" />
+    <ProjectReference Include="..\TeaQL.Sql\TeaQL.Sql.csproj" />
   </ItemGroup>
 </Project>
