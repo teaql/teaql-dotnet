@@ -64,6 +64,7 @@ public abstract record Value
         double item => new F64Value(item),
         decimal item => new DecimalValue(item),
         string item => new TextValue(item),
+        BlobRef item => new TextValue(item.ToSqlText()),
         DateTime item => new TimestampValue(new DateTimeOffset(item).ToUnixTimeMilliseconds()),
         DateTimeOffset item => new TimestampValue(item.ToUnixTimeMilliseconds()),
         Record item => new ObjectValue(item),

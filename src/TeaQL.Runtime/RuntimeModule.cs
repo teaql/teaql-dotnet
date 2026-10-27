@@ -12,6 +12,9 @@ public class RuntimeModule
     internal Dictionary<string, IEntityChecker> Checkers { get; } = new();
     internal Func<UserContext, Task>? GeneratedBootstrapCallback { get; private set; }
     public Dictionary<string, WireEntityMetadata> WireMetadata { get; } = new();
+    private readonly HashSet<string> _requiredCapabilities = new(StringComparer.Ordinal);
+    public IReadOnlyList<string> RequiredCapabilities => _requiredCapabilities
+        .OrderBy(x => x, StringComparer.Ordinal).ToArray();
 
     public RuntimeModule() { }
 
@@ -22,8 +25,10 @@ public class RuntimeModule
         IReadOnlyDictionary<string, Record> schemaSamples,
         IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> requiredFields,
         IReadOnlyDictionary<string, IReadOnlyList<RelationDescriptor>>? relations = null,
-        IReadOnlyDictionary<string, string>? tableNames = null)
+        IReadOnlyDictionary<string, string>? tableNames = null,
+        IEnumerable<string>? requiredCapabilities = null)
     {
+        if (requiredCapabilities != null) WithRequiredCapabilities(requiredCapabilities.ToArray());
         foreach (var entity in entities)
         {
             var descriptor = EntityDescriptor.New(entity);
@@ -82,6 +87,19 @@ public class RuntimeModule
         return this;
     }
 
+    public RuntimeModule WithRequiredCapabilities(params string[] capabilities)
+    {
+        ArgumentNullException.ThrowIfNull(capabilities);
+        foreach (var name in capabilities)
+        {
+            if (string.IsNullOrWhiteSpace(name) || name != name.Trim()
+                || name.Any(char.IsWhiteSpace))
+                throw new ArgumentException("Invalid runtime capability", nameof(capabilities));
+            _requiredCapabilities.Add(name);
+        }
+        return this;
+    }
+
     public RuntimeModule WireEntity(WireEntityMetadata metadata) { WireMetadata[metadata.EntityType] = metadata; return this; }
 
     public RuntimeModule Entity(EntityDescriptor descriptor)
@@ -101,6 +119,8 @@ public class RuntimeModule
         foreach (var metadata in other.WireMetadata.Values) combined.WireEntity(metadata);
         foreach (var checker in Checkers) combined.Checker(checker.Key, checker.Value);
         foreach (var checker in other.Checkers) combined.Checker(checker.Key, checker.Value);
+        combined.WithRequiredCapabilities(RequiredCapabilities.ToArray());
+        combined.WithRequiredCapabilities(other.RequiredCapabilities.ToArray());
         if (GeneratedBootstrapCallback != null) combined.GeneratedBootstrap(GeneratedBootstrapCallback);
         if (other.GeneratedBootstrapCallback != null) combined.GeneratedBootstrap(other.GeneratedBootstrapCallback);
         return combined;
@@ -115,6 +135,7 @@ public class RuntimeModule
 
     public void ApplyTo(UserContext context)
     {
+        context.InstallRequiredCapabilities(RequiredCapabilities);
         context.Metadata = Metadata;
         context.EntityRegistry = EntityRegistry;
         context.InstallCheckers(Checkers);

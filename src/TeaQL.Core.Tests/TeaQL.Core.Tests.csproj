@@ -24,6 +24,8 @@
     <ProjectReference Include="..\TeaQL.Core\TeaQL.Core.csproj" />
     <None Update="fixtures/sql-trace-path-v1.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="fixtures/smart-list-semantics.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../test-vectors/blob-value-cases.json" Link="fixtures/blob-value-cases.json"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
