@@ -87,6 +87,56 @@ public class BlobUploadSqliteTests
         }
     }
 
+    private sealed class FailedReplayStream : MemoryStream
+    {
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer,
+            CancellationToken cancellationToken = default) =>
+            throw new IOException("PRIVATE-REPLAY-SOURCE-CANARY");
+    }
+
+    private sealed class CountingStore(IObjectStorageProvider inner) : IObjectStorageProvider
+    {
+        public int Puts;
+        public Task<ObjectMetadata> PutAsync(StorageInvocation invocation, ObjectKey key,
+            Stream content, ObjectPutOptions options)
+        { Puts++; return inner.PutAsync(invocation, key, content, options); }
+        public Task<ObjectContent> GetAsync(StorageInvocation invocation, ObjectKey key) =>
+            inner.GetAsync(invocation, key);
+        public Task<ObjectMetadata?> HeadAsync(StorageInvocation invocation, ObjectKey key) =>
+            inner.HeadAsync(invocation, key);
+        public Task DeleteAsync(StorageInvocation invocation, ObjectKey key) =>
+            inner.DeleteAsync(invocation, key);
+        public Task<ObjectReadUrl> GetReadUrlAsync(StorageInvocation invocation, ObjectKey key,
+            ObjectReadUrlOptions options) => inner.GetReadUrlAsync(invocation, key, options);
+    }
+
+    private sealed class LostCommitTransport(ISqlTransactionTransport inner) : ISqlTransactionTransport
+    {
+        public bool LoseNextCommitReply;
+        public Task<List<TeaQL.Core.Record>> FetchAllSqlAsync(CompiledQuery query) => inner.FetchAllSqlAsync(query);
+        public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+        public async Task<ISqlTransaction> BeginSqlAsync()
+        {
+            var tx = await inner.BeginSqlAsync();
+            if (!LoseNextCommitReply) return tx;
+            LoseNextCommitReply = false;
+            return new LostCommitTx(tx);
+        }
+
+        private sealed class LostCommitTx(ISqlTransaction inner) : ISqlTransaction
+        {
+            public Task<List<TeaQL.Core.Record>> FetchAllSqlAsync(CompiledQuery query) => inner.FetchAllSqlAsync(query);
+            public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+            public async Task CommitSqlAsync()
+            {
+                await inner.CommitSqlAsync();
+                throw new IOException("PRIVATE-COMMIT-CANARY");
+            }
+            public Task RollbackSqlAsync() => inner.RollbackSqlAsync();
+            public void Dispose() => inner.Dispose();
+        }
+    }
+
     private sealed class PausedVerifier : IBlobContentVerifier
     {
         public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -164,8 +214,7 @@ public class BlobUploadSqliteTests
             Assert.False(competingWrite.IsCompleted, "competing write passed the SQL owner during File I/O");
             pausedSource.Release.SetResult();
             Assert.Equal(bytes.Length, await firstWrite.WaitAsync(TimeSpan.FromSeconds(5)));
-            Assert.Equal("BLOB_IDEMPOTENCY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
-                () => competingWrite.WaitAsync(TimeSpan.FromSeconds(5)))).Message);
+            Assert.Equal(bytes.Length, await competingWrite.WaitAsync(TimeSpan.FromSeconds(5)));
 
             var firstConfirm = first.CompleteAsync(actor1, session.UploadId);
             await verifier.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
@@ -177,6 +226,63 @@ public class BlobUploadSqliteTests
             Assert.Equal(session.Reference, await firstConfirm.WaitAsync(TimeSpan.FromSeconds(5)));
             Assert.Equal(session.Reference, await competingConfirm.WaitAsync(TimeSpan.FromSeconds(5)));
             Assert.Equal(1, verifier.Calls);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task CommittedWriteWithLostReplyReplaysOnlySameBytesAndGeneration()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-blob-commit-unknown-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var transport = new LostCommitTransport(new SqliteTransport(db));
+            var catalog = new SqliteBlobCatalog(transport);
+            await catalog.EnsureSchemaAsync();
+            await using var file = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var store = new CountingStore(file);
+            var actor = new UserContext().WithObjectStorage(store);
+            var policy = new UploadAuthorization();
+            var verifier = new PdfVerifier();
+            var service = new SqliteBlobUploadService(catalog, policy, verifier, 10_000);
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nSQL commit succeeded, reply lost\n%%EOF");
+            var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
+                new BlobUploadInput("report.pdf", bytes.Length), "unknown-write");
+            transport.LoseNextCommitReply = true;
+            Assert.Equal("BLOB_CATALOG_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)))).Message);
+            Assert.Equal("written", await Scalar(db,
+                "SELECT state FROM teaql_blob_upload WHERE key=@key", session.Reference.Key));
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            Assert.Equal(1, store.Puts);
+            policy.Allowed = false;
+            Assert.Equal("BLOB_UPLOAD_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)))).Message);
+            policy.Allowed = true;
+            Assert.Equal("BLOB_IDEMPOTENCY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId,
+                    new MemoryStream(Enumerable.Repeat((byte)'x', bytes.Length).ToArray())))).Message);
+            Assert.Equal("BLOB_IDEMPOTENCY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes[..^1])))).Message);
+            Assert.Equal("BLOB_STORE_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId, new FailedReplayStream()))).Message);
+            Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
+            Assert.Equal(1, store.Puts);
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal(1, verifier.Calls);
+            Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
+            Assert.Equal(1, verifier.Calls);
+            var objectKey = await Scalar(db,
+                "SELECT object_key FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key);
+            await actor.ObjectStorage("replace File generation").PutBytesAsync(new ObjectKey(objectKey),
+                bytes, new ObjectPutOptions(bytes.Length, ObjectWriteMode.Replace, "application/pdf"));
+            Assert.Equal("BLOB_IDEMPOTENCY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)))).Message);
         }
         finally { Directory.Delete(root, recursive: true); }
     }

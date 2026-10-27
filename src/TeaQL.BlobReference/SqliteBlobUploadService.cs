@@ -282,31 +282,60 @@ public sealed class SqliteBlobUploadService
         if (!source.Eof || source.Count != row.DeclaredSize)
             throw Error("BLOB_STORE_FAILED");
         var digest = source.Digest();
+        var metadata = await VerifyStoredAsync(store, key, source.Count, mime, digest,
+            null, "BLOB_STORE_FAILED");
+        return (metadata, digest);
+    }
+
+    private static async Task<ObjectMetadata> VerifyStoredAsync(ObjectStorage store, ObjectKey key,
+        long expectedSize, string mime, string digest, string? expectedETag, string mismatch)
+    {
         var before = await store.HeadAsync(key);
-        if (before == null || before.Size != source.Count || before.ContentType != mime ||
-            string.IsNullOrEmpty(before.ETag)) throw Error("BLOB_STORE_FAILED");
+        if (before == null || before.Size != expectedSize || before.ContentType != mime ||
+            string.IsNullOrEmpty(before.ETag) || expectedETag != null && before.ETag != expectedETag)
+            throw Error(mismatch);
         await using (var content = await store.GetAsync(key))
         {
             if (content.Metadata.Size != before.Size || content.Metadata.ETag != before.ETag ||
-                content.Metadata.ContentType != mime) throw Error("BLOB_STORE_FAILED");
+                content.Metadata.ContentType != mime) throw Error(mismatch);
             using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
             var buffer = new byte[65536];
             long count = 0;
             int read;
             while ((read = await content.Stream.ReadAsync(buffer)) != 0)
             {
-                if (count > source.Count - read) throw Error("BLOB_STORE_FAILED");
+                if (count > expectedSize - read) throw Error(mismatch);
                 hash.AppendData(buffer.AsSpan(0, read));
                 count += read;
             }
-            if (count != source.Count ||
+            if (count != expectedSize ||
                 Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant() != digest)
-                throw Error("BLOB_STORE_FAILED");
+                throw Error(mismatch);
         }
         var after = await store.HeadAsync(key);
         if (after == null || after.Size != before.Size || after.ETag != before.ETag ||
-            after.ContentType != mime) throw Error("BLOB_STORE_FAILED");
-        return (before, digest);
+            after.ContentType != mime) throw Error(mismatch);
+        return before;
+    }
+
+    private static async Task ConsumeReplaySourceAsync(Stream source, long expectedSize, string digest)
+    {
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        var buffer = new byte[65536];
+        long count = 0;
+        while (true)
+        {
+            int read;
+            try { read = await source.ReadAsync(buffer); }
+            catch { throw Error("BLOB_STORE_FAILED"); }
+            if (read == 0) break;
+            if (count > expectedSize - read) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
+            count += read;
+            hash.AppendData(buffer.AsSpan(0, read));
+        }
+        if (count != expectedSize ||
+            Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant() != digest)
+            throw Error("BLOB_IDEMPOTENCY_CONFLICT");
     }
 
     public async Task<long> WriteAsync(UserContext actor, string uploadId, Stream source)
@@ -316,9 +345,49 @@ public sealed class SqliteBlobUploadService
         return await Transaction(async tx =>
         {
             var row = await Row(actor, uploadId, "Write", tx);
-            if (row.State != "initiated") throw Error("BLOB_IDEMPOTENCY_CONFLICT");
-            var key = await ObjectKey(row, tx);
+            List<Record> records;
+            try { records = await tx.FetchAllSqlAsync(Query("""
+                SELECT object_key,status,content_version,content_type,size_bytes FROM teaql_blob_catalog
+                WHERE key=@p0 AND scope=@p1
+                """, Text(row.Key), Text(row.Scope))); }
+            catch { throw Error("BLOB_CATALOG_FAILED"); }
+            if (records.Count != 1) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
+            var catalog = records[0];
+            ObjectKey key;
+            try { key = new ObjectKey(Required(catalog, "object_key")); }
+            catch { throw Error("BLOB_CATALOG_FAILED"); }
             var mime = BlobFieldSpec.MimeForExtension(row.Extension) ?? throw Error("BLOB_FORMAT_NOT_ALLOWED");
+            if (row.State is "written" or "completed")
+            {
+                if (row.WrittenSha256 == null || !Regex.IsMatch(row.WrittenSha256, "\\A[0-9a-f]{64}\\z") ||
+                    string.IsNullOrEmpty(row.WrittenETag) || row.State == "written" &&
+                    catalog.GetValueOrDefault("status")?.TryText() != "initiated")
+                    throw Error("BLOB_IDEMPOTENCY_CONFLICT");
+                if (row.State == "completed" &&
+                    (catalog.GetValueOrDefault("status")?.TryText() is not ("uploaded_unbound" or "available") ||
+                     catalog.GetValueOrDefault("content_version")?.TryText() != row.WrittenETag ||
+                     catalog.GetValueOrDefault("content_type")?.TryText() != mime ||
+                     catalog.GetValueOrDefault("size_bytes")?.TryI64() != row.DeclaredSize))
+                    throw Error("BLOB_IDEMPOTENCY_CONFLICT");
+                var target = new BlobUploadTarget(row.Entity, row.EntityId, row.Field);
+                var input = new BlobUploadInput(row.FileName, row.DeclaredSize);
+                await Current(actor, target, "Write", input, row.Scope, tx);
+                if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
+                await ConsumeReplaySourceAsync(source, row.DeclaredSize, row.WrittenSha256);
+                ObjectStorage store;
+                try { store = actor.ObjectStorage("recheck committed Blob upload"); }
+                catch { throw Error("BLOB_STORE_FAILED"); }
+                try { await VerifyStoredAsync(store, key, row.DeclaredSize, mime, row.WrittenSha256,
+                    row.WrittenETag, "BLOB_IDEMPOTENCY_CONFLICT"); }
+                catch (InvalidOperationException error) when (error.Message == "BLOB_IDEMPOTENCY_CONFLICT")
+                { throw; }
+                catch { throw Error("BLOB_STORE_FAILED"); }
+                await Current(actor, target, "Write", input, row.Scope, tx);
+                if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
+                return row.DeclaredSize;
+            }
+            if (row.State != "initiated" || catalog.GetValueOrDefault("status")?.TryText() != "initiated")
+                throw Error("BLOB_IDEMPOTENCY_CONFLICT");
             var reader = new HashingReadStream(source, row.DeclaredSize);
             try
             {
