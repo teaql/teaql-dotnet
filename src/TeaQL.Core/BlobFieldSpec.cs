@@ -15,6 +15,10 @@ public sealed class BlobFieldSpec
         ["pdf"] = "application/pdf"
     };
 
+    /// <summary>Resolve only the frozen Blob format set, never a client MIME hint.</summary>
+    public static string? MimeForExtension(string extension) =>
+        extension is not null && Mime.TryGetValue(extension, out var value) ? value : null;
+
     public string Entity { get; }
     public string Field { get; }
     public bool Nullable { get; }
