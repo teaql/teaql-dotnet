@@ -21,8 +21,13 @@ provider API, and retries a failed final catalog acknowledgment. File storage
 uses a persistent per-object OS lock for manifest updates and conditional
 deletion across processes. Its ETag includes an immutable generation token,
 so a same-byte replacement cannot match an older version. The matching
-current File generation is removed; older immutable generations still need a
-separate collector. Keep Blob object keys unique and immutable; direct-upload
+current File generation is removed. The host may separately call
+`FileObjectStorage.SweepOldGenerationsAsync(key)` for a known key to remove
+inaccessible older immutable data generations. This sweep waits for a
+persistent writer lock before taking the manifest lock and preserves the
+current generation; all processes sharing the private root must first run a
+writer-lock-capable version. Scheduling and retry remain host responsibilities.
+Keep Blob object keys unique and immutable; direct-upload
 quiescence needs separate implementation.
 
 For retention-aware uploads, the host can implement

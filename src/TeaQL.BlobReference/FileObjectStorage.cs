@@ -13,7 +13,7 @@ namespace TeaQL.BlobReference;
 
 /// <summary>
 /// A server-owned local store. The root and its parent must be protected from untrusted writers.
-/// Old immutable data generations require a separate collector; deleting a key removes its manifest.
+/// Old immutable data generations can be swept explicitly by a host.
 /// Start explicitly enables the loopback-only HTTP read gateway.
 /// </summary>
 public sealed class FileObjectStorage : IObjectStorageProvider, IObjectStorageConditionalDeleter, IAsyncDisposable
@@ -25,7 +25,7 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IObjectStorageCo
     private readonly string _root;
     private readonly byte[] _secret;
     private readonly SemaphoreSlim _writeLock = new(1, 1);
-    private static readonly ConcurrentDictionary<string, SemaphoreSlim> ManifestLocks = new(StringComparer.Ordinal);
+    private static readonly ConcurrentDictionary<(string Root, string Name), SemaphoreSlim> FileLocks = new();
     private readonly object _gatewayLock = new();
     private HttpListener? _listener;
     private Task? _worker;
@@ -72,10 +72,12 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IObjectStorageCo
         }
     }
 
-    private async Task<ManifestLock> LockManifestAsync(string directory, CancellationToken cancellationToken)
+    private async Task<ManifestLock> LockFileAsync(string directory, string name, CancellationToken cancellationToken)
     {
-        var path = Path.Combine(directory, "manifest.lock");
-        var local = ManifestLocks.GetOrAdd(_root, _ => new SemaphoreSlim(1, 1));
+        var path = Path.Combine(directory, name);
+        // Keep the in-process semaphore table bounded by configured roots.
+        // The OS lock file still distinguishes individual object directories.
+        var local = FileLocks.GetOrAdd((_root, name), _ => new SemaphoreSlim(1, 1));
         await local.WaitAsync(cancellationToken).ConfigureAwait(false);
         FileStream? stream = null;
         try
@@ -114,6 +116,9 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IObjectStorageCo
             throw new StorageException(StorageErrorCode.Unavailable);
         }
     }
+
+    private Task<ManifestLock> LockManifestAsync(string directory, CancellationToken cancellationToken) =>
+        LockFileAsync(directory, "manifest.lock", cancellationToken);
 
     private void EnsureRoot(bool create)
     {
@@ -181,6 +186,9 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IObjectStorageCo
             var directory = DirectoryFor(hash);
             if (OperatingSystem.IsWindows()) Directory.CreateDirectory(directory);
             else Directory.CreateDirectory(directory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+            // This lock spans data creation, publication and failed-write cleanup.
+            // The generation sweep takes it before taking the manifest lock.
+            using var writer = await LockFileAsync(directory, "writer.lock", invocation.CancellationToken).ConfigureAwait(false);
             var version = Version();
             var dataPath = DataPath(directory, version);
             var tempPath = Path.Combine(directory, "manifest-" + version);
@@ -305,6 +313,42 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IObjectStorageCo
             }
             catch { throw new StorageException(StorageErrorCode.Io); }
         }
+    }
+
+    /// <summary>
+    /// Host-scheduled cleanup for one known key. Upgrade every process sharing
+    /// this private root to a writer-lock-capable version before enabling it.
+    /// </summary>
+    public async Task<int> SweepOldGenerationsAsync(ObjectKey key, CancellationToken cancellationToken = default)
+    {
+        if (!Directory.Exists(_root)) return 0;
+        EnsureRoot(false);
+        var hash = Hash(key);
+        var directory = DirectoryFor(hash);
+        if (!Directory.Exists(directory)) return 0;
+        using var writer = await LockFileAsync(directory, "writer.lock", cancellationToken).ConfigureAwait(false);
+        using var manifestLock = await LockManifestAsync(directory, cancellationToken).ConfigureAwait(false);
+        var current = ReadManifest(hash);
+        var keep = current is null ? null : "data-" + current.Version;
+        var removed = 0;
+        try
+        {
+            foreach (var path in Directory.EnumerateFiles(directory, "data-*"))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var name = Path.GetFileName(path);
+                if (name == keep || !name.StartsWith("data-", StringComparison.Ordinal) || !ValidVersion(name[5..])) continue;
+                var info = new FileInfo(path);
+                if (!info.Exists || info.LinkTarget is not null)
+                    throw new StorageException(StorageErrorCode.Unavailable);
+                File.Delete(path);
+                removed++;
+            }
+            return removed;
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (StorageException) { throw; }
+        catch { throw new StorageException(StorageErrorCode.Io); }
     }
 
     private string Seal(Ticket ticket)

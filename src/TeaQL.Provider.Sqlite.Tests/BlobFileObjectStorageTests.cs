@@ -13,6 +13,61 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class BlobFileObjectStorageTests
 {
+    private sealed class PausedReadStream(byte[] bytes) : MemoryStream(bytes)
+    {
+        private readonly TaskCompletionSource _started = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource _proceed = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public Task Started => _started.Task;
+        public void Release() => _proceed.TrySetResult();
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            _started.TrySetResult();
+            await _proceed.Task.WaitAsync(cancellationToken);
+            return await base.ReadAsync(buffer, cancellationToken);
+        }
+    }
+
+    [Fact]
+    public async Task GenerationSweepWaitsForWriterAndPreservesCurrentData()
+    {
+        var parent = Path.Combine(Path.GetTempPath(), "teaql-file-sweep-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(parent);
+        PausedReadStream? source = null;
+        try
+        {
+            var root = Path.Combine(parent, "private");
+            var secret = RandomNumberGenerator.GetBytes(32);
+            await using var first = new FileObjectStorage(root, secret);
+            await using var second = new FileObjectStorage(root, secret);
+            var writer = new UserContext().WithObjectStorage(first).ObjectStorage("write File generations");
+            var key = new ObjectKey("blob/generation-sweep");
+            var bytes = Encoding.UTF8.GetBytes("same bytes");
+            var initial = await writer.PutBytesAsync(key, bytes, new(bytes.Length, ObjectWriteMode.CreateOnly));
+            var newer = await writer.PutBytesAsync(key, bytes, new(bytes.Length, ObjectWriteMode.Replace));
+            Assert.NotEqual(initial.ETag, newer.ETag);
+            source = new PausedReadStream(bytes);
+            var writing = writer.PutAsync(key, source, new(bytes.Length, ObjectWriteMode.Replace));
+            await source.Started.WaitAsync(TimeSpan.FromSeconds(5));
+            var sweeping = second.SweepOldGenerationsAsync(key);
+            await Task.Delay(100);
+            Assert.False(sweeping.IsCompleted);
+            source.Release();
+            var current = await writing;
+            Assert.Equal(2, await sweeping);
+            Assert.Equal(current.ETag, (await writer.HeadAsync(key))?.ETag);
+            Assert.Equal(0, await second.SweepOldGenerationsAsync(key));
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key.Value))).ToLowerInvariant();
+            var directory = Path.Combine(root, hash[..2], hash);
+            Assert.False(File.Exists(Path.Combine(directory, "data-" + initial.ETag!.Split('.').Last())));
+            Assert.True(File.Exists(Path.Combine(directory, "data-" + current.ETag!.Split('.').Last())));
+        }
+        finally
+        {
+            source?.Release();
+            Directory.Delete(parent, true);
+        }
+    }
+
     [Fact]
     public async Task ConditionalDeleteWaitsForExternalManifestLockOnLinux()
     {
