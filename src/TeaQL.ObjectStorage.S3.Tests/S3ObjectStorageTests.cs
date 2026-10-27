@@ -27,6 +27,8 @@ public class S3ObjectStorageTests
             new AmazonS3Config { ServiceURL = endpoint, AuthenticationRegion = "us-east-1", ForcePathStyle = true }), bucket!);
         var storage = new UserContext().WithObjectStorage(provider).ObjectStorage("F4 real S3-compatible .NET");
         var key = new ObjectKey("f4/dotnet/" + Guid.NewGuid().ToString("N"));
+        var createKey = new ObjectKey("f4/dotnet/create/" + Guid.NewGuid().ToString("N"));
+        var raceKey = new ObjectKey("f4/dotnet/race/" + Guid.NewGuid().ToString("N"));
         var bytes = Encoding.ASCII.GetBytes("%PDF-1.7\nF4 real S3-compatible bytes\n%%EOF");
         using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
         try
@@ -50,8 +52,32 @@ public class S3ObjectStorageTests
             if (delay > TimeSpan.Zero) await Task.Delay(delay);
             using var expired = await http.GetAsync(ticket.Url);
             Assert.Equal(HttpStatusCode.Forbidden, expired.StatusCode);
+            if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_CREATE_ONLY") == "1")
+            {
+                var create = new ObjectPutOptions(bytes.Length, ObjectWriteMode.CreateOnly, "application/pdf");
+                var created = await storage.PutBytesAsync(createKey, bytes, create);
+                await Expect(StorageErrorCode.Conflict, () => storage.PutBytesAsync(createKey,
+                    Enumerable.Repeat((byte)'x', bytes.Length).ToArray(), create));
+                Assert.Equal(created.ETag, (await storage.HeadAsync(createKey))?.ETag);
+                Assert.Equal(bytes, await storage.GetBytesAsync(createKey, 1024));
+                var candidates = new[] { bytes, Enumerable.Repeat((byte)'y', bytes.Length).ToArray() };
+                var attempts = candidates.Select(value => storage.PutBytesAsync(raceKey, value, create)).ToArray();
+                var winner = -1;
+                for (var i = 0; i < attempts.Length; i++)
+                {
+                    try { await attempts[i]; Assert.Equal(-1, winner); winner = i; }
+                    catch (StorageException error) { Assert.Equal(StorageErrorCode.Conflict, error.Code); }
+                }
+                Assert.InRange(winner, 0, 1);
+                Assert.Equal(candidates[winner], await storage.GetBytesAsync(raceKey, 1024));
+            }
         }
-        finally { await storage.DeleteAsync(key); }
+        finally
+        {
+            await storage.DeleteAsync(key);
+            if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_CREATE_ONLY") == "1")
+            { await storage.DeleteAsync(createKey); await storage.DeleteAsync(raceKey); }
+        }
     }
 
     [Fact]
