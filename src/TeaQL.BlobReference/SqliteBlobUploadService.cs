@@ -37,6 +37,7 @@ public interface IBlobContentVerifier
 public sealed class SqliteBlobUploadService
 {
     private readonly SqliteBlobCatalog _catalog;
+    internal SqliteBlobCatalog Catalog => _catalog;
     private readonly ISqlTransactionTransport _transport;
     private readonly IBlobUploadAuthorization _authorization;
     private readonly IBlobContentVerifier _verifier;

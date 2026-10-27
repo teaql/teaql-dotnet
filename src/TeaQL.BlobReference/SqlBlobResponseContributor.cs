@@ -13,6 +13,7 @@ public interface IBlobReadAuthorization
 public sealed class SqlBlobResponseContributor : IBlobResponseContributor
 {
     private readonly SqliteBlobCatalog _catalog;
+    internal SqliteBlobCatalog Catalog => _catalog;
     private readonly IBlobReadAuthorization _authorization;
     private readonly int _maximumUrlSeconds;
 

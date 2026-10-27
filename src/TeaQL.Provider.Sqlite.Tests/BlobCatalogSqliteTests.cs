@@ -60,6 +60,41 @@ public class BlobCatalogSqliteTests
     private static readonly BlobBindingTarget Target = new("Asset", "1", "file");
     private static readonly BlobRef Reference = new("blob_abc");
 
+    private sealed class ModuleUploadAuthorization : IBlobUploadAuthorization
+    {
+        public string Scope(UserContext _) => "tenant-a";
+        public BlobFieldSpec Field(UserContext _, BlobUploadTarget target) =>
+            new(target.Entity, target.Field, ["pdf"], true, "default");
+        public Task<bool> AuthorizeAsync(UserContext _, BlobUploadTarget __, string ___,
+            BlobUploadInput ____) => Task.FromResult(true);
+    }
+    private sealed class ModuleVerifier : IBlobContentVerifier
+    {
+        public Task<BlobVerifiedContent> VerifyAsync(Stream _, string __, long ___) =>
+            throw new NotSupportedException("No upload occurs in the readiness test");
+    }
+
+    [Fact]
+    public async Task BlobModuleInstallsPassivelyAndRequiresProviderAtExplicitReadiness()
+    {
+        var (db, actor, catalog) = await Fixture();
+        await using (db)
+        {
+            var upload = new SqliteBlobUploadService(catalog, new ModuleUploadAuthorization(),
+                new ModuleVerifier(), 10_000);
+            var module = new BlobReferenceModule(catalog, upload, new ReadAuthorization(true));
+            module.Install(actor);
+            Assert.Same(upload, actor.GetResource<SqliteBlobUploadService>());
+            Assert.Same(module.Read, actor.GetResource<IBlobResponseContributor>());
+            Assert.Equal("BLOB_CAPABILITY_MISSING", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => module.ReadyAsync(actor))).Message);
+            actor.WithObjectStorage(new SignedStore());
+            await module.ReadyAsync(actor);
+            Assert.Equal("BLOB_CAPABILITY_MISSING", Assert.Throws<InvalidOperationException>(
+                () => module.Install(actor)).Message);
+        }
+    }
+
     private static async Task<(SqliteConnection Db, UserContext Actor, SqliteBlobCatalog Catalog)> Fixture()
     {
         var db = new SqliteConnection("Data Source=:memory:");

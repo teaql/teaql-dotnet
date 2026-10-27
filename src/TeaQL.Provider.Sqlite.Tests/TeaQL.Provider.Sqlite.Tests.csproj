@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TeaQL.Provider.Sqlite\TeaQL.Provider.Sqlite.csproj" />
     <ProjectReference Include="..\TeaQL.BlobReference\TeaQL.BlobReference.csproj" />
+    <ProjectReference Include="..\TeaQL.SecureDocumentReference\TeaQL.SecureDocumentReference.csproj" />
   </ItemGroup>
 
 </Project>
