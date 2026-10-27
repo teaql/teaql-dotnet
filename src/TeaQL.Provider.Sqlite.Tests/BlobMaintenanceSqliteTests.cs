@@ -1,4 +1,6 @@
 using Microsoft.Data.Sqlite;
+using System.Security.Cryptography;
+using System.Text;
 using TeaQL.BlobReference;
 using TeaQL.Core.Storage;
 using TeaQL.Runtime;
@@ -9,6 +11,65 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class BlobMaintenanceSqliteTests
 {
+    [Fact]
+    public async Task RealSqliteAndFileDeleteRecoverReceiptAndPreserveNewGeneration()
+    {
+        var parent = Path.Combine(Path.GetTempPath(), "teaql-file-maintenance-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(parent);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=" + Path.Combine(parent, "catalog.sqlite"));
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var file = new FileObjectStorage(Path.Combine(parent, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(file);
+            var storage = actor.ObjectStorage("seed real File upload");
+            var service = new SqliteBlobMaintenanceService(catalog, new Authority(), 10,
+                () => DateTimeOffset.FromUnixTimeMilliseconds(10000));
+            var bytes = Encoding.UTF8.GetBytes("%PDF-");
+            var key = new ObjectKey("objects/blob_file_receipt");
+            _ = await storage.PutBytesAsync(key, bytes, new(bytes.Length, ObjectWriteMode.CreateOnly));
+            await Seed(db, "blob_file_receipt", state: "initiated");
+            await Execute(db, """
+                CREATE TRIGGER fail_file_receipt BEFORE UPDATE OF status ON teaql_blob_catalog
+                  WHEN NEW.status='deleted' BEGIN SELECT RAISE(ABORT,'receipt failure'); END
+                """);
+            var failed = await service.RunBatchAsync(actor);
+            Assert.Equal("failed", Assert.Single(failed.Outcomes).Status);
+            Assert.Equal("deleting", await Status(db, "blob_file_receipt"));
+            Assert.Null(await storage.HeadAsync(key));
+            await Execute(db, "DROP TRIGGER fail_file_receipt");
+            var retry = await service.RunBatchAsync(actor);
+            Assert.Equal("already_missing", Assert.Single(retry.Outcomes).Status);
+            Assert.Equal("deleted", await Status(db, "blob_file_receipt"));
+
+            var staleKey = new ObjectKey("objects/blob_file_stale");
+            var old = await storage.PutBytesAsync(staleKey, bytes,
+                new(bytes.Length, ObjectWriteMode.CreateOnly));
+            await Seed(db, "blob_file_stale", state: "initiated", version: old.ETag!);
+            var newer = await storage.PutBytesAsync(staleKey, bytes,
+                new(bytes.Length, ObjectWriteMode.Replace));
+            var stale = await service.RunBatchAsync(actor);
+            Assert.Equal("version_conflict", Assert.Single(stale.Outcomes).Status);
+            Assert.Equal(newer.ETag, (await storage.HeadAsync(staleKey))?.ETag);
+
+            var partialKey = new ObjectKey("objects/blob_file_partial");
+            var partial = await storage.PutBytesAsync(partialKey, bytes,
+                new(bytes.Length, ObjectWriteMode.CreateOnly));
+            await Seed(db, "blob_file_partial", state: "initiated", version: partial.ETag!);
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(partialKey.Value))).ToLowerInvariant();
+            File.Delete(Path.Combine(parent, "private", hash[..2], hash,
+                "data-" + partial.ETag!.Split('.').Last()));
+            var recoveredPartial = await service.RunBatchAsync(actor);
+            Assert.Contains(recoveredPartial.Outcomes,
+                item => item.Reference.Key == "blob_file_partial" && item.Status == "deleted");
+            Assert.Equal("deleted", await Status(db, "blob_file_partial"));
+        }
+        finally { Directory.Delete(parent, true); }
+    }
+
     private sealed class Authority : IBlobMaintenanceAuthorization
     {
         public string CurrentScope = "tenant-a";
@@ -122,7 +183,7 @@ public class BlobMaintenanceSqliteTests
         var second = await service.RunBatchAsync(actor, first.Next);
         Assert.Single(second.Outcomes);
         Assert.Equal("deleted", second.Outcomes[0].Status);
-        Assert.Equal(1, store.Deletes);
+        Assert.Equal(2, store.Deletes); // stale pinned version is refused by conditional deletion
         Assert.Equal("etag-new", store.Objects["objects/blob_race"]);
         foreach (var (key, expected) in new Dictionary<string, string> {
             ["blob_absent"] = "deleted", ["blob_race"] = "deleting", ["blob_written"] = "deleted",

@@ -12,11 +12,15 @@ It is passive until the host explicitly calls `RunBatchAsync`. The bounded
 service collects only expired, uncompleted, unbound server-stream uploads. An
 explicit catalog migration adds the unique object-key index required for this
 path. The service claims candidates in SQLite's physical write transaction,
-pins the observed ETag, deletes through the optional S3 version-conditional
+pins the observed ETag, deletes through a version-conditional S3 or File
 provider API, and retries a failed final catalog acknowledgment. File storage
-is rejected until it has cross-process version fencing. Keep Blob object keys
-unique and immutable; completed unbound and old bound retention, File fencing
-and direct-upload quiescence need separate implementation.
+uses a persistent per-object OS lock for manifest updates and conditional
+deletion across processes. Its ETag includes an immutable generation token,
+so a same-byte replacement cannot match an older version. The matching
+current File generation is removed; older immutable generations still need a
+separate collector. Keep Blob object keys unique and immutable; completed
+unbound and old bound retention and direct-upload quiescence need separate
+implementation.
 
 For JPEG/PNG uploads, pass `new StbImageBlobContentVerifier()` to
 `SqliteBlobUploadService`. It accepts only `jpg`, `jpeg` and `png`. The host's

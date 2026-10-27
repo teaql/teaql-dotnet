@@ -1,5 +1,8 @@
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -13,7 +16,7 @@ namespace TeaQL.BlobReference;
 /// Old immutable data generations require a separate collector; deleting a key removes its manifest.
 /// Start explicitly enables the loopback-only HTTP read gateway.
 /// </summary>
-public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
+public sealed class FileObjectStorage : IObjectStorageProvider, IObjectStorageConditionalDeleter, IAsyncDisposable
 {
     private sealed record Manifest(string Version, long Size, string ContentType, string Sha256,
         DateTimeOffset Modified, Dictionary<string, string> Metadata);
@@ -22,6 +25,7 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
     private readonly string _root;
     private readonly byte[] _secret;
     private readonly SemaphoreSlim _writeLock = new(1, 1);
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> ManifestLocks = new(StringComparer.Ordinal);
     private readonly object _gatewayLock = new();
     private HttpListener? _listener;
     private Task? _worker;
@@ -42,6 +46,74 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
     private static bool ValidVersion(string? version) => version is { Length: 32 } &&
         version.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_');
     private static bool ValidHash(string? hash) => hash is { Length: 64 } && hash.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
+
+    [DllImport("libc", EntryPoint = "flock", SetLastError = true)]
+    private static extern int UnixFlock(int descriptor, int operation);
+    private static bool TryLockManifest(FileStream stream)
+    {
+        if (!OperatingSystem.IsWindows())
+            return UnixFlock(stream.SafeFileHandle.DangerousGetHandle().ToInt32(), 2 | 4) == 0;
+        try { stream.Lock(0, 1); return true; }
+        catch (IOException) { return false; }
+    }
+    private static void UnlockManifest(FileStream stream)
+    {
+        if (!OperatingSystem.IsWindows())
+            _ = UnixFlock(stream.SafeFileHandle.DangerousGetHandle().ToInt32(), 8);
+        else stream.Unlock(0, 1);
+    }
+
+    private sealed class ManifestLock(FileStream stream, SemaphoreSlim local) : IDisposable
+    {
+        public void Dispose()
+        {
+            try { UnlockManifest(stream); }
+            finally { stream.Dispose(); local.Release(); }
+        }
+    }
+
+    private async Task<ManifestLock> LockManifestAsync(string directory, CancellationToken cancellationToken)
+    {
+        var path = Path.Combine(directory, "manifest.lock");
+        var local = ManifestLocks.GetOrAdd(_root, _ => new SemaphoreSlim(1, 1));
+        await local.WaitAsync(cancellationToken).ConfigureAwait(false);
+        FileStream? stream = null;
+        try
+        {
+            var options = new FileStreamOptions
+            { Mode = FileMode.OpenOrCreate, Access = FileAccess.ReadWrite, Share = FileShare.ReadWrite };
+            if (!OperatingSystem.IsWindows()) options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+            var elapsed = Stopwatch.StartNew();
+            while (stream is null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                try { stream = new FileStream(path, options); }
+                catch (IOException) when (elapsed.Elapsed < TimeSpan.FromSeconds(30))
+                { await Task.Delay(20, cancellationToken).ConfigureAwait(false); }
+            }
+            if (new FileInfo(path).LinkTarget is not null) throw new StorageException(StorageErrorCode.Unavailable);
+            if (!OperatingSystem.IsWindows() &&
+                (File.GetUnixFileMode(path) & (UnixFileMode.GroupRead | UnixFileMode.GroupWrite |
+                    UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherWrite |
+                    UnixFileMode.OtherExecute)) != 0)
+                throw new StorageException(StorageErrorCode.Unavailable);
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (TryLockManifest(stream)) return new ManifestLock(stream, local);
+                if (elapsed.Elapsed >= TimeSpan.FromSeconds(30))
+                    throw new StorageException(StorageErrorCode.Timeout);
+                await Task.Delay(20, cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) { stream?.Dispose(); local.Release(); throw; }
+        catch (StorageException) { stream?.Dispose(); local.Release(); throw; }
+        catch
+        {
+            stream?.Dispose(); local.Release();
+            throw new StorageException(StorageErrorCode.Unavailable);
+        }
+    }
 
     private void EnsureRoot(bool create)
     {
@@ -147,9 +219,12 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
                     await JsonSerializer.SerializeAsync(output, manifest, cancellationToken: invocation.CancellationToken).ConfigureAwait(false);
                     output.Flush(true);
                 }
-                try { File.Move(tempPath, Path.Combine(directory, "manifest.json"), options.Mode == ObjectWriteMode.Replace); }
-                catch (IOException) when (options.Mode == ObjectWriteMode.CreateOnly && File.Exists(Path.Combine(directory, "manifest.json")))
-                { throw new StorageException(StorageErrorCode.Conflict); }
+                using (await LockManifestAsync(directory, invocation.CancellationToken).ConfigureAwait(false))
+                {
+                    try { File.Move(tempPath, Path.Combine(directory, "manifest.json"), options.Mode == ObjectWriteMode.Replace); }
+                    catch (IOException) when (options.Mode == ObjectWriteMode.CreateOnly && File.Exists(Path.Combine(directory, "manifest.json")))
+                    { throw new StorageException(StorageErrorCode.Conflict); }
+                }
                 installed = true;
                 return Metadata(key, manifest);
             }
@@ -181,6 +256,7 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
     public Task<ObjectMetadata?> HeadAsync(StorageInvocation invocation, ObjectKey key)
     {
         invocation.CancellationToken.ThrowIfCancellationRequested();
+        if (!Directory.Exists(_root)) return Task.FromResult<ObjectMetadata?>(null);
         EnsureRoot(false);
         var hash = Hash(key);
         var value = ReadManifest(hash);
@@ -191,11 +267,44 @@ public sealed class FileObjectStorage : IObjectStorageProvider, IAsyncDisposable
 
     public async Task DeleteAsync(StorageInvocation invocation, ObjectKey key)
     {
+        if (!Directory.Exists(_root)) return;
         EnsureRoot(false);
         await _writeLock.WaitAsync(invocation.CancellationToken).ConfigureAwait(false);
-        try { File.Delete(Path.Combine(DirectoryFor(Hash(key)), "manifest.json")); }
+        try
+        {
+            var directory = DirectoryFor(Hash(key));
+            if (!Directory.Exists(directory)) return;
+            using (await LockManifestAsync(directory, invocation.CancellationToken).ConfigureAwait(false))
+                File.Delete(Path.Combine(directory, "manifest.json"));
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (StorageException) { throw; }
         catch { throw new StorageException(StorageErrorCode.Io); }
         finally { _writeLock.Release(); }
+    }
+
+    public async Task<ObjectConditionalDeleteResult> DeleteIfVersionAsync(StorageInvocation invocation,
+        ObjectKey key, string contentVersion)
+    {
+        invocation.CancellationToken.ThrowIfCancellationRequested();
+        if (!Directory.Exists(_root)) return ObjectConditionalDeleteResult.AlreadyMissing;
+        EnsureRoot(false);
+        var hash = Hash(key);
+        var directory = DirectoryFor(hash);
+        if (!Directory.Exists(directory)) return ObjectConditionalDeleteResult.AlreadyMissing;
+        using (await LockManifestAsync(directory, invocation.CancellationToken).ConfigureAwait(false))
+        {
+            var value = ReadManifest(hash);
+            if (value is null) return ObjectConditionalDeleteResult.AlreadyMissing;
+            if (Metadata(key, value).ETag != contentVersion) return ObjectConditionalDeleteResult.VersionMismatch;
+            try
+            {
+                File.Delete(DataPath(directory, value.Version));
+                File.Delete(Path.Combine(directory, "manifest.json"));
+                return ObjectConditionalDeleteResult.Deleted;
+            }
+            catch { throw new StorageException(StorageErrorCode.Io); }
+        }
     }
 
     private string Seal(Ticket ticket)

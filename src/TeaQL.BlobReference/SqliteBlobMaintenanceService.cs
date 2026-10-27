@@ -221,18 +221,23 @@ public sealed class SqliteBlobMaintenanceService
             ObjectKey objectKey;
             try { objectKey = new ObjectKey(claim.ObjectKey); }
             catch { throw Error("BLOB_CATALOG_FAILED"); }
-            ObjectMetadata? observed;
-            try { observed = await storage.HeadAsync(objectKey).ConfigureAwait(false); }
-            catch { throw Error("BLOB_STORE_FAILED"); }
             var version = claim.Version;
-            if (observed != null)
+            if (version.Length > 0 && claim.WrittenETag.Length > 0 && version != claim.WrittenETag)
+                throw Error("BLOB_IDEMPOTENCY_CONFLICT");
+            if (version.Length == 0)
             {
-                if (!ValidVersion(observed.ETag) || version.Length > 0 && observed.ETag != version ||
-                    claim.WrittenETag.Length > 0 && observed.ETag != claim.WrittenETag)
-                    throw Error("BLOB_IDEMPOTENCY_CONFLICT");
-                version = observed.ETag!;
-                await AuthorizeAsync(actor, scope).ConfigureAwait(false);
-                await CaptureAsync(scope, claim, version, NowMs()).ConfigureAwait(false);
+                ObjectMetadata? observed;
+                try { observed = await storage.HeadAsync(objectKey).ConfigureAwait(false); }
+                catch { throw Error("BLOB_STORE_FAILED"); }
+                if (observed != null)
+                {
+                    if (!ValidVersion(observed.ETag) ||
+                        claim.WrittenETag.Length > 0 && observed.ETag != claim.WrittenETag)
+                        throw Error("BLOB_IDEMPOTENCY_CONFLICT");
+                    version = observed.ETag!;
+                    await AuthorizeAsync(actor, scope).ConfigureAwait(false);
+                    await CaptureAsync(scope, claim, version, NowMs()).ConfigureAwait(false);
+                }
             }
             await AuthorizeAsync(actor, scope).ConfigureAwait(false);
             var result = "already_missing";

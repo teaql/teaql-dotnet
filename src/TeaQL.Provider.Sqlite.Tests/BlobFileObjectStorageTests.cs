@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -12,6 +13,91 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class BlobFileObjectStorageTests
 {
+    [Fact]
+    public async Task ConditionalDeleteWaitsForExternalManifestLockOnLinux()
+    {
+        if (!OperatingSystem.IsLinux() || !File.Exists("/usr/bin/flock")) return;
+        var parent = Path.Combine(Path.GetTempPath(), "teaql-file-process-lock-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(parent);
+        try
+        {
+            var root = Path.Combine(parent, "private");
+            await using var provider = new FileObjectStorage(root, RandomNumberGenerator.GetBytes(32));
+            var storage = new UserContext().WithObjectStorage(provider).ObjectStorage("verify process lock");
+            var key = new ObjectKey("blob/process-lock");
+            var bytes = Encoding.UTF8.GetBytes("content");
+            var written = await storage.PutBytesAsync(key, bytes, new(bytes.Length, ObjectWriteMode.CreateOnly));
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key.Value))).ToLowerInvariant();
+            var lockPath = Path.Combine(root, hash[..2], hash, "manifest.lock");
+            var marker = Path.Combine(parent, "locked");
+            var start = new ProcessStartInfo("/usr/bin/flock") { UseShellExecute = false };
+            start.ArgumentList.Add("-x");
+            start.ArgumentList.Add(lockPath);
+            start.ArgumentList.Add("/bin/sh");
+            start.ArgumentList.Add("-c");
+            start.ArgumentList.Add("touch \"$1\"; sleep 3");
+            start.ArgumentList.Add("sh");
+            start.ArgumentList.Add(marker);
+            using var process = Process.Start(start) ?? throw new InvalidOperationException("flock did not start");
+            try
+            {
+                for (var attempt = 0; !File.Exists(marker) && attempt < 100; attempt++)
+                    await Task.Delay(10);
+                Assert.True(File.Exists(marker), "external process never acquired the manifest lock");
+                var deletion = storage.DeleteIfVersionAsync(key, written.ETag!);
+                await Task.Delay(100);
+                Assert.False(process.HasExited, "external lock holder already exited");
+                Assert.False(deletion.IsCompleted,
+                    "deletion completed while locked: " + (deletion.Exception?.GetBaseException().GetType().Name ?? "success"));
+                await process.WaitForExitAsync();
+                Assert.Equal(0, process.ExitCode);
+                Assert.Equal(ObjectConditionalDeleteResult.Deleted, await deletion);
+            }
+            finally
+            {
+                if (!process.HasExited) process.Kill();
+                await process.WaitForExitAsync();
+            }
+        }
+        finally { Directory.Delete(parent, true); }
+    }
+
+    [Fact]
+    public async Task ConditionalDeleteFencesSameByteReplacementAcrossInstances()
+    {
+        var parent = Path.Combine(Path.GetTempPath(), "teaql-file-conditional-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(parent);
+        try
+        {
+            var root = Path.Combine(parent, "private");
+            var secret = RandomNumberGenerator.GetBytes(32);
+            await using var first = new FileObjectStorage(root, secret);
+            await using var second = new FileObjectStorage(root, secret);
+            var writer = new UserContext().WithObjectStorage(first).ObjectStorage("write File generation");
+            var collector = new UserContext().WithObjectStorage(second).ObjectStorage("delete File generation");
+            var key = new ObjectKey("blob/same-byte-replacement");
+            Assert.Null(await collector.HeadAsync(key));
+            Assert.Equal(ObjectConditionalDeleteResult.AlreadyMissing,
+                await collector.DeleteIfVersionAsync(key, "absent"));
+            var bytes = Encoding.UTF8.GetBytes("same bytes");
+            var initial = await writer.PutBytesAsync(key, bytes, new(bytes.Length, ObjectWriteMode.CreateOnly));
+            var newer = await writer.PutBytesAsync(key, bytes, new(bytes.Length, ObjectWriteMode.Replace));
+            Assert.NotEqual(initial.ETag, newer.ETag);
+            Assert.Equal(ObjectConditionalDeleteResult.VersionMismatch,
+                await collector.DeleteIfVersionAsync(key, initial.ETag!));
+            Assert.Equal(bytes, await collector.GetBytesAsync(key, 100));
+            Assert.Equal(ObjectConditionalDeleteResult.Deleted,
+                await collector.DeleteIfVersionAsync(key, newer.ETag!));
+            Assert.Null(await collector.HeadAsync(key));
+            Assert.Equal(ObjectConditionalDeleteResult.AlreadyMissing,
+                await collector.DeleteIfVersionAsync(key, newer.ETag!));
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key.Value))).ToLowerInvariant();
+            var version = newer.ETag!.Split('.').Last();
+            Assert.False(File.Exists(Path.Combine(root, hash[..2], hash, "data-" + version)));
+        }
+        finally { Directory.Delete(parent, true); }
+    }
+
     [Fact]
     public async Task RealFileBytesAndAuthenticatedLoopbackReadUrl()
     {
