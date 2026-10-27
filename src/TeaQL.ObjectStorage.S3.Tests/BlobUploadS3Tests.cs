@@ -1,11 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Net;
 using Amazon.Runtime;
 using Amazon.S3;
 using Microsoft.Data.Sqlite;
 using TeaQL.BlobReference;
 using TeaQL.Core;
 using TeaQL.Core.Storage;
+using TeaQL.DataService;
 using TeaQL.ObjectStorage.S3;
 using TeaQL.Provider.Sqlite;
 using TeaQL.Runtime;
@@ -54,6 +56,32 @@ public class BlobUploadS3Tests
         }
     }
 
+    private sealed class BindingPermission : IBlobBindingAuthorization
+    {
+        public string Scope(UserContext actor) => "f4-s3-upload";
+        public Task<bool> AuthorizeAsync(UserContext actor, BlobBindingTarget target,
+            BlobRef? previous, BlobRef? next, string action) => Task.FromResult(
+                target.Entity == "Asset" && target.EntityId == "1" && target.Field == "file" &&
+                previous is null && next is not null && action == "Create");
+    }
+
+    private sealed class ReadPermission : IBlobReadAuthorization
+    {
+        public bool Allowed = true;
+        public Task<bool> AuthorizeAsync(UserContext actor, AuthorizedBlobSlot slot) =>
+            Task.FromResult(Allowed);
+    }
+
+    private sealed class GraphAuthorizer(BlobRef reference) : IResponseGraphAuthorizer
+    {
+        public long BindingVersion = 1;
+        public Task<AuthorizedResponseGraph> AuthorizeAsync(UserContext actor, object? result,
+            ViewOptions options) => Task.FromResult(new AuthorizedResponseGraph(
+                new Dictionary<string, object?> { ["document"] = reference },
+                [new AuthorizedBlobSlot(["document"], "Asset", "1", "file",
+                    "f4-s3-upload", BindingVersion, reference)]));
+    }
+
     [Fact]
     public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay()
     {
@@ -67,11 +95,20 @@ public class BlobUploadS3Tests
             new BasicAWSCredentials(access!, secret!), new AmazonS3Config {
                 ServiceURL = endpoint, AuthenticationRegion = "us-east-1", ForcePathStyle = true
             }), bucket!);
-        var actor = new UserContext().WithObjectStorage(provider);
-        var store = actor.ObjectStorage("verify S3 Blob upload");
         await using var db = new SqliteConnection("Data Source=:memory:");
         await db.OpenAsync();
-        var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+        var asset = EntityDescriptor.New("Asset").TableName("asset")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+            .Property(PropertyDescriptor.New("name", DataType.Text));
+        var transport = new SqliteTransport(db);
+        var actor = new RuntimeModule().Entity(asset).IntoContext().WithDataService(
+            new SqlDataServiceExecutor(new SqliteDialect(), transport,
+                new MetadataSchemaProvider(name => name == "Asset" ? asset : null)))
+            .WithObjectStorage(provider);
+        await actor.EnsureSchemaAsync();
+        var store = actor.ObjectStorage("verify S3 Blob upload");
+        var catalog = new SqliteBlobCatalog(transport);
         await catalog.EnsureSchemaAsync();
         var permission = new UploadPermission();
         var verifier = new PdfVerifier();
@@ -106,6 +143,53 @@ public class BlobUploadS3Tests
                 "SELECT size_bytes FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
             Assert.Equal(head.ETag, await Scalar(db,
                 "SELECT content_version FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            await actor.ExecuteGraphSaveAsync("bind S3 Blob in business graph", async graph =>
+            {
+                await graph.MutateAsync(new InsertMutationRequest(new InsertCommand("Asset")
+                    .Value("id", new Value.U64Value(1))
+                    .Value("name", new Value.TextValue("document")), "save asset"),
+                    graph.Scope("Asset", 1, null));
+                Assert.Equal(1, await catalog.BindInGraphAsync(graph, actor,
+                    new BlobBindingChange(new BlobBindingTarget("Asset", "1", "file"),
+                        session.Reference, 0, 1, "Create"), new BindingPermission()));
+                return true;
+            });
+            Assert.Equal(session.Reference.Key, await Scalar(db,
+                "SELECT key FROM teaql_blob_binding WHERE entity_id='1'", session.Reference.Key));
+            Assert.Equal("available", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+
+            var readPermission = new ReadPermission();
+            var graphAuthorizer = new GraphAuthorizer(session.Reference);
+            actor.InsertResource<IBlobResponseContributor>(
+                new SqlBlobResponseContributor(catalog, readPermission, 3));
+            actor.InsertResource<IResponseGraphAuthorizer>(graphAuthorizer);
+            var options = new ViewOptions("ordinary", "read_only", DateTimeOffset.UtcNow.AddSeconds(60));
+            var view = await new ViewPreparationService().PrepareAsync(actor, null, options);
+            var link = Assert.IsType<string>(
+                Assert.IsType<Dictionary<string, object?>>(view.Presentation)["document"]);
+            Assert.StartsWith("http", link);
+            Assert.Equal("private, no-store", view.CacheControl);
+            using var http = new HttpClient(new HttpClientHandler { UseProxy = false });
+            using var request = new HttpRequestMessage(HttpMethod.Get, link);
+            request.Headers.TryAddWithoutValidation("Range", "bytes=0-7");
+            using var response = await http.SendAsync(request);
+            Assert.Equal(HttpStatusCode.PartialContent, response.StatusCode);
+            Assert.Equal(bytes.AsSpan(0, 8).ToArray(), await response.Content.ReadAsByteArrayAsync());
+            Assert.Equal("application/pdf", response.Content.Headers.ContentType?.MediaType);
+            Assert.Contains("report.pdf", response.Content.Headers.ContentDisposition?.ToString());
+
+            readPermission.Allowed = false;
+            var denied = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+                new ViewPreparationService().PrepareAsync(actor, null, options));
+            Assert.Equal("BLOB_READ_DENIED", denied.Code);
+            readPermission.Allowed = true;
+            graphAuthorizer.BindingVersion = 0;
+            var stale = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+                new ViewPreparationService().PrepareAsync(actor, null,
+                    new ViewOptions("ordinary", "committed", DateTimeOffset.UtcNow.AddSeconds(60))));
+            Assert.Equal("BLOB_READ_DENIED", stale.Code);
+            Assert.Equal("committed", stale.BusinessState);
         }
         finally { await store.DeleteAsync(key); }
     }
