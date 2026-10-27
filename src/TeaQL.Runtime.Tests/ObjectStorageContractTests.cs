@@ -9,13 +9,26 @@ public class ObjectStorageContractTests
     private sealed class Stub : IObjectStorageProvider
     {
         public long Size = 3;
+        public int Deletes;
         public StorageErrorCode? Error;
         public StorageInvocation? Seen;
         public Task<ObjectMetadata> PutAsync(StorageInvocation invocation, ObjectKey key, Stream content, ObjectPutOptions options) { Seen = invocation; return Task.FromResult(new ObjectMetadata(key, options.Size)); }
         public Task<ObjectContent> GetAsync(StorageInvocation invocation, ObjectKey key) => Task.FromResult(new ObjectContent(new(key, Size), new MemoryStream([1, 2, 3])));
         public Task<ObjectMetadata?> HeadAsync(StorageInvocation invocation, ObjectKey key) { Seen = invocation; if (Error is { } error) throw new StorageException(error); return Task.FromResult<ObjectMetadata?>(null); }
-        public Task DeleteAsync(StorageInvocation invocation, ObjectKey key) => Task.CompletedTask;
+        public Task DeleteAsync(StorageInvocation invocation, ObjectKey key) { Deletes++; return Task.CompletedTask; }
         public Task<ObjectReadUrl> GetReadUrlAsync(StorageInvocation invocation, ObjectKey key, ObjectReadUrlOptions options) => throw new StorageException(StorageErrorCode.Unsupported);
+    }
+    [Fact]
+    public async Task ConditionalDeleteRequiresProviderCapability()
+    {
+        var stub = new Stub();
+        var api = new UserContext().WithObjectStorage(stub).ObjectStorage("conditional delete");
+        var key = new ObjectKey("f4/conditional");
+        Assert.Equal(StorageErrorCode.InvalidInput,
+            (await Assert.ThrowsAsync<StorageException>(() => api.DeleteIfVersionAsync(key, "*"))).Code);
+        Assert.Equal(StorageErrorCode.Unsupported,
+            (await Assert.ThrowsAsync<StorageException>(() => api.DeleteIfVersionAsync(key, "\"etag\""))).Code);
+        Assert.Equal(0, stub.Deletes);
     }
     private sealed class Observer : IObjectStorageObserver
     {

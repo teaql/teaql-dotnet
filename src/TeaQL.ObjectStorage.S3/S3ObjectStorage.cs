@@ -5,7 +5,7 @@ using TeaQL.Runtime.Storage;
 
 namespace TeaQL.ObjectStorage.S3;
 
-public sealed class S3ObjectStorage : IObjectStorageProvider, IDisposable
+public sealed class S3ObjectStorage : IObjectStorageProvider, IObjectStorageConditionalDeleter, IDisposable
 {
     private readonly IAmazonS3 _client;
     private readonly string _bucket;
@@ -98,6 +98,24 @@ public sealed class S3ObjectStorage : IObjectStorageProvider, IDisposable
     {
         try { await _client.DeleteObjectAsync(new DeleteObjectRequest { BucketName = _bucket, Key = key.Value }, invocation.CancellationToken).ConfigureAwait(false); }
         catch (OperationCanceledException) when (invocation.CancellationToken.IsCancellationRequested) { throw new OperationCanceledException(invocation.CancellationToken); }
+        catch (Exception error) { throw Translate(error); }
+    }
+    public async Task<ObjectConditionalDeleteResult> DeleteIfVersionAsync(StorageInvocation invocation, ObjectKey key, string contentVersion)
+    {
+        if (string.IsNullOrEmpty(contentVersion) || contentVersion.Length > 256 || contentVersion == "*" ||
+            contentVersion.Trim() != contentVersion || contentVersion.Any(char.IsControl))
+            throw new StorageException(StorageErrorCode.InvalidInput);
+        try
+        {
+            await _client.DeleteObjectAsync(new DeleteObjectRequest { BucketName = _bucket, Key = key.Value, IfMatch = contentVersion }, invocation.CancellationToken).ConfigureAwait(false);
+            return ObjectConditionalDeleteResult.Deleted;
+        }
+        catch (OperationCanceledException) when (invocation.CancellationToken.IsCancellationRequested) { throw new OperationCanceledException(invocation.CancellationToken); }
+        catch (AmazonS3Exception error) when ((int)error.StatusCode is 404 or 412)
+        {
+            var current = await HeadAsync(invocation, key).ConfigureAwait(false);
+            return current is null ? ObjectConditionalDeleteResult.AlreadyMissing : ObjectConditionalDeleteResult.VersionMismatch;
+        }
         catch (Exception error) { throw Translate(error); }
     }
     public async Task<ObjectReadUrl> GetReadUrlAsync(StorageInvocation invocation, ObjectKey key, ObjectReadUrlOptions options)

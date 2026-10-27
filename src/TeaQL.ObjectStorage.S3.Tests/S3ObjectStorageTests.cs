@@ -29,6 +29,7 @@ public class S3ObjectStorageTests
         var key = new ObjectKey("f4/dotnet/" + Guid.NewGuid().ToString("N"));
         var createKey = new ObjectKey("f4/dotnet/create/" + Guid.NewGuid().ToString("N"));
         var raceKey = new ObjectKey("f4/dotnet/race/" + Guid.NewGuid().ToString("N"));
+        var conditionalKey = new ObjectKey("f4/dotnet/conditional/" + Guid.NewGuid().ToString("N"));
         var bytes = Encoding.ASCII.GetBytes("%PDF-1.7\nF4 real S3-compatible bytes\n%%EOF");
         using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
         try
@@ -71,10 +72,32 @@ public class S3ObjectStorageTests
                 Assert.InRange(winner, 0, 1);
                 Assert.Equal(candidates[winner], await storage.GetBytesAsync(raceKey, 1024));
             }
+            if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_CONDITIONAL_DELETE") == "1")
+            {
+                var firstBytes = Encoding.ASCII.GetBytes("first version");
+                var first = await storage.PutBytesAsync(conditionalKey, firstBytes, new(firstBytes.Length, ObjectWriteMode.Replace));
+                Assert.Equal(ObjectConditionalDeleteResult.VersionMismatch,
+                    await storage.DeleteIfVersionAsync(conditionalKey, "\"wrong-etag\""));
+                Assert.Equal(first.ETag, (await storage.HeadAsync(conditionalKey))?.ETag);
+                var replacementBytes = Encoding.ASCII.GetBytes("replacement version");
+                var replacement = await storage.PutBytesAsync(conditionalKey, replacementBytes, new(replacementBytes.Length, ObjectWriteMode.Replace));
+                Assert.NotEqual(first.ETag, replacement.ETag);
+                Assert.Equal(ObjectConditionalDeleteResult.VersionMismatch,
+                    await storage.DeleteIfVersionAsync(conditionalKey, first.ETag));
+                Assert.Equal(replacement.ETag, (await storage.HeadAsync(conditionalKey))?.ETag);
+                Assert.Equal(ObjectConditionalDeleteResult.Deleted,
+                    await storage.DeleteIfVersionAsync(conditionalKey, replacement.ETag));
+                Assert.Equal(ObjectConditionalDeleteResult.AlreadyMissing,
+                    await storage.DeleteIfVersionAsync(conditionalKey, replacement.ETag));
+                await Expect(StorageErrorCode.InvalidInput, () => storage.DeleteIfVersionAsync(conditionalKey, "*"));
+                if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_GATE_MARKER") is { } marker)
+                    File.WriteAllText(marker, "conditional-delete-real-gate-passed");
+            }
         }
         finally
         {
             await storage.DeleteAsync(key);
+            if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_CONDITIONAL_DELETE") == "1") await storage.DeleteAsync(conditionalKey);
             if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_CREATE_ONLY") == "1")
             { await storage.DeleteAsync(createKey); await storage.DeleteAsync(raceKey); }
         }
