@@ -67,6 +67,9 @@ public class BlobCatalogSqliteTests
             new(target.Entity, target.Field, ["pdf"], true, "default");
         public Task<bool> AuthorizeAsync(UserContext _, BlobUploadTarget __, string ___,
             BlobUploadInput ____) => Task.FromResult(true);
+        public Task<BlobUploadAuthorizationState> CurrentOnLeaseAsync(UserContext actor,
+            BlobUploadTarget target, string action, BlobUploadInput input, ISqlTransport lease) =>
+            Task.FromResult(new BlobUploadAuthorizationState(Scope(actor), Field(actor, target), true));
     }
     private sealed class ModuleVerifier : IBlobContentVerifier
     {

@@ -32,6 +32,9 @@ public sealed class NativeBlobMutationSqliteTests
             new("Asset", "document", ["pdf"], true, "default");
         public Task<bool> AuthorizeAsync(UserContext actor, BlobUploadTarget target, string action,
             BlobUploadInput input) => Task.FromResult(true);
+        public Task<BlobUploadAuthorizationState> CurrentOnLeaseAsync(UserContext actor,
+            BlobUploadTarget target, string action, BlobUploadInput input, ISqlTransport lease) =>
+            Task.FromResult(new BlobUploadAuthorizationState(Scope(actor), Field(actor, target), true));
     }
 
     private sealed class UnusedVerifier : IBlobContentVerifier

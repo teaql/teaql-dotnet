@@ -13,6 +13,7 @@ namespace TeaQL.BlobReference;
 public sealed record BlobUploadTarget(string Entity, string EntityId, string Field);
 public sealed record BlobUploadInput(string FileName, long DeclaredSize, string? DeclaredContentType = null);
 public sealed record BlobVerifiedContent(long SizeBytes, string Sha256, string ContentType);
+public sealed record BlobUploadAuthorizationState(string Scope, BlobFieldSpec Field, bool Allowed);
 public sealed record BlobUploadSession(string UploadId, BlobRef Reference, DateTimeOffset ExpiresAt)
 {
     public override string ToString() => "BlobUploadSession[masked]";
@@ -25,6 +26,9 @@ public interface IBlobUploadAuthorization
     BlobFieldSpec Field(UserContext actor, BlobUploadTarget target);
     Task<bool> AuthorizeAsync(UserContext actor, BlobUploadTarget target, string action,
         BlobUploadInput input);
+    /// <summary>Resolve current scope, field and permission on the upload's SQL owner.</summary>
+    Task<BlobUploadAuthorizationState> CurrentOnLeaseAsync(UserContext actor,
+        BlobUploadTarget target, string action, BlobUploadInput input, ISqlTransport lease);
 }
 
 /// <summary>Host-supplied trusted parser; it must consume every byte and report actual format.</summary>
@@ -98,7 +102,7 @@ public sealed class SqliteBlobUploadService
     }
 
     private async Task<string> Current(UserContext actor, BlobUploadTarget target, string action,
-        BlobUploadInput input, string? expectedScope = null)
+        BlobUploadInput input, string? expectedScope = null, ISqlTransport? lease = null)
     {
         if (actor == null || target == null || !ValidText(target.Entity, 256) ||
             !ValidText(target.Field, 256) || target.Entity.EnumerateRunes().Count() > 128 ||
@@ -109,9 +113,19 @@ public sealed class SqliteBlobUploadService
         bool allowed;
         try
         {
-            scope = _authorization.Scope(actor);
-            field = _authorization.Field(actor, target);
-            allowed = await _authorization.AuthorizeAsync(actor, target, action, input);
+            if (lease == null)
+            {
+                scope = _authorization.Scope(actor);
+                field = _authorization.Field(actor, target);
+                allowed = await _authorization.AuthorizeAsync(actor, target, action, input);
+            }
+            else
+            {
+                var state = await _authorization.CurrentOnLeaseAsync(actor, target, action, input, lease);
+                scope = state.Scope;
+                field = state.Field;
+                allowed = state.Allowed;
+            }
         }
         catch { throw Error("BLOB_UPLOAD_DENIED"); }
         if (!ValidText(scope, 256) || expectedScope != null && scope != expectedScope ||
@@ -157,6 +171,7 @@ public sealed class SqliteBlobUploadService
         var requestHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request))).ToLowerInvariant();
         return await Transaction(async tx =>
         {
+            await Current(actor, target, "Begin", normalized, scope, tx);
             List<Record> rows;
             try { rows = await tx.FetchAllSqlAsync(Query(
                 "SELECT upload_id,key,request_hash,expires_ms FROM teaql_blob_upload WHERE scope=@p0 AND replay_key=@p1",
@@ -168,7 +183,7 @@ public sealed class SqliteBlobUploadService
                 var old = rows[0];
                 if (old.GetValueOrDefault("request_hash")?.TryText() != requestHash)
                     throw Error("BLOB_IDEMPOTENCY_CONFLICT");
-                await Current(actor, target, "Begin", normalized, scope);
+                await Current(actor, target, "Begin", normalized, scope, tx);
                 BlobUploadSession prior;
                 try { prior = new BlobUploadSession(old["upload_id"].TryText()!,
                     new BlobRef(old["key"].TryText()!),
@@ -181,7 +196,7 @@ public sealed class SqliteBlobUploadService
             var uploadId = "bu_" + Token();
             var objectKey = "blob/" + Token();
             var expiresMs = _now().Add(_lease).ToUnixTimeMilliseconds();
-            await Current(actor, target, "Begin", normalized, scope);
+            await Current(actor, target, "Begin", normalized, scope, tx);
             try
             {
                 await tx.ExecuteSqlAsync(Query("""
@@ -212,7 +227,8 @@ public sealed class SqliteBlobUploadService
         return value ?? throw Error("BLOB_CATALOG_FAILED");
     }
 
-    private async Task<UploadRow> Row(UserContext actor, string uploadId, string action)
+    private async Task<UploadRow> Row(UserContext actor, string uploadId, string action,
+        ISqlTransport lease)
     {
         if (actor == null || !Regex.IsMatch(uploadId ?? "", @"\Abu_[A-Za-z0-9_-]{32}\z"))
             throw Error("BLOB_UPLOAD_DENIED");
@@ -221,7 +237,7 @@ public sealed class SqliteBlobUploadService
         catch { throw Error("BLOB_UPLOAD_DENIED"); }
         if (!ValidText(scope, 256)) throw Error("BLOB_UPLOAD_DENIED");
         List<Record> rows;
-        try { rows = await _catalog.Transport.FetchAllSqlAsync(Query("""
+        try { rows = await lease.FetchAllSqlAsync(Query("""
             SELECT upload_id,scope,key,entity,entity_id,field,file_name,extension,
               declared_size,expires_ms,state,written_sha256,written_etag
             FROM teaql_blob_upload WHERE scope=@p0 AND upload_id=@p1
@@ -238,7 +254,7 @@ public sealed class SqliteBlobUploadService
             Required(r, "state"), r.GetValueOrDefault("written_sha256")?.TryText(),
             r.GetValueOrDefault("written_etag")?.TryText());
         await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), action,
-            new BlobUploadInput(row.FileName, row.DeclaredSize), scope);
+            new BlobUploadInput(row.FileName, row.DeclaredSize), scope, lease);
         if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
         if (row.DeclaredSize < 0 || row.DeclaredSize > _maximumBytes) throw Error("BLOB_SIZE_EXCEEDED");
         if (row.Extension != row.FileName.Split('.').Last().ToLowerInvariant())
@@ -246,14 +262,15 @@ public sealed class SqliteBlobUploadService
         return row;
     }
 
-    private async Task<ObjectKey> ObjectKey(UploadRow row)
+    private async Task<ObjectKey> ObjectKey(UploadRow row, ISqlTransport lease)
     {
         try
         {
-            var rows = await _catalog.Transport.FetchAllSqlAsync(Query(
-                "SELECT object_key FROM teaql_blob_catalog WHERE key=@p0 AND scope=@p1",
+            var rows = await lease.FetchAllSqlAsync(Query(
+                "SELECT object_key,status FROM teaql_blob_catalog WHERE key=@p0 AND scope=@p1",
                 Text(row.Key), Text(row.Scope)));
-            if (rows.Count == 1) return new ObjectKey(Required(rows[0], "object_key"));
+            if (rows.Count == 1 && Required(rows[0], "status") == "initiated")
+                return new ObjectKey(Required(rows[0], "object_key"));
         }
         catch { /* Stable catalog failure below. */ }
         throw Error("BLOB_CATALOG_FAILED");
@@ -263,25 +280,25 @@ public sealed class SqliteBlobUploadService
     {
         if (source == null) throw Error("BLOB_UPLOAD_INCOMPLETE");
         await using var sourceLifetime = source;
-        var row = await Row(actor, uploadId, "Write");
-        if (row.State != "initiated") throw Error("BLOB_IDEMPOTENCY_CONFLICT");
-        var key = await ObjectKey(row);
-        var mime = BlobFieldSpec.MimeForExtension(row.Extension) ?? throw Error("BLOB_FORMAT_NOT_ALLOWED");
-        var reader = new HashingReadStream(source, row.DeclaredSize);
-        ObjectMetadata metadata;
-        try { metadata = await actor.ObjectStorage("write Blob upload").PutAsync(key, reader,
-            new ObjectPutOptions(row.DeclaredSize, ObjectWriteMode.CreateOnly, mime)); }
-        catch { reader.Release(); throw Error("BLOB_STORE_FAILED"); }
-        try
+        return await Transaction(async tx =>
         {
-            await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Write",
-                new BlobUploadInput(row.FileName, row.DeclaredSize), row.Scope);
-            if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
-            if (!reader.Eof || reader.Count != row.DeclaredSize || metadata.Size != reader.Count ||
-                string.IsNullOrEmpty(metadata.ETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
-            var digest = reader.Digest();
-            return await Transaction(async tx =>
+            var row = await Row(actor, uploadId, "Write", tx);
+            if (row.State != "initiated") throw Error("BLOB_IDEMPOTENCY_CONFLICT");
+            var key = await ObjectKey(row, tx);
+            var mime = BlobFieldSpec.MimeForExtension(row.Extension) ?? throw Error("BLOB_FORMAT_NOT_ALLOWED");
+            var reader = new HashingReadStream(source, row.DeclaredSize);
+            try
             {
+                ObjectMetadata metadata;
+                try { metadata = await actor.ObjectStorage("write Blob upload").PutAsync(key, reader,
+                    new ObjectPutOptions(row.DeclaredSize, ObjectWriteMode.CreateOnly, mime)); }
+                catch { throw Error("BLOB_STORE_FAILED"); }
+                await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Write",
+                    new BlobUploadInput(row.FileName, row.DeclaredSize), row.Scope, tx);
+                if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
+                if (!reader.Eof || reader.Count != row.DeclaredSize || metadata.Size != reader.Count ||
+                    string.IsNullOrEmpty(metadata.ETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
+                var digest = reader.Digest();
                 var nowMs = _now().ToUnixTimeMilliseconds();
                 if (nowMs >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
                 ulong affected;
@@ -296,92 +313,92 @@ public sealed class SqliteBlobUploadService
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
                 if (affected != 1) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
                 return reader.Count;
-            });
-        }
-        finally { reader.Release(); }
+            }
+            finally { reader.Release(); }
+        });
     }
 
     public async Task<BlobRef> CompleteAsync(UserContext actor, string uploadId)
     {
-        var row = await Row(actor, uploadId, "Confirm");
-        if (row.State == "completed")
+        return await Transaction(async tx =>
         {
-            if (row.WrittenSha256 == null || !Regex.IsMatch(row.WrittenSha256, "\\A[0-9a-f]{64}\\z") ||
+            var row = await Row(actor, uploadId, "Confirm", tx);
+            if (row.State == "completed")
+            {
+                if (row.WrittenSha256 == null || !Regex.IsMatch(row.WrittenSha256, "\\A[0-9a-f]{64}\\z") ||
+                    string.IsNullOrEmpty(row.WrittenETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
+                List<Record> records;
+                try { records = await tx.FetchAllSqlAsync(Query("""
+                    SELECT object_key,content_version,content_type,size_bytes,status
+                    FROM teaql_blob_catalog WHERE key=@p0 AND scope=@p1
+                    """, Text(row.Key), Text(row.Scope))); }
+                catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+                if (records.Count != 1) throw Error("BLOB_UPLOAD_INCOMPLETE");
+                var catalog = records[0];
+                var location = catalog.GetValueOrDefault("object_key")?.TryText();
+                var version = catalog.GetValueOrDefault("content_version")?.TryText();
+                var contentType = catalog.GetValueOrDefault("content_type")?.TryText();
+                var size = catalog.GetValueOrDefault("size_bytes")?.TryI64();
+                var status = catalog.GetValueOrDefault("status")?.TryText();
+                var mime = BlobFieldSpec.MimeForExtension(row.Extension);
+                if (location == null || version != row.WrittenETag || contentType != mime ||
+                    size != row.DeclaredSize || status is not ("uploaded_unbound" or "available"))
+                    throw Error("BLOB_UPLOAD_INCOMPLETE");
+                ObjectKey replayKey;
+                try { replayKey = new ObjectKey(location); }
+                catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+                ObjectStorage replayStore;
+                try { replayStore = actor.ObjectStorage("recheck completed Blob upload"); }
+                catch { throw Error("BLOB_STORE_FAILED"); }
+                ObjectMetadata? metadata;
+                try { metadata = await replayStore.HeadAsync(replayKey); }
+                catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+                if (metadata == null || metadata.Size != row.DeclaredSize || metadata.ETag != version)
+                    throw Error("BLOB_UPLOAD_INCOMPLETE");
+                await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Confirm",
+                    new BlobUploadInput(row.FileName, row.DeclaredSize, mime), row.Scope, tx);
+                if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
+                return new BlobRef(row.Key);
+            }
+            if (row.State != "written" || string.IsNullOrEmpty(row.WrittenSha256) ||
                 string.IsNullOrEmpty(row.WrittenETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
-            List<Record> records;
-            try { records = await _catalog.Transport.FetchAllSqlAsync(Query("""
-                SELECT object_key,content_version,content_type,size_bytes,status
-                FROM teaql_blob_catalog WHERE key=@p0 AND scope=@p1
-                """, Text(row.Key), Text(row.Scope))); }
-            catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
-            if (records.Count != 1) throw Error("BLOB_UPLOAD_INCOMPLETE");
-            var catalog = records[0];
-            var location = catalog.GetValueOrDefault("object_key")?.TryText();
-            var version = catalog.GetValueOrDefault("content_version")?.TryText();
-            var contentType = catalog.GetValueOrDefault("content_type")?.TryText();
-            var size = catalog.GetValueOrDefault("size_bytes")?.TryI64();
-            var status = catalog.GetValueOrDefault("status")?.TryText();
-            var mime = BlobFieldSpec.MimeForExtension(row.Extension);
-            if (location == null || version != row.WrittenETag || contentType != mime ||
-                size != row.DeclaredSize || status is not ("uploaded_unbound" or "available"))
-                throw Error("BLOB_UPLOAD_INCOMPLETE");
-            ObjectKey replayKey;
-            try { replayKey = new ObjectKey(location); }
-            catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
-            ObjectStorage replayStore;
-            try { replayStore = actor.ObjectStorage("recheck completed Blob upload"); }
+            var key = await ObjectKey(row, tx);
+            ObjectStorage store;
+            try { store = actor.ObjectStorage("verify Blob upload"); }
             catch { throw Error("BLOB_STORE_FAILED"); }
-            ObjectMetadata? metadata;
-            try { metadata = await replayStore.HeadAsync(replayKey); }
+            ObjectMetadata? before;
+            try { before = await store.HeadAsync(key); }
             catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
-            if (metadata == null || metadata.Size != row.DeclaredSize || metadata.ETag != version)
+            if (before == null || before.Size != row.DeclaredSize || before.ETag != row.WrittenETag)
                 throw Error("BLOB_UPLOAD_INCOMPLETE");
-            await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Confirm",
-                new BlobUploadInput(row.FileName, row.DeclaredSize, mime), row.Scope);
-            if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
-            return new BlobRef(row.Key);
-        }
-        if (row.State != "written" || string.IsNullOrEmpty(row.WrittenSha256) ||
-            string.IsNullOrEmpty(row.WrittenETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
-        var key = await ObjectKey(row);
-        ObjectStorage store;
-        try { store = actor.ObjectStorage("verify Blob upload"); }
-        catch { throw Error("BLOB_STORE_FAILED"); }
-        ObjectMetadata? before;
-        try { before = await store.HeadAsync(key); }
-        catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
-        if (before == null || before.Size != row.DeclaredSize || before.ETag != row.WrittenETag)
-            throw Error("BLOB_UPLOAD_INCOMPLETE");
-        BlobVerifiedContent verified;
-        try
-        {
-            await using var content = await store.GetAsync(key);
-            if (content.Metadata.Size != before.Size || content.Metadata.ETag != before.ETag)
-                throw Error("BLOB_UPLOAD_INCOMPLETE");
-            var reader = new HashingReadStream(content.Stream, _maximumBytes, leaveOpen: true);
+            BlobVerifiedContent verified;
             try
             {
-                verified = await _verifier.VerifyAsync(reader, row.Extension, _maximumBytes);
-                var digest = reader.Digest();
-                if (!reader.Eof || reader.Count != before.Size || verified == null ||
-                    verified.SizeBytes != reader.Count || verified.Sha256 != digest ||
-                    verified.Sha256 != row.WrittenSha256 ||
-                    verified.ContentType != BlobFieldSpec.MimeForExtension(row.Extension))
+                await using var content = await store.GetAsync(key);
+                if (content.Metadata.Size != before.Size || content.Metadata.ETag != before.ETag)
                     throw Error("BLOB_UPLOAD_INCOMPLETE");
+                var reader = new HashingReadStream(content.Stream, _maximumBytes, leaveOpen: true);
+                try
+                {
+                    verified = await _verifier.VerifyAsync(reader, row.Extension, _maximumBytes);
+                    var digest = reader.Digest();
+                    if (!reader.Eof || reader.Count != before.Size || verified == null ||
+                        verified.SizeBytes != reader.Count || verified.Sha256 != digest ||
+                        verified.Sha256 != row.WrittenSha256 ||
+                        verified.ContentType != BlobFieldSpec.MimeForExtension(row.Extension))
+                        throw Error("BLOB_UPLOAD_INCOMPLETE");
+                }
+                finally { reader.Release(); }
             }
-            finally { reader.Release(); }
-        }
-        catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
-        ObjectMetadata? after;
-        try { after = await store.HeadAsync(key); }
-        catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
-        if (after == null || after.Size != before.Size || after.ETag != before.ETag)
-            throw Error("BLOB_UPLOAD_INCOMPLETE");
-        await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Confirm",
-            new BlobUploadInput(row.FileName, row.DeclaredSize, verified.ContentType), row.Scope);
-        if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
-        await Transaction(async tx =>
-        {
+            catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+            ObjectMetadata? after;
+            try { after = await store.HeadAsync(key); }
+            catch { throw Error("BLOB_UPLOAD_INCOMPLETE"); }
+            if (after == null || after.Size != before.Size || after.ETag != before.ETag)
+                throw Error("BLOB_UPLOAD_INCOMPLETE");
+            await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Confirm",
+                new BlobUploadInput(row.FileName, row.DeclaredSize, verified.ContentType), row.Scope, tx);
+            if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
             var nowMs = _now().ToUnixTimeMilliseconds();
             if (nowMs >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
             ulong affected;
@@ -400,9 +417,8 @@ public sealed class SqliteBlobUploadService
                 Text(row.Key), Text(row.Scope))); }
             catch { throw Error("BLOB_CATALOG_FAILED"); }
             if (affected != 1) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
-            return true;
+            return new BlobRef(row.Key);
         });
-        return new BlobRef(row.Key);
     }
 
     private sealed class HashingReadStream(Stream inner, long maximum, bool leaveOpen = false) : Stream

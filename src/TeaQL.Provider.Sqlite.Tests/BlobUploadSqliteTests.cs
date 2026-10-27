@@ -18,6 +18,7 @@ public class BlobUploadSqliteTests
     {
         public string CurrentScope = "tenant-a";
         public bool Allowed = true;
+        public bool CheckSqlPolicy;
         public string Scope(UserContext actor) => CurrentScope;
         public BlobFieldSpec Field(UserContext actor, BlobUploadTarget target) =>
             new("Asset", "file", ["pdf"], true, "default");
@@ -25,6 +26,18 @@ public class BlobUploadSqliteTests
             string action, BlobUploadInput input) => Task.FromResult(Allowed &&
                 target.Entity == "Asset" && target.Field == "file" &&
                 action is "Begin" or "Write" or "Confirm");
+        public async Task<BlobUploadAuthorizationState> CurrentOnLeaseAsync(UserContext actor,
+            BlobUploadTarget target, string action, BlobUploadInput input, ISqlTransport lease)
+        {
+            var allowed = await AuthorizeAsync(actor, target, action, input);
+            if (CheckSqlPolicy)
+            {
+                var rows = await lease.FetchAllSqlAsync(new CompiledQuery(
+                    "SELECT allowed FROM upload_policy", []));
+                allowed &= rows.Count == 1 && rows[0]["allowed"].TryI64() == 1;
+            }
+            return new(Scope(actor), Field(actor, target), allowed);
+        }
     }
 
     private sealed class BindingAuthorization : IBlobBindingAuthorization
@@ -56,12 +69,116 @@ public class BlobUploadSqliteTests
         }
     }
 
+    private sealed class PausedReadStream(byte[] bytes) : MemoryStream(bytes)
+    {
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private bool _paused;
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_paused)
+            {
+                _paused = true;
+                Entered.SetResult();
+                await Release.Task.WaitAsync(cancellationToken);
+            }
+            return await base.ReadAsync(buffer, cancellationToken);
+        }
+    }
+
+    private sealed class PausedVerifier : IBlobContentVerifier
+    {
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public int Calls;
+        public async Task<BlobVerifiedContent> VerifyAsync(Stream content, string extension,
+            long maximumBytes)
+        {
+            Calls++;
+            Entered.SetResult();
+            await Release.Task;
+            return await new PdfVerifier().VerifyAsync(content, extension, maximumBytes);
+        }
+    }
+
     private static async Task<string> Scalar(SqliteConnection db, string sql, string key)
     {
         await using var command = db.CreateCommand();
         command.CommandText = sql;
         command.Parameters.AddWithValue("@key", key);
         return (string)(await command.ExecuteScalarAsync())!;
+    }
+
+    [Fact]
+    public async Task TwoConnectionsSerializeWriteAndConfirmationAcrossExternalIO()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-blob-owner-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var path = Path.Combine(root, "upload.db");
+            await using var db1 = new SqliteConnection($"Data Source={path};Default Timeout=5");
+            await using var db2 = new SqliteConnection($"Data Source={path};Default Timeout=5");
+            await db1.OpenAsync();
+            await db2.OpenAsync();
+            var catalog1 = new SqliteBlobCatalog(new SqliteTransport(db1));
+            var catalog2 = new SqliteBlobCatalog(new SqliteTransport(db2));
+            await catalog1.EnsureSchemaAsync();
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor1 = new UserContext().WithObjectStorage(store);
+            var actor2 = new UserContext().WithObjectStorage(store);
+            var policy = new UploadAuthorization { CheckSqlPolicy = true };
+            await using (var command = db1.CreateCommand())
+            {
+                command.CommandText = "CREATE TABLE upload_policy (allowed INTEGER NOT NULL); INSERT INTO upload_policy VALUES (1)";
+                await command.ExecuteNonQueryAsync();
+            }
+            var verifier = new PausedVerifier();
+            var first = new SqliteBlobUploadService(catalog1, policy, verifier, 10_000);
+            var second = new SqliteBlobUploadService(catalog2, policy, verifier, 10_000);
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nconcurrent content\n%%EOF");
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var input = new BlobUploadInput("report.pdf", bytes.Length, "application/pdf");
+            var denied = await first.BeginAsync(actor1, target, input, "policy-change");
+            await using (var command = db1.CreateCommand())
+            {
+                command.CommandText = "UPDATE upload_policy SET allowed=0";
+                await command.ExecuteNonQueryAsync();
+            }
+            Assert.Equal("BLOB_UPLOAD_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => first.WriteAsync(actor1, denied.UploadId, new MemoryStream(bytes)))).Message);
+            await using (var command = db1.CreateCommand())
+            {
+                command.CommandText = "UPDATE upload_policy SET allowed=1";
+                await command.ExecuteNonQueryAsync();
+            }
+            var session = await first.BeginAsync(actor1, target, input, "concurrent");
+            var pausedSource = new PausedReadStream(bytes);
+            var firstWrite = first.WriteAsync(actor1, session.UploadId, pausedSource);
+            await pausedSource.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            var competingWrite = Task.Run(() => second.WriteAsync(actor2, session.UploadId,
+                new MemoryStream(bytes)));
+            await Task.Delay(75);
+            Assert.False(competingWrite.IsCompleted, "competing write passed the SQL owner during File I/O");
+            pausedSource.Release.SetResult();
+            Assert.Equal(bytes.Length, await firstWrite.WaitAsync(TimeSpan.FromSeconds(5)));
+            Assert.Equal("BLOB_IDEMPOTENCY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => competingWrite.WaitAsync(TimeSpan.FromSeconds(5)))).Message);
+
+            var firstConfirm = first.CompleteAsync(actor1, session.UploadId);
+            await verifier.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            var competingConfirm = Task.Run(() => second.CompleteAsync(actor2, session.UploadId));
+            await Task.Delay(75);
+            Assert.False(competingConfirm.IsCompleted,
+                "competing confirmation passed the SQL owner during parser I/O");
+            verifier.Release.SetResult();
+            Assert.Equal(session.Reference, await firstConfirm.WaitAsync(TimeSpan.FromSeconds(5)));
+            Assert.Equal(session.Reference, await competingConfirm.WaitAsync(TimeSpan.FromSeconds(5)));
+            Assert.Equal(1, verifier.Calls);
+        }
+        finally { Directory.Delete(root, recursive: true); }
     }
 
     [Fact]
