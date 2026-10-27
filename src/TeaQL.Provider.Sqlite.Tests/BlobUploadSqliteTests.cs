@@ -182,6 +182,59 @@ public class BlobUploadSqliteTests
     }
 
     [Fact]
+    public async Task RetryRecoversOnlyIdenticalFileAfterJournalPromotionRollback()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-blob-recover-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(store);
+            var verifier = new PdfVerifier();
+            var service = new SqliteBlobUploadService(catalog, new UploadAuthorization(), verifier, 10_000);
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nrecover committed File content\n%%EOF");
+            var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
+                new BlobUploadInput("report.pdf", bytes.Length), "recovery-request");
+            await using (var command = db.CreateCommand())
+            {
+                command.CommandText = """
+                    CREATE TRIGGER reject_upload_write BEFORE UPDATE ON teaql_blob_upload
+                    WHEN NEW.state='written' BEGIN SELECT RAISE(ABORT, 'injected'); END
+                    """;
+                await command.ExecuteNonQueryAsync();
+            }
+            Assert.Equal("BLOB_CATALOG_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)))).Message);
+            var objectKey = await Scalar(db,
+                "SELECT object_key FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key);
+            var stable = await actor.ObjectStorage("check recovery candidate").HeadAsync(new ObjectKey(objectKey));
+            Assert.NotNull(stable);
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT state FROM teaql_blob_upload WHERE key=@key", session.Reference.Key));
+            await using (var command = db.CreateCommand())
+            {
+                command.CommandText = "DROP TRIGGER reject_upload_write";
+                await command.ExecuteNonQueryAsync();
+            }
+            Assert.Equal("BLOB_STORE_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId,
+                    new MemoryStream(Enumerable.Repeat((byte)'x', bytes.Length).ToArray())))).Message);
+            Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId,
+                new MemoryStream(bytes)));
+            Assert.Equal(stable.ETag, (await actor.ObjectStorage("check recovered generation")
+                .HeadAsync(new ObjectKey(objectKey)))?.ETag);
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal(1, verifier.Calls);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public async Task RealSQLiteFileUploadRequiresFullVerificationBeforeGraphBind()
     {
         var parent = Path.Combine(Path.GetTempPath(), "teaql-blob-upload-test-" + Guid.NewGuid().ToString("N"));

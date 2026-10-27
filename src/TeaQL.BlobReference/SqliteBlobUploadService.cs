@@ -276,6 +276,39 @@ public sealed class SqliteBlobUploadService
         throw Error("BLOB_CATALOG_FAILED");
     }
 
+    private static async Task<(ObjectMetadata Metadata, string Digest)> RecoverExistingAsync(
+        ObjectStorage store, ObjectKey key, HashingReadStream source, UploadRow row, string mime)
+    {
+        if (!source.Eof || source.Count != row.DeclaredSize)
+            throw Error("BLOB_STORE_FAILED");
+        var digest = source.Digest();
+        var before = await store.HeadAsync(key);
+        if (before == null || before.Size != source.Count || before.ContentType != mime ||
+            string.IsNullOrEmpty(before.ETag)) throw Error("BLOB_STORE_FAILED");
+        await using (var content = await store.GetAsync(key))
+        {
+            if (content.Metadata.Size != before.Size || content.Metadata.ETag != before.ETag ||
+                content.Metadata.ContentType != mime) throw Error("BLOB_STORE_FAILED");
+            using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var buffer = new byte[65536];
+            long count = 0;
+            int read;
+            while ((read = await content.Stream.ReadAsync(buffer)) != 0)
+            {
+                if (count > source.Count - read) throw Error("BLOB_STORE_FAILED");
+                hash.AppendData(buffer.AsSpan(0, read));
+                count += read;
+            }
+            if (count != source.Count ||
+                Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant() != digest)
+                throw Error("BLOB_STORE_FAILED");
+        }
+        var after = await store.HeadAsync(key);
+        if (after == null || after.Size != before.Size || after.ETag != before.ETag ||
+            after.ContentType != mime) throw Error("BLOB_STORE_FAILED");
+        return (before, digest);
+    }
+
     public async Task<long> WriteAsync(UserContext actor, string uploadId, Stream source)
     {
         if (source == null) throw Error("BLOB_UPLOAD_INCOMPLETE");
@@ -290,15 +323,23 @@ public sealed class SqliteBlobUploadService
             try
             {
                 ObjectMetadata metadata;
-                try { metadata = await actor.ObjectStorage("write Blob upload").PutAsync(key, reader,
+                string? recoveredDigest = null;
+                var store = actor.ObjectStorage("write Blob upload");
+                try { metadata = await store.PutAsync(key, reader,
                     new ObjectPutOptions(row.DeclaredSize, ObjectWriteMode.CreateOnly, mime)); }
+                catch (StorageException error) when (error.Code == StorageErrorCode.Conflict)
+                {
+                    try { (metadata, recoveredDigest) = await RecoverExistingAsync(store, key, reader,
+                        row, mime); }
+                    catch { throw Error("BLOB_STORE_FAILED"); }
+                }
                 catch { throw Error("BLOB_STORE_FAILED"); }
                 await Current(actor, new BlobUploadTarget(row.Entity, row.EntityId, row.Field), "Write",
                     new BlobUploadInput(row.FileName, row.DeclaredSize), row.Scope, tx);
                 if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
                 if (!reader.Eof || reader.Count != row.DeclaredSize || metadata.Size != reader.Count ||
                     string.IsNullOrEmpty(metadata.ETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
-                var digest = reader.Digest();
+                var digest = recoveredDigest ?? reader.Digest();
                 var nowMs = _now().ToUnixTimeMilliseconds();
                 if (nowMs >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
                 ulong affected;
