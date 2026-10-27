@@ -218,7 +218,15 @@ public static class GeneratedRuntimeModule
        ["Tenant"] = "tenant_data",
        ["PurchaseOrder"] = "purchase_order_data",
        ["OrderItem"] = "order_item_data"
-    }).WireEntity(WireFields.CreateMetadata("Tenant", ["id", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("PurchaseOrder", ["id", "tenant", "contact_phone", "internal_note", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["tenant"] = ["tenant"], ["contact_phone"] = ["contact_phone"], ["internal_note"] = ["internal_note"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "purchase_order", "tenant", "product_name", "unit_price", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["purchase_order"] = ["purchase_order"], ["tenant"] = ["tenant"], ["product_name"] = ["product_name"], ["unit_price"] = ["unit_price"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }, integer32Fields: new Dictionary<string, IReadOnlyList<string>>
+    {
+       ["Tenant"] = new List<string> {
+        },
+       ["PurchaseOrder"] = new List<string> {
+        },
+       ["OrderItem"] = new List<string> {
+        }
+    }).WireEntity(WireFields.CreateMetadata("Tenant", ["id", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("PurchaseOrder", ["id", "tenant", "contact_phone", "internal_note", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["tenant"] = ["tenant"], ["contact_phone"] = ["contact_phone"], ["internal_note"] = ["internal_note"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "purchase_order", "tenant", "product_name", "unit_price", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["purchase_order"] = ["purchase_order"], ["tenant"] = ["tenant"], ["product_name"] = ["product_name"], ["unit_price"] = ["unit_price"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

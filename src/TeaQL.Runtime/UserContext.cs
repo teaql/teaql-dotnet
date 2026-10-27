@@ -554,9 +554,11 @@ public class UserContext
 
     internal void CheckAndFix(MutationRequest request)
     {
+        MutationVersionAdmission.Validate(this, request);
         if (request is BatchMutationRequest batch)
         {
             foreach (var item in batch.Requests) CheckAndFix(item);
+            MutationVersionAdmission.Validate(this, request);
             return;
         }
         var entity = request switch
@@ -574,6 +576,7 @@ public class UserContext
         var violations = _checkers.TryGetValue(entity, out var checker)
             ? checker.CheckAndFix(this, request, _graphFixTime ?? BusinessTime).ToList()
             : new List<CheckResult>();
+        MutationVersionAdmission.Validate(this, request);
         CanonicalMutationFields.Validate(this, request);
         // Runtime admission is independent of generated/custom checker presence.
         // Inspect final values after Fix, allowing a custom checker to repair them.

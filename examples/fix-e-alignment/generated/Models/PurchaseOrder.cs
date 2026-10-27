@@ -7,16 +7,79 @@ using TeaQL.Core;
 namespace Generated.Models
 {
 
-    public class PurchaseOrder
+    public class PurchaseOrder : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("PurchaseOrder", new global::TeaQL.Runtime.EntityJsonField[] {
+            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
+            new global::TeaQL.Runtime.EntityJsonField("tenant", global::TeaQL.Runtime.EntityJsonKind.Reference, "tenant", () => global::Generated.Models.Tenant._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("contact_phone", global::TeaQL.Runtime.EntityJsonKind.Text, "contact_phone"),
+            new global::TeaQL.Runtime.EntityJsonField("internal_note", global::TeaQL.Runtime.EntityJsonKind.Text, "internal_note"),
+            new global::TeaQL.Runtime.EntityJsonField("create_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "create_time"),
+            new global::TeaQL.Runtime.EntityJsonField("update_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "update_time"),
+            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField("order_item_list", global::TeaQL.Runtime.EntityJsonKind.Many, "OrderItemList", () => global::Generated.Models.OrderItem._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+
+        global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
+
+        public string ToJson(global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) => _teaqlJsonSchema.Serialize(this, profile);
+
+        public static PurchaseOrder FromJson(string payload, global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) =>
+            FromRecord(_teaqlJsonSchema.Parse(payload, profile));
+
+        IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
+        {
+            if (IsLoaded("Id"))
+            {
+                yield return new KeyValuePair<string, object?>("id", Id);
+            }
+            if (IsLoaded("Tenant"))
+            {
+                object? jsonTenant = IsLoaded("TenantEntity") && TenantEntity != null && TenantEntity.Id == Tenant
+                    ? TenantEntity : Tenant;
+                yield return new KeyValuePair<string, object?>("tenant", jsonTenant);
+            }
+            if (IsLoaded("ContactPhone"))
+            {
+                yield return new KeyValuePair<string, object?>("contact_phone", ContactPhone);
+            }
+            if (IsLoaded("InternalNote"))
+            {
+                yield return new KeyValuePair<string, object?>("internal_note", InternalNote);
+            }
+            if (IsLoaded("CreateTime"))
+            {
+                yield return new KeyValuePair<string, object?>("create_time", CreateTime);
+            }
+            if (IsLoaded("UpdateTime"))
+            {
+                yield return new KeyValuePair<string, object?>("update_time", UpdateTime);
+            }
+            if (IsLoaded("Version"))
+            {
+                yield return new KeyValuePair<string, object?>("version", Version);
+            }
+            if (IsLoaded("OrderItemList"))
+                yield return new KeyValuePair<string, object?>("OrderItemList", OrderItemList);
+        }
+
         public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
+        private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("PurchaseOrder", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
-        internal void AttachRoot(EntityRoot root) { if (!ReferenceEquals(root, _entityRoot)) { root.MergeFrom(_entityRoot); _entityRoot = root; } foreach (var child in OrderItemList) child.AttachRoot(root); }
+        internal void AttachRoot(EntityRoot root, bool hydration = false)
+        {
+            var key = TeaqlEntityKey();
+            if (!ReferenceEquals(root, _entityRoot) && (hydration || _entityRoot.HasPending(key)))
+            {
+                root.MergeEntityFrom(_entityRoot, key);
+                _entityRoot = root;
+            }
+            foreach (var child in OrderItemList) child.AttachRoot(root, hydration);
+        }
         private static Value TeaqlValue(object? value) => value switch {
             null => new Value.NullValue(), string v => new Value.TextValue(v), bool v => new Value.BoolValue(v),
             double v => new Value.F64Value(v), decimal v => new Value.DecimalValue(v), DateTime v => new Value.TimestampValue(new DateTimeOffset(v).ToUnixTimeMilliseconds()), TimeSpan v => new Value.TimeValue(v),
@@ -39,7 +102,7 @@ namespace Generated.Models
                 public DateTime? UpdateTime { get; set; }
                 public long? Version { get; set; }
                 public Tenant? TenantEntity { get; set; }
-                public List<OrderItem> OrderItemList { get; } = new List<OrderItem>();
+                public SmartList<OrderItem> OrderItemList { get; } = SmartList<OrderItem>.Empty();
 
         private string? _comment;
         private bool _markedForDeletion;
@@ -76,7 +139,7 @@ namespace Generated.Models
 
         public PurchaseOrder AuditAs(string comment)
         {
-            _comment = comment;
+            _comment = new MutationIntent(comment).Comment;
             return this;
         }
 
@@ -89,12 +152,16 @@ namespace Generated.Models
 
         public static PurchaseOrder Refer(long id)
         {
-            return new PurchaseOrder { Id = id }.MarkLoadedOnly("Id");
+            var entity = new PurchaseOrder();
+            entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
+            entity.Id = id;
+            return entity.MarkLoadedOnly("Id");
         }
 
         public static PurchaseOrder FromRecord(Record record)
         {
             var entity = new PurchaseOrder().MarkLoadedOnly();
+            entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
                     if (record.TryGetValue("id", out var idValue))
                     {
                         entity.MarkLoaded("Id");
@@ -121,6 +188,8 @@ namespace Generated.Models
                                 break;
                             }
                         }
+                        else if (tenantValue.Raw == null)
+                            entity.MarkLoaded("TenantEntity");
                         else if (tenantValue.Raw != null)
                             entity.Tenant = Convert.ToInt64(tenantValue.Raw);
                     }
@@ -157,9 +226,14 @@ namespace Generated.Models
                         if (record.TryGetValue("OrderItemList", out var orderItemListValue))
                         {
                             entity.MarkLoaded("OrderItemList");
+                            entity.OrderItemList.IsLoaded = true;
                             if (orderItemListValue is Value.ListValue rows)
+                            {
+                                if (rows.Values is SmartList<Value> carrier)
+                                    entity.OrderItemList.Facets = carrier.Facets;
                                 foreach (var row in rows.Values.OfType<Value.ObjectValue>())
                                     entity.OrderItemList.Add(global::Generated.Models.OrderItem.FromRecord(row.Value));
+                            }
                         }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
                 "id", "tenant", "contact_phone", "internal_note", "create_time", "update_time", "version",
@@ -169,30 +243,40 @@ namespace Generated.Models
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
             if (entity.Version.HasValue) entity._entityRoot.SetOriginalVersion(entity.TeaqlEntityKey(), entity.Version.Value);
+            entity._loadedSnapshot = entity.TeaqlScalarSnapshot();
             return entity;
         }
 
         internal static PurchaseOrder FromRecord(Record record, EntityRoot root)
         {
             var entity = FromRecord(record);
-            entity.AttachRoot(root);
+            entity.AttachRoot(root, hydration: true);
             return entity;
         }
 
-        public async Task<PurchaseOrder> SaveAsync(UserContext context)
+        public async global::System.Threading.Tasks.Task<PurchaseOrder> SaveAsync(UserContext context)
         {
-            return await context.ExecuteGraphSaveAsync(_comment!, async graph =>
+            var intent = new MutationIntent(_comment);
+            return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
+                graph.DeclareRootEntity("PurchaseOrder");
                 if (!Id.HasValue || _teaqlForceCreate)
                 {
                 }
+                TeaqlPrepareInputGraph(context, graph);
+                graph.SealPreparedGraph();
+                await global::System.Threading.Tasks.Task.CompletedTask;
+            }, async graph =>
+            {
+                await TeaqlReserveGraphIdentitiesAsync(graph);
                 TeaqlPreflightGraph(context, graph);
                 return await TeaqlSaveWithinGraphAsync(context, graph);
             });
         }
 
-        internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
+        internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            graph.DiscardRestoredFields("PurchaseOrder", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
             if (changed)
@@ -219,16 +303,17 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 ((UpdateCommand)command).Values = _entityRoot.Change(TeaqlEntityKey());
-                if (Version.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(Version.Value);
+                var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
+                if (originalVersion.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            graph.Preflight(TeaqlMutationRequest(command, string.IsNullOrWhiteSpace(_comment) ? graph.Intent.Comment : _comment!));
+            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment));
             }
             for (var index = 0; index < OrderItemList.Count; index++)
             {
                 var child = OrderItemList[index];
                 child.AttachRoot(_entityRoot);
                 if (child.PurchaseOrder != (Id ?? _ledgerId)) child.UpdatePurchaseOrderId(Id ?? _ledgerId);
-                try { child.TeaqlPreflightGraph(context, graph); }
+                try { child.TeaqlPrepareInputGraph(context, graph); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("order_item_list").Index(index);
@@ -238,26 +323,27 @@ namespace Generated.Models
             }
         }
 
-        internal async Task<PurchaseOrder> TeaqlSaveWithinGraphAsync(UserContext context, GraphMutationSession graph, MutationTraceScope? parentScope = null)
+        internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
-            var scope = graph.Scope("PurchaseOrder", Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
-            if (Id.HasValue && !_teaqlForceCreate && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
+            if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+                graph.PreflightPrepared(this);
+            for (var index = 0; index < OrderItemList.Count; index++)
             {
-                for (var index = 0; index < OrderItemList.Count; index++)
+                try { OrderItemList[index].TeaqlPreflightGraph(context, graph); }
+                catch (CheckException error)
                 {
-                    var child = OrderItemList[index];
-                    child.AttachRoot(_entityRoot);
-                    if (child.PurchaseOrder != Id) child.UpdatePurchaseOrderId(Id);
-                    try { await child.TeaqlSaveWithinGraphAsync(context, graph, scope); }
-                    catch (CheckException error)
-                    {
-                        var prefix = ObjectLocation.Property("order_item_list").Index(index);
-                        throw new CheckException(error.Violations.Select(violation =>
-                            new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
-                    }
+                    var prefix = ObjectLocation.Property("order_item_list").Index(index);
+                    throw new CheckException(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
                 }
-                return this;
             }
+        }
+
+        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        {
+            var creating = !Id.HasValue || _teaqlForceCreate;
+            if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            {
             var teaqlOriginalKey = TeaqlEntityKey();
             var teaqlOriginalLedgerId = _ledgerId;
             var teaqlOriginalMarkedForDeletion = _markedForDeletion;
@@ -293,21 +379,39 @@ namespace Generated.Models
                 _entityRoot.ClearEntity(TeaqlEntityKey());
                 if (Version.HasValue) _entityRoot.AcceptCommittedVersion(TeaqlEntityKey(), Version.Value);
             });
-            var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (_markedForDeletion && creating)
                 throw new InvalidOperationException("Cannot delete an entity without an id");
-            var cmd = _markedForDeletion ? (object)ToDeleteCommand()
-                : creating ? (object)ToInsertCommand()
-                : (object)ToUpdateCommand();
-            if (!creating && !_markedForDeletion) {
-                ((UpdateCommand)cmd).Values = _entityRoot.Change(TeaqlEntityKey());
-                if (Version.HasValue) ((UpdateCommand)cmd).Values["version"] = new Value.I64Value(Version.Value);
+            if (creating)
+            {
+                var allocationKey = TeaqlEntityKey();
+                Id = checked((long)await graph.ReservePreparedIdAsync(this));
+                _teaqlForceCreate = true;
+                _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
             }
-            var req = TeaqlMutationRequest(cmd, scope.Node.Detail!);
-            var mutationResult = await graph.MutateAsync(req, scope);
+            }
+            foreach (var child in OrderItemList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
+            await global::System.Threading.Tasks.Task.CompletedTask;
+        }
+
+        internal async global::System.Threading.Tasks.Task<PurchaseOrder> TeaqlSaveWithinGraphAsync(UserContext context,
+            GraphMutationSession graph, MutationTraceScope? parentScope = null)
+        {
+            var creating = !this.Id.HasValue || _teaqlForceCreate;
+            if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
+            {
+                var cleanScope = graph.Scope("PurchaseOrder",
+                    Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
+                await TeaqlSaveChildrenAsync(context, graph, cleanScope);
+                return this;
+            }
+            var scope = graph.Scope("PurchaseOrder",
+                Id.HasValue ? checked((ulong)Id.Value) : null, _comment, parentScope);
+            var mutationResult = await graph.MutatePreparedAsync(this, scope);
             if (mutationResult.PersistedRecord == null)
                 throw new InvalidOperationException("Mutation provider did not return authoritative persisted state for PurchaseOrder");
             var saved = FromRecord(mutationResult.PersistedRecord);
+            var committedSnapshot = saved._loadedSnapshot;
+            graph.AfterCommit(() => _loadedSnapshot = committedSnapshot);
             var oldKey = TeaqlEntityKey();
             this.Id = saved.Id;
             this.Tenant = saved.Tenant;
@@ -319,6 +423,12 @@ namespace Generated.Models
             _ledgerId = Id ?? _ledgerId;
             _teaqlForceCreate = false;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
+            await TeaqlSaveChildrenAsync(context, graph, scope);
+            return saved;
+        }
+
+        private async global::System.Threading.Tasks.Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
+        {
             for (var index = 0; index < OrderItemList.Count; index++)
             {
                 var child = OrderItemList[index];
@@ -332,16 +442,29 @@ namespace Generated.Models
                         new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
                 }
             }
-            return saved;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
-        private MutationRequest TeaqlMutationRequest(object command, string comment) => command switch
+        private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
         {
-            InsertCommand insert => MutationRequest.Create(insert, comment, TeaqlEntityKey(), _entityRoot),
-            UpdateCommand update => MutationRequest.Create(update, comment, TeaqlEntityKey(), _entityRoot),
-            DeleteCommand delete => MutationRequest.Create(delete, comment, TeaqlEntityKey(), _entityRoot),
+            InsertCommand insert => MutationRequest.Create(insert, rootComment, TeaqlEntityKey(), _entityRoot),
+            UpdateCommand update => MutationRequest.Create(update, rootComment, TeaqlEntityKey(), _entityRoot),
+            DeleteCommand delete => MutationRequest.Create(delete, rootComment, TeaqlEntityKey(), _entityRoot),
             _ => throw new InvalidOperationException("Unsupported mutation command")
-        };
+        }).WithLoadedSnapshot(_loadedSnapshot);
+
+        private LoadedScalarSnapshot TeaqlScalarSnapshot()
+        {
+            var record = new Record();
+                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
+                        if (IsLoaded("Tenant")) record["tenant"] = TeaqlValue(Tenant);
+                        if (IsLoaded("ContactPhone")) record["contact_phone"] = TeaqlValue(ContactPhone);
+                        if (IsLoaded("InternalNote")) record["internal_note"] = TeaqlValue(InternalNote);
+                        if (IsLoaded("CreateTime")) record["create_time"] = TeaqlValue(CreateTime);
+                        if (IsLoaded("UpdateTime")) record["update_time"] = TeaqlValue(UpdateTime);
+                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
+        }
 
         public InsertCommand ToInsertCommand()
         {
@@ -381,7 +504,7 @@ namespace Generated.Models
             return new UpdateCommand { 
                 Entity = "PurchaseOrder", 
                 Id = this.Id.HasValue ? new Value.I64Value(this.Id.Value) : throw new InvalidOperationException("Update requires a loaded id"),
-                ExpectedVersionValue = this.Version,
+                ExpectedVersionValue = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? this.Version,
                 Values = record 
             };
         }
@@ -393,7 +516,7 @@ namespace Generated.Models
             return new DeleteCommand {
                 Entity = "PurchaseOrder",
                 Id = new Value.I64Value(Id.Value),
-                Version = new Value.I64Value(Version.Value)
+                Version = new Value.I64Value(_entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version.Value)
             };
         }
 
@@ -412,6 +535,7 @@ namespace Generated.Models
 
                 internal PurchaseOrder UpdateTenant(long? value)
                 {
+                    if (this.Tenant != value) this.TenantEntity = null;
                     this.Tenant = value;
                     MarkLoaded("Tenant");
                     _entityRoot.Set(TeaqlEntityKey(), "tenant", TeaqlValue(value));
@@ -459,19 +583,15 @@ namespace Generated.Models
                 }
                 internal PurchaseOrder UpdateTenant(Tenant value)
                 {
-                    this.Tenant = value?.Id;
-                    MarkLoaded("Tenant");
-                    _entityRoot.Set(TeaqlEntityKey(), "tenant", TeaqlValue(this.Tenant));
+                    UpdateTenant(value?.Id);
+                    this.TenantEntity = value;
                     return this;
                 }
 
 
                 internal PurchaseOrder UpdateTenantId(long? value)
                 {
-                    this.Tenant = value;
-                    MarkLoaded("Tenant");
-                    _entityRoot.Set(TeaqlEntityKey(), "tenant", TeaqlValue(value));
-                    return this;
+                    return UpdateTenant(value);
                 }
 
     }

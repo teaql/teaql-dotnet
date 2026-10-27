@@ -223,7 +223,12 @@ namespace Generated
             var path = _path.Member("tenant", "Tenant");
             if (_notLoaded != null) return new TenantExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new TenantExpression(null, _root, path);
-            if (!_value.IsLoaded("TenantEntity"))
+            if (!_value.IsLoaded("Tenant"))
+                return new TenantExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "tenant"));
+            if (_value.Tenant is null) return new TenantExpression(null, _root, path);
+            if (!_value.IsLoaded("TenantEntity") || _value.TenantEntity is null
+                || _value.TenantEntity.Id != _value.Tenant)
                 return new TenantExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "tenant"));
             return new TenantExpression(_value.TenantEntity, _root, path);
@@ -351,7 +356,12 @@ namespace Generated
             var path = _path.Member("purchase_order", "PurchaseOrder");
             if (_notLoaded != null) return new PurchaseOrderExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new PurchaseOrderExpression(null, _root, path);
-            if (!_value.IsLoaded("PurchaseOrderEntity"))
+            if (!_value.IsLoaded("PurchaseOrder"))
+                return new PurchaseOrderExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "purchase_order"));
+            if (_value.PurchaseOrder is null) return new PurchaseOrderExpression(null, _root, path);
+            if (!_value.IsLoaded("PurchaseOrderEntity") || _value.PurchaseOrderEntity is null
+                || _value.PurchaseOrderEntity.Id != _value.PurchaseOrder)
                 return new PurchaseOrderExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "purchase_order"));
             return new PurchaseOrderExpression(_value.PurchaseOrderEntity, _root, path);
@@ -362,7 +372,12 @@ namespace Generated
             var path = _path.Member("tenant", "Tenant");
             if (_notLoaded != null) return new TenantExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new TenantExpression(null, _root, path);
-            if (!_value.IsLoaded("TenantEntity"))
+            if (!_value.IsLoaded("Tenant"))
+                return new TenantExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "tenant"));
+            if (_value.Tenant is null) return new TenantExpression(null, _root, path);
+            if (!_value.IsLoaded("TenantEntity") || _value.TenantEntity is null
+                || _value.TenantEntity.Id != _value.Tenant)
                 return new TenantExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "tenant"));
             return new TenantExpression(_value.TenantEntity, _root, path);

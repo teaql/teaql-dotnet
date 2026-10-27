@@ -5,6 +5,9 @@
     "en": {
       "messages": {
         "checker.required": "The {location} is required",
+        "checker.invalid_version_state": "The {location} has an invalid state for this mutation: {input}",
+        "checker.invalid_deletion_state": "Soft delete requires a positive {location}, got {input}",
+        "checker.version_exhausted": "The {location} has no representable successor for this mutation: {input}",
         "checker.min": "The {location} should be equal or greater than {system}, but input is {input}",
         "checker.max": "The {location} should be equal or less than {system}, but input is {input}",
         "checker.minLength": "The length of {location} should be equal or greater than {system}, but the length of {input} is {input_len}",
@@ -15,6 +18,9 @@
     "zh-CN": {
       "messages": {
         "checker.required": "{location} 是必填项",
+        "checker.invalid_version_state": "{location} 的状态不允许本次修改：{input}",
+        "checker.invalid_deletion_state": "软删除要求 {location} 为正数，实际为 {input}",
+        "checker.version_exhausted": "{location} 在本次修改后将超出可表示范围：{input}",
         "checker.min": "{location} 应该大于等于 {system}，但输入值为 {input}",
         "checker.max": "{location} 应该小于等于 {system}，但输入值为 {input}",
         "checker.minLength": "{location} 的长度应大于等于 {system}，但实际长度为 {input_len}",

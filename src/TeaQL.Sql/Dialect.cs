@@ -376,7 +376,7 @@ public abstract class SqlDialect
         {
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
-            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.Value + 1));
+            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(CompileMutationVersion(MutationKind.Update, command.ExpectedVersionValue.Value)));
             assignments.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
         }
         if (assignments.Count == 0)
@@ -454,7 +454,7 @@ public abstract class SqlDialect
                     SqlLogBindings.AddField(paramsList, entity, idProperty, id);
                     var idPh = Placeholder(paramsList.Count);
 
-                    SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(expVerOpt.Value + 1));
+                    SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(CompileMutationVersion(MutationKind.Update, expVerOpt.Value)));
                     var valPh = Placeholder(paramsList.Count);
 
                     caseParts.Add($"WHEN {idPh} THEN {valPh}");
@@ -520,7 +520,8 @@ public abstract class SqlDialect
             var versionProperty = entity.Properties.FirstOrDefault(p => p.IsVersion)
                 ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
 
-            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.HasValue ? -(command.ExpectedVersionValue.Value + 1) : -1));
+            SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue is { } expected
+                ? CompileMutationVersion(MutationKind.Delete, expected) : -1));
             SqlLogBindings.AddField(paramsList, entity, idProperty, command.Id);
 
             var predicates = new List<string> { $"{QuoteIdent(idProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}" };
@@ -530,6 +531,7 @@ public abstract class SqlDialect
                 SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue.Value));
                 predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(paramsList.Count)}");
             }
+            else predicates.Add($"{QuoteIdent(versionProperty.ColumnNameString)} >= 1");
             AppendMutationGuards(entity, command.Guards, predicates, paramsList);
 
             var sqlSoft = $"UPDATE {QuoteIdent(entity.TableNameValue)} SET {QuoteIdent(versionProperty.ColumnNameString)} = {Placeholder(1)} WHERE {string.Join(" AND ", predicates)}";
@@ -554,8 +556,7 @@ public abstract class SqlDialect
 
     public virtual CompiledQuery CompileRecover(EntityDescriptor entity, RecoverCommand command)
     {
-        if (command.ExpectedVersionValue >= 0)
-            throw SqlCompileException.InvalidRecoverVersion(command.ExpectedVersionValue);
+        var nextVersion = CompileMutationVersion(MutationKind.Recover, command.ExpectedVersionValue);
 
         var idProperty = entity.Properties.FirstOrDefault(p => p.IsId)
             ?? throw SqlCompileException.MissingIdProperty(entity.Name);
@@ -563,7 +564,7 @@ public abstract class SqlDialect
             ?? throw SqlCompileException.MissingVersionProperty(entity.Name);
 
         var paramsList = SqlLogBindings.Create();
-        SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(-command.ExpectedVersionValue + 1));
+        SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(nextVersion));
         SqlLogBindings.AddField(paramsList, entity, idProperty, command.Id);
         SqlLogBindings.AddField(paramsList, entity, versionProperty, new Value.I64Value(command.ExpectedVersionValue));
 
@@ -577,6 +578,12 @@ public abstract class SqlDialect
                   $"WHERE {string.Join(" AND ", predicates)}";
         
         return new CompiledQuery(sql, paramsList, null);
+    }
+
+    private static long CompileMutationVersion(MutationKind operation, long version)
+    {
+        try { return MutationVersion.Next(operation, version); }
+        catch (MutationVersionException error) { throw new SqlCompileException(error.Message, error); }
     }
 
     private void AppendMutationGuards(EntityDescriptor entity, Record guards,

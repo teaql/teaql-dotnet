@@ -132,6 +132,18 @@ approval emits a warning; it is not automatic rejection. Marking for deletion
 stages a change—the audited Save performs it. Atomicity is provider/route scoped,
 not a distributed transaction across unrelated databases.
 
+Signed optimistic versions use checked transitions shared by Core, Runtime and
+SQL: update requires `1 <= v < long.MaxValue`; soft delete accepts every positive
+version and computes `-v-1`; recovery requires a negative version with a
+representable `-v+1`. Exhaustion rejects without wrapping or resetting a version.
+`long.MinValue` and `long.MinValue+1` tombstones cannot be recovered. Hard deletion
+is a separate operation. Admission runs before customer callbacks and again
+before provider execution, including complete nested mutation batches.
+The application-owned [version probe](examples/fix-e-alignment/VersionProbe.cs)
+uses generated Q/E/audited Save on SQLite, with calibrated SQL, transaction,
+policy and audit counters. Run it twice without resetting the database via
+`node examples/fix-e-alignment/verify-local.cjs`; generated fixtures stay unchanged.
+
 ## Automatic logs without handwritten logging code
 
 **Debuggability and operability are core design goals.** The Q and Save

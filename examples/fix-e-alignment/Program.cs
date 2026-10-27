@@ -85,6 +85,7 @@ Require(E.PurchaseOrder(persisted).UpdateTime().Eval() == second.UtcDateTime, "U
 Require(E.PurchaseOrder(persisted).ContactPhone().Eval() == "5550101", "Business input was not updated");
 await LoadingProbe.Verify(context, orderId);
 await OwnershipProbe.Verify(context);
+await VersionProbe.Verify(context, connection);
 Console.WriteLine("FIX_E_EXAMPLE=" + JsonSerializer.Serialize(new {
     language = "dotnet", passed = true, normalGeneratedSave = true, createTimePreserved = true,
     updateTimeAdvanced = true, declaredContextRootInjected = true,

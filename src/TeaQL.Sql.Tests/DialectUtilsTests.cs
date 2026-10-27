@@ -189,7 +189,7 @@ namespace TeaQL.Sql.Tests
             var cmd = new DeleteCommand { Id = new Value.I64Value(1), SoftDelete = true };
             
             var compiled = _dialect.CompileDelete(entity, cmd);
-            Assert.Equal("UPDATE \"users\" SET \"version\" = $1 WHERE \"id\" = $2", compiled.Sql);
+            Assert.Equal("UPDATE \"users\" SET \"version\" = $1 WHERE \"id\" = $2 AND \"version\" >= 1", compiled.Sql);
             Assert.Equal(2, compiled.Params.Count);
         }
 

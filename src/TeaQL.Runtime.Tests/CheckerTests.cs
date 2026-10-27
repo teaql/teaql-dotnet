@@ -151,7 +151,7 @@ public class CheckerTests
         {
             var command = new RecoverCommand
             {
-                Entity = "SchoolType", Id = new Value.I64Value(1001), ExpectedVersionValue = 2
+                Entity = "SchoolType", Id = new Value.I64Value(1001), ExpectedVersionValue = -2
             }.Guard("code", new Value.TextValue("GUARD-VALUE-CANARY"));
             command.TraceChain.Add(new TraceNode("SchoolType", 1001, "recover 1001 GUARD-VALUE-CANARY"));
             request = new RecoverMutationRequest(command, "recover 1001 GUARD-VALUE-CANARY");
@@ -169,6 +169,7 @@ public class CheckerTests
         var audit = Assert.Single(sink.Events);
         Assert.Equal(1001L, audit["entityId"]);
         Assert.Equal(recover ? "recover [REDACTED] [REDACTED]" : "delete [REDACTED] [REDACTED]", audit["reason"]);
+        Assert.Equal(1, provider.MutationCalls);
     }
 
     [Fact]
