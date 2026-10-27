@@ -137,6 +137,18 @@ public sealed class SqliteBlobUploadService
         return scope;
     }
 
+    private async Task<BlobRetentionPolicy?> PolicyOnLeaseAsync(UserContext actor,
+        ISqlTransport lease, BlobUploadTarget target)
+    {
+        if (_authorization is not IBlobUploadPolicyAuthorization source) return null;
+        BlobRetentionPolicy policy;
+        try { policy = await source.CurrentPolicyOnLeaseAsync(actor, lease, target); }
+        catch { throw Error("BLOB_POLICY_INVALID"); }
+        if (policy == null) throw Error("BLOB_POLICY_INVALID");
+        if (policy.UploadMode != "server_stream") throw Error("BLOB_CAPABILITY_MISSING");
+        return policy;
+    }
+
     private async Task<T> Transaction<T>(Func<ISqlTransaction, Task<T>> work)
     {
         ISqlTransaction tx;
@@ -197,14 +209,20 @@ public sealed class SqliteBlobUploadService
             var objectKey = "blob/" + Token();
             var expiresMs = _now().Add(_lease).ToUnixTimeMilliseconds();
             await Current(actor, target, "Begin", normalized, scope, tx);
+            var policy = await PolicyOnLeaseAsync(actor, tx, target);
             try
             {
                 await tx.ExecuteSqlAsync(Query("""
                     INSERT INTO teaql_blob_catalog
-                    (key,scope,object_key,content_version,file_name,content_type,size_bytes,status)
-                    VALUES (@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7)
+                    (key,scope,object_key,content_version,file_name,content_type,size_bytes,status,
+                     policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds)
+                    VALUES (@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11)
                     """, Text(reference.Key), Text(scope), Text(objectKey), Text(""),
-                    Text(normalized.FileName), Text(""), Number(0), Text("initiated")));
+                    Text(normalized.FileName), Text(""), Number(0), Text("initiated"),
+                    policy is null ? new Value.NullValue() : Text(policy.Profile),
+                    policy is null ? new Value.NullValue() : Text(policy.UploadMode),
+                    policy is null ? new Value.NullValue() : Number(policy.UnboundRetentionSeconds),
+                    policy is null ? new Value.NullValue() : Number(policy.UnreferencedRetentionSeconds)));
                 await tx.ExecuteSqlAsync(Query("""
                     INSERT INTO teaql_blob_upload
                     (upload_id,scope,replay_key,request_hash,key,entity,entity_id,field,file_name,
@@ -525,9 +543,10 @@ public sealed class SqliteBlobUploadService
             if (affected != 1) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
             try { affected = await tx.ExecuteSqlAsync(Query("""
                 UPDATE teaql_blob_catalog SET content_version=@p0,content_type=@p1,size_bytes=@p2,
-                  status='uploaded_unbound' WHERE key=@p3 AND scope=@p4 AND status='initiated'
+                  completed_at_ms=@p3,status='uploaded_unbound'
+                  WHERE key=@p4 AND scope=@p5 AND status='initiated'
                 """, Text(row.WrittenETag!), Text(verified.ContentType), Number(verified.SizeBytes),
-                Text(row.Key), Text(row.Scope))); }
+                Number(nowMs), Text(row.Key), Text(row.Scope))); }
             catch { throw Error("BLOB_CATALOG_FAILED"); }
             if (affected != 1) throw Error("BLOB_IDEMPOTENCY_CONFLICT");
             return new BlobRef(row.Key);

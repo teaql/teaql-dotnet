@@ -14,11 +14,16 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class BlobCatalogSqliteTests
 {
-    private sealed class Authorization(string scope, bool allow = true) : IBlobBindingAuthorization
+    private sealed class Authorization(string scope, bool allow = true)
+        : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
     {
+        public BlobRetentionPolicy Policy = new("default", "server_stream", 86400, 604800, 3600);
         public string Scope(UserContext context) => scope;
         public Task<bool> AuthorizeAsync(UserContext context, BlobBindingTarget target,
             BlobRef? previous, BlobRef? next, string action) => Task.FromResult(allow);
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            IPhysicalSqlLease lease, BlobBindingTarget target) =>
+            Task.FromResult(Policy);
     }
 
     private sealed class ReadAuthorization(bool allow) : IBlobReadAuthorization
@@ -112,7 +117,8 @@ public class BlobCatalogSqliteTests
         }
     }
 
-    private static async Task<(SqliteConnection Db, UserContext Actor, SqliteBlobCatalog Catalog)> Fixture()
+    private static async Task<(SqliteConnection Db, UserContext Actor, SqliteBlobCatalog Catalog)> Fixture(
+        Func<DateTimeOffset>? now = null)
     {
         var db = new SqliteConnection("Data Source=:memory:");
         await db.OpenAsync();
@@ -125,14 +131,17 @@ public class BlobCatalogSqliteTests
             new SqlDataServiceExecutor(new SqliteDialect(), transport,
                 new MetadataSchemaProvider(name => name == "Asset" ? asset : null)));
         await actor.EnsureSchemaAsync();
-        var catalog = new SqliteBlobCatalog(transport);
+        var catalog = new SqliteBlobCatalog(transport, now);
         await catalog.EnsureSchemaAsync();
         await catalog.ValidateSchemaAsync();
         await using var command = db.CreateCommand();
         command.CommandText = """
             INSERT INTO teaql_blob_catalog
-            (key, scope, object_key, content_version, file_name, content_type, size_bytes, status)
-            VALUES ('blob_abc', 'tenant-a', 'objects/abc', 'v1', 'report.pdf', 'application/pdf', 7, 'uploaded_unbound')
+            (key, scope, object_key, content_version, file_name, content_type, size_bytes, status,
+             completed_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds)
+            VALUES ('blob_abc', 'tenant-a', 'objects/abc', 'v1', 'report.pdf', 'application/pdf', 7,
+              'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,
+              'default','server_stream',86400,604800)
             """;
         await command.ExecuteNonQueryAsync();
         return (db, actor, catalog);
@@ -238,7 +247,7 @@ public class BlobCatalogSqliteTests
                 new BlobBindingChange(Target, null, 1, 2, "Delete"), allowed));
             return true;
         });
-        Assert.Equal("uploaded_unbound", await CatalogStatus(db));
+        Assert.Equal("available", await CatalogStatus(db));
         await actor.ExecuteGraphSaveAsync("rebind", async graph =>
         {
             Assert.Equal(3, await catalog.BindInGraphAsync(graph, actor,
@@ -283,7 +292,85 @@ public class BlobCatalogSqliteTests
                 new BlobBindingChange(second, null, 1, 2, "Delete"), allowed);
             return true;
         });
-        Assert.Equal("uploaded_unbound", await CatalogStatus(db));
+        Assert.Equal("available", await CatalogStatus(db));
+    }
+
+    [Fact]
+    public async Task GraphBindingRejectsExpiredSourceAndPreservesMaximumRetentionFloor()
+    {
+        var clock = DateTimeOffset.FromUnixTimeMilliseconds(1_700_000_000_000);
+        var (db, actor, catalog) = await Fixture(() => clock);
+        await using var lifetime = db;
+        var authority = new Authorization("tenant-a");
+        async Task SetCompleted(long value)
+        {
+            await using var command = db.CreateCommand();
+            command.CommandText = "UPDATE teaql_blob_catalog SET completed_at_ms=@completed WHERE key='blob_abc'";
+            command.Parameters.AddWithValue("@completed", value);
+            await command.ExecuteNonQueryAsync();
+        }
+        async Task<long> Change(BlobBindingTarget target, BlobRef? next, long expected,
+            long version, string action) => await actor.ExecuteGraphSaveAsync("retention binding",
+                graph => catalog.BindInGraphAsync(graph, actor,
+                    new BlobBindingChange(target, next, expected, version, action), authority));
+
+        await SetCompleted(clock.ToUnixTimeMilliseconds() - 86_400_000);
+        Assert.Equal("BLOB_REFERENCE_EXPIRED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => Change(Target, Reference, 0, 1, "Create"))).Message);
+        await SetCompleted(clock.ToUnixTimeMilliseconds() - 1000);
+        Assert.Equal(1, await Change(Target, Reference, 0, 1, "Create"));
+        var second = new BlobBindingTarget("Asset", "2", "file");
+        authority.Policy = new("longer", "server_stream", 86400, 2592000, 2678400);
+        Assert.Equal(1, await Change(second, Reference, 0, 1, "Create"));
+        Assert.Equal(2, await Change(Target, null, 1, 2, "Update"));
+        await using (var command = db.CreateCommand())
+        {
+            command.CommandText = "SELECT effective_unref_seconds,retention_floor_until_ms,"
+                + "last_unbound_at_ms FROM teaql_blob_catalog WHERE key='blob_abc'";
+            await using var reader = await command.ExecuteReaderAsync();
+            Assert.True(await reader.ReadAsync());
+            Assert.Equal(2592000, reader.GetInt64(0));
+            Assert.Equal(clock.ToUnixTimeMilliseconds() + 2_678_400_000, reader.GetInt64(1));
+            Assert.True(reader.IsDBNull(2));
+        }
+        Assert.Equal(2, await Change(second, null, 1, 2, "Update"));
+        Assert.Equal("available", await CatalogStatus(db));
+        long floor;
+        await using (var command = db.CreateCommand())
+        {
+            command.CommandText = "SELECT retention_floor_until_ms,last_unbound_at_ms "
+                + "FROM teaql_blob_catalog WHERE key='blob_abc'";
+            await using var reader = await command.ExecuteReaderAsync();
+            Assert.True(await reader.ReadAsync());
+            floor = reader.GetInt64(0);
+            Assert.Equal(clock.ToUnixTimeMilliseconds(), reader.GetInt64(1));
+        }
+        authority.Policy = new("shorter", "server_stream", 86400, 3600, 0);
+        clock = DateTimeOffset.FromUnixTimeMilliseconds(floor - 1);
+        Assert.Equal(3, await Change(Target, Reference, 2, 3, "Update"));
+        Assert.Equal(4, await Change(Target, null, 3, 4, "Update"));
+        clock = DateTimeOffset.FromUnixTimeMilliseconds(floor + 2_592_000_000);
+        Assert.Equal("BLOB_REFERENCE_EXPIRED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => Change(Target, Reference, 4, 5, "Update"))).Message);
+    }
+
+    [Fact]
+    public async Task NewBindingRejectsLegacyUnknownPolicyRow()
+    {
+        var (db, actor, catalog) = await Fixture();
+        await using var lifetime = db;
+        await using (var command = db.CreateCommand())
+        {
+            command.CommandText = "UPDATE teaql_blob_catalog SET policy_profile=NULL,"
+                + "upload_mode=NULL,completed_at_ms=NULL WHERE key='blob_abc'";
+            await command.ExecuteNonQueryAsync();
+        }
+        Assert.Equal("BLOB_BIND_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => actor.ExecuteGraphSaveAsync("reject legacy Blob", graph =>
+                catalog.BindInGraphAsync(graph, actor,
+                    new BlobBindingChange(Target, Reference, 0, 1, "Create"),
+                    new Authorization("tenant-a"))))).Message);
+        Assert.Equal(0, await Count(db, "teaql_blob_binding"));
     }
 
     [Fact]

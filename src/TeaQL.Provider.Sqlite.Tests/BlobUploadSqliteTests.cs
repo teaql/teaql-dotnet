@@ -14,7 +14,7 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class BlobUploadSqliteTests
 {
-    private sealed class UploadAuthorization : IBlobUploadAuthorization
+    private sealed class UploadAuthorization : IBlobUploadAuthorization, IBlobUploadPolicyAuthorization
     {
         public string CurrentScope = "tenant-a";
         public bool Allowed = true;
@@ -39,14 +39,20 @@ public class BlobUploadSqliteTests
             }
             return new(Scope(actor), Field(actor, target), allowed);
         }
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            ISqlTransport lease, BlobUploadTarget target) =>
+            Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
     }
 
-    private sealed class BindingAuthorization : IBlobBindingAuthorization
+    private sealed class BindingAuthorization : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
     {
         public string Scope(UserContext actor) => "tenant-a";
         public Task<bool> AuthorizeAsync(UserContext actor, BlobBindingTarget target,
             BlobRef? previous, BlobRef? next, string action) =>
             Task.FromResult(target.Entity == "Asset" && target.Field == "file" && action == "Create");
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            IPhysicalSqlLease lease, BlobBindingTarget target) =>
+            Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
     }
 
     // Fixture-only full-byte parser, not production PDF or ten-format detection.

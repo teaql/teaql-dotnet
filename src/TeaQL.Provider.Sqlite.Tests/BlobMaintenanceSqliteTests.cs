@@ -70,12 +70,121 @@ public class BlobMaintenanceSqliteTests
         finally { Directory.Delete(parent, true); }
     }
 
+    [Fact]
+    public async Task CompletedServerStreamRetentionUsesRealFileVersionAndRecoverableReceipt()
+    {
+        var parent = Path.Combine(Path.GetTempPath(), "teaql-completed-retention-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(parent);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=" + Path.Combine(parent, "catalog.sqlite"));
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var file = new FileObjectStorage(Path.Combine(parent, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(file);
+            var storage = actor.ObjectStorage("real completed retention");
+            var service = new SqliteBlobMaintenanceService(catalog, new Authority(), 100,
+                () => DateTimeOffset.FromUnixTimeMilliseconds(10000));
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nretained\n%%EOF");
+
+            async Task<(ObjectKey Key, string Version)> SeedCompleted(string name,
+                string status = "uploaded_unbound", long? last = null, long? floor = null,
+                string? profile = "default", string mode = "server_stream", bool bound = false)
+            {
+                var key = new ObjectKey("objects/" + name);
+                var created = await storage.PutBytesAsync(key, bytes,
+                    new(bytes.Length, ObjectWriteMode.CreateOnly));
+                await Seed(db, name, state: "completed", version: created.ETag!,
+                    writtenETag: created.ETag, bound: bound);
+                await Execute(db, """
+                    UPDATE teaql_blob_catalog SET status=@status,completed_at_ms=9000,
+                      last_unbound_at_ms=@last,policy_profile=@profile,upload_mode=@mode,
+                      unbound_retention_seconds=1,effective_unref_seconds=2,
+                      retention_floor_until_ms=@floor,content_type='application/pdf',size_bytes=@size
+                    WHERE key=@key
+                    """, ("@status", status), ("@last", last), ("@profile", profile),
+                    ("@mode", mode), ("@floor", floor), ("@size", bytes.Length), ("@key", name));
+                return (key, created.ETag!);
+            }
+
+            var (expired, _) = await SeedCompleted("blob_completed_expired");
+            var (former, _) = await SeedCompleted("blob_completed_former", status: "available",
+                last: 7000, floor: 10000);
+            var (active, _) = await SeedCompleted("blob_completed_active", status: "available", bound: true);
+            var (floored, _) = await SeedCompleted("blob_completed_floor", status: "available",
+                last: 7000, floor: 20000);
+            var (legacy, _) = await SeedCompleted("blob_completed_legacy", profile: null);
+            var (direct, _) = await SeedCompleted("blob_completed_direct", mode: "direct");
+            var first = await service.RunBatchAsync(actor);
+            Assert.Equal(["blob_completed_expired", "blob_completed_former"],
+                first.Outcomes.Select(item => item.Reference.Key).ToArray());
+            Assert.All(first.Outcomes, item => Assert.Equal("deleted", item.Status));
+            Assert.Null(await storage.HeadAsync(expired));
+            Assert.Null(await storage.HeadAsync(former));
+            foreach (var key in new[] { active, floored, legacy, direct })
+                Assert.NotNull(await storage.HeadAsync(key));
+
+            var (staleKey, oldVersion) = await SeedCompleted("blob_completed_stale");
+            var newer = await storage.PutBytesAsync(staleKey, bytes,
+                new(bytes.Length, ObjectWriteMode.Replace));
+            Assert.NotEqual(oldVersion, newer.ETag);
+            var stale = await service.RunBatchAsync(actor);
+            Assert.Equal("version_conflict", Assert.Single(stale.Outcomes).Status);
+            Assert.Equal(newer.ETag, (await storage.HeadAsync(staleKey))?.ETag);
+            Assert.Equal("deleting", await Status(db, "blob_completed_stale"));
+
+            var (retryKey, _) = await SeedCompleted("blob_completed_retry");
+            await Execute(db, """
+                CREATE TRIGGER fail_completed_ack BEFORE UPDATE OF status ON teaql_blob_catalog
+                  WHEN NEW.status='deleted' AND OLD.key='blob_completed_retry'
+                  BEGIN SELECT RAISE(ABORT,'receipt failure'); END
+                """);
+            var failed = await service.RunBatchAsync(actor);
+            Assert.Contains(failed.Outcomes, item => item.Reference.Key == "blob_completed_retry"
+                && item.Status == "failed");
+            Assert.Equal("deleting", await Status(db, "blob_completed_retry"));
+            Assert.Null(await storage.HeadAsync(retryKey));
+            await Execute(db, "DROP TRIGGER fail_completed_ack");
+            var recovered = await service.RunBatchAsync(actor);
+            Assert.Contains(recovered.Outcomes, item => item.Reference.Key == "blob_completed_retry"
+                && item.Status == "already_missing");
+            Assert.Equal("deleted", await Status(db, "blob_completed_retry"));
+
+            var (racedKey, _) = await SeedCompleted("blob_completed_race");
+            var calls = 0;
+            var raceAuthority = new Authority {
+                OnMaintainAsync = async () => {
+                    if (++calls == 2)
+                        await Execute(db, """
+                            INSERT INTO teaql_blob_binding(scope,entity,entity_id,field,key,version)
+                            VALUES('tenant-a','Asset','9','document','blob_completed_race',1)
+                            """);
+                }
+            };
+            var raceService = new SqliteBlobMaintenanceService(catalog, raceAuthority, 100,
+                () => DateTimeOffset.FromUnixTimeMilliseconds(10000));
+            var raced = await raceService.RunBatchAsync(actor);
+            Assert.Contains(raced.Outcomes, item => item.Reference.Key == "blob_completed_race"
+                && item.Status == "not_eligible");
+            Assert.Equal("uploaded_unbound", await Status(db, "blob_completed_race"));
+            Assert.NotNull(await storage.HeadAsync(racedKey));
+        }
+        finally { Directory.Delete(parent, true); }
+    }
+
     private sealed class Authority : IBlobMaintenanceAuthorization
     {
         public string CurrentScope = "tenant-a";
         public bool Allowed = true;
+        public Func<Task>? OnMaintainAsync;
         public string Scope(UserContext actor) => CurrentScope;
-        public Task<bool> CanMaintainAsync(UserContext actor, string scope) => Task.FromResult(Allowed);
+        public async Task<bool> CanMaintainAsync(UserContext actor, string scope)
+        {
+            if (OnMaintainAsync != null) await OnMaintainAsync();
+            return Allowed;
+        }
     }
 
     private sealed class ConditionalStore : IObjectStorageProvider, IObjectStorageConditionalDeleter

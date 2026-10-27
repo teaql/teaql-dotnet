@@ -20,7 +20,7 @@ public sealed record BlobMaintenanceCursor(string Scope, string After)
 public sealed record BlobMaintenanceOutcome(BlobRef Reference, string Status, string? Error = null);
 public sealed record BlobMaintenanceBatch(IReadOnlyList<BlobMaintenanceOutcome> Outcomes, BlobMaintenanceCursor? Next);
 
-/// <summary>Explicit, host-scheduled cleanup of expired uncompleted server-stream uploads only.</summary>
+/// <summary>Explicit, host-scheduled fenced cleanup of expired or retained server-stream objects.</summary>
 public sealed class SqliteBlobMaintenanceService
 {
     private readonly SqliteBlobCatalog _catalog;
@@ -31,7 +31,10 @@ public sealed class SqliteBlobMaintenanceService
     private readonly Func<DateTimeOffset> _now;
 
     private sealed record Row(string Key, string ObjectKey, string Version,
-        string WrittenETag, string Status, string UploadState, long ExpiresMs);
+        string WrittenETag, string Status, string UploadState, long ExpiresMs,
+        long? CompletedAtMs, long? LastUnboundAtMs, string? PolicyProfile,
+        string? UploadMode, long? UnboundRetentionSeconds,
+        long? EffectiveUnrefSeconds, long? RetentionFloorUntilMs);
 
     private static InvalidOperationException Error(string code) => new(code);
     private static CompiledQuery Query(string sql, params Value[] values) => new(sql, values.ToList());
@@ -78,7 +81,7 @@ public sealed class SqliteBlobMaintenanceService
     private long NowMs()
     {
         var value = _now().ToUnixTimeMilliseconds();
-        if (value < 0) throw Error("BLOB_POLICY_INVALID");
+        if (!BlobRetentionPolicy.ValidTime(value)) throw Error("BLOB_POLICY_INVALID");
         return value;
     }
 
@@ -110,7 +113,10 @@ public sealed class SqliteBlobMaintenanceService
         try
         {
             rows = await sql.FetchAllSqlAsync(Query("""
-                SELECT c.object_key,c.content_version,c.status,u.state,u.expires_ms,u.written_etag
+                SELECT c.object_key,c.content_version,c.status,c.completed_at_ms,
+                  c.last_unbound_at_ms,c.policy_profile,c.upload_mode,
+                  c.unbound_retention_seconds,c.effective_unref_seconds,
+                  c.retention_floor_until_ms,u.state,u.expires_ms,u.written_etag
                 FROM teaql_blob_catalog c JOIN teaql_blob_upload u
                   ON u.key=c.key AND u.scope=c.scope WHERE c.scope=@p0 AND c.key=@p1
                 """, Text(scope), Text(key))).ConfigureAwait(false);
@@ -130,11 +136,52 @@ public sealed class SqliteBlobMaintenanceService
             status == null || state == null || expires == null || written == null ||
             written.Length > 0 && !ValidVersion(written) || state == "written" && written.Length == 0)
             throw Error("BLOB_CATALOG_FAILED");
-        return new Row(key, objectKey, version, written, status, state, expires.Value);
+        return new Row(key, objectKey, version, written, status, state, expires.Value,
+            row.GetValueOrDefault("completed_at_ms")?.TryI64(),
+            row.GetValueOrDefault("last_unbound_at_ms")?.TryI64(),
+            row.GetValueOrDefault("policy_profile")?.TryText(),
+            row.GetValueOrDefault("upload_mode")?.TryText(),
+            row.GetValueOrDefault("unbound_retention_seconds")?.TryI64(),
+            row.GetValueOrDefault("effective_unref_seconds")?.TryI64(),
+            row.GetValueOrDefault("retention_floor_until_ms")?.TryI64());
     }
 
-    private static bool Eligible(Row? row, long now) => row is not null && row.ExpiresMs <= now &&
-        row.UploadState is "initiated" or "written" && row.Status is "initiated" or "deleting";
+    private static bool Eligible(Row? row, long now)
+    {
+        if (row == null) return false;
+        if (row.UploadState is "initiated" or "written")
+            return row.ExpiresMs <= now && row.Status is "initiated" or "deleting";
+        if (row.UploadState != "completed" ||
+            row.Status is not ("uploaded_unbound" or "available" or "deleting") ||
+            !ValidScope(row.PolicyProfile) || row.UploadMode != "server_stream" ||
+            row.CompletedAtMs is null || !BlobRetentionPolicy.ValidTime(row.CompletedAtMs.Value) ||
+            row.UnboundRetentionSeconds is null ||
+            !BlobRetentionPolicy.ValidSeconds(row.UnboundRetentionSeconds.Value) ||
+            row.EffectiveUnrefSeconds is null ||
+            !BlobRetentionPolicy.ValidSeconds(row.EffectiveUnrefSeconds.Value) ||
+            !ValidVersion(row.Version)) return false;
+        try
+        {
+            long deadline;
+            if (row.LastUnboundAtMs is null)
+            {
+                if (row.Status == "available") return false;
+                deadline = BlobRetentionPolicy.Deadline(row.CompletedAtMs.Value,
+                    row.UnboundRetentionSeconds.Value);
+            }
+            else
+            {
+                if (!BlobRetentionPolicy.ValidTime(row.LastUnboundAtMs.Value) ||
+                    row.RetentionFloorUntilMs is not null &&
+                    !BlobRetentionPolicy.ValidTime(row.RetentionFloorUntilMs.Value)) return false;
+                deadline = BlobRetentionPolicy.UnreferencedEligibleAt(
+                    row.LastUnboundAtMs.Value, row.EffectiveUnrefSeconds.Value,
+                    row.RetentionFloorUntilMs);
+            }
+            return now >= deadline;
+        }
+        catch (InvalidOperationException) { return false; }
+    }
 
     private static async Task<long> CountAsync(ISqlTransport sql, string statement, string value)
     {
@@ -154,12 +201,12 @@ public sealed class SqliteBlobMaintenanceService
             return null;
         if (await CountAsync(tx, "SELECT count(*) AS n FROM teaql_blob_catalog WHERE object_key=@p0", row!.ObjectKey).ConfigureAwait(false) != 1)
             throw Error("BLOB_CATALOG_FAILED");
-        if (row.Status == "initiated")
+        if (row.Status != "deleting")
         {
             ulong affected;
             try { affected = await tx.ExecuteSqlAsync(Query(
-                "UPDATE teaql_blob_catalog SET status='deleting' WHERE key=@p0 AND scope=@p1 AND status='initiated'",
-                Text(key), Text(scope))).ConfigureAwait(false); }
+                "UPDATE teaql_blob_catalog SET status='deleting' WHERE key=@p0 AND scope=@p1 AND status=@p2",
+                Text(key), Text(scope), Text(row.Status))).ConfigureAwait(false); }
             catch { throw Error("BLOB_CATALOG_FAILED"); }
             if (affected != 1) throw Error("BLOB_CATALOG_FAILED");
         }
@@ -282,8 +329,17 @@ public sealed class SqliteBlobMaintenanceService
             rows = await _transport.FetchAllSqlAsync(Query("""
                 SELECT DISTINCT c.key FROM teaql_blob_catalog c JOIN teaql_blob_upload u
                   ON u.key=c.key AND u.scope=c.scope
-                WHERE c.scope=@p0 AND c.key>@p1 AND u.expires_ms<=@p2
-                  AND u.state IN ('initiated','written') AND c.status IN ('initiated','deleting')
+                WHERE c.scope=@p0 AND c.key>@p1 AND (
+                  (u.expires_ms<=@p2 AND u.state IN ('initiated','written')
+                    AND c.status IN ('initiated','deleting')) OR
+                  (u.state='completed' AND c.upload_mode='server_stream'
+                    AND c.policy_profile IS NOT NULL AND c.completed_at_ms IS NOT NULL
+                    AND c.content_version<>'' AND (c.status='deleting' OR
+                      (c.status='uploaded_unbound' AND c.last_unbound_at_ms IS NULL
+                        AND c.completed_at_ms+c.unbound_retention_seconds*1000<=@p2) OR
+                      (c.status='available' AND c.last_unbound_at_ms IS NOT NULL
+                        AND c.last_unbound_at_ms+c.effective_unref_seconds*1000<=@p2
+                        AND (c.retention_floor_until_ms IS NULL OR c.retention_floor_until_ms<=@p2)))))
                   AND NOT EXISTS (SELECT 1 FROM teaql_blob_binding b WHERE b.key=c.key)
                 ORDER BY c.key LIMIT @p3
                 """, Text(scope), Text(cursor?.After ?? ""), Number(now), Number(_batchSize))).ConfigureAwait(false);

@@ -110,13 +110,16 @@ public class SecureDocumentServiceSqliteTests
         }
 
         private sealed class BindingAuthorization(string entity, string entityId, string expectedAction)
-            : IBlobBindingAuthorization
+            : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
         {
             public string Scope(UserContext _) => "merchant:7";
             public Task<bool> AuthorizeAsync(UserContext _, BlobBindingTarget target,
                 BlobRef? previous, BlobRef? next, string action) =>
                 Task.FromResult(target == new BlobBindingTarget(entity, entityId, "attachment") &&
                     next != null && action == expectedAction);
+            public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+                IPhysicalSqlLease lease, BlobBindingTarget target) =>
+                Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
         }
 
         public async Task BindBlobSelectionAsync(UserContext actor, GraphMutationSession graph,
@@ -320,9 +323,12 @@ public class SecureDocumentServiceSqliteTests
         await catalog.EnsureSchemaAsync(); await catalog.ValidateSchemaAsync();
         await Execute(db, """
             INSERT INTO teaql_blob_catalog
-            (key,scope,object_key,content_version,file_name,content_type,size_bytes,status)
-            VALUES ('blob_A','merchant:7','objects/a','v1','a.pdf','application/pdf',3,'uploaded_unbound'),
-                   ('blob_B','merchant:7','objects/b','v1','b.pdf','application/pdf',3,'uploaded_unbound')
+            (key,scope,object_key,content_version,file_name,content_type,size_bytes,status,
+             completed_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds)
+            VALUES ('blob_A','merchant:7','objects/a','v1','a.pdf','application/pdf',3,
+              'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,'default','server_stream',86400,604800),
+                   ('blob_B','merchant:7','objects/b','v1','b.pdf','application/pdf',3,
+              'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,'default','server_stream',86400,604800)
             """);
         var actor = new RuntimeModule().IntoContext().WithDataService(
             new SqlDataServiceExecutor(new SqliteDialect(), transport,
@@ -437,9 +443,12 @@ public class SecureDocumentServiceSqliteTests
         await catalog.EnsureSchemaAsync(); await catalog.ValidateSchemaAsync();
         await Execute(db, """
             INSERT INTO teaql_blob_catalog
-            (key,scope,object_key,content_version,file_name,content_type,size_bytes,status)
-            VALUES ('blob_C','merchant:7','objects/c','v1','c.pdf','application/pdf',3,'uploaded_unbound'),
-                   ('blob_D','merchant:7','objects/d','v1','d.pdf','application/pdf',3,'uploaded_unbound')
+            (key,scope,object_key,content_version,file_name,content_type,size_bytes,status,
+             completed_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds)
+            VALUES ('blob_C','merchant:7','objects/c','v1','c.pdf','application/pdf',3,
+              'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,'default','server_stream',86400,604800),
+                   ('blob_D','merchant:7','objects/d','v1','d.pdf','application/pdf',3,
+              'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,'default','server_stream',86400,604800)
             """);
         var actor = new RuntimeModule().IntoContext().WithDataService(
             new SqlDataServiceExecutor(new SqliteDialect(), transport,

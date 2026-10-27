@@ -20,11 +20,18 @@ public interface IBlobBindingAuthorization
 }
 
 /// <summary>SQLite-only authoritative catalog. Schema installation is an explicit host action.</summary>
-public sealed class SqliteBlobCatalog(ISqlTransport transport)
+public sealed class SqliteBlobCatalog(ISqlTransport transport, Func<DateTimeOffset>? now = null)
 {
     internal ISqlTransport Transport => transport;
+    private readonly Func<DateTimeOffset> _now = now ?? (() => DateTimeOffset.UtcNow);
     private static InvalidOperationException Error(string code) => new(code);
     private static CompiledQuery Query(string sql, params Value[] values) => new(sql, values.ToList());
+    private long NowMs()
+    {
+        var value = _now().ToUnixTimeMilliseconds();
+        if (!BlobRetentionPolicy.ValidTime(value)) throw Error("BLOB_POLICY_INVALID");
+        return value;
+    }
 
     public async Task EnsureSchemaAsync()
     {
@@ -34,6 +41,9 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
               key TEXT PRIMARY KEY, scope TEXT NOT NULL, object_key TEXT NOT NULL,
               content_version TEXT NOT NULL, file_name TEXT NOT NULL,
               content_type TEXT NOT NULL, size_bytes BIGINT NOT NULL,
+              completed_at_ms BIGINT, last_unbound_at_ms BIGINT,
+              policy_profile TEXT, upload_mode TEXT, unbound_retention_seconds BIGINT,
+              effective_unref_seconds BIGINT, retention_floor_until_ms BIGINT,
               status TEXT NOT NULL CHECK (status IN
                 ('initiated','uploaded_unbound','available','deleting','deleted')))
             """,
@@ -60,13 +70,33 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
         })
             try { await transport.ExecuteSqlAsync(Query(sql)); }
             catch { throw Error("BLOB_CATALOG_FAILED"); }
+        // An old row cannot inherit a policy or completion time by inference.
+        foreach (var (name, kind) in new (string Name, string Kind)[] {
+            ("completed_at_ms", "BIGINT"), ("last_unbound_at_ms", "BIGINT"),
+            ("policy_profile", "TEXT"), ("upload_mode", "TEXT"),
+            ("unbound_retention_seconds", "BIGINT"), ("effective_unref_seconds", "BIGINT"),
+            ("retention_floor_until_ms", "BIGINT") })
+        {
+            try
+            {
+                var columns = await transport.FetchAllSqlAsync(Query("PRAGMA table_info(teaql_blob_catalog)"));
+                if (columns.Any(row => row.GetValueOrDefault("name")?.TryText() == name)) continue;
+                try { await transport.ExecuteSqlAsync(Query($"ALTER TABLE teaql_blob_catalog ADD COLUMN {name} {kind}")); }
+                catch
+                {
+                    columns = await transport.FetchAllSqlAsync(Query("PRAGMA table_info(teaql_blob_catalog)"));
+                    if (!columns.Any(row => row.GetValueOrDefault("name")?.TryText() == name)) throw;
+                }
+            }
+            catch { throw Error("BLOB_CATALOG_FAILED"); }
+        }
     }
 
     public async Task ValidateSchemaAsync()
     {
         try
         {
-            await transport.FetchAllSqlAsync(Query("SELECT key,scope,object_key,content_version,file_name,content_type,size_bytes,status FROM teaql_blob_catalog WHERE 1 = 0"));
+            await transport.FetchAllSqlAsync(Query("SELECT key,scope,object_key,content_version,file_name,content_type,size_bytes,completed_at_ms,last_unbound_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds,retention_floor_until_ms,status FROM teaql_blob_catalog WHERE 1 = 0"));
             await transport.FetchAllSqlAsync(Query("SELECT scope,entity,entity_id,field,key,version FROM teaql_blob_binding WHERE 1 = 0"));
             await transport.FetchAllSqlAsync(Query("SELECT upload_id,scope,replay_key,request_hash,key,entity,entity_id,field,file_name,extension,declared_size,expires_ms,state,written_sha256,written_etag FROM teaql_blob_upload WHERE 1 = 0"));
             var columns = await transport.FetchAllSqlAsync(Query("PRAGMA table_info(teaql_blob_binding)"));
@@ -189,13 +219,63 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
             try { allowed = await authorization.AuthorizeAsync(actor, target, previous, change.Next, change.Action); }
             catch { throw Error("BLOB_BIND_DENIED"); }
             if (!allowed) throw Error("BLOB_BIND_DENIED");
+            BlobRetentionPolicy? acceptedPolicy = null;
+            long acceptedFloor = 0;
             if (change.Next != null)
             {
                 List<Record> available;
-                try { available = await lease.FetchAllAsync("SELECT key FROM teaql_blob_catalog WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')",
+                try { available = await lease.FetchAllAsync("""
+                    SELECT key,status,completed_at_ms,last_unbound_at_ms,policy_profile,
+                      upload_mode,unbound_retention_seconds,effective_unref_seconds,
+                      retention_floor_until_ms FROM teaql_blob_catalog
+                    WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')
+                    """,
                     [new Value.TextValue(change.Next.Key), new Value.TextValue(scope)]); }
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
                 if (available.Count != 1) throw Error("BLOB_BIND_DENIED");
+                var blob = available[0];
+                var status = blob.GetValueOrDefault("status")?.TryText();
+                var profile = blob.GetValueOrDefault("policy_profile")?.TryText();
+                var mode = blob.GetValueOrDefault("upload_mode")?.TryText();
+                var completed = blob.GetValueOrDefault("completed_at_ms")?.TryI64();
+                var unbound = blob.GetValueOrDefault("unbound_retention_seconds")?.TryI64();
+                var effective = blob.GetValueOrDefault("effective_unref_seconds")?.TryI64();
+                if (string.IsNullOrEmpty(profile) || mode != "server_stream" ||
+                    completed is null || !BlobRetentionPolicy.ValidTime(completed.Value) ||
+                    unbound is null || !BlobRetentionPolicy.ValidSeconds(unbound.Value) ||
+                    effective is null || !BlobRetentionPolicy.ValidSeconds(effective.Value) ||
+                    authorization is not IBlobBindingPolicyAuthorization policySource)
+                    throw Error("BLOB_BIND_DENIED");
+                BlobRetentionPolicy policy;
+                try { policy = await policySource.CurrentPolicyOnLeaseAsync(actor, lease, target); }
+                catch { throw Error("BLOB_BIND_DENIED"); }
+                if (policy == null || policy.UploadMode != "server_stream")
+                    throw Error("BLOB_BIND_DENIED");
+                var nowMs = NowMs();
+                long? eligibleAt = null;
+                if (status == "available")
+                {
+                    List<Record> bindings;
+                    try { bindings = await lease.FetchAllAsync(
+                        "SELECT 1 FROM teaql_blob_binding WHERE key=@p0 LIMIT 1",
+                        [new Value.TextValue(change.Next.Key)]); }
+                    catch { throw Error("BLOB_CATALOG_FAILED"); }
+                    if (bindings.Count == 0)
+                    {
+                        var last = blob.GetValueOrDefault("last_unbound_at_ms")?.TryI64();
+                        var floor = blob.GetValueOrDefault("retention_floor_until_ms")?.TryI64();
+                        if (last is null || !BlobRetentionPolicy.ValidTime(last.Value) ||
+                            floor is not null && !BlobRetentionPolicy.ValidTime(floor.Value))
+                            throw Error("BLOB_BIND_DENIED");
+                        eligibleAt = BlobRetentionPolicy.UnreferencedEligibleAt(last.Value,
+                            effective.Value, floor);
+                    }
+                }
+                BlobRetentionPolicy.RequireBindable(status!, nowMs, completed,
+                    unbound.Value, eligibleAt);
+                acceptedPolicy = policy;
+                acceptedFloor = BlobRetentionPolicy.Deadline(nowMs,
+                    policy.MinimumRetentionSeconds);
             }
             Value next = change.Next is null ? new Value.NullValue() : new Value.TextValue(change.Next.Key);
             ulong affected;
@@ -213,17 +293,36 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
             {
                 ulong promoted;
                 try { promoted = await lease.ExecuteAsync(
-                    "UPDATE teaql_blob_catalog SET status = 'available' WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')",
+                    "UPDATE teaql_blob_catalog SET status = 'available', last_unbound_at_ms=NULL " +
+                    "WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')",
                     [new Value.TextValue(change.Next.Key), new Value.TextValue(scope)]); }
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
                 if (promoted != 1) throw Error("BLOB_BIND_DENIED");
+                if (acceptedPolicy is not null)
+                {
+                    ulong retained;
+                    try { retained = await lease.ExecuteAsync("""
+                        UPDATE teaql_blob_catalog SET
+                          effective_unref_seconds=MAX(effective_unref_seconds,@p0),
+                          retention_floor_until_ms=CASE WHEN retention_floor_until_ms IS NULL
+                            OR retention_floor_until_ms<@p1 THEN @p1 ELSE retention_floor_until_ms END
+                        WHERE key=@p2 AND scope=@p3 AND upload_mode='server_stream'
+                          AND effective_unref_seconds IS NOT NULL
+                        """, [new Value.I64Value(acceptedPolicy.UnreferencedRetentionSeconds),
+                            new Value.I64Value(acceptedFloor), new Value.TextValue(change.Next.Key),
+                            new Value.TextValue(scope)]); }
+                    catch { throw Error("BLOB_CATALOG_FAILED"); }
+                    if (retained != 1) throw Error("BLOB_BIND_DENIED");
+                }
             }
             if (previous != null && !previous.Equals(change.Next))
             {
                 try { await lease.ExecuteAsync(
-                    "UPDATE teaql_blob_catalog SET status = 'uploaded_unbound' WHERE key = @p0 AND scope = @p1 AND status = 'available' " +
-                    "AND NOT EXISTS (SELECT 1 FROM teaql_blob_binding WHERE key = @p2)",
-                    [new Value.TextValue(previous.Key), new Value.TextValue(scope), new Value.TextValue(previous.Key)]); }
+                    "UPDATE teaql_blob_catalog SET last_unbound_at_ms=@p0 " +
+                    "WHERE key=@p1 AND scope=@p2 AND status='available' " +
+                    "AND NOT EXISTS (SELECT 1 FROM teaql_blob_binding WHERE key=@p3)",
+                    [new Value.I64Value(NowMs()), new Value.TextValue(previous.Key),
+                     new Value.TextValue(scope), new Value.TextValue(previous.Key)]); }
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
             }
             return change.NextVersion;

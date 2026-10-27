@@ -19,7 +19,7 @@ namespace TeaQL.Tests.ObjectStorageS3;
 
 public class BlobUploadS3Tests
 {
-    private sealed class UploadPermission : IBlobUploadAuthorization
+    private sealed class UploadPermission : IBlobUploadAuthorization, IBlobUploadPolicyAuthorization
     {
         public bool Allowed = true;
         public string Extension = "pdf";
@@ -34,6 +34,9 @@ public class BlobUploadS3Tests
             BlobUploadTarget target, string action, BlobUploadInput input, ISqlTransport lease) =>
             new(Scope(actor), Field(actor, target),
                 await AuthorizeAsync(actor, target, action, input));
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            ISqlTransport lease, BlobUploadTarget target) =>
+            Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
     }
 
     // Fixture-only full-byte parser; production format detection has a separate gate.
@@ -57,13 +60,16 @@ public class BlobUploadS3Tests
         }
     }
 
-    private sealed class BindingPermission : IBlobBindingAuthorization
+    private sealed class BindingPermission : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
     {
         public string Scope(UserContext actor) => "f4-s3-upload";
         public Task<bool> AuthorizeAsync(UserContext actor, BlobBindingTarget target,
             BlobRef? previous, BlobRef? next, string action) => Task.FromResult(
                 target.Entity == "Asset" && target.EntityId == "1" && target.Field == "file" &&
                 previous is null && next is not null && action == "Create");
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            IPhysicalSqlLease lease, BlobBindingTarget target) =>
+            Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
     }
 
     private sealed class ReadPermission : IBlobReadAuthorization

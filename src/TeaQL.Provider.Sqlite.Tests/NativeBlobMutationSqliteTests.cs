@@ -11,13 +11,16 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public sealed class NativeBlobMutationSqliteTests
 {
-    private sealed class BindingPermission : IBlobBindingAuthorization
+    private sealed class BindingPermission : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
     {
         public string CurrentScope = "tenant-a";
         public bool Allowed = true;
         public string Scope(UserContext actor) => CurrentScope;
         public Task<bool> AuthorizeAsync(UserContext actor, BlobBindingTarget target,
             BlobRef? previous, BlobRef? next, string action) => Task.FromResult(Allowed);
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            IPhysicalSqlLease lease, BlobBindingTarget target) =>
+            Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
     }
 
     private sealed class ReadPermission : IBlobReadAuthorization
@@ -82,8 +85,11 @@ public sealed class NativeBlobMutationSqliteTests
                 await using var insert = db.CreateCommand();
                 insert.CommandText = """
                     INSERT INTO teaql_blob_catalog
-                    (key,scope,object_key,content_version,file_name,content_type,size_bytes,status)
-                    VALUES (@key,'tenant-a',@object,'v1','report.pdf','application/pdf',7,'uploaded_unbound')
+                    (key,scope,object_key,content_version,file_name,content_type,size_bytes,status,
+                     completed_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds)
+                    VALUES (@key,'tenant-a',@object,'v1','report.pdf','application/pdf',7,
+                      'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,
+                      'default','server_stream',86400,604800)
                     """;
                 insert.Parameters.AddWithValue("@key", reference.Key);
                 insert.Parameters.AddWithValue("@object", "objects/" + reference.Key);

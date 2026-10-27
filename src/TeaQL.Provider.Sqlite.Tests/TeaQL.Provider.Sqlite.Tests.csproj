@@ -30,6 +30,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Fixtures/sample.jpg;Fixtures/sample.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../test-vectors/blob-policy-cases.json" Link="Fixtures/blob-policy-cases.json"
+             CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

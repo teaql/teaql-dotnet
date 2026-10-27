@@ -9,18 +9,33 @@ host responsibilities.
 The host may also construct `SqliteBlobMaintenanceService` with a current
 scope/permission policy and pass it as `maintenance:` to `BlobReferenceModule`.
 It is passive until the host explicitly calls `RunBatchAsync`. The bounded
-service collects only expired, uncompleted, unbound server-stream uploads. An
-explicit catalog migration adds the unique object-key index required for this
-path. The service claims candidates in SQLite's physical write transaction,
+service collects expired incomplete uploads and policy-backed completed,
+unbound server-stream objects after their retention deadlines. Formerly bound
+objects use the final-unbind time and the longest accepted duration/minimum
+floor. Active bindings, unknown-policy legacy rows and direct uploads are
+excluded. An explicit catalog migration adds the unique object-key index and
+nullable time/policy fields; historical rows keep unknown facts NULL. The
+service claims candidates in SQLite's physical write transaction,
 pins the observed ETag, deletes through a version-conditional S3 or File
 provider API, and retries a failed final catalog acknowledgment. File storage
 uses a persistent per-object OS lock for manifest updates and conditional
 deletion across processes. Its ETag includes an immutable generation token,
 so a same-byte replacement cannot match an older version. The matching
 current File generation is removed; older immutable generations still need a
-separate collector. Keep Blob object keys unique and immutable; completed
-unbound and old bound retention and direct-upload quiescence need separate
-implementation.
+separate collector. Keep Blob object keys unique and immutable; direct-upload
+quiescence needs separate implementation.
+
+For retention-aware uploads, the host can implement
+`IBlobUploadPolicyAuthorization.CurrentPolicyOnLeaseAsync`. The service
+snapshots its immutable `BlobRetentionPolicy` on the physical begin-upload
+SQLite lease; server-stream upload rejects direct mode. Confirmation records
+the completion time in the same catalog transaction, and replay does not
+change the accepted snapshot. New graph bindings require a current target
+policy through `IBlobBindingPolicyAuthorization` on the graph SQL lease.
+They reject expired or unknown-policy sources and accumulate the maximum
+accepted unreferenced duration and minimum retention floor. Final unbind
+records its own time while the catalog row remains `available`; rebind clears
+that time. Shared policy vectors are pinned by SHA-256 in the SQLite tests.
 
 For JPEG/PNG uploads, pass `new StbImageBlobContentVerifier()` to
 `SqliteBlobUploadService`. It accepts only `jpg`, `jpeg` and `png`. The host's
