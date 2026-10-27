@@ -1,6 +1,7 @@
 using TeaQL.Core;
 using TeaQL.DataService;
 using TeaQL.Runtime;
+using TeaQL.Sql;
 
 namespace TeaQL.BlobReference;
 
@@ -13,6 +14,10 @@ internal sealed class SqliteBlobMutationParticipant(SqliteBlobCatalog catalog,
     public async Task ApplyAsync(IPhysicalSqlOwner owner, MutationRequest request,
         EntityDescriptor entity, Record? previous, Record? persisted)
     {
+        if (owner is not SqlDataServiceTransaction transaction ||
+            transaction.Dialect.Kind != DatabaseKind.Sqlite ||
+            !ReferenceEquals(transaction.RootTransport, catalog.Transport))
+            throw Error("BLOB_TRANSACTION_REQUIRED");
         var idProperty = entity.IdProperty() ?? throw Error("BLOB_REFERENCE_INVALID");
         var idValue = request switch
         {

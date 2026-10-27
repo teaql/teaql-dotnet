@@ -163,6 +163,26 @@ public sealed class NativeBlobMutationSqliteTests
                     return true;
                 }));
             Assert.Equal(0L, await Scalar(db, "SELECT COUNT(*) FROM native_asset WHERE id=2"));
+
+            var alien = new RuntimeModule().Entity(asset).Entity(control).IntoContext()
+                .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(),
+                    new SqliteTransport(db), new MetadataSchemaProvider(name =>
+                        name == "Asset" ? asset : name == "Control" ? control : null)))
+                .WithObjectStorage(store);
+            module.Install(alien);
+            var readiness = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => module.ReadyAsync(alien));
+            Assert.Equal("BLOB_CAPABILITY_MISSING", readiness.Message);
+            var wrongOwner = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                alien.ExecuteGraphSaveAsync("reject different transport owner", async graph =>
+                {
+                    await graph.MutateAsync(new InsertMutationRequest(new InsertCommand("Asset")
+                        .Value("id", 3UL).Value("document", first),
+                        "reject different transport owner"));
+                    return true;
+                }));
+            Assert.Equal("BLOB_TRANSACTION_REQUIRED", wrongOwner.Message);
+            Assert.Equal(0L, await Scalar(db, "SELECT COUNT(*) FROM native_asset WHERE id=3"));
         }
         finally { Directory.Delete(root, recursive: true); }
     }

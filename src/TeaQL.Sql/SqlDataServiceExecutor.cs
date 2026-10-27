@@ -105,7 +105,8 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         if (Transport is IAutomaticMutationTransactionTransport transactionTransport)
         {
             using var transportTransaction = await transactionTransport.BeginSqlAsync();
-            var transaction = new SqlDataServiceTransaction(Dialect, transportTransaction, SchemaProvider);
+            var transaction = new SqlDataServiceTransaction(Dialect, transportTransaction, SchemaProvider,
+                Transport);
             try
             {
                 var result = await transaction.MutateAsync(request);
@@ -241,7 +242,7 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
             throw new SqlExecutorException($"Transport error: {ex.Message}", ex);
         }
 
-        return new SqlDataServiceTransaction(Dialect, tx, SchemaProvider);
+        return new SqlDataServiceTransaction(Dialect, tx, SchemaProvider, Transport);
     }
 
     public Task<ulong> NextIdAsync(string entity) =>
@@ -538,6 +539,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 {
     public SqlDialect Dialect { get; }
     public ISqlTransaction Transport { get; }
+    public ISqlTransport? RootTransport { get; }
     public ISchemaProvider SchemaProvider { get; }
     private int _rollbackOnly;
     private int _physicalSqlActive;
@@ -545,11 +547,13 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
     private bool _mutationStarted;
     private IBlobMutationParticipant? _blobParticipant;
 
-    public SqlDataServiceTransaction(SqlDialect dialect, ISqlTransaction transport, ISchemaProvider schemaProvider)
+    public SqlDataServiceTransaction(SqlDialect dialect, ISqlTransaction transport,
+        ISchemaProvider schemaProvider, ISqlTransport? rootTransport = null)
     {
         Dialect = dialect;
         Transport = transport;
         SchemaProvider = schemaProvider;
+        RootTransport = rootTransport;
     }
 
     public void InstallBlobMutationParticipant(IBlobMutationParticipant participant)

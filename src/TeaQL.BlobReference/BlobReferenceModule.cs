@@ -1,6 +1,7 @@
 using TeaQL.Runtime;
 using TeaQL.Runtime.Storage;
 using TeaQL.DataService;
+using TeaQL.Sql;
 
 namespace TeaQL.BlobReference;
 
@@ -24,7 +25,9 @@ public sealed class BlobReferenceModule
                 !ReferenceEquals(context.GetResource<IBlobResponseContributor>(), module.Read) ||
                 !ReferenceEquals(context.GetResource<IBlobMutationParticipant>(), participant) ||
                 context.GetResource<IObjectStorageProvider>() == null ||
-                context.GetResource<ITransactionExecutor>() is not { } transactions)
+                context.GetResource<ITransactionExecutor>() is not SqlDataServiceExecutor transactions ||
+                transactions.Dialect.Kind != DatabaseKind.Sqlite ||
+                !ReferenceEquals(transactions.Transport, module.Catalog.Transport))
                 throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
             await module.Catalog.ValidateSchemaAsync().ConfigureAwait(false);
             using var transaction = await transactions.BeginTransactionAsync().ConfigureAwait(false);

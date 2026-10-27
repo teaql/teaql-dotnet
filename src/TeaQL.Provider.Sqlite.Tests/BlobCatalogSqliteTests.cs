@@ -104,11 +104,12 @@ public class BlobCatalogSqliteTests
             .Property(PropertyDescriptor.New("id", DataType.I64).Id())
             .Property(PropertyDescriptor.New("version", DataType.I64).Version())
             .Property(PropertyDescriptor.New("name", DataType.Text));
+        var transport = new SqliteTransport(db);
         var actor = new RuntimeModule().Entity(asset).IntoContext().WithDataService(
-            new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(db),
+            new SqlDataServiceExecutor(new SqliteDialect(), transport,
                 new MetadataSchemaProvider(name => name == "Asset" ? asset : null)));
         await actor.EnsureSchemaAsync();
-        var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+        var catalog = new SqliteBlobCatalog(transport);
         await catalog.EnsureSchemaAsync();
         await catalog.ValidateSchemaAsync();
         await using var command = db.CreateCommand();
