@@ -34,6 +34,9 @@ public sealed class GraphMutationSession
         if (!_active) throw new InvalidOperationException("GRAPH_CAPABILITY_EXPIRED");
     }
 
+    /// <summary>Verify the trusted actor is the owner of this exact graph invocation.</summary>
+    public bool BelongsTo(UserContext context) => ReferenceEquals(_context, context);
+
     public MutationTraceScope Scope(string entity, ulong? id, string? localReason,
         MutationTraceScope? parent = null)
     {
