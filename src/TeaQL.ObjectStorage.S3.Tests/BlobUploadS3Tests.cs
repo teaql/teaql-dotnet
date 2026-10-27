@@ -22,9 +22,10 @@ public class BlobUploadS3Tests
     private sealed class UploadPermission : IBlobUploadAuthorization
     {
         public bool Allowed = true;
+        public string Extension = "pdf";
         public string Scope(UserContext actor) => "f4-s3-upload";
         public BlobFieldSpec Field(UserContext actor, BlobUploadTarget target) =>
-            new("Asset", "file", ["pdf"], true, "default");
+            new("Asset", "file", [Extension], true, "default");
         public Task<bool> AuthorizeAsync(UserContext actor, BlobUploadTarget target,
             string action, BlobUploadInput input) => Task.FromResult(Allowed &&
                 target.Entity == "Asset" && target.Field == "file" &&
@@ -82,10 +83,13 @@ public class BlobUploadS3Tests
                     "f4-s3-upload", BindingVersion, reference)]));
     }
 
-    [Fact]
-    public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay(bool realImage)
     {
         if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BLOB_UPLOAD") != "1") return;
+        if (realImage && Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_IMAGE") != "1") return;
         var endpoint = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ENDPOINT");
         var bucket = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BUCKET");
         var access = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ACCESS_KEY");
@@ -110,12 +114,17 @@ public class BlobUploadS3Tests
         var store = actor.ObjectStorage("verify S3 Blob upload");
         var catalog = new SqliteBlobCatalog(transport);
         await catalog.EnsureSchemaAsync();
-        var permission = new UploadPermission();
-        var verifier = new PdfVerifier();
+        var permission = new UploadPermission { Extension = realImage ? "jpg" : "pdf" };
+        var pdfVerifier = new PdfVerifier();
+        IBlobContentVerifier verifier = realImage ? new StbImageBlobContentVerifier() : pdfVerifier;
         var service = new SqliteBlobUploadService(catalog, permission, verifier, 10_000);
-        var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nreal S3 Blob upload\n%%EOF");
+        var bytes = realImage
+            ? await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample.jpg"))
+            : Encoding.UTF8.GetBytes("%PDF-1.7\nreal S3 Blob upload\n%%EOF");
+        var contentType = realImage ? "image/jpeg" : "application/pdf";
+        var filename = realImage ? "sample.jpg" : "report.pdf";
         var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
-            new BlobUploadInput("report.pdf", bytes.Length, "application/pdf"),
+            new BlobUploadInput(filename, bytes.Length, contentType),
             Guid.NewGuid().ToString("N"));
         var key = new ObjectKey(await Scalar(db,
             "SELECT object_key FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
@@ -123,13 +132,20 @@ public class BlobUploadS3Tests
         {
             Assert.Equal(bytes.Length,
                 await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
+            if (realImage)
+            {
+                var uploaded = await store.GetBytesAsync(key, 10_000);
+                Assert.Equal(bytes, uploaded);
+                var decoded = await verifier.VerifyAsync(new MemoryStream(uploaded), "jpg", 10_000);
+                Assert.Equal(contentType, decoded.ContentType);
+            }
             permission.Allowed = false;
             Assert.Equal("BLOB_UPLOAD_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
                 () => service.CompleteAsync(actor, session.UploadId))).Message);
             permission.Allowed = true;
             Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
             Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
-            Assert.Equal(1, verifier.Calls);
+            if (!realImage) Assert.Equal(1, pdfVerifier.Calls);
             Assert.Equal(bytes.Length,
                 await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
             Assert.Equal(bytes, await store.GetBytesAsync(key, 10_000));
@@ -137,7 +153,7 @@ public class BlobUploadS3Tests
             Assert.NotNull(head);
             Assert.Equal("uploaded_unbound", await Scalar(db,
                 "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
-            Assert.Equal("application/pdf", await Scalar(db,
+            Assert.Equal(contentType, await Scalar(db,
                 "SELECT content_type FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
             Assert.Equal(bytes.Length.ToString(), await Scalar(db,
                 "SELECT size_bytes FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
@@ -176,8 +192,8 @@ public class BlobUploadS3Tests
             using var response = await http.SendAsync(request);
             Assert.Equal(HttpStatusCode.PartialContent, response.StatusCode);
             Assert.Equal(bytes.AsSpan(0, 8).ToArray(), await response.Content.ReadAsByteArrayAsync());
-            Assert.Equal("application/pdf", response.Content.Headers.ContentType?.MediaType);
-            Assert.Contains("report.pdf", response.Content.Headers.ContentDisposition?.ToString());
+            Assert.Equal(contentType, response.Content.Headers.ContentType?.MediaType);
+            Assert.Contains(filename, response.Content.Headers.ContentDisposition?.ToString());
 
             readPermission.Allowed = false;
             var denied = await Assert.ThrowsAsync<ViewPreparationException>(() =>

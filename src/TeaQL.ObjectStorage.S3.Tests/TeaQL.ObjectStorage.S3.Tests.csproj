@@ -4,5 +4,6 @@
   <ItemGroup>
     <ProjectReference Include="../TeaQL.BlobReference/TeaQL.BlobReference.csproj" />
     <ProjectReference Include="../TeaQL.Provider.Sqlite/TeaQL.Provider.Sqlite.csproj" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.jpg" Link="Fixtures/sample.jpg" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
