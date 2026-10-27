@@ -76,6 +76,14 @@ public sealed class GraphMutationSession
     public Task<MutationResult> MutateAsync(MutationRequest request, MutationTraceScope? scope = null) =>
         _service.MutateAsync(Request(request, scope));
 
+    public Task<T> WithPhysicalSqlAsync<T>(Func<IPhysicalSqlLease, Task<T>> work)
+    {
+        RequireActive();
+        if (_transaction is not IPhysicalSqlOwner owner)
+            throw new InvalidOperationException("BLOB_TRANSACTION_REQUIRED");
+        return owner.WithPhysicalSqlAsync(work);
+    }
+
     public Task<ulong> AllocateIdAsync(string entity)
     {
         RequireActive();

@@ -530,17 +530,84 @@ internal static class RelationQueryLoader
     }
 }
 
-public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IIdGeneratorExecutor
+public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IIdGeneratorExecutor, IPhysicalSqlOwner
 {
     public SqlDialect Dialect { get; }
     public ISqlTransaction Transport { get; }
     public ISchemaProvider SchemaProvider { get; }
+    private int _rollbackOnly;
+    private int _physicalSqlActive;
+    private bool _completed;
 
     public SqlDataServiceTransaction(SqlDialect dialect, ISqlTransaction transport, ISchemaProvider schemaProvider)
     {
         Dialect = dialect;
         Transport = transport;
         SchemaProvider = schemaProvider;
+    }
+
+    public async Task<T> WithPhysicalSqlAsync<T>(Func<IPhysicalSqlLease, Task<T>> work)
+    {
+        if (_completed || Volatile.Read(ref _rollbackOnly) != 0 || work == null)
+            throw new InvalidOperationException("BLOB_TRANSACTION_REQUIRED");
+        if (Interlocked.CompareExchange(ref _physicalSqlActive, 1, 0) != 0)
+        {
+            Volatile.Write(ref _rollbackOnly, 1);
+            throw new InvalidOperationException("BLOB_TRANSACTION_REQUIRED");
+        }
+        var lease = new PhysicalSqlLease(Transport);
+        try
+        {
+            var result = await work(lease).ConfigureAwait(false);
+            if (lease.Failed)
+                throw new InvalidOperationException("GRAPH_TRANSACTION_ROLLBACK_ONLY");
+            return result;
+        }
+        catch
+        {
+            Volatile.Write(ref _rollbackOnly, 1);
+            throw;
+        }
+        finally
+        {
+            lease.Close();
+            Volatile.Write(ref _physicalSqlActive, 0);
+        }
+    }
+
+    private sealed class PhysicalSqlLease(ISqlTransaction transport) : IPhysicalSqlLease
+    {
+        private int _active = 1;
+        public bool Failed { get; private set; }
+        public void Close() => Volatile.Write(ref _active, 0);
+
+        public async Task<List<Record>> FetchAllAsync(string sql, IReadOnlyList<Value> parameters)
+        {
+            RequireActive();
+            try { return await transport.FetchAllSqlAsync(new CompiledQuery(sql, parameters.ToList())).ConfigureAwait(false); }
+            catch
+            {
+                Failed = true;
+                throw new SqlExecutorException("BLOB_CATALOG_ERROR");
+            }
+        }
+
+        public async Task<ulong> ExecuteAsync(string sql, IReadOnlyList<Value> parameters)
+        {
+            RequireActive();
+            try { return await transport.ExecuteSqlAsync(new CompiledQuery(sql, parameters.ToList())).ConfigureAwait(false); }
+            catch
+            {
+                Failed = true;
+                throw new SqlExecutorException("BLOB_CATALOG_ERROR");
+            }
+        }
+
+        private void RequireActive()
+        {
+            if (Volatile.Read(ref _active) == 0)
+                throw new InvalidOperationException("BLOB_TRANSACTION_REQUIRED");
+        }
     }
 
     public DataServiceCapabilities Capabilities => new DataServiceCapabilities
@@ -598,6 +665,8 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
+        if (_completed || Volatile.Read(ref _rollbackOnly) != 0)
+            throw new InvalidOperationException("GRAPH_TRANSACTION_ROLLBACK_ONLY");
         if (request is BatchMutationRequest batchReq)
             return await SqlMutationBatch.ExecuteAsync(Dialect, batchReq, MutateAsync);
 
@@ -721,9 +790,12 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
     public async Task CommitAsync()
     {
+        if (_completed || Volatile.Read(ref _rollbackOnly) != 0 || Volatile.Read(ref _physicalSqlActive) != 0)
+            throw new InvalidOperationException("GRAPH_TRANSACTION_ROLLBACK_ONLY");
         try
         {
             await Transport.CommitSqlAsync();
+            _completed = true;
         }
         catch (Exception ex)
         {
@@ -739,6 +811,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
     public async Task RollbackAsync()
     {
+        _completed = true;
         try
         {
             await Transport.RollbackSqlAsync();
