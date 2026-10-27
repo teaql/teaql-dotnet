@@ -273,6 +273,15 @@ public class BlobUploadSqliteTests
                 () => service.WriteAsync(actor, session.UploadId, new FailedReplayStream()))).Message);
             Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
             Assert.Equal(1, store.Puts);
+            transport.LoseNextCommitReply = true;
+            Assert.Equal("BLOB_CATALOG_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, session.UploadId))).Message);
+            Assert.Equal("completed", await Scalar(db,
+                "SELECT state FROM teaql_blob_upload WHERE key=@key", session.Reference.Key));
+            policy.Allowed = false;
+            Assert.Equal("BLOB_UPLOAD_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, session.UploadId))).Message);
+            policy.Allowed = true;
             Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
             Assert.Equal(1, verifier.Calls);
             Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
