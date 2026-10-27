@@ -6,6 +6,41 @@ namespace TeaQL.Runtime.Tests;
 public class BlobViewPreparationTests
 {
     [Fact]
+    public async Task IndependentUrlLifetimesUseOriginalCeilingAndReturnMinimum()
+    {
+        var first = new BlobRef("blob_asset_1");
+        var second = new BlobRef("blob_asset_2");
+        var ceiling = DateTimeOffset.UtcNow.AddSeconds(90);
+        var firstExpiry = DateTimeOffset.UtcNow.AddSeconds(20);
+        var secondExpiry = DateTimeOffset.UtcNow.AddSeconds(40);
+        var context = new UserContext();
+        context.InsertResource<IResponseGraphAuthorizer>(new Authorizer((_, _, _) =>
+            new AuthorizedResponseGraph(new Dictionary<string, object?>
+            {
+                ["first"] = first, ["second"] = second
+            }, new[]
+            {
+                new AuthorizedBlobSlot(new object[] { "first" }, "Asset", "1", "first", "tenant-a", 4, first),
+                new AuthorizedBlobSlot(new object[] { "second" }, "Asset", "1", "second", "tenant-a", 5, second)
+            })));
+        context.InsertResource<IBlobResponseContributor>(new Blob((_, _, supplied) =>
+        {
+            Assert.Equal(ceiling, supplied);
+            return new[]
+            {
+                new ProjectedBlobUrl("https://files.example.invalid/first", firstExpiry),
+                new ProjectedBlobUrl("https://files.example.invalid/second", secondExpiry)
+            };
+        }));
+
+        var view = await new ViewPreparationService().PrepareAsync(context, null,
+            new ViewOptions("ordinary", "read_only", ceiling));
+        Assert.Equal(firstExpiry, view.ExpiresAt);
+        var presentation = Assert.IsType<Dictionary<string, object?>>(view.Presentation);
+        Assert.Equal("https://files.example.invalid/second", presentation["second"]);
+    }
+
+    [Fact]
     public async Task CurrentAuthorizationIsDetachedBeforeDocumentAndBlobStages()
     {
         var reference = new BlobRef("blob_asset_1");

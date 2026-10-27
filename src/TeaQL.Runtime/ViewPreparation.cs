@@ -110,7 +110,8 @@ public sealed class ViewPreparationService
             {
                 var blob = context.GetResource<IBlobResponseContributor>()
                     ?? throw Failure("BLOB_CAPABILITY_MISSING");
-                var urls = await blob.ProjectBatchAsync(context, graph, expiry)
+                var ceiling = expiry;
+                var urls = await blob.ProjectBatchAsync(context, graph, ceiling)
                     .ConfigureAwait(false);
                 if (urls.Count != graph.BlobSlots.Count) throw Failure("BLOB_SIGN_FAILED");
                 for (var index = 0; index < urls.Count; index++)
@@ -119,7 +120,7 @@ public sealed class ViewPreparationService
                     if (!Uri.TryCreate(signed.Url, UriKind.Absolute, out var uri)
                         || uri.Scheme is not ("http" or "https") || string.IsNullOrEmpty(uri.Host)
                         || signed.ExpiresAt <= DateTimeOffset.UtcNow
-                        || expiry is { } ceiling && signed.ExpiresAt > ceiling)
+                        || ceiling is { } limit && signed.ExpiresAt > limit)
                         throw Failure("BLOB_SIGN_FAILED");
                     Replace(presentation, graph.BlobSlots[index].Path, signed.Url);
                     expiry = Earlier(expiry, signed.ExpiresAt);
