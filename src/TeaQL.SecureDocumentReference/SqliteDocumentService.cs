@@ -24,6 +24,11 @@ public sealed record AcceptedDocument(ContextualDocument Document,
 
 public sealed record CurrentBoundDocument(BoundDocumentSnapshot Document,
     JsonElement Body, TimeSpan Lifetime);
+public sealed record VerifiedDocumentBlobSelection(BlobSelectionTarget Target, BlobRef Reference,
+    string EntityId, long ExpectedVersion, long NextVersion)
+{
+    public override string ToString() => "VerifiedDocumentBlobSelection[redacted]";
+}
 
 /// <summary>Application-owned current projection and allowed model mutation plan.</summary>
 public interface ISqliteContextBoundDocumentHost
@@ -36,6 +41,13 @@ public interface ISqliteContextBoundDocumentHost
     Task ApplyAsync(UserContext actor, BoundDocumentSnapshot issued,
         SubmittedDocumentCommand submitted, IPhysicalSqlLease sql);
     Task PresentAsync(UserContext actor, ContextualDocument document);
+}
+
+/// <summary>Optional trusted model-field and Blob-catalog binding on the current lease.</summary>
+public interface ISqliteDocumentBlobSelectionHost
+{
+    Task BindBlobSelectionAsync(UserContext actor, GraphMutationSession graph,
+        VerifiedDocumentBlobSelection selection, IPhysicalSqlLease sql);
 }
 
 /// <summary>Current SQL-authorized tqd2 open and durable accept on the native graph owner.</summary>
@@ -90,6 +102,35 @@ public sealed class SqliteContextBoundDocumentService
 
     private static byte[] Fingerprint(BoundDocumentSnapshot document) =>
         DocumentWire.EncodeBound(document, new byte[32], 0, 1);
+
+    private IReadOnlyList<VerifiedDocumentBlobSelection> VerifiedSelections(
+        TrustedReferencePrincipal principal, BoundDocumentSnapshot issued,
+        SubmittedDocumentCommand command)
+    {
+        var result = new List<VerifiedDocumentBlobSelection>();
+        var seen = new HashSet<(string, string)>();
+        foreach (var selected in command.BlobSelections ?? [])
+        {
+            var target = new BlobSelectionTarget(issued.Snapshot.Scope,
+                selected.TargetEntity, selected.CanonicalField, selected.Kind,
+                selected.TargetKey, command.CommandId);
+            if (!seen.Add((target.TargetKey, target.CanonicalField)))
+                throw Error("DOCUMENT_COMMAND_INVALID");
+            var claim = _module.ConsumeBlobSelection(principal, command.DocumentToken,
+                selected.Token, target).Document;
+            if (target.Kind != "EXISTING_ROW") throw Error("DOCUMENT_CAPABILITY_MISSING");
+            var row = issued.Snapshot.Entities.SingleOrDefault(e => e.RowKey == target.TargetKey);
+            var binding = issued.Bindings.SingleOrDefault(b => b.RowKey == target.TargetKey &&
+                b.CanonicalField == target.CanonicalField);
+            if (row == null || binding == null || row.Identity.EntityType != target.TargetEntity ||
+                !binding.Writable || binding.BindingVersion >= long.MaxValue)
+                throw Error("DOCUMENT_PROJECTION_VIOLATION");
+            result.Add(new VerifiedDocumentBlobSelection(target, claim.Reference,
+                row.Identity.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                (long)binding.BindingVersion, (long)binding.BindingVersion + 1));
+        }
+        return result;
+    }
 
     private static JsonElement Validate(CurrentBoundDocument current, string businessId,
         string aggregateType, string purpose)
@@ -172,7 +213,14 @@ public sealed class SqliteContextBoundDocumentService
                     _ = Validate(before, frozen.BusinessId, request.AggregateType, request.Purpose);
                     if (!Fingerprint(before.Document).SequenceEqual(Fingerprint(issued)))
                         throw Error("DOCUMENT_REVISION_CONFLICT");
+                    var selections = VerifiedSelections(principal, issued, frozen);
+                    if (selections.Count > 0 && _host is not ISqliteDocumentBlobSelectionHost)
+                        throw Error("DOCUMENT_CAPABILITY_MISSING");
                     await _host.ApplyAsync(actor, issued, frozen, sql).ConfigureAwait(false);
+                    if (_host is ISqliteDocumentBlobSelectionHost binder)
+                        foreach (var selection in selections)
+                            await binder.BindBlobSelectionAsync(actor, graph, selection, sql)
+                                .ConfigureAwait(false);
                     var after = await _host.LoadAsync(actor, frozen.BusinessId, sql).ConfigureAwait(false);
                     var body = Validate(after, frozen.BusinessId, request.AggregateType, request.Purpose);
                     var next = after.Document.Snapshot.Scope;
@@ -180,6 +228,16 @@ public sealed class SqliteContextBoundDocumentService
                         next.AggregateType != scope.AggregateType || next.Purpose != scope.Purpose ||
                         next.AggregateRevision < scope.AggregateRevision)
                         throw Error("DOCUMENT_PROJECTION_VIOLATION");
+                    foreach (var selection in selections)
+                    {
+                        var binding = after.Document.Bindings.SingleOrDefault(b =>
+                            b.RowKey == selection.Target.TargetKey &&
+                            b.CanonicalField == selection.Target.CanonicalField);
+                        if (binding == null || binding.EntityType != selection.Target.TargetEntity ||
+                            binding.Reference?.Key != selection.Reference.Key ||
+                            binding.BindingVersion != (ulong)selection.NextVersion)
+                            throw Error("DOCUMENT_PROJECTION_VIOLATION");
+                    }
                     try { await _host.AuthorizeAsync(actor, principal, next, sql).ConfigureAwait(false); }
                     catch { throw Error("DOCUMENT_AUTHORIZATION_REQUIRED"); }
                     var token = _module.IssueBoundDocumentSnapshot(principal,

@@ -535,7 +535,7 @@ internal static class RelationQueryLoader
     }
 }
 
-public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IIdGeneratorExecutor, IPhysicalSqlOwner, IBlobMutationOwner
+public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IIdGeneratorExecutor, IPhysicalSqlOwner, ICurrentPhysicalSqlLease, IBlobMutationOwner
 {
     public SqlDialect Dialect { get; }
     public ISqlTransaction Transport { get; }
@@ -563,6 +563,12 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         _blobParticipant = participant;
     }
 
+    public bool IsCurrentPhysicalSqlLease(IPhysicalSqlLease lease) =>
+        !_completed && Volatile.Read(ref _physicalSqlActive) != 0 &&
+        ReferenceEquals(_currentPhysicalSqlLease, lease);
+
+    private PhysicalSqlLease? _currentPhysicalSqlLease;
+
     public async Task<T> WithPhysicalSqlAsync<T>(Func<IPhysicalSqlLease, Task<T>> work)
     {
         if (_completed || Volatile.Read(ref _rollbackOnly) != 0 || work == null)
@@ -573,6 +579,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
             throw new InvalidOperationException("BLOB_TRANSACTION_REQUIRED");
         }
         var lease = new PhysicalSqlLease(Transport);
+        _currentPhysicalSqlLease = lease;
         try
         {
             var result = await work(lease).ConfigureAwait(false);
@@ -588,6 +595,7 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
         finally
         {
             lease.Close();
+            _currentPhysicalSqlLease = null;
             Volatile.Write(ref _physicalSqlActive, 0);
         }
     }

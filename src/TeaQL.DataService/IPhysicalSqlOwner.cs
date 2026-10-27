@@ -14,3 +14,9 @@ public interface IPhysicalSqlOwner
 {
     Task<T> WithPhysicalSqlAsync<T>(Func<IPhysicalSqlLease, Task<T>> work);
 }
+
+/// <summary>Checks an already-borrowed lease without entering its owner again.</summary>
+public interface ICurrentPhysicalSqlLease
+{
+    bool IsCurrentPhysicalSqlLease(IPhysicalSqlLease lease);
+}

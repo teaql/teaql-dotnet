@@ -49,6 +49,11 @@ public sealed class GraphMutationSession : IPhysicalSqlOwner
     /// <summary>Verify the trusted actor is the owner of this exact graph invocation.</summary>
     public bool BelongsTo(UserContext context) => ReferenceEquals(_context, context);
 
+    /// <summary>Check a lease supplied by this graph's physical SQL callback.</summary>
+    public bool IsCurrentPhysicalSqlLease(UserContext actor, IPhysicalSqlLease lease) =>
+        _active && BelongsTo(actor) && _transaction is ICurrentPhysicalSqlLease owner &&
+        owner.IsCurrentPhysicalSqlLease(lease);
+
     public MutationTraceScope Scope(string entity, ulong? id, string? localReason,
         MutationTraceScope? parent = null)
     {

@@ -135,8 +135,21 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
 
     internal Task<long> BindInOwnerAsync(IPhysicalSqlOwner owner, UserContext actor,
         BlobBindingChange change, IBlobBindingAuthorization authorization) =>
-        owner.WithPhysicalSqlAsync(async lease =>
-        {
+        owner.WithPhysicalSqlAsync(lease => BindOnLeaseCoreAsync(lease, actor, change, authorization));
+
+    /// <summary>Use a trusted host's already-borrowed graph SQL lease. Reborrowing
+    /// the owner would poison the current graph. Failure must reach its callback.</summary>
+    public Task<long> BindOnGraphLeaseAsync(GraphMutationSession graph, UserContext actor,
+        IPhysicalSqlLease lease, BlobBindingChange change, IBlobBindingAuthorization authorization)
+    {
+        if (graph == null || lease == null || !graph.IsCurrentPhysicalSqlLease(actor, lease))
+            throw Error("BLOB_TRANSACTION_REQUIRED");
+        return BindOnLeaseCoreAsync(lease, actor, change, authorization);
+    }
+
+    private async Task<long> BindOnLeaseCoreAsync(IPhysicalSqlLease lease, UserContext actor,
+        BlobBindingChange change, IBlobBindingAuthorization authorization)
+    {
             if (change?.Target == null || authorization == null ||
                 !Name(change.Target.Entity) || !Name(change.Target.Field) || !EntityId(change.Target.EntityId) ||
                 change.ExpectedVersion < 0 || change.NextVersion <= change.ExpectedVersion ||
@@ -206,5 +219,5 @@ public sealed class SqliteBlobCatalog(ISqlTransport transport)
                 catch { throw Error("BLOB_CATALOG_FAILED"); }
             }
             return change.NextVersion;
-        });
+    }
 }

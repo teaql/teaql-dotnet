@@ -9,9 +9,16 @@ using TeaQL.Sql;
 namespace TeaQL.SecureDocumentReference;
 
 public sealed record SubmittedDocumentCommand(string BusinessId, string DocumentToken,
-    string CommandId, JsonElement Body)
+    string CommandId, JsonElement Body,
+    IReadOnlyList<DocumentBlobSelectionSubmission>? BlobSelections = null)
 {
     public override string ToString() => "SubmittedDocumentCommand[redacted]";
+}
+
+public sealed record DocumentBlobSelectionSubmission(string Token, string TargetEntity,
+    string CanonicalField, string Kind, string TargetKey)
+{
+    public override string ToString() => "DocumentBlobSelectionSubmission[redacted]";
 }
 
 public sealed record DocumentCommandReceipt(long PreviousRevision, long NewRevision, string Response)
@@ -108,11 +115,24 @@ public sealed class SqliteDocumentCommandJournal(ISqlTransport transport)
         Text(command.CommandId, 256);
         var bodyCopy = CopyBody(command.Body);
         var body = bodyCopy.GetRawText();
-        if (JsonSerializer.SerializeToUtf8Bytes(new[] { command.BusinessId,
-                command.DocumentToken, command.CommandId, body }).Length > MaximumBytes)
+        var selections = command.BlobSelections?.ToArray();
+        if (selections?.Length > 100) throw Error("DOCUMENT_COMMAND_INVALID");
+        if (selections != null)
+            foreach (var selection in selections)
+            {
+                if (selection == null || selection.Kind is not ("EXISTING_ROW" or "NEW_CLIENT_KEY"))
+                    throw Error("DOCUMENT_COMMAND_INVALID");
+                Text(selection.Token, MaximumBytes); Text(selection.TargetEntity, 16384);
+                Text(selection.CanonicalField, 16384); Text(selection.TargetKey, 16384);
+            }
+        // Existing four-element digests remain replayable after this extension.
+        var parts = new List<string> { command.BusinessId, command.DocumentToken,
+            command.CommandId, body };
+        if (selections != null) parts.Add(JsonSerializer.Serialize(selections));
+        if (JsonSerializer.SerializeToUtf8Bytes(parts).Length > MaximumBytes)
             throw Error("DOCUMENT_COMMAND_INVALID");
-        return (Hash(command.BusinessId, command.DocumentToken, command.CommandId, body),
-            command with { Body = bodyCopy });
+        return (Hash(parts.ToArray()), command with { Body = bodyCopy,
+            BlobSelections = selections });
     }
 
     internal static JsonElement CopyBody(JsonElement body)
