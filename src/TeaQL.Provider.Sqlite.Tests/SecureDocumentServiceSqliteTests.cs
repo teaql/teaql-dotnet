@@ -13,13 +13,16 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class SecureDocumentServiceSqliteTests
 {
-    private sealed class Host : ISqliteContextBoundDocumentHost, ISqliteDocumentBlobSelectionHost
+    private sealed class Host : ISqliteContextBoundDocumentHost, ISqliteDocumentBlobSelectionHost,
+        ISqliteDocumentNewBlobSelectionHost
     {
         public TrustedReferencePrincipal Actor = new("oidc", "alice", "Merchant", 7);
         public bool FailPresent;
         public bool SwitchActorOnApply;
         public int Mutations;
         public SqliteBlobCatalog? Catalog;
+        public bool ChildRows;
+        public bool WrongResolve;
 
         public TrustedReferencePrincipal Principal(UserContext _) => Actor;
 
@@ -65,34 +68,95 @@ public class SecureDocumentServiceSqliteTests
                 bindings.Add(new DocumentBlobBindingSnapshot("order:10", "attachment", "Order",
                     key == null ? null : new BlobRef(key), (ulong)bindingVersion, true, true));
             }
+            if (ChildRows)
+            {
+                var children = await sql.FetchAllAsync(
+                    "SELECT id,version,blob_key FROM document_order_line WHERE order_id=@p0 ORDER BY id",
+                    [new Value.I64Value(10)]);
+                var entities = snapshot.Entities.ToList();
+                var rowKeys = new List<string>();
+                foreach (var child in children)
+                {
+                    var childId = child["id"].TryI64()!.Value;
+                    var rowKey = $"line:{childId}";
+                    rowKeys.Add(rowKey);
+                    var linked = await sql.FetchAllAsync("""
+                        SELECT key,version FROM teaql_blob_binding WHERE scope=@p0 AND entity=@p1
+                        AND entity_id=@p2 AND field=@p3
+                        """, [new Value.TextValue("merchant:7"), new Value.TextValue("OrderLine"),
+                            new Value.TextValue(childId.ToString()), new Value.TextValue("attachment")]);
+                    Assert.True(linked.Count <= 1);
+                    var key = linked.Count == 0 ? null : linked[0]["key"].TryText();
+                    var bindingVersion = linked.Count == 0 ? 0 : linked[0]["version"].TryI64()!.Value;
+                    Assert.Equal(child["blob_key"].TryText(), key);
+                    entities.Add(new DocumentEntitySnapshot(rowKey,
+                        new ReferenceIdentity("OrderLine", (ulong)childId, child["version"].TryI64()!.Value),
+                        ["attachment"], ["attachment"], ["UPDATE"]));
+                    bindings.Add(new DocumentBlobBindingSnapshot(rowKey, "attachment", "OrderLine",
+                        key == null ? null : new BlobRef(key), (ulong)bindingVersion, true, true));
+                }
+                snapshot = snapshot with { Entities = entities,
+                    Relations = [new DocumentRelationSnapshot("lines", rowKeys, "COMPLETE", true,
+                        ["CREATE_CHILD"])] };
+                bindings.Sort((left, right) =>
+                {
+                    var byRow = string.CompareOrdinal(left.RowKey, right.RowKey);
+                    return byRow != 0 ? byRow :
+                        string.CompareOrdinal(left.CanonicalField, right.CanonicalField);
+                });
+            }
             return new CurrentBoundDocument(new BoundDocumentSnapshot(snapshot, bindings),
                 JsonSerializer.SerializeToElement(new { quantity }), TimeSpan.FromMinutes(5));
         }
 
-        private sealed class BindingAuthorization : IBlobBindingAuthorization
+        private sealed class BindingAuthorization(string entity, string entityId, string expectedAction)
+            : IBlobBindingAuthorization
         {
             public string Scope(UserContext _) => "merchant:7";
             public Task<bool> AuthorizeAsync(UserContext _, BlobBindingTarget target,
                 BlobRef? previous, BlobRef? next, string action) =>
-                Task.FromResult(target == new BlobBindingTarget("Order", "10", "attachment") &&
-                    next != null && action == "Update");
+                Task.FromResult(target == new BlobBindingTarget(entity, entityId, "attachment") &&
+                    next != null && action == expectedAction);
         }
 
         public async Task BindBlobSelectionAsync(UserContext actor, GraphMutationSession graph,
             VerifiedDocumentBlobSelection selection, IPhysicalSqlLease sql)
         {
-            if (Catalog == null || selection.Target.TargetEntity != "Order" ||
-                selection.Target.TargetKey != "order:10" ||
-                selection.Target.CanonicalField != "attachment" || selection.EntityId != "10")
+            var child = selection.Target.Kind == "NEW_CLIENT_KEY" &&
+                selection.Target.TargetEntity == "OrderLine" &&
+                selection.RowKey == $"line:{selection.EntityId}";
+            var parent = selection.Target.Kind == "EXISTING_ROW" &&
+                selection.Target.TargetEntity == "Order" &&
+                selection.Target.TargetKey == "order:10" && selection.EntityId == "10";
+            if (Catalog == null || (!parent && !child) ||
+                selection.Target.CanonicalField != "attachment")
                 throw new InvalidOperationException("BLOB_BIND_DENIED");
             var affected = await sql.ExecuteAsync(
-                "UPDATE document_order SET blob_key=@p0 WHERE id=@p1",
-                [new Value.TextValue(selection.Reference.Key), new Value.I64Value(10)]);
+                child ? "UPDATE document_order_line SET blob_key=@p0 WHERE id=@p1" :
+                    "UPDATE document_order SET blob_key=@p0 WHERE id=@p1",
+                [new Value.TextValue(selection.Reference.Key),
+                    new Value.I64Value(child ? long.Parse(selection.EntityId) : 10)]);
             if (affected != 1) throw new InvalidOperationException("BLOB_BIND_DENIED");
+            var entity = child ? "OrderLine" : "Order";
+            var entityId = child ? selection.EntityId : "10";
+            var action = child ? "Create" : "Update";
             await Catalog.BindOnGraphLeaseAsync(graph, actor, sql,
-                new BlobBindingChange(new BlobBindingTarget("Order", "10", "attachment"),
-                    selection.Reference, selection.ExpectedVersion, selection.NextVersion, "Update"),
-                new BindingAuthorization());
+                new BlobBindingChange(new BlobBindingTarget(entity, entityId, "attachment"),
+                    selection.Reference, selection.ExpectedVersion, selection.NextVersion, action),
+                new BindingAuthorization(entity, entityId, action));
+        }
+
+        public async Task<(string RowKey, string EntityId)> ResolveNewBlobSelectionAsync(
+            UserContext _, BoundDocumentSnapshot __, SubmittedDocumentCommand ___,
+            DocumentBlobSelectionClaim selection, IPhysicalSqlLease sql)
+        {
+            if (WrongResolve) return ("order:10", "10");
+            var rows = await sql.FetchAllAsync("""
+                SELECT id FROM document_order_line WHERE order_id=@p0 AND client_key=@p1
+                """, [new Value.I64Value(10), new Value.TextValue(selection.Target.TargetKey)]);
+            if (rows.Count != 1) throw new InvalidOperationException("DOCUMENT_PROJECTION_VIOLATION");
+            var id = rows[0]["id"].TryI64()!.Value.ToString();
+            return ($"line:{id}", id);
         }
 
         public async Task ApplyAsync(UserContext _, BoundDocumentSnapshot issued,
@@ -107,6 +171,22 @@ public class SecureDocumentServiceSqliteTests
                 """, [new Value.I64Value(3), new Value.I64Value(10),
                     new Value.I64Value(issued.Snapshot.Scope.AggregateRevision)]);
             if (changed != 1) throw new InvalidOperationException("stale order");
+            if (ChildRows)
+                foreach (var selection in submitted.BlobSelections ?? [])
+                {
+                    if (selection.Kind != "NEW_CLIENT_KEY") continue;
+                    if (selection.TargetEntity != "OrderLine" ||
+                        selection.CanonicalField != "attachment" ||
+                        selection.TargetKey is not ("client-line-1" or "client-line-2"))
+                        throw new InvalidOperationException("DOCUMENT_PROJECTION_VIOLATION");
+                    var childId = selection.TargetKey == "client-line-1" ? 21 : 22;
+                    changed = await sql.ExecuteAsync("""
+                        INSERT INTO document_order_line(id,order_id,client_key,version,blob_key)
+                        VALUES (@p0,@p1,@p2,1,NULL)
+                        """, [new Value.I64Value(childId), new Value.I64Value(10),
+                            new Value.TextValue(selection.TargetKey)]);
+                    if (changed != 1) throw new InvalidOperationException("DOCUMENT_PROJECTION_VIOLATION");
+                }
             if (SwitchActorOnApply) Actor = Actor with { Subject = "bob" };
         }
 
@@ -339,6 +419,108 @@ public class SecureDocumentServiceSqliteTests
         Assert.Equal((2L, 3L, "blob_A"), await BoundOrder());
         Assert.Equal(("blob_A", 1L), await Binding());
         Assert.Equal("uploaded_unbound", await Status("blob_B"));
+        Assert.Equal(1, await Receipts(db));
+    }
+
+    [Fact]
+    public async Task NewChildBlobSelectionCommitsAndReceiptFailureRollsBack()
+    {
+        await using var db = new SqliteConnection("Data Source=:memory:");
+        await db.OpenAsync();
+        await Execute(db, "CREATE TABLE document_order(id INTEGER PRIMARY KEY,business_id TEXT UNIQUE NOT NULL,version INTEGER NOT NULL,quantity INTEGER NOT NULL,blob_key TEXT)");
+        await Execute(db, "CREATE TABLE document_order_line(id INTEGER PRIMARY KEY,order_id INTEGER NOT NULL,client_key TEXT UNIQUE NOT NULL,version INTEGER NOT NULL,blob_key TEXT)");
+        await Execute(db, "CREATE TABLE document_permission(subject TEXT PRIMARY KEY,can_edit INTEGER NOT NULL)");
+        await Execute(db, "INSERT INTO document_order VALUES(10,'ORD-10',1,1,NULL)");
+        await Execute(db, "INSERT INTO document_permission VALUES('alice',1)");
+        var transport = new SqliteTransport(db);
+        var catalog = new SqliteBlobCatalog(transport);
+        await catalog.EnsureSchemaAsync(); await catalog.ValidateSchemaAsync();
+        await Execute(db, """
+            INSERT INTO teaql_blob_catalog
+            (key,scope,object_key,content_version,file_name,content_type,size_bytes,status)
+            VALUES ('blob_C','merchant:7','objects/c','v1','c.pdf','application/pdf',3,'uploaded_unbound'),
+                   ('blob_D','merchant:7','objects/d','v1','d.pdf','application/pdf',3,'uploaded_unbound')
+            """);
+        var actor = new RuntimeModule().IntoContext().WithDataService(
+            new SqlDataServiceExecutor(new SqliteDialect(), transport,
+                new MetadataSchemaProvider(_ => null)));
+        var keys = new StaticReferenceKeyProvider("k1",
+            new ReferenceKey("k1", Enumerable.Repeat((byte)0x42, 32).ToArray()));
+        var module = new SecureDocumentReferenceModule("order-service", "test", keys,
+            (_, _, _) => true);
+        var journal = new SqliteDocumentCommandJournal(transport);
+        await journal.EnsureSchemaAsync(); await journal.ValidateSchemaAsync();
+        var host = new Host { Catalog = catalog, ChildRows = true };
+        var service = new SqliteContextBoundDocumentService(actor, transport, module, journal, host);
+        Task<ContextualDocument> Open() => service.OpenAsync(actor,
+            new DocumentOpenRequest("Order", "ORD-10", "edit-order", TimeSpan.FromMinutes(1)));
+        Task<AcceptedDocument> Accept(SubmittedDocumentCommand command) => service.AcceptAsync(actor,
+            new DocumentAcceptRequest("Order", "edit-order", command));
+        DocumentBlobSelectionSubmission Select(ContextualDocument opened, string commandId,
+            string clientKey, string key)
+        {
+            var issued = module.ConsumeBoundDocumentSnapshot(host.Actor, opened.DocumentToken,
+                "Order", "edit-order").Document;
+            var target = new BlobSelectionTarget(issued.Snapshot.Scope, "OrderLine", "attachment",
+                "NEW_CLIENT_KEY", clientKey, commandId);
+            var token = module.IssueBlobSelection(host.Actor, opened.DocumentToken,
+                new BlobSelectionClaim(target, new BlobRef(key)), TimeSpan.FromMinutes(1));
+            return new DocumentBlobSelectionSubmission(token, "OrderLine", "attachment",
+                "NEW_CLIENT_KEY", clientKey);
+        }
+        async Task<long> Scalar(string sql)
+        {
+            await using var command = db.CreateCommand();
+            command.CommandText = sql;
+            return (long)(await command.ExecuteScalarAsync())!;
+        }
+        async Task<string> TextScalar(string sql)
+        {
+            await using var command = db.CreateCommand();
+            command.CommandText = sql;
+            return (string)(await command.ExecuteScalarAsync())!;
+        }
+
+        var opened = await Open();
+        var submitted = new SubmittedDocumentCommand("ORD-10", opened.DocumentToken,
+            "command-child-1", JsonSerializer.SerializeToElement(new { quantity = 3 }),
+            [Select(opened, "command-child-1", "client-line-1", "blob_C")]);
+        host.WrongResolve = true;
+        Assert.Equal("DOCUMENT_PROJECTION_VIOLATION", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => Accept(submitted))).Message);
+        Assert.Equal((1L, 1L), await Order(db));
+        Assert.Equal(0, await Receipts(db));
+        host.WrongResolve = false;
+        var first = await Accept(submitted);
+        Assert.Equal((1L, 2L, false),
+            (first.PreviousRevision, first.NewRevision, first.Replayed));
+        Assert.True((await Accept(submitted)).Replayed);
+        Assert.Equal((2L, 3L), await Order(db));
+        Assert.Equal(21, await Scalar("SELECT id FROM document_order_line"));
+        Assert.Equal("blob_C", await TextScalar("SELECT blob_key FROM document_order_line"));
+        Assert.Equal("blob_C", await TextScalar(
+            "SELECT key FROM teaql_blob_binding WHERE entity='OrderLine' AND entity_id='21'"));
+        Assert.Equal("available", await TextScalar(
+            "SELECT status FROM teaql_blob_catalog WHERE key='blob_C'"));
+        Assert.Equal(1, await Receipts(db));
+
+        opened = await Open();
+        var failed = new SubmittedDocumentCommand("ORD-10", opened.DocumentToken,
+            "command-child-2", JsonSerializer.SerializeToElement(new { quantity = 3 }),
+            [Select(opened, "command-child-2", "client-line-2", "blob_D")]);
+        await Execute(db, """
+            CREATE TRIGGER reject_child_receipt BEFORE INSERT ON teaql_document_command_receipt
+            WHEN NEW.command_id='command-child-2'
+            BEGIN SELECT RAISE(ABORT, 'receipt rejected'); END
+            """);
+        Assert.Equal("DOCUMENT_CATALOG_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => Accept(failed))).Message);
+        Assert.Equal((2L, 3L), await Order(db));
+        Assert.Equal(1, await Scalar("SELECT COUNT(*) FROM document_order_line"));
+        Assert.Equal(0, await Scalar(
+            "SELECT COUNT(*) FROM teaql_blob_binding WHERE entity_id='22'"));
+        Assert.Equal("uploaded_unbound", await TextScalar(
+            "SELECT status FROM teaql_blob_catalog WHERE key='blob_D'"));
         Assert.Equal(1, await Receipts(db));
     }
 }

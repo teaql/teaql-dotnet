@@ -25,9 +25,13 @@ public sealed record AcceptedDocument(ContextualDocument Document,
 public sealed record CurrentBoundDocument(BoundDocumentSnapshot Document,
     JsonElement Body, TimeSpan Lifetime);
 public sealed record VerifiedDocumentBlobSelection(BlobSelectionTarget Target, BlobRef Reference,
-    string EntityId, long ExpectedVersion, long NextVersion)
+    string RowKey, string EntityId, long ExpectedVersion, long NextVersion)
 {
     public override string ToString() => "VerifiedDocumentBlobSelection[redacted]";
+}
+public sealed record DocumentBlobSelectionClaim(BlobSelectionTarget Target, BlobRef Reference)
+{
+    public override string ToString() => "DocumentBlobSelectionClaim[redacted]";
 }
 
 /// <summary>Application-owned current projection and allowed model mutation plan.</summary>
@@ -48,6 +52,14 @@ public interface ISqliteDocumentBlobSelectionHost
 {
     Task BindBlobSelectionAsync(UserContext actor, GraphMutationSession graph,
         VerifiedDocumentBlobSelection selection, IPhysicalSqlLease sql);
+}
+
+/// <summary>Resolve a sealed client key after its child is persisted on the current lease.</summary>
+public interface ISqliteDocumentNewBlobSelectionHost
+{
+    Task<(string RowKey, string EntityId)> ResolveNewBlobSelectionAsync(UserContext actor,
+        BoundDocumentSnapshot issued, SubmittedDocumentCommand submitted,
+        DocumentBlobSelectionClaim selection, IPhysicalSqlLease sql);
 }
 
 /// <summary>Current SQL-authorized tqd2 open and durable accept on the native graph owner.</summary>
@@ -103,11 +115,11 @@ public sealed class SqliteContextBoundDocumentService
     private static byte[] Fingerprint(BoundDocumentSnapshot document) =>
         DocumentWire.EncodeBound(document, new byte[32], 0, 1);
 
-    private IReadOnlyList<VerifiedDocumentBlobSelection> VerifiedSelections(
+    private IReadOnlyList<DocumentBlobSelectionClaim> VerifiedSelections(
         TrustedReferencePrincipal principal, BoundDocumentSnapshot issued,
         SubmittedDocumentCommand command)
     {
-        var result = new List<VerifiedDocumentBlobSelection>();
+        var result = new List<DocumentBlobSelectionClaim>();
         var seen = new HashSet<(string, string)>();
         foreach (var selected in command.BlobSelections ?? [])
         {
@@ -118,18 +130,54 @@ public sealed class SqliteContextBoundDocumentService
                 throw Error("DOCUMENT_COMMAND_INVALID");
             var claim = _module.ConsumeBlobSelection(principal, command.DocumentToken,
                 selected.Token, target).Document;
-            if (target.Kind != "EXISTING_ROW") throw Error("DOCUMENT_CAPABILITY_MISSING");
-            var row = issued.Snapshot.Entities.SingleOrDefault(e => e.RowKey == target.TargetKey);
-            var binding = issued.Bindings.SingleOrDefault(b => b.RowKey == target.TargetKey &&
-                b.CanonicalField == target.CanonicalField);
-            if (row == null || binding == null || row.Identity.EntityType != target.TargetEntity ||
-                !binding.Writable || binding.BindingVersion >= long.MaxValue)
-                throw Error("DOCUMENT_PROJECTION_VIOLATION");
-            result.Add(new VerifiedDocumentBlobSelection(target, claim.Reference,
-                row.Identity.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                (long)binding.BindingVersion, (long)binding.BindingVersion + 1));
+            result.Add(new DocumentBlobSelectionClaim(target, claim.Reference));
         }
         return result;
+    }
+
+    private static VerifiedDocumentBlobSelection MapExisting(BoundDocumentSnapshot issued,
+        DocumentBlobSelectionClaim selection)
+    {
+        var target = selection.Target;
+        var row = issued.Snapshot.Entities.SingleOrDefault(e => e.RowKey == target.TargetKey);
+        var binding = issued.Bindings.SingleOrDefault(b => b.RowKey == target.TargetKey &&
+            b.CanonicalField == target.CanonicalField);
+        if (row == null || binding == null || row.Identity.EntityType != target.TargetEntity ||
+            !binding.Writable || binding.BindingVersion >= long.MaxValue)
+            throw Error("DOCUMENT_PROJECTION_VIOLATION");
+        return new VerifiedDocumentBlobSelection(target, selection.Reference, target.TargetKey,
+            row.Identity.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            (long)binding.BindingVersion, (long)binding.BindingVersion + 1);
+    }
+
+    private static VerifiedDocumentBlobSelection MapNew(BoundDocumentSnapshot issued,
+        DocumentBlobSelectionClaim selection, (string RowKey, string EntityId) resolved)
+    {
+        try { Text(resolved.RowKey); }
+        catch { throw Error("DOCUMENT_PROJECTION_VIOLATION"); }
+        if (!ulong.TryParse(resolved.EntityId, System.Globalization.NumberStyles.None,
+                System.Globalization.CultureInfo.InvariantCulture, out var id) || id == 0 ||
+            id.ToString(System.Globalization.CultureInfo.InvariantCulture) != resolved.EntityId ||
+            issued.Snapshot.Entities.Any(e => e.RowKey == resolved.RowKey))
+            throw Error("DOCUMENT_PROJECTION_VIOLATION");
+        return new VerifiedDocumentBlobSelection(selection.Target, selection.Reference,
+            resolved.RowKey, resolved.EntityId, 0, 1);
+    }
+
+    private static bool ValidNewChild(BoundDocumentSnapshot issued, BoundDocumentSnapshot after,
+        VerifiedDocumentBlobSelection selection)
+    {
+        var row = after.Snapshot.Entities.SingleOrDefault(e => e.RowKey == selection.RowKey);
+        return row != null && row.Identity.EntityType == selection.Target.TargetEntity &&
+            row.Identity.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) == selection.EntityId &&
+            row.WritableFields.Contains(selection.Target.CanonicalField) &&
+            after.Snapshot.Relations.Any(relation =>
+                relation.RowKeys.Contains(selection.RowKey) && relation.Completeness == "COMPLETE" &&
+                relation.Writable && relation.AllowedMutations.Contains("CREATE_CHILD") &&
+                issued.Snapshot.Relations.Any(previous => previous.Name == relation.Name &&
+                    previous.Completeness == "COMPLETE" && previous.Writable &&
+                    previous.AllowedMutations.Contains("CREATE_CHILD") &&
+                    !previous.RowKeys.Contains(selection.RowKey)));
     }
 
     private static JsonElement Validate(CurrentBoundDocument current, string businessId,
@@ -216,9 +264,25 @@ public sealed class SqliteContextBoundDocumentService
                     var selections = VerifiedSelections(principal, issued, frozen);
                     if (selections.Count > 0 && _host is not ISqliteDocumentBlobSelectionHost)
                         throw Error("DOCUMENT_CAPABILITY_MISSING");
+                    if (selections.Any(s => s.Target.Kind == "NEW_CLIENT_KEY") &&
+                        _host is not ISqliteDocumentNewBlobSelectionHost)
+                        throw Error("DOCUMENT_CAPABILITY_MISSING");
                     await _host.ApplyAsync(actor, issued, frozen, sql).ConfigureAwait(false);
+                    var mapped = new List<VerifiedDocumentBlobSelection>();
+                    var mappedTargets = new HashSet<(string, string)>();
+                    foreach (var selection in selections)
+                    {
+                        var bound = selection.Target.Kind == "EXISTING_ROW"
+                            ? MapExisting(issued, selection)
+                            : MapNew(issued, selection, await ((ISqliteDocumentNewBlobSelectionHost)_host)
+                                .ResolveNewBlobSelectionAsync(actor, issued, frozen, selection, sql)
+                                .ConfigureAwait(false));
+                        if (!mappedTargets.Add((bound.RowKey, bound.Target.CanonicalField)))
+                            throw Error("DOCUMENT_COMMAND_INVALID");
+                        mapped.Add(bound);
+                    }
                     if (_host is ISqliteDocumentBlobSelectionHost binder)
-                        foreach (var selection in selections)
+                        foreach (var selection in mapped)
                             await binder.BindBlobSelectionAsync(actor, graph, selection, sql)
                                 .ConfigureAwait(false);
                     var after = await _host.LoadAsync(actor, frozen.BusinessId, sql).ConfigureAwait(false);
@@ -228,14 +292,17 @@ public sealed class SqliteContextBoundDocumentService
                         next.AggregateType != scope.AggregateType || next.Purpose != scope.Purpose ||
                         next.AggregateRevision < scope.AggregateRevision)
                         throw Error("DOCUMENT_PROJECTION_VIOLATION");
-                    foreach (var selection in selections)
+                    foreach (var selection in mapped)
                     {
                         var binding = after.Document.Bindings.SingleOrDefault(b =>
-                            b.RowKey == selection.Target.TargetKey &&
+                            b.RowKey == selection.RowKey &&
                             b.CanonicalField == selection.Target.CanonicalField);
                         if (binding == null || binding.EntityType != selection.Target.TargetEntity ||
                             binding.Reference?.Key != selection.Reference.Key ||
                             binding.BindingVersion != (ulong)selection.NextVersion)
+                            throw Error("DOCUMENT_PROJECTION_VIOLATION");
+                        if (selection.Target.Kind == "NEW_CLIENT_KEY" &&
+                            !ValidNewChild(issued, after.Document, selection))
                             throw Error("DOCUMENT_PROJECTION_VIOLATION");
                     }
                     try { await _host.AuthorizeAsync(actor, principal, next, sql).ConfigureAwait(false); }
