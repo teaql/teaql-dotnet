@@ -43,13 +43,36 @@ public static class SqlLogBindings
         state.Policies[values.Count] = policy ?? state.Scope ?? SqlParameterLogPolicy.Unknown;
         values.Add(value);
     }
-    public static void AddField(List<Value> values, EntityDescriptor entity, PropertyDescriptor property, Value value) =>
+    public static void AddField(List<Value> values, EntityDescriptor entity, PropertyDescriptor property, Value value)
+    {
+        if (property.DataType == DataType.BlobRef || property.BlobSpec != null)
+        {
+            var spec = property.BlobSpec;
+            if (property.DataType != DataType.BlobRef || spec == null ||
+                spec.Entity != entity.Name || spec.Field != property.Name ||
+                spec.Nullable != property.Nullable || spec.AllowedExtensions.Count == 0)
+                throw new SqlCompileException("BLOB_CAPABILITY_MISSING");
+            if (value is Value.TypedNullValue { Type: DataType.BlobRef } && property.Nullable)
+            {
+                Add(values, value, SqlParameterLogPolicy.Credential);
+                return;
+            }
+            if (value is not Value.BlobRefValue { Reference: not null })
+                throw new SqlCompileException("BLOB_REFERENCE_INVALID");
+            Add(values, value, SqlParameterLogPolicy.Credential);
+            return;
+        }
+        if (value is Value.BlobRefValue)
+            throw new SqlCompileException("BLOB_REFERENCE_INVALID");
         Add(values, value, Field(entity, property.Name));
+    }
 
     public static SqlParameterLogPolicy Field(EntityDescriptor entity, string name)
     {
         var property = entity.PropertyByName(name);
         if (property == null) return SqlParameterLogPolicy.Unknown;
+        if (property.DataType == DataType.BlobRef || property.BlobSpec != null)
+            return SqlParameterLogPolicy.Credential;
         if (SensitiveLogNames.IsCredential(property.Name) || SensitiveLogNames.IsCredential(property.ColumnNameString))
             return SqlParameterLogPolicy.Credential;
         if (!entity.HasExplicitSqlLogPolicyMetadata)

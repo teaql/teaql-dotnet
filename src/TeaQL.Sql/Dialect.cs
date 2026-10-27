@@ -74,6 +74,7 @@ public abstract class SqlDialect
             DataType.F64 => "REAL",
             DataType.Decimal => "NUMERIC",
             DataType.Text => "VARCHAR(255)",
+            DataType.BlobRef => "VARCHAR(128)",
             DataType.LargeText or DataType.Json or DataType.Date or DataType.Timestamp => "TEXT",
             _ => throw SqlCompileException.UnsupportedSchemaType(dataType)
         };

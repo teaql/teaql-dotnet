@@ -134,6 +134,10 @@ public class SqlDataServiceExecutor : IDataService, ITransactionExecutor, IStrea
         var entityDesc = SchemaProvider.GetEntity(entityName)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {entityName}");
 
+        // A modeled Blob row cannot commit without a same-owner catalog participant.
+        if (entityDesc.HasBlobFields())
+            throw new SqlExecutorException("BLOB_CAPABILITY_MISSING");
+
         if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
         {
             if (!allocationInsert.Command.Values.TryGetValue(allocationId.Name, out var explicitId))
@@ -681,6 +685,12 @@ public class SqlDataServiceTransaction : ITransaction, IStreamQueryExecutor, IId
 
         var entityDesc = SchemaProvider.GetEntity(entityName)
             ?? throw new SqlExecutorException($"SQL compile error: unknown entity {entityName}");
+
+        if (entityDesc.HasBlobFields())
+        {
+            Volatile.Write(ref _rollbackOnly, 1);
+            throw new SqlExecutorException("BLOB_CAPABILITY_MISSING");
+        }
 
         if (request is InsertMutationRequest allocationInsert && entityDesc.IdProperty() is { } allocationId)
         {

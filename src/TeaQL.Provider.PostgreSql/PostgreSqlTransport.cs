@@ -181,6 +181,7 @@ public class PostgreSqlTransport : IStreamingSqlTransport, IAutomaticMutationTra
             Value.F64Value f => f.Value,
             Value.DecimalValue d => d.Value,
             Value.TextValue t => t.Value,
+            Value.BlobRefValue b => b.Reference.ToSqlText(),
             Value.JsonValue j => GetJsonValue(j, out type),
             Value.DateValue d => d.Value,
             Value.TimestampValue t => DateTimeOffset.FromUnixTimeMilliseconds(t.Milliseconds),

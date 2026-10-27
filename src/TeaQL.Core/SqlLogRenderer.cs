@@ -132,6 +132,7 @@ public static class SqlLogRenderer
             case Value.DecimalValue v: return Number(v.Value);
             case Value.F64Value v when double.IsFinite(v.Value): return Number(v.Value);
             case Value.TextValue v: return Quote(v.Value);
+            case Value.BlobRefValue: return Quote("[REDACTED]");
             case Value.JsonValue v: return Quote(v.Value?.ToJsonString() ?? "null");
             case Value.ObjectValue v: return Quote(System.Text.Json.JsonSerializer.Serialize(v.Value));
             case Value.ListValue v:

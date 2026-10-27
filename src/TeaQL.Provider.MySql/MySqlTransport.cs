@@ -265,6 +265,7 @@ public class MySqlTransport : IStreamingSqlTransport, IAutomaticMutationTransact
             Value.F64Value f => f.Value,
             Value.DecimalValue d => d.Value,
             Value.TextValue t => t.Value,
+            Value.BlobRefValue b => b.Reference.ToSqlText(),
             Value.JsonValue j => j.Value?.ToJsonString() ?? (object)DBNull.Value,
             Value.DateValue d => d.Value,
             Value.TimestampValue t => DateTimeOffset.FromUnixTimeMilliseconds(t.Milliseconds).UtcDateTime,

@@ -28,6 +28,7 @@ public class MySqlDialect : SqlDialect
             DataType.F64 => "DOUBLE",
             DataType.Decimal => "DECIMAL(38, 18)",
             DataType.Text => "VARCHAR(255)",
+            DataType.BlobRef => "VARCHAR(128)",
             DataType.LargeText => "LONGTEXT",
             DataType.Json => "JSON",
             DataType.Date => "DATE",
