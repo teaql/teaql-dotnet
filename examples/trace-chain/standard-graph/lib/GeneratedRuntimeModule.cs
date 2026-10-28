@@ -244,7 +244,21 @@ public static class GeneratedRuntimeModule
        ["Payment"] = "payment_data",
        ["PaymentAttempt"] = "payment_attempt_data",
        ["Shipment"] = "shipment_data"
-    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("CustomerOrder", ["id", "platform", "order_number", "description", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["order_number"] = ["order_number"], ["description"] = ["description"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "customer_order", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Payment", ["id", "customer_order", "reference_code", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["reference_code"] = ["reference_code"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("PaymentAttempt", ["id", "payment", "reference_code", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["payment"] = ["payment"], ["reference_code"] = ["reference_code"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Shipment", ["id", "customer_order", "reference_code", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["reference_code"] = ["reference_code"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }, integer32Fields: new Dictionary<string, IReadOnlyList<string>>
+    {
+       ["Platform"] = new List<string> {
+        },
+       ["CustomerOrder"] = new List<string> {
+        },
+       ["OrderItem"] = new List<string> {
+        },
+       ["Payment"] = new List<string> {
+        },
+       ["PaymentAttempt"] = new List<string> {
+        },
+       ["Shipment"] = new List<string> {
+        }
+    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("CustomerOrder", ["id", "platform", "order_number", "description", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["order_number"] = ["order_number"], ["description"] = ["description"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "customer_order", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Payment", ["id", "customer_order", "reference_code", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["reference_code"] = ["reference_code"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("PaymentAttempt", ["id", "payment", "reference_code", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["payment"] = ["payment"], ["reference_code"] = ["reference_code"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Shipment", ["id", "customer_order", "reference_code", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["reference_code"] = ["reference_code"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

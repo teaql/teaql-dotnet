@@ -209,7 +209,17 @@ public static class GeneratedRuntimeModule
        ["Platform"] = "platform_data",
        ["SchoolType"] = "school_type_data",
        ["School"] = "school_data"
-    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "base_url", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["base_url"] = ["base_url"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("SchoolType", ["platform", "id", "name", "code", "display_order", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("School", ["id", "platform", "school_type", "name", "address", "established_date", "student_capacity", "active", "create_time", "update_time", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["school_type"] = ["school_type"], ["name"] = ["name"], ["address"] = ["address"], ["established_date"] = ["established_date"], ["student_capacity"] = ["student_capacity"], ["active"] = ["active"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }, integer32Fields: new Dictionary<string, IReadOnlyList<string>>
+    {
+       ["Platform"] = new List<string> {
+        },
+       ["SchoolType"] = new List<string> {
+        },
+       ["School"] = new List<string> {
+            "student_capacity",
+
+        }
+    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "base_url", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["base_url"] = ["base_url"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("SchoolType", ["platform", "id", "name", "code", "display_order", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("School", ["id", "platform", "school_type", "name", "address", "established_date", "student_capacity", "active", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["school_type"] = ["school_type"], ["name"] = ["name"], ["address"] = ["address"], ["established_date"] = ["established_date"], ["student_capacity"] = ["student_capacity"], ["active"] = ["active"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

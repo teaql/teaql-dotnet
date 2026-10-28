@@ -707,27 +707,40 @@ namespace Generated.Requests
             return await service.QueryAsync(req);
         }
 
-        private async Task<QueryResult> ExecuteForOneInternalAsync(UserContext context)
+        private async Task<Generated.Models.Customer?> ExecuteForOneInternalAsync(UserContext context)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
             query.Limit(1);
             var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            return await service.QueryAsync(req);
+            var result = await service.QueryAsync(req);
+            if (result.Rows.Count == 0) return null;
+            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
+                Generated.Models.Customer.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
         }
 
-        private async Task<SmartList<Record>> ExecuteForListWithMetadataInternalAsync(
+        private async Task<SmartList<Generated.Models.Customer>> ExecuteForListWithMetadataInternalAsync(
             UserContext context)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            if (_countRequested)
-                return await RuntimeDataService.FetchPageAsync(service, context, request);
-            var result = await service.QueryAsync(request);
-            return new SmartList<Record>(result.Rows) { Facets = result.Facets };
+            SmartList<Record> result;
+            if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
+            else {
+                var rows = await service.QueryAsync(request);
+                result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var entities = new SmartList<Generated.Models.Customer>() {
+                TotalCount = result.TotalCount, Aggregations = result.Aggregations,
+                Summary = result.Summary, Facets = result.Facets
+            };
+            foreach (var row in result)
+                entities.Add(Generated.Models.Customer.FromRecord(row, new EntityRoot()));
+            global::TeaQL.Runtime.EntityQueryProperties.CaptureList(entities, request.Query);
+            return entities;
         }
 
         private IAsyncEnumerable<Generated.Models.Customer> ExecuteForStreamInternalAsync(
@@ -741,7 +754,8 @@ namespace Generated.Requests
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
             return RuntimeDataService.StreamEntities(context, request,
-                row => Generated.Models.Customer.FromRecord(row, new EntityRoot()),
+                row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
+                    Generated.Models.Customer.FromRecord(row, new EntityRoot()), request.Query),
                 chunkSize, cancellationToken);
         }
 
@@ -755,16 +769,16 @@ namespace Generated.Requests
     public sealed class ExecutableCustomerRequest
     {
         private readonly Func<UserContext, Task<QueryResult>> _executeForRows;
-        private readonly Func<UserContext, Task<QueryResult>> _executeForOne;
-        private readonly Func<UserContext, Task<SmartList<Record>>> _executeForList;
+        private readonly Func<UserContext, Task<Generated.Models.Customer?>> _executeForOne;
+        private readonly Func<UserContext, Task<SmartList<Generated.Models.Customer>>> _executeForList;
         private readonly Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.Customer>> _executeForStream;
         private readonly Action<string> _comment;
         private readonly Action _ensureIntent;
 
         internal ExecutableCustomerRequest(
             Func<UserContext, Task<QueryResult>> executeForRows,
-            Func<UserContext, Task<QueryResult>> executeForOne,
-            Func<UserContext, Task<SmartList<Record>>> executeForList,
+            Func<UserContext, Task<Generated.Models.Customer?>> executeForOne,
+            Func<UserContext, Task<SmartList<Generated.Models.Customer>>> executeForList,
             Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.Customer>> executeForStream,
             Action<string> comment,
             Action ensureIntent)
@@ -792,18 +806,8 @@ namespace Generated.Requests
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 
-        public async Task<SmartList<Generated.Models.Customer>> ExecuteForListAsync(UserContext context)
-        {
-            var result = await _executeForList(context);
-            var entities = new SmartList<Generated.Models.Customer>() {
-                TotalCount = result.TotalCount, Aggregations = result.Aggregations,
-                Summary = result.Summary, Facets = result.Facets
-            };
-            foreach (var row in result)
-                entities.Add(Generated.Models.Customer.FromRecord(row, new EntityRoot()));
-            entities.Facets = result.Facets;
-            return entities;
-        }
+        public Task<SmartList<Generated.Models.Customer>> ExecuteForListAsync(UserContext context)
+            => _executeForList(context);
 
         public IAsyncEnumerable<Generated.Models.Customer> ExecuteForStreamAsync(
             UserContext context,
@@ -811,14 +815,9 @@ namespace Generated.Requests
             CancellationToken cancellationToken = default)
             => _executeForStream(context, chunkSize, cancellationToken);
 
-        public async Task<Generated.Models.Customer?> ExecuteForOneAsync(
+        public Task<Generated.Models.Customer?> ExecuteForOneAsync(
             UserContext context)
-        {
-            var result = await _executeForOne(context);
-            if (result.Rows.Count == 0) return null;
-            return Generated.Models.Customer.FromRecord(
-                result.Rows[0], new EntityRoot());
-        }
+            => _executeForOne(context);
     }
 
 }

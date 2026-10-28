@@ -223,7 +223,12 @@ namespace Generated
             var path = _path.Member("platform", "Platform");
             if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new PlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("PlatformEntity"))
+            if (!_value.IsLoaded("Platform"))
+                return new PlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
+            if (_value.Platform is null) return new PlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("PlatformEntity") || _value.PlatformEntity is null
+                || _value.PlatformEntity.Id != _value.Platform)
                 return new PlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new PlatformExpression(_value.PlatformEntity, _root, path);
@@ -311,7 +316,12 @@ namespace Generated
             var path = _path.Member("platform", "Platform");
             if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new PlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("PlatformEntity"))
+            if (!_value.IsLoaded("Platform"))
+                return new PlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
+            if (_value.Platform is null) return new PlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("PlatformEntity") || _value.PlatformEntity is null
+                || _value.PlatformEntity.Id != _value.Platform)
                 return new PlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new PlatformExpression(_value.PlatformEntity, _root, path);
@@ -429,7 +439,12 @@ namespace Generated
             var path = _path.Member("customer", "Customer");
             if (_notLoaded != null) return new CustomerExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CustomerExpression(null, _root, path);
-            if (!_value.IsLoaded("CustomerEntity"))
+            if (!_value.IsLoaded("Customer"))
+                return new CustomerExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer"));
+            if (_value.Customer is null) return new CustomerExpression(null, _root, path);
+            if (!_value.IsLoaded("CustomerEntity") || _value.CustomerEntity is null
+                || _value.CustomerEntity.Id != _value.Customer)
                 return new CustomerExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "customer"));
             return new CustomerExpression(_value.CustomerEntity, _root, path);
@@ -440,7 +455,12 @@ namespace Generated
             var path = _path.Member("status", "Status");
             if (_notLoaded != null) return new OrderStatusExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new OrderStatusExpression(null, _root, path);
-            if (!_value.IsLoaded("StatusEntity"))
+            if (!_value.IsLoaded("Status"))
+                return new OrderStatusExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "status"));
+            if (_value.Status is null) return new OrderStatusExpression(null, _root, path);
+            if (!_value.IsLoaded("StatusEntity") || _value.StatusEntity is null
+                || _value.StatusEntity.Id != _value.Status)
                 return new OrderStatusExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "status"));
             return new OrderStatusExpression(_value.StatusEntity, _root, path);
@@ -548,7 +568,12 @@ namespace Generated
             var path = _path.Member("customer_order", "CustomerOrder");
             if (_notLoaded != null) return new CustomerOrderExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CustomerOrderExpression(null, _root, path);
-            if (!_value.IsLoaded("CustomerOrderEntity"))
+            if (!_value.IsLoaded("CustomerOrder"))
+                return new CustomerOrderExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer_order"));
+            if (_value.CustomerOrder is null) return new CustomerOrderExpression(null, _root, path);
+            if (!_value.IsLoaded("CustomerOrderEntity") || _value.CustomerOrderEntity is null
+                || _value.CustomerOrderEntity.Id != _value.CustomerOrder)
                 return new CustomerOrderExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "customer_order"));
             return new CustomerOrderExpression(_value.CustomerOrderEntity, _root, path);

@@ -92,7 +92,13 @@ public static class GeneratedRuntimeModule
     {
        ["Platform"] = "platform_data",
        ["WorkItem"] = "work_item_data"
-    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("WorkItem", ["id", "title", "description", "platform", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["title"] = ["title"], ["description"] = ["description"], ["platform"] = ["platform"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }, integer32Fields: new Dictionary<string, IReadOnlyList<string>>
+    {
+       ["Platform"] = new List<string> {
+        },
+       ["WorkItem"] = new List<string> {
+        }
+    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("WorkItem", ["id", "title", "description", "platform", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["title"] = ["title"], ["description"] = ["description"], ["platform"] = ["platform"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

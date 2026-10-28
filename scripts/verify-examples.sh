@@ -27,6 +27,7 @@ export MSBUILDDISABLENODEREUSE=1
 export UseSharedCompilation=false
 node "$repo/examples/fix-e-alignment/verify-local.cjs"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify.sh"
+TEAQL_EMPTY_EVIDENCE_DIR="$inventory_evidence/empty-aggregates" TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify-empty.sh"
 bash "$repo/examples/object-storage/verify.sh"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/conformance/runtime-example-conformance-service-console.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/business-id/business-id.csproj"

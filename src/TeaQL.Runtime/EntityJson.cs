@@ -14,6 +14,7 @@ public interface IEntityJsonDocument
 {
     EntityJsonSchema EntityJsonSchema { get; }
     IEnumerable<KeyValuePair<string, object?>> LoadedJsonFields();
+    DynamicPropertySnapshot QueryProperties => DynamicPropertySnapshot.Empty;
 }
 
 public enum EntityJsonKind
@@ -111,6 +112,16 @@ public sealed class EntityJsonSchema
         return actual;
     }
 
+    internal bool IsReservedQueryAlias(string alias) => _byKey.ContainsKey(alias)
+        || Fields.Any(field => field.CanonicalName == alias) || _names.Values.Any(names => names.ContainsKey(alias));
+
+    internal EntityJsonField? QueryField(string name)
+    {
+        if (_byKey.TryGetValue(name, out var field)) return field;
+        foreach (var names in _names.Values) if (names.TryGetValue(name, out field)) return field;
+        return null;
+    }
+
     private void WriteEntity(Utf8JsonWriter writer, IEntityJsonDocument entity, JsonFieldNamingProfile profile,
         ObjectLocation location, string pointer, HashSet<IEntityJsonDocument> active, int depth, int maxBytes)
     {
@@ -131,9 +142,59 @@ public sealed class EntityJsonSchema
                 WriteValue(writer, field, value, profile, childLocation, childPointer, active, depth + 1, maxBytes);
                 if (writer.BytesCommitted + writer.BytesPending > maxBytes) throw Error(childLocation, childPointer, "WIRE_JSON_LIMIT", "JSON byte limit exceeded");
             }
+            foreach (var (alias, value) in EntityQueryProperties.SelectedValues(entity))
+            {
+                var child = location.PropertyAt(alias); var childPointer = Pointer(pointer, alias);
+                if (IsReservedQueryAlias(alias)) throw Error(child, childPointer, "WIRE_QUERY_PROPERTY_COLLISION");
+                Utf8Bytes(alias, child, childPointer); writer.WritePropertyName(alias);
+                WriteQueryValue(writer, value, child, childPointer, maxBytes);
+            }
             writer.WriteEndObject();
         }
         finally { active.Remove(entity); }
+    }
+
+    private void WriteQueryValue(Utf8JsonWriter writer, Value value, ObjectLocation location, string pointer, int maxBytes)
+    {
+        if (writer.CurrentDepth >= MaxDepth && value is Value.ListValue or Value.ObjectValue)
+            throw Error(location, pointer, "WIRE_JSON_LIMIT");
+        switch (value)
+        {
+            case Value.NullValue: case Value.TypedNullValue: writer.WriteNullValue(); break;
+            case Value.BoolValue item: writer.WriteBooleanValue(item.Value); break;
+            case Value.I64Value item: writer.WriteNumberValue(item.Value); break;
+            case Value.U64Value item: writer.WriteNumberValue(item.Value); break;
+            case Value.F64Value item when double.IsFinite(item.Value): writer.WriteNumberValue(item.Value); break;
+            case Value.DecimalValue item: writer.WriteStringValue(item.Value.ToString(Invariant)); break;
+            case Value.TextValue item:
+                if (Utf8Bytes(item.Value, location, pointer) > maxBytes) throw Error(location, pointer, "WIRE_JSON_LIMIT");
+                writer.WriteStringValue(item.Value); break;
+            case Value.DateValue item when item.Value.TimeOfDay == TimeSpan.Zero:
+                writer.WriteStringValue(item.Value.ToString("yyyy-MM-dd", Invariant)); break;
+            case Value.TimestampValue item:
+                try { writer.WriteStringValue(DateTimeOffset.FromUnixTimeMilliseconds(item.Milliseconds).UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", Invariant)); }
+                catch (ArgumentOutOfRangeException) { throw Error(location, pointer, "WIRE_TEMPORAL_PRECISION"); }
+                break;
+            case Value.DateTimeValue item when item.Value.Kind == DateTimeKind.Utc && item.Value.Ticks % TimeSpan.TicksPerMillisecond == 0:
+                writer.WriteStringValue(item.Value.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", Invariant)); break;
+            case Value.TimeValue item when item.Value >= TimeSpan.Zero && item.Value < TimeSpan.FromDays(1):
+                writer.WriteStringValue(item.Value.ToString(@"hh\:mm\:ss\.fffffff", Invariant).TrimEnd('0').TrimEnd('.')); break;
+            case Value.ListValue item:
+                writer.WriteStartArray(); var index = 0;
+                foreach (var child in item.Values) { WriteQueryValue(writer, child, location.Index(index), Pointer(pointer, index), maxBytes); index++; }
+                writer.WriteEndArray(); break;
+            case Value.ObjectValue item:
+                writer.WriteStartObject();
+                foreach (var (key, child) in item.Value)
+                {
+                    if (Utf8Bytes(key, location, pointer) > maxBytes) throw Error(location, pointer, "WIRE_JSON_LIMIT");
+                    writer.WritePropertyName(key);
+                    WriteQueryValue(writer, child, location.PropertyAt(key), Pointer(pointer, key), maxBytes);
+                }
+                writer.WriteEndObject(); break;
+            default: throw Error(location, pointer, "WIRE_INVALID_TYPE", "Unsupported query-property value");
+        }
+        if (writer.BytesCommitted + writer.BytesPending > maxBytes) throw Error(location, pointer, "WIRE_JSON_LIMIT", "JSON byte limit exceeded");
     }
 
     private void WriteValue(Utf8JsonWriter writer, EntityJsonField field, object? value, JsonFieldNamingProfile profile,

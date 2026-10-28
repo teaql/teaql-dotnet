@@ -147,3 +147,31 @@ distinguish no-ops from genuine writes; independent readonly SQLite queries
 verify the final rows. Signed-zero intent is not a claim about SQLite retaining
 the sign bit. This example does not qualify persistent dynamic fields, external
 transaction ownership or installed NuGet artifacts.
+
+## Empty aggregates and selected query properties
+
+Run `bash examples/scalar-type-probe/verify-empty.sh` from the repository root.
+It uses the same evaluated scalar model and the local runtime, seeds exclusively
+through generated audited mutation APIs, and executes two rounds on one fresh
+SQLite file. The shared `empty-aggregate-vectors.json` covers COUNT, nullable
+SUM, genuine zero, empty groups, explicit fallback and complete-membership
+facets behind a one-row page. Generated Q/E and typed entity JSON are exercised.
+
+Each round records thirty request/result cases and forty-six actual SELECT
+attempts. Ordinary logging is tested both on and off; local runtime telemetry
+still records masked SQL diagnostics and business lineage in both modes.
+Test-only savepoint/drop/rollback DDL makes the generated query encounter a real
+missing-table SQLite error, restores the table, and verifies an independent
+request succeeds. Those fault-injection statements are not application queries
+or a replacement for generated mutation/query APIs.
+
+Only selected query aliases are included in typed JSON. Private unknown values
+stay private; query properties do not become loaded model fields, writable JSON
+input or mutation changes. The runtime owns immutable output views and validates
+the complete selected graph before replacing any view. No Context or implicit
+database access is involved in property capture or serialization.
+
+`TEAQL_EMPTY_EVIDENCE_DIR` selects a new compact evidence directory; an existing
+`TEAQL_EMPTY_DB` is refused by the script. Build outputs are removed on exit;
+reports, raw observations and SQLite data remain available for inspection.
+Installed-package qualification is a separate gate.

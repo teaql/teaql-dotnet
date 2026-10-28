@@ -238,7 +238,21 @@ public static class GeneratedRuntimeModule
        ["Customer"] = "customer_data",
        ["CustomerOrder"] = "customer_order_data",
        ["OrderItem"] = "order_item_data"
-    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderStatus", ["platform", "id", "name", "code", "color", "display_order", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["color"] = ["color"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Customer", ["id", "platform", "name", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("CustomerOrder", ["id", "customer", "status", "order_number", "order_date", "total_amount", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer"] = ["customer"], ["status"] = ["status"], ["order_number"] = ["order_number"], ["order_date"] = ["order_date"], ["total_amount"] = ["total_amount"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "customer_order", "product_name", "quantity", "unit_price", "version"], aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["product_name"] = ["product_name"], ["quantity"] = ["quantity"], ["unit_price"] = ["unit_price"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }, integer32Fields: new Dictionary<string, IReadOnlyList<string>>
+    {
+       ["Platform"] = new List<string> {
+        },
+       ["OrderStatus"] = new List<string> {
+        },
+       ["Customer"] = new List<string> {
+        },
+       ["CustomerOrder"] = new List<string> {
+        },
+       ["OrderItem"] = new List<string> {
+            "quantity",
+
+        }
+    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderStatus", ["platform", "id", "name", "code", "color", "display_order", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["color"] = ["color"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Customer", ["id", "platform", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("CustomerOrder", ["id", "customer", "status", "order_number", "order_date", "total_amount", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer"] = ["customer"], ["status"] = ["status"], ["order_number"] = ["order_number"], ["order_date"] = ["order_date"], ["total_amount"] = ["total_amount"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "customer_order", "product_name", "quantity", "unit_price", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["product_name"] = ["product_name"], ["quantity"] = ["quantity"], ["unit_price"] = ["unit_price"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

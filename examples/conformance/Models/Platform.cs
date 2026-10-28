@@ -7,8 +7,40 @@ using TeaQL.Core;
 namespace Generated.Models
 {
 
-    public class Platform
+    public class Platform : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("Platform", new global::TeaQL.Runtime.EntityJsonField[] {
+            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
+            new global::TeaQL.Runtime.EntityJsonField("name", global::TeaQL.Runtime.EntityJsonKind.Text, "name"),
+            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField("work_item_list", global::TeaQL.Runtime.EntityJsonKind.Many, "WorkItemList", () => global::Generated.Models.WorkItem._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+
+        global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
+        DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
+
+        public string ToJson(global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) => _teaqlJsonSchema.Serialize(this, profile);
+
+        public static Platform FromJson(string payload, global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) =>
+            FromRecord(_teaqlJsonSchema.Parse(payload, profile));
+
+        IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
+        {
+            if (IsLoaded("Id"))
+            {
+                yield return new KeyValuePair<string, object?>("id", Id);
+            }
+            if (IsLoaded("Name"))
+            {
+                yield return new KeyValuePair<string, object?>("name", Name);
+            }
+            if (IsLoaded("Version"))
+            {
+                yield return new KeyValuePair<string, object?>("version", Version);
+            }
+            if (IsLoaded("WorkItemList"))
+                yield return new KeyValuePair<string, object?>("WorkItemList", WorkItemList);
+        }
+
         public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
@@ -153,7 +185,7 @@ namespace Generated.Models
             return entity;
         }
 
-        public async Task<Platform> SaveAsync(UserContext context)
+        public async global::System.Threading.Tasks.Task<Platform> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
@@ -163,7 +195,8 @@ namespace Generated.Models
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
-                await Task.CompletedTask;
+                graph.SealPreparedGraph();
+                await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
                 await TeaqlReserveGraphIdentitiesAsync(graph);
@@ -174,6 +207,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            graph.DiscardRestoredFields("Platform", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
             if (changed)
@@ -228,7 +262,7 @@ namespace Generated.Models
             }
         }
 
-        internal async Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
@@ -271,10 +305,10 @@ namespace Generated.Models
             }
             }
             foreach (var child in WorkItemList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
-        internal async Task<Platform> TeaqlSaveWithinGraphAsync(UserContext context,
+        internal async global::System.Threading.Tasks.Task<Platform> TeaqlSaveWithinGraphAsync(UserContext context,
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
             var creating = !this.Id.HasValue || _teaqlForceCreate;
@@ -304,7 +338,7 @@ namespace Generated.Models
             return saved;
         }
 
-        private async Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
+        private async global::System.Threading.Tasks.Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
         {
             for (var index = 0; index < WorkItemList.Count; index++)
             {
@@ -319,7 +353,7 @@ namespace Generated.Models
                         new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
                 }
             }
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
         private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
@@ -333,13 +367,10 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
-
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
-
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
-
-            return new LoadedScalarSnapshot(record);
+                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
+                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
+                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
         }
 
         public InsertCommand ToInsertCommand()

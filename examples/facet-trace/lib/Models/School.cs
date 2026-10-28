@@ -7,8 +7,81 @@ using TeaQL.Core;
 namespace Generated.Models
 {
 
-    public class School
+    public class School : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("School", new global::TeaQL.Runtime.EntityJsonField[] {
+            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
+            new global::TeaQL.Runtime.EntityJsonField("platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "platform", () => global::Generated.Models.Platform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("school_type", global::TeaQL.Runtime.EntityJsonKind.Reference, "school_type", () => global::Generated.Models.SchoolType._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("name", global::TeaQL.Runtime.EntityJsonKind.Text, "name"),
+            new global::TeaQL.Runtime.EntityJsonField("address", global::TeaQL.Runtime.EntityJsonKind.Text, "address"),
+            new global::TeaQL.Runtime.EntityJsonField("established_date", global::TeaQL.Runtime.EntityJsonKind.Date, "established_date"),
+            new global::TeaQL.Runtime.EntityJsonField("student_capacity", global::TeaQL.Runtime.EntityJsonKind.Integer, "student_capacity"),
+            new global::TeaQL.Runtime.EntityJsonField("active", global::TeaQL.Runtime.EntityJsonKind.Boolean, "active"),
+            new global::TeaQL.Runtime.EntityJsonField("create_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "create_time"),
+            new global::TeaQL.Runtime.EntityJsonField("update_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "update_time"),
+            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+
+        global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
+        DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
+
+        public string ToJson(global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) => _teaqlJsonSchema.Serialize(this, profile);
+
+        public static School FromJson(string payload, global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) =>
+            FromRecord(_teaqlJsonSchema.Parse(payload, profile));
+
+        IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
+        {
+            if (IsLoaded("Id"))
+            {
+                yield return new KeyValuePair<string, object?>("id", Id);
+            }
+            if (IsLoaded("Platform"))
+            {
+                object? jsonPlatform = IsLoaded("PlatformEntity") && PlatformEntity != null && PlatformEntity.Id == Platform
+                    ? PlatformEntity : Platform;
+                yield return new KeyValuePair<string, object?>("platform", jsonPlatform);
+            }
+            if (IsLoaded("SchoolType"))
+            {
+                object? jsonSchoolType = IsLoaded("SchoolTypeEntity") && SchoolTypeEntity != null && SchoolTypeEntity.Id == SchoolType
+                    ? SchoolTypeEntity : SchoolType;
+                yield return new KeyValuePair<string, object?>("school_type", jsonSchoolType);
+            }
+            if (IsLoaded("Name"))
+            {
+                yield return new KeyValuePair<string, object?>("name", Name);
+            }
+            if (IsLoaded("Address"))
+            {
+                yield return new KeyValuePair<string, object?>("address", Address);
+            }
+            if (IsLoaded("EstablishedDate"))
+            {
+                yield return new KeyValuePair<string, object?>("established_date", EstablishedDate);
+            }
+            if (IsLoaded("StudentCapacity"))
+            {
+                yield return new KeyValuePair<string, object?>("student_capacity", StudentCapacity);
+            }
+            if (IsLoaded("Active"))
+            {
+                yield return new KeyValuePair<string, object?>("active", Active);
+            }
+            if (IsLoaded("CreateTime"))
+            {
+                yield return new KeyValuePair<string, object?>("create_time", CreateTime);
+            }
+            if (IsLoaded("UpdateTime"))
+            {
+                yield return new KeyValuePair<string, object?>("update_time", UpdateTime);
+            }
+            if (IsLoaded("Version"))
+            {
+                yield return new KeyValuePair<string, object?>("version", Version);
+            }
+        }
+
         public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
@@ -138,6 +211,8 @@ namespace Generated.Models
                                 break;
                             }
                         }
+                        else if (platformValue.Raw == null)
+                            entity.MarkLoaded("PlatformEntity");
                         else if (platformValue.Raw != null)
                             entity.Platform = Convert.ToInt64(platformValue.Raw);
                     }
@@ -161,6 +236,8 @@ namespace Generated.Models
                                 break;
                             }
                         }
+                        else if (schoolTypeValue.Raw == null)
+                            entity.MarkLoaded("SchoolTypeEntity");
                         else if (schoolTypeValue.Raw != null)
                             entity.SchoolType = Convert.ToInt64(schoolTypeValue.Raw);
                     }
@@ -230,7 +307,7 @@ namespace Generated.Models
             return entity;
         }
 
-        public async Task<School> SaveAsync(UserContext context)
+        public async global::System.Threading.Tasks.Task<School> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
@@ -240,7 +317,8 @@ namespace Generated.Models
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
-                await Task.CompletedTask;
+                graph.SealPreparedGraph();
+                await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
                 await TeaqlReserveGraphIdentitiesAsync(graph);
@@ -251,6 +329,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            graph.DiscardRestoredFields("School", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
             if (changed)
@@ -298,7 +377,7 @@ namespace Generated.Models
                 graph.PreflightPrepared(this);
         }
 
-        internal async Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
@@ -356,10 +435,10 @@ namespace Generated.Models
                 _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
             }
             }
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
-        internal async Task<School> TeaqlSaveWithinGraphAsync(UserContext context,
+        internal async global::System.Threading.Tasks.Task<School> TeaqlSaveWithinGraphAsync(UserContext context,
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
             var creating = !this.Id.HasValue || _teaqlForceCreate;
@@ -397,9 +476,9 @@ namespace Generated.Models
             return saved;
         }
 
-        private async Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
+        private async global::System.Threading.Tasks.Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
         {
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
         private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
@@ -413,25 +492,18 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
-
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
-
-                    if (Address != null) record["address"] = new Value.TextValue(Address);
-
-                    if (EstablishedDate.HasValue) record["established_date"] = new Value.DateValue(EstablishedDate.Value);
-
-                    if (StudentCapacity.HasValue) record["student_capacity"] = new Value.I64Value(StudentCapacity.Value);
-
-                    if (Active.HasValue) record["active"] = new Value.BoolValue(Active.Value);
-
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
-
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
-
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
-
-            return new LoadedScalarSnapshot(record);
+                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
+                        if (IsLoaded("Platform")) record["platform"] = TeaqlValue(Platform);
+                        if (IsLoaded("SchoolType")) record["school_type"] = TeaqlValue(SchoolType);
+                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
+                        if (IsLoaded("Address")) record["address"] = TeaqlValue(Address);
+                        if (IsLoaded("EstablishedDate")) record["established_date"] = TeaqlValue(EstablishedDate);
+                        if (IsLoaded("StudentCapacity")) record["student_capacity"] = TeaqlValue(StudentCapacity);
+                        if (IsLoaded("Active")) record["active"] = TeaqlValue(Active);
+                        if (IsLoaded("CreateTime")) record["create_time"] = TeaqlValue(CreateTime);
+                        if (IsLoaded("UpdateTime")) record["update_time"] = TeaqlValue(UpdateTime);
+                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
         }
 
         public InsertCommand ToInsertCommand()
@@ -519,6 +591,7 @@ namespace Generated.Models
 
                 public School UpdatePlatform(long? value)
                 {
+                    if (this.Platform != value) this.PlatformEntity = null;
                     this.Platform = value;
                     MarkLoaded("Platform");
                     _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
@@ -527,6 +600,7 @@ namespace Generated.Models
 
                 public School UpdateSchoolType(long? value)
                 {
+                    if (this.SchoolType != value) this.SchoolTypeEntity = null;
                     this.SchoolType = value;
                     MarkLoaded("SchoolType");
                     _entityRoot.Set(TeaqlEntityKey(), "school_type", TeaqlValue(value));
@@ -598,52 +672,38 @@ namespace Generated.Models
                 }
                 public School UpdatePlatform(Platform value)
                 {
-                    this.Platform = value?.Id;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(this.Platform));
+                    UpdatePlatform(value?.Id);
+                    this.PlatformEntity = value;
                     return this;
                 }
 
 
                 public School UpdatePlatformId(long? value)
                 {
-                    this.Platform = value;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
-                    return this;
+                    return UpdatePlatform(value);
                 }
 
 
                 public School UpdateSchoolType(SchoolType value)
                 {
-                    this.SchoolType = value?.Id;
-                    MarkLoaded("SchoolType");
-                    _entityRoot.Set(TeaqlEntityKey(), "school_type", TeaqlValue(this.SchoolType));
+                    UpdateSchoolType(value?.Id);
+                    this.SchoolTypeEntity = value;
                     return this;
                 }
 
 
                 public School UpdateSchoolTypeId(long? value)
                 {
-                    this.SchoolType = value;
-                    MarkLoaded("SchoolType");
-                    _entityRoot.Set(TeaqlEntityKey(), "school_type", TeaqlValue(value));
-                    return this;
+                    return UpdateSchoolType(value);
                 }
                 public School UpdateSchoolTypeToPrimary()
                 {
-                    this.SchoolType = 1001;
-                    MarkLoaded("SchoolType");
-                    _entityRoot.Set(TeaqlEntityKey(), "school_type", TeaqlValue(this.SchoolType));
-                    return this;
+                    return UpdateSchoolType(1001);
                 }
 
                 public School UpdateSchoolTypeToSecondary()
                 {
-                    this.SchoolType = 1002;
-                    MarkLoaded("SchoolType");
-                    _entityRoot.Set(TeaqlEntityKey(), "school_type", TeaqlValue(this.SchoolType));
-                    return this;
+                    return UpdateSchoolType(1002);
                 }
 
 

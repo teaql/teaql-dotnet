@@ -7,8 +7,54 @@ using TeaQL.Core;
 namespace Generated.Models
 {
 
-    public class OrderItem
+    public class OrderItem : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("OrderItem", new global::TeaQL.Runtime.EntityJsonField[] {
+            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
+            new global::TeaQL.Runtime.EntityJsonField("customer_order", global::TeaQL.Runtime.EntityJsonKind.Reference, "customer_order", () => global::Generated.Models.CustomerOrder._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("product_name", global::TeaQL.Runtime.EntityJsonKind.Text, "product_name"),
+            new global::TeaQL.Runtime.EntityJsonField("quantity", global::TeaQL.Runtime.EntityJsonKind.Integer, "quantity"),
+            new global::TeaQL.Runtime.EntityJsonField("unit_price", global::TeaQL.Runtime.EntityJsonKind.Decimal, "unit_price"),
+            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+
+        global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
+        DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
+
+        public string ToJson(global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) => _teaqlJsonSchema.Serialize(this, profile);
+
+        public static OrderItem FromJson(string payload, global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) =>
+            FromRecord(_teaqlJsonSchema.Parse(payload, profile));
+
+        IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
+        {
+            if (IsLoaded("Id"))
+            {
+                yield return new KeyValuePair<string, object?>("id", Id);
+            }
+            if (IsLoaded("CustomerOrder"))
+            {
+                object? jsonCustomerOrder = IsLoaded("CustomerOrderEntity") && CustomerOrderEntity != null && CustomerOrderEntity.Id == CustomerOrder
+                    ? CustomerOrderEntity : CustomerOrder;
+                yield return new KeyValuePair<string, object?>("customer_order", jsonCustomerOrder);
+            }
+            if (IsLoaded("ProductName"))
+            {
+                yield return new KeyValuePair<string, object?>("product_name", ProductName);
+            }
+            if (IsLoaded("Quantity"))
+            {
+                yield return new KeyValuePair<string, object?>("quantity", Quantity);
+            }
+            if (IsLoaded("UnitPrice"))
+            {
+                yield return new KeyValuePair<string, object?>("unit_price", UnitPrice);
+            }
+            if (IsLoaded("Version"))
+            {
+                yield return new KeyValuePair<string, object?>("version", Version);
+            }
+        }
+
         public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
@@ -132,6 +178,8 @@ namespace Generated.Models
                                 break;
                             }
                         }
+                        else if (customerOrderValue.Raw == null)
+                            entity.MarkLoaded("CustomerOrderEntity");
                         else if (customerOrderValue.Raw != null)
                             entity.CustomerOrder = Convert.ToInt64(customerOrderValue.Raw);
                     }
@@ -177,7 +225,7 @@ namespace Generated.Models
             return entity;
         }
 
-        public async Task<OrderItem> SaveAsync(UserContext context)
+        public async global::System.Threading.Tasks.Task<OrderItem> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
@@ -187,7 +235,8 @@ namespace Generated.Models
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
-                await Task.CompletedTask;
+                graph.SealPreparedGraph();
+                await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
                 await TeaqlReserveGraphIdentitiesAsync(graph);
@@ -198,6 +247,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            graph.DiscardRestoredFields("OrderItem", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
             if (changed)
@@ -235,7 +285,7 @@ namespace Generated.Models
                 graph.PreflightPrepared(this);
         }
 
-        internal async Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
@@ -283,10 +333,10 @@ namespace Generated.Models
                 _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
             }
             }
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
-        internal async Task<OrderItem> TeaqlSaveWithinGraphAsync(UserContext context,
+        internal async global::System.Threading.Tasks.Task<OrderItem> TeaqlSaveWithinGraphAsync(UserContext context,
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
             var creating = !this.Id.HasValue || _teaqlForceCreate;
@@ -319,9 +369,9 @@ namespace Generated.Models
             return saved;
         }
 
-        private async Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
+        private async global::System.Threading.Tasks.Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
         {
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
         private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
@@ -335,17 +385,13 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
-
-                    if (ProductName != null) record["product_name"] = new Value.TextValue(ProductName);
-
-                    if (Quantity.HasValue) record["quantity"] = new Value.I64Value(Quantity.Value);
-
-                    if (UnitPrice.HasValue) record["unit_price"] = new Value.DecimalValue(UnitPrice.Value);
-
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
-
-            return new LoadedScalarSnapshot(record);
+                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
+                        if (IsLoaded("CustomerOrder")) record["customer_order"] = TeaqlValue(CustomerOrder);
+                        if (IsLoaded("ProductName")) record["product_name"] = TeaqlValue(ProductName);
+                        if (IsLoaded("Quantity")) record["quantity"] = TeaqlValue(Quantity);
+                        if (IsLoaded("UnitPrice")) record["unit_price"] = TeaqlValue(UnitPrice);
+                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
         }
 
         public InsertCommand ToInsertCommand()
@@ -413,6 +459,7 @@ namespace Generated.Models
 
                 public OrderItem UpdateCustomerOrder(long? value)
                 {
+                    if (this.CustomerOrder != value) this.CustomerOrderEntity = null;
                     this.CustomerOrder = value;
                     MarkLoaded("CustomerOrder");
                     _entityRoot.Set(TeaqlEntityKey(), "customer_order", TeaqlValue(value));
@@ -452,19 +499,15 @@ namespace Generated.Models
                 }
                 public OrderItem UpdateCustomerOrder(CustomerOrder value)
                 {
-                    this.CustomerOrder = value?.Id;
-                    MarkLoaded("CustomerOrder");
-                    _entityRoot.Set(TeaqlEntityKey(), "customer_order", TeaqlValue(this.CustomerOrder));
+                    UpdateCustomerOrder(value?.Id);
+                    this.CustomerOrderEntity = value;
                     return this;
                 }
 
 
                 public OrderItem UpdateCustomerOrderId(long? value)
                 {
-                    this.CustomerOrder = value;
-                    MarkLoaded("CustomerOrder");
-                    _entityRoot.Set(TeaqlEntityKey(), "customer_order", TeaqlValue(value));
-                    return this;
+                    return UpdateCustomerOrder(value);
                 }
 
     }

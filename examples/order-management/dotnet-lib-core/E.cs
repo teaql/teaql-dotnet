@@ -287,7 +287,12 @@ namespace Generated
             var path = _path.Member("commerce_platform", "CommercePlatform");
             if (_notLoaded != null) return new CommercePlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CommercePlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("CommercePlatformEntity"))
+            if (!_value.IsLoaded("CommercePlatform"))
+                return new CommercePlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
+            if (_value.CommercePlatform is null) return new CommercePlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("CommercePlatformEntity") || _value.CommercePlatformEntity is null
+                || _value.CommercePlatformEntity.Id != _value.CommercePlatform)
                 return new CommercePlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
             return new CommercePlatformExpression(_value.CommercePlatformEntity, _root, path);
@@ -405,7 +410,12 @@ namespace Generated
             var path = _path.Member("commerce_platform", "CommercePlatform");
             if (_notLoaded != null) return new CommercePlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CommercePlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("CommercePlatformEntity"))
+            if (!_value.IsLoaded("CommercePlatform"))
+                return new CommercePlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
+            if (_value.CommercePlatform is null) return new CommercePlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("CommercePlatformEntity") || _value.CommercePlatformEntity is null
+                || _value.CommercePlatformEntity.Id != _value.CommercePlatform)
                 return new CommercePlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
             return new CommercePlatformExpression(_value.CommercePlatformEntity, _root, path);
@@ -553,7 +563,12 @@ namespace Generated
             var path = _path.Member("status", "Status");
             if (_notLoaded != null) return new OrderStatusExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new OrderStatusExpression(null, _root, path);
-            if (!_value.IsLoaded("StatusEntity"))
+            if (!_value.IsLoaded("Status"))
+                return new OrderStatusExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "status"));
+            if (_value.Status is null) return new OrderStatusExpression(null, _root, path);
+            if (!_value.IsLoaded("StatusEntity") || _value.StatusEntity is null
+                || _value.StatusEntity.Id != _value.Status)
                 return new OrderStatusExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "status"));
             return new OrderStatusExpression(_value.StatusEntity, _root, path);
@@ -564,7 +579,12 @@ namespace Generated
             var path = _path.Member("customer", "Customer");
             if (_notLoaded != null) return new CustomerExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CustomerExpression(null, _root, path);
-            if (!_value.IsLoaded("CustomerEntity"))
+            if (!_value.IsLoaded("Customer"))
+                return new CustomerExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer"));
+            if (_value.Customer is null) return new CustomerExpression(null, _root, path);
+            if (!_value.IsLoaded("CustomerEntity") || _value.CustomerEntity is null
+                || _value.CustomerEntity.Id != _value.Customer)
                 return new CustomerExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "customer"));
             return new CustomerExpression(_value.CustomerEntity, _root, path);
@@ -575,7 +595,12 @@ namespace Generated
             var path = _path.Member("commerce_platform", "CommercePlatform");
             if (_notLoaded != null) return new CommercePlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CommercePlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("CommercePlatformEntity"))
+            if (!_value.IsLoaded("CommercePlatform"))
+                return new CommercePlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
+            if (_value.CommercePlatform is null) return new CommercePlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("CommercePlatformEntity") || _value.CommercePlatformEntity is null
+                || _value.CommercePlatformEntity.Id != _value.CommercePlatform)
                 return new CommercePlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
             return new CommercePlatformExpression(_value.CommercePlatformEntity, _root, path);
@@ -703,7 +728,12 @@ namespace Generated
             var path = _path.Member("commerce_platform", "CommercePlatform");
             if (_notLoaded != null) return new CommercePlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CommercePlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("CommercePlatformEntity"))
+            if (!_value.IsLoaded("CommercePlatform"))
+                return new CommercePlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
+            if (_value.CommercePlatform is null) return new CommercePlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("CommercePlatformEntity") || _value.CommercePlatformEntity is null
+                || _value.CommercePlatformEntity.Id != _value.CommercePlatform)
                 return new CommercePlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
             return new CommercePlatformExpression(_value.CommercePlatformEntity, _root, path);
@@ -841,7 +871,12 @@ namespace Generated
             var path = _path.Member("customer_order", "CustomerOrder");
             if (_notLoaded != null) return new CustomerOrderExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CustomerOrderExpression(null, _root, path);
-            if (!_value.IsLoaded("CustomerOrderEntity"))
+            if (!_value.IsLoaded("CustomerOrder"))
+                return new CustomerOrderExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "customer_order"));
+            if (_value.CustomerOrder is null) return new CustomerOrderExpression(null, _root, path);
+            if (!_value.IsLoaded("CustomerOrderEntity") || _value.CustomerOrderEntity is null
+                || _value.CustomerOrderEntity.Id != _value.CustomerOrder)
                 return new CustomerOrderExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "customer_order"));
             return new CustomerOrderExpression(_value.CustomerOrderEntity, _root, path);
@@ -852,7 +887,12 @@ namespace Generated
             var path = _path.Member("product", "Product");
             if (_notLoaded != null) return new ProductExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new ProductExpression(null, _root, path);
-            if (!_value.IsLoaded("ProductEntity"))
+            if (!_value.IsLoaded("Product"))
+                return new ProductExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "product"));
+            if (_value.Product is null) return new ProductExpression(null, _root, path);
+            if (!_value.IsLoaded("ProductEntity") || _value.ProductEntity is null
+                || _value.ProductEntity.Id != _value.Product)
                 return new ProductExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "product"));
             return new ProductExpression(_value.ProductEntity, _root, path);
@@ -863,7 +903,12 @@ namespace Generated
             var path = _path.Member("commerce_platform", "CommercePlatform");
             if (_notLoaded != null) return new CommercePlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CommercePlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("CommercePlatformEntity"))
+            if (!_value.IsLoaded("CommercePlatform"))
+                return new CommercePlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
+            if (_value.CommercePlatform is null) return new CommercePlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("CommercePlatformEntity") || _value.CommercePlatformEntity is null
+                || _value.CommercePlatformEntity.Id != _value.CommercePlatform)
                 return new CommercePlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
             return new CommercePlatformExpression(_value.CommercePlatformEntity, _root, path);
@@ -991,7 +1036,12 @@ namespace Generated
             var path = _path.Member("commerce_platform", "CommercePlatform");
             if (_notLoaded != null) return new CommercePlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new CommercePlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("CommercePlatformEntity"))
+            if (!_value.IsLoaded("CommercePlatform"))
+                return new CommercePlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
+            if (_value.CommercePlatform is null) return new CommercePlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("CommercePlatformEntity") || _value.CommercePlatformEntity is null
+                || _value.CommercePlatformEntity.Id != _value.CommercePlatform)
                 return new CommercePlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "commerce_platform"));
             return new CommercePlatformExpression(_value.CommercePlatformEntity, _root, path);

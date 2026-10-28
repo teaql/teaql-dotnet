@@ -7,8 +7,58 @@ using TeaQL.Core;
 namespace Generated.Models
 {
 
-    public class CustomerOrder
+    public class CustomerOrder : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("CustomerOrder", new global::TeaQL.Runtime.EntityJsonField[] {
+            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
+            new global::TeaQL.Runtime.EntityJsonField("platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "platform", () => global::Generated.Models.Platform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("order_number", global::TeaQL.Runtime.EntityJsonKind.Text, "order_number"),
+            new global::TeaQL.Runtime.EntityJsonField("description", global::TeaQL.Runtime.EntityJsonKind.Text, "description"),
+            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField("order_item_list", global::TeaQL.Runtime.EntityJsonKind.Many, "OrderItemList", () => global::Generated.Models.OrderItem._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("payment_list", global::TeaQL.Runtime.EntityJsonKind.Many, "PaymentList", () => global::Generated.Models.Payment._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField("shipment_list", global::TeaQL.Runtime.EntityJsonKind.Many, "ShipmentList", () => global::Generated.Models.Shipment._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+
+        global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
+        DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
+
+        public string ToJson(global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) => _teaqlJsonSchema.Serialize(this, profile);
+
+        public static CustomerOrder FromJson(string payload, global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) =>
+            FromRecord(_teaqlJsonSchema.Parse(payload, profile));
+
+        IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
+        {
+            if (IsLoaded("Id"))
+            {
+                yield return new KeyValuePair<string, object?>("id", Id);
+            }
+            if (IsLoaded("Platform"))
+            {
+                object? jsonPlatform = IsLoaded("PlatformEntity") && PlatformEntity != null && PlatformEntity.Id == Platform
+                    ? PlatformEntity : Platform;
+                yield return new KeyValuePair<string, object?>("platform", jsonPlatform);
+            }
+            if (IsLoaded("OrderNumber"))
+            {
+                yield return new KeyValuePair<string, object?>("order_number", OrderNumber);
+            }
+            if (IsLoaded("Description"))
+            {
+                yield return new KeyValuePair<string, object?>("description", Description);
+            }
+            if (IsLoaded("Version"))
+            {
+                yield return new KeyValuePair<string, object?>("version", Version);
+            }
+            if (IsLoaded("OrderItemList"))
+                yield return new KeyValuePair<string, object?>("OrderItemList", OrderItemList);
+            if (IsLoaded("PaymentList"))
+                yield return new KeyValuePair<string, object?>("PaymentList", PaymentList);
+            if (IsLoaded("ShipmentList"))
+                yield return new KeyValuePair<string, object?>("ShipmentList", ShipmentList);
+        }
+
         public DynamicPropertySnapshot DynamicProperties { get; private set; } = DynamicPropertySnapshot.Empty;
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
@@ -137,6 +187,8 @@ namespace Generated.Models
                                 break;
                             }
                         }
+                        else if (platformValue.Raw == null)
+                            entity.MarkLoaded("PlatformEntity");
                         else if (platformValue.Raw != null)
                             entity.Platform = Convert.ToInt64(platformValue.Raw);
                     }
@@ -213,7 +265,7 @@ namespace Generated.Models
             return entity;
         }
 
-        public async Task<CustomerOrder> SaveAsync(UserContext context)
+        public async global::System.Threading.Tasks.Task<CustomerOrder> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
@@ -223,7 +275,8 @@ namespace Generated.Models
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
-                await Task.CompletedTask;
+                graph.SealPreparedGraph();
+                await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
                 await TeaqlReserveGraphIdentitiesAsync(graph);
@@ -234,6 +287,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            graph.DiscardRestoredFields("CustomerOrder", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
             if (changed)
@@ -338,7 +392,7 @@ namespace Generated.Models
             }
         }
 
-        internal async Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
             var creating = !Id.HasValue || _teaqlForceCreate;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
@@ -387,10 +441,10 @@ namespace Generated.Models
             foreach (var child in OrderItemList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
             foreach (var child in PaymentList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
             foreach (var child in ShipmentList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
-        internal async Task<CustomerOrder> TeaqlSaveWithinGraphAsync(UserContext context,
+        internal async global::System.Threading.Tasks.Task<CustomerOrder> TeaqlSaveWithinGraphAsync(UserContext context,
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
             var creating = !this.Id.HasValue || _teaqlForceCreate;
@@ -422,7 +476,7 @@ namespace Generated.Models
             return saved;
         }
 
-        private async Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
+        private async global::System.Threading.Tasks.Task TeaqlSaveChildrenAsync(UserContext context, GraphMutationSession graph, MutationTraceScope scope)
         {
             for (var index = 0; index < OrderItemList.Count; index++)
             {
@@ -463,7 +517,7 @@ namespace Generated.Models
                         new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
                 }
             }
-            await Task.CompletedTask;
+            await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
         private MutationRequest TeaqlMutationRequest(object command, string rootComment) => (command switch
@@ -477,15 +531,12 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
-
-                    if (OrderNumber != null) record["order_number"] = new Value.TextValue(OrderNumber);
-
-                    if (Description != null) record["description"] = new Value.TextValue(Description);
-
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
-
-            return new LoadedScalarSnapshot(record);
+                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
+                        if (IsLoaded("Platform")) record["platform"] = TeaqlValue(Platform);
+                        if (IsLoaded("OrderNumber")) record["order_number"] = TeaqlValue(OrderNumber);
+                        if (IsLoaded("Description")) record["description"] = TeaqlValue(Description);
+                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
         }
 
         public InsertCommand ToInsertCommand()
@@ -549,6 +600,7 @@ namespace Generated.Models
 
                 public CustomerOrder UpdatePlatform(long? value)
                 {
+                    if (this.Platform != value) this.PlatformEntity = null;
                     this.Platform = value;
                     MarkLoaded("Platform");
                     _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
@@ -580,19 +632,15 @@ namespace Generated.Models
                 }
                 public CustomerOrder UpdatePlatform(Platform value)
                 {
-                    this.Platform = value?.Id;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(this.Platform));
+                    UpdatePlatform(value?.Id);
+                    this.PlatformEntity = value;
                     return this;
                 }
 
 
                 public CustomerOrder UpdatePlatformId(long? value)
                 {
-                    this.Platform = value;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
-                    return this;
+                    return UpdatePlatform(value);
                 }
 
     }

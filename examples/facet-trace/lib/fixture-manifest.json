@@ -6,10 +6,10 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
   "producerSource": {
-    "commit": "ebef725ccbd00f2b5b7119545810cd953b37a386",
-    "diff": "dee8bda8fd1652e516823fd31b0272adb45f02daa4fab42bd98c6e7c3afb50d8",
-    "status": "dc965bac5d04a212ac1a1d7bcc5c66221e0fb179701e9ab94a76362c90b913bc",
-    "sourceContentsSha256": "262f0d7a9ad38553849172884431f02e1f076cb1b4b9d815bf98fc16312b11c5",
+    "commit": "67a452018063f946719cf2c93a846c46a6d9464c",
+    "diff": "cb743fcd4c9c7e7b8f00fbbc6faf9f404992e3d2c007d8165dadb59320b53cf8",
+    "status": "30b73aab8acf6026efd16fba0e38a5234c1e8af0a01f517e8286902b4c38560b",
+    "sourceContentsSha256": "67f95a92f6f2f342e0cdaa327bcdc1411fa1f9f66a67e88d18a861771c59eeb5",
     "retainedModels": [
       {
         "id": "conformance",
@@ -68,23 +68,23 @@
         "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c"
       }
     ],
-    "exporterProbeSha256": "28ed6118a3440044db8e7bb519ae1628702d625e819fdf5de9a87b416c8d3177"
+    "exporterProbeSha256": "a91a2d427e7ab59515b71fb745777324a7d824df1a5fe30a4c5041f8e1e7dfd5"
   },
-  "producerReceiptSha256": "b3420e354a2e8826a8d760341c05ca6477b6f909a238bcac7d4e916ec057b84c",
-  "generatedManifestSha256": "e9cd8c004b235a0985743ff84d3305a6d27f3df6ec79ad384dda4cd1bc88734e",
+  "producerReceiptSha256": "733c97dc2b7ec3ee609ffabb0af0cc676b375729cd2f5cbc4d440510636ea1c7",
+  "generatedManifestSha256": "d0aff1281dbf34c5963562b469922661acc9951a4f6f484f0ff72fa7dfda8fb1",
   "files": {
     "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97",
-    "E.cs": "15f22daa11ace7ddbedc65523f95a607dddbd1feefb053cfb362dd10d5e1106d",
+    "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
     "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
     "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
     "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "Models/Platform.cs": "a2946a75cf76b757d85ddccc905a37ecda41d70fd62151bc3d2621b3d9720ef2",
-    "Models/SchoolType.cs": "f16b283549bd528c837ce5a655fa73eec53331afea8103494278f6be8d9044c9",
-    "Models/School.cs": "18b267095e0dd1cb69c39e88497cc1ad93d05385a049fe6bac1a1685dbee5877",
-    "GeneratedRuntimeModule.cs": "cb233d0121adc56776738c99273f6e00ad0f1fa448a6b7d4c3f3016dab673e4a",
-    "Requests/PlatformRequest.cs": "c3e0f0d673f9bfa7b1b1e90f7ce0345beee121ce8cdf26a40ca1b5cfdf8ac8b3",
-    "Requests/SchoolTypeRequest.cs": "088dcb85bf98210a2ae906eeab22f95b090e181ae6dd471161a9bf8ece2945db",
-    "Requests/SchoolRequest.cs": "5d12411e61cbc846324c3caa08b33989e0ce33576e9e06d5668e964bb5251fc2"
+    "Models/Platform.cs": "e694035d8bbe3f8919016185db6dd3f0c0ff0cc26ab434a4e97b3a405b5f31cc",
+    "Models/SchoolType.cs": "721cad766c7d96e8429a2a103abc9365557ead1a8450b3c5cf595b6d554e3b84",
+    "Models/School.cs": "741716eed1b006928d4a92131cbaf5c683a2b275ddc5bdd8b74c92f9f5ffeae1",
+    "GeneratedRuntimeModule.cs": "df2e10dc0b870920ea7c6923bb9755af4fa0902594b525424fa40ff0966ab773",
+    "Requests/PlatformRequest.cs": "0d0d300f8f2bcab4a45b5748ce36bf8776dde2a1f3c95baeb0ec23170e56f451",
+    "Requests/SchoolTypeRequest.cs": "750c2622e639b76760d6d1ae41a32fec4cbf9e6af9dd6cd5d68be3e53018401b",
+    "Requests/SchoolRequest.cs": "8f09b22551a2747021326cec26535355ce6a452a4c421be8b0e593aac8377cf0"
   },
-  "previousFixtureManifestSha256": "7195ea8857185b352cc1576f190f2b5bf5b55ecd480db11123b475da6278b072"
+  "previousFixtureManifestSha256": "a6c3e63e602da50d4dca8e05f9aabacdc5cf79fa2233eabead3706c97493446b"
 }

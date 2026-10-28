@@ -243,7 +243,12 @@ namespace Generated
             var path = _path.Member("platform", "Platform");
             if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new PlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("PlatformEntity"))
+            if (!_value.IsLoaded("Platform"))
+                return new PlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
+            if (_value.Platform is null) return new PlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("PlatformEntity") || _value.PlatformEntity is null
+                || _value.PlatformEntity.Id != _value.Platform)
                 return new PlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new PlatformExpression(_value.PlatformEntity, _root, path);
@@ -401,7 +406,12 @@ namespace Generated
             var path = _path.Member("platform", "Platform");
             if (_notLoaded != null) return new PlatformExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new PlatformExpression(null, _root, path);
-            if (!_value.IsLoaded("PlatformEntity"))
+            if (!_value.IsLoaded("Platform"))
+                return new PlatformExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
+            if (_value.Platform is null) return new PlatformExpression(null, _root, path);
+            if (!_value.IsLoaded("PlatformEntity") || _value.PlatformEntity is null
+                || _value.PlatformEntity.Id != _value.Platform)
                 return new PlatformExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "platform"));
             return new PlatformExpression(_value.PlatformEntity, _root, path);
@@ -412,7 +422,12 @@ namespace Generated
             var path = _path.Member("school_type", "SchoolType");
             if (_notLoaded != null) return new SchoolTypeExpression(null, _root, path, _notLoaded.WithPath(path));
             if (_value is null) return new SchoolTypeExpression(null, _root, path);
-            if (!_value.IsLoaded("SchoolTypeEntity"))
+            if (!_value.IsLoaded("SchoolType"))
+                return new SchoolTypeExpression(null, _root, path,
+                    new TeaQLNotLoadedException(path.MarkMissing(), "school_type"));
+            if (_value.SchoolType is null) return new SchoolTypeExpression(null, _root, path);
+            if (!_value.IsLoaded("SchoolTypeEntity") || _value.SchoolTypeEntity is null
+                || _value.SchoolTypeEntity.Id != _value.SchoolType)
                 return new SchoolTypeExpression(null, _root, path,
                     new TeaQLNotLoadedException(path.MarkMissing(), "school_type"));
             return new SchoolTypeExpression(_value.SchoolTypeEntity, _root, path);

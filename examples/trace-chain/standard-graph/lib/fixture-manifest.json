@@ -6,10 +6,10 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
   "producerSource": {
-    "commit": "ebef725ccbd00f2b5b7119545810cd953b37a386",
-    "diff": "dee8bda8fd1652e516823fd31b0272adb45f02daa4fab42bd98c6e7c3afb50d8",
-    "status": "dc965bac5d04a212ac1a1d7bcc5c66221e0fb179701e9ab94a76362c90b913bc",
-    "sourceContentsSha256": "262f0d7a9ad38553849172884431f02e1f076cb1b4b9d815bf98fc16312b11c5",
+    "commit": "67a452018063f946719cf2c93a846c46a6d9464c",
+    "diff": "cb743fcd4c9c7e7b8f00fbbc6faf9f404992e3d2c007d8165dadb59320b53cf8",
+    "status": "30b73aab8acf6026efd16fba0e38a5234c1e8af0a01f517e8286902b4c38560b",
+    "sourceContentsSha256": "67f95a92f6f2f342e0cdaa327bcdc1411fa1f9f66a67e88d18a861771c59eeb5",
     "retainedModels": [
       {
         "id": "conformance",
@@ -68,29 +68,29 @@
         "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c"
       }
     ],
-    "exporterProbeSha256": "28ed6118a3440044db8e7bb519ae1628702d625e819fdf5de9a87b416c8d3177"
+    "exporterProbeSha256": "a91a2d427e7ab59515b71fb745777324a7d824df1a5fe30a4c5041f8e1e7dfd5"
   },
-  "producerReceiptSha256": "b3420e354a2e8826a8d760341c05ca6477b6f909a238bcac7d4e916ec057b84c",
-  "generatedManifestSha256": "e9cd8c004b235a0985743ff84d3305a6d27f3df6ec79ad384dda4cd1bc88734e",
+  "producerReceiptSha256": "733c97dc2b7ec3ee609ffabb0af0cc676b375729cd2f5cbc4d440510636ea1c7",
+  "generatedManifestSha256": "d0aff1281dbf34c5963562b469922661acc9951a4f6f484f0ff72fa7dfda8fb1",
   "files": {
     "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134",
-    "E.cs": "da42e62e1c04a8e081ba84c61a5af4307ee279b97cf70a0a0079ca4e30a792f4",
+    "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
     "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
     "GeneratedSearchModels.cs": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332",
     "trace-chain-service-lib.csproj": "44eafffe5a1bb9aecc284417a993b45a4290b5b452fedcd0c728de07d14e36bd",
-    "Models/Platform.cs": "7ed5127f48b7cebfce80056aa927aa0939e2ba05bc5753f20484edd7fb6ed15e",
-    "Models/CustomerOrder.cs": "f418c10c3f5001f116906420a180af66b584ae14d516280c70687c8d7f7aa1d4",
-    "Models/OrderItem.cs": "b356ef79761dd8eee277c7e64a9f9b7289b41105437e08fa04cce627c537be19",
-    "Models/Payment.cs": "b591f8c2671ba27d131a5dd351c0a37303c3f24b799c8f577066bf9a5316445a",
-    "Models/PaymentAttempt.cs": "bc5ac57d6cd478fe0d4894ac3958537f3ce36f3ff2d46c90ca3825216f8d6904",
-    "Models/Shipment.cs": "318477582551a21ca522ee6e0841a5e191032918f0c62ec0f6c2a56bdfa884ba",
-    "GeneratedRuntimeModule.cs": "698adbe9b8998ab963cb5ffbb02fe860fcefeeb7a8282060d16ec03e1e37c4dd",
-    "Requests/PlatformRequest.cs": "41c2c48d1f769354839df6498c1df2bbd28b0bd721ece51b62659ee5c0ef630a",
-    "Requests/CustomerOrderRequest.cs": "bd35e399ed1952a14bec718fa05e2a35fb9c691a3bd8c1c236f696b6d40bb082",
-    "Requests/OrderItemRequest.cs": "88314cc23e2d762e18cf0b13ccfed5d3b08c466f591135abb84b30e095950082",
-    "Requests/PaymentRequest.cs": "f66fc198ff2826e77fc2868f83dc3dbd49a6bc62fc3eba67aebcf0fcac1544cd",
-    "Requests/PaymentAttemptRequest.cs": "8bfc7ee2e3f3f8cc26af1124ab3a1cd3c25beec8b01171d636640af7845f174e",
-    "Requests/ShipmentRequest.cs": "831d1a218620f5c68b205036746cbc6b9a30b6342eb4decb73c5b6454b0afd47"
+    "Models/Platform.cs": "5588d8d2f77009fd1e43723c1c02cb50602d130e4c37a4ab668c1f4506579415",
+    "Models/CustomerOrder.cs": "c735bd33b7041bdaf0a5e7d3c3d568a84bd4d3b5ee7a44f5698124fff7bf20bc",
+    "Models/OrderItem.cs": "13ccd29ede0fec5276fadf24ef8dd5671f6fe58ee6600874d91691faf17c61be",
+    "Models/Payment.cs": "f1cfe705cbccf0e852bfd15462a29d8002f95d018ae10525e5ae4df9c2be7d4b",
+    "Models/PaymentAttempt.cs": "96a048696106eab32dc948e2685f4d8c470e402f72eaee8c0cc550f95d378736",
+    "Models/Shipment.cs": "349abc29f92bac531436d4a32f0fbf45ec1b59b7067df2d2d125442060870b5c",
+    "GeneratedRuntimeModule.cs": "597768649d1ac393eba161b8462529e57234bff9426975bc583baeb0108ba8e3",
+    "Requests/PlatformRequest.cs": "6a25ce8510d825a60f53913e49f9e606eeaddaafb607003cfedcb1f7f8cef365",
+    "Requests/CustomerOrderRequest.cs": "ac9a643f59fdadd2503fb2dbe583387d6f85d845b617333f4ee9a1d85feefdf2",
+    "Requests/OrderItemRequest.cs": "51d2c72bde96fd79edff9be0096aa478692b3a554f611d40928ee24166039e4d",
+    "Requests/PaymentRequest.cs": "729d1a53c203e04f13ac656e6c9bea849086cb2816bb4bc50e2582cd6a5c7577",
+    "Requests/PaymentAttemptRequest.cs": "64aa9ff82432ddcfb10bae01add8ac04fbc5ba595ad5101b1eecfb3c6daa4e7a",
+    "Requests/ShipmentRequest.cs": "1b79fabc6f66f9d666efca0d668d9647c121b195f2309b730e9bc09ec8418755"
   },
-  "previousFixtureManifestSha256": "4015461b561c1453b425d64f7d769bb9eb4bc48c00b3d10bafa51c2cbe11b141"
+  "previousFixtureManifestSha256": "67257cfc1dc85bbf580fbb937c92b33f2d91941ea9cea987187684077b3b6ac4"
 }
