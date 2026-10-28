@@ -419,8 +419,14 @@ public sealed class SqliteBlobUploadService
     public async Task<long> WriteAsync(UserContext actor, string uploadId, Stream source)
     {
         if (source == null) throw Error("BLOB_UPLOAD_INCOMPLETE");
-        await using var sourceLifetime = source;
-        return await Transaction(async tx =>
+        var sourceClosed = false;
+        async ValueTask CloseSourceAsync()
+        {
+            if (sourceClosed) return;
+            sourceClosed = true;
+            await source.DisposeAsync();
+        }
+        Task<long> WriteOnLeaseAsync() => Transaction(async tx =>
         {
             var row = await Row(actor, uploadId, "Write", tx);
             List<Record> records;
@@ -462,11 +468,15 @@ public sealed class SqliteBlobUploadService
                 catch { throw Error("BLOB_STORE_FAILED"); }
                 await Current(actor, target, "Write", input, row.Scope, tx);
                 if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
+                try { await CloseSourceAsync(); }
+                catch { throw Error("BLOB_STORE_FAILED"); }
                 return row.DeclaredSize;
             }
             if (row.State != "initiated" || catalog.GetValueOrDefault("status")?.TryText() != "initiated")
                 throw Error("BLOB_IDEMPOTENCY_CONFLICT");
-            var reader = new HashingReadStream(source, row.DeclaredSize);
+            // ObjectStorage.PutAsync disposes its reader. Retain the caller's
+            // source until conflict recovery and close it before SQL promotion.
+            var reader = new HashingReadStream(source, row.DeclaredSize, leaveOpen: true);
             try
             {
                 ObjectMetadata metadata;
@@ -486,6 +496,8 @@ public sealed class SqliteBlobUploadService
                 if (_now().ToUnixTimeMilliseconds() >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
                 if (!reader.Eof || reader.Count != row.DeclaredSize || metadata.Size != reader.Count ||
                     string.IsNullOrEmpty(metadata.ETag)) throw Error("BLOB_UPLOAD_INCOMPLETE");
+                try { await CloseSourceAsync(); }
+                catch { throw Error("BLOB_STORE_FAILED"); }
                 var digest = recoveredDigest ?? reader.Digest();
                 var nowMs = _now().ToUnixTimeMilliseconds();
                 if (nowMs >= row.ExpiresMs) throw Error("BLOB_UPLOAD_EXPIRED");
@@ -504,6 +516,15 @@ public sealed class SqliteBlobUploadService
             }
             finally { reader.Release(); }
         });
+        try { return await WriteOnLeaseAsync(); }
+        finally
+        {
+            if (!sourceClosed)
+            {
+                try { await CloseSourceAsync(); }
+                catch { /* Preserve the upload error on early exit. */ }
+            }
+        }
     }
 
     public async Task<BlobRef> CompleteAsync(UserContext actor, string uploadId)

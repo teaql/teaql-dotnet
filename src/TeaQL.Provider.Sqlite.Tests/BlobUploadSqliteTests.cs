@@ -158,6 +158,19 @@ public class BlobUploadSqliteTests
             ObjectReadUrlOptions options) => inner.GetReadUrlAsync(invocation, key, options);
     }
 
+    private sealed class CountedUploadSource(byte[] bytes) : MemoryStream(bytes)
+    {
+        public int CloseCount;
+        public bool FailOnClose;
+        public override async ValueTask DisposeAsync()
+        {
+            CloseCount++;
+            await base.DisposeAsync();
+            if (FailOnClose) throw new IOException("PRIVATE-UPLOAD-SOURCE-CLOSE-CANARY");
+            if (CloseCount > 1) throw new IOException("PRIVATE-DOUBLE-CLOSE-CANARY");
+        }
+    }
+
     private sealed class LostCommitTransport(ISqlTransactionTransport inner) : ISqlTransactionTransport
     {
         public bool LoseNextCommitReply;
@@ -941,6 +954,44 @@ public class BlobUploadSqliteTests
             verifier?.Release.TrySetResult();
             Directory.Delete(root, recursive: true);
         }
+    }
+
+    [Fact]
+    public async Task WriteClosesSourceOnceBeforePromotionAndReplay()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-blob-source-close-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var file = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(file);
+            var service = new SqliteBlobUploadService(catalog, new UploadAuthorization(),
+                new PdfVerifier(), 10_000);
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nsource close before promotion\n%%EOF");
+            var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
+                new BlobUploadInput("report.pdf", bytes.Length), "source-close-request");
+            var failed = new CountedUploadSource(bytes) { FailOnClose = true };
+            Assert.Equal("BLOB_STORE_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.WriteAsync(actor, session.UploadId, failed))).Message);
+            Assert.Equal(1, failed.CloseCount);
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT state FROM teaql_blob_upload WHERE key=@key", session.Reference.Key));
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            var retry = new CountedUploadSource(bytes);
+            Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId, retry));
+            Assert.Equal(1, retry.CloseCount);
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+            var replay = new CountedUploadSource(bytes);
+            Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId, replay));
+            Assert.Equal(1, replay.CloseCount);
+        }
+        finally { Directory.Delete(root, recursive: true); }
     }
 
     [Fact]
