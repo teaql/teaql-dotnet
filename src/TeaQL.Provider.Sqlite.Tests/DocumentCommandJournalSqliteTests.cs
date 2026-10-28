@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using TeaQL.Core;
@@ -92,6 +93,22 @@ public class DocumentCommandJournalSqliteTests
         var replay = await Apply(command);
         Assert.True(replay.Replayed);
         Assert.Equal(first.Receipt, replay.Receipt);
+        Assert.Equal(1, mutations);
+        var legacyParts = new[] { "ORD-10", "tqd2.fixture", "command-1",
+            "{\"note\":\"ok\",\"quantity\":3}" };
+        var legacyHash = Convert.ToHexString(SHA256.HashData(
+            JsonSerializer.SerializeToUtf8Bytes(legacyParts))).ToLowerInvariant();
+        await using (var stored = db.CreateCommand())
+        {
+            stored.CommandText = "SELECT request_hash FROM teaql_document_command_receipt";
+            Assert.NotEqual(legacyHash, (string)(await stored.ExecuteScalarAsync())!);
+            stored.CommandText = "UPDATE teaql_document_command_receipt SET request_hash=@hash";
+            stored.Parameters.AddWithValue("@hash", legacyHash);
+            Assert.Equal(1, await stored.ExecuteNonQueryAsync());
+        }
+        var oldReplay = await Apply(command);
+        Assert.True(oldReplay.Replayed);
+        Assert.Equal(first.Receipt, oldReplay.Receipt);
         Assert.Equal(1, mutations);
         var changedCommand = command with
         { Body = JsonSerializer.SerializeToElement(new { quantity = 4, note = "ok" }) };

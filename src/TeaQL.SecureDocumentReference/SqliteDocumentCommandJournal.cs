@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using TeaQL.Core;
 using TeaQL.DataService;
@@ -108,7 +109,41 @@ public sealed class SqliteDocumentCommandJournal(ISqlTransport transport)
         }
     }
 
-    private static (string Hash, SubmittedDocumentCommand Frozen) Prepare(SubmittedDocumentCommand command)
+    private static string CanonicalRequestHash(SubmittedDocumentCommand command,
+        JsonElement body, IReadOnlyList<DocumentBlobSelectionSubmission>? selections)
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions
+        { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
+        {
+            writer.WriteStartArray();
+            writer.WriteStringValue(command.BusinessId);
+            writer.WriteStringValue(command.DocumentToken);
+            writer.WriteStringValue(command.CommandId);
+            body.WriteTo(writer);
+            if (selections != null)
+            {
+                writer.WriteStartArray();
+                foreach (var selection in selections)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("canonicalField", selection.CanonicalField);
+                    writer.WriteString("kind", selection.Kind);
+                    writer.WriteString("targetEntity", selection.TargetEntity);
+                    writer.WriteString("targetKey", selection.TargetKey);
+                    writer.WriteString("token", selection.Token);
+                    writer.WriteEndObject();
+                }
+                writer.WriteEndArray();
+            }
+            writer.WriteEndArray();
+        }
+        if (stream.Length > MaximumBytes) throw Error("DOCUMENT_COMMAND_INVALID");
+        return Convert.ToHexString(SHA256.HashData(stream.ToArray())).ToLowerInvariant();
+    }
+
+    private static (string Hash, string LegacyHash, SubmittedDocumentCommand Frozen)
+        Prepare(SubmittedDocumentCommand command)
     {
         if (command == null) throw Error("DOCUMENT_COMMAND_INVALID");
         Text(command.BusinessId, 16384); Text(command.DocumentToken, MaximumBytes);
@@ -131,7 +166,8 @@ public sealed class SqliteDocumentCommandJournal(ISqlTransport transport)
         if (selections != null) parts.Add(JsonSerializer.Serialize(selections));
         if (JsonSerializer.SerializeToUtf8Bytes(parts).Length > MaximumBytes)
             throw Error("DOCUMENT_COMMAND_INVALID");
-        return (Hash(parts.ToArray()), command with { Body = bodyCopy,
+        return (CanonicalRequestHash(command, bodyCopy, selections), Hash(parts.ToArray()),
+            command with { Body = bodyCopy,
             BlobSelections = selections });
     }
 
@@ -203,7 +239,7 @@ public sealed class SqliteDocumentCommandJournal(ISqlTransport transport)
             authority == null || mutate == null)
             throw Error("DOCUMENT_TRANSACTION_REQUIRED");
         var scopeHash = ScopeHash(scope);
-        var (requestHash, frozen) = Prepare(command);
+        var (requestHash, legacyHash, frozen) = Prepare(command);
         return graph.WithPhysicalSqlAsync(async sql =>
         {
             async Task<string> CurrentActor()
@@ -229,7 +265,8 @@ public sealed class SqliteDocumentCommandJournal(ISqlTransport transport)
             if (rows.Count == 1)
             {
                 var row = rows[0];
-                if (row["request_hash"].TryText() != requestHash)
+                if (row["request_hash"].TryText() is not string persisted ||
+                    (persisted != requestHash && persisted != legacyHash))
                     throw Error("DOCUMENT_REPLAY_CONFLICT");
                 if (row["previous_revision"].TryI64() is not long previous ||
                     row["new_revision"].TryI64() is not long next ||
