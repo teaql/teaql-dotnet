@@ -102,4 +102,15 @@ wall time; rejects encrypted or malformed PDFs; renders and fully decodes every
 page from stdin without scratch files; and reports the original byte SHA-256
 and `application/pdf`. The host must check readiness and explicitly allow PDF
 in field policy. This is decodability validation, not malware scanning or full
-PDF conformance. Binary DOC/XLS still need production verifiers.
+PDF conformance.
+
+For binary DOC/XLS, the host may pass `LegacyOfficeBlobContentVerifier` with
+absolute paths to patched Linux LibreOffice (`soffice`), `bwrap` and `prlimit`
+executables and a private `0700` scratch directory. It checks the original
+CFB header and sector layout, converts in a network/PID-isolated bubblewrap
+namespace with read-only system mounts and only per-upload writable scratch,
+then validates the DOCX/XLSX output through the bounded OOXML verifier. Child
+CPU/address-space/file-size and parent wall-time limits apply. Successful
+uploads retain original DOC/XLS bytes, SHA-256 and MIME. Host readiness checks
+the tools and scratch before accepting uploads. This is decodability validation,
+not malware or macro detection.

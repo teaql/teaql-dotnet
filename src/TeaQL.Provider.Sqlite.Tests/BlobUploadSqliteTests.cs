@@ -179,6 +179,125 @@ public class BlobUploadSqliteTests
             maximumRenderedBytes: maximumRenderedBytes,
             concurrentVerifications: concurrentVerifications);
 
+    private static LegacyOfficeBlobContentVerifier LegacyOfficeVerifier(string scratch,
+        int maximumConvertedBytes = 100_000, int concurrentVerifications = 2) =>
+        new("/usr/bin/soffice", "/usr/bin/bwrap", "/usr/bin/prlimit", scratch,
+            maximumInputBytes: 100_000, maximumConvertedBytes: maximumConvertedBytes,
+            concurrentVerifications: concurrentVerifications);
+
+    [Theory]
+    [InlineData("doc", "application/msword", "9fca8d262d2aa905d58b1cc1c8914d1a8069c16c340f24cd3c4a77daff9c8b73")]
+    [InlineData("xls", "application/vnd.ms-excel", "7f387858aaa3ed39d3c7c692aa865b36ac6620462714f3d0daa96388424cf75d")]
+    public async Task RealLegacyOfficeVerifierConvertsAndChecksOriginalBytes(string extension,
+        string mime, string digest)
+    {
+        if (!OperatingSystem.IsLinux()) return;
+        var scratch = Path.Combine(Path.GetTempPath(), "teaql-legacy-office-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(scratch, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        try
+        {
+            var bytes = ImageFixture(extension);
+            Assert.Equal(digest, Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant());
+            var verifier = LegacyOfficeVerifier(scratch);
+            await verifier.ValidateReadyAsync();
+            var actual = await verifier.VerifyAsync(new MemoryStream(bytes), extension, bytes.Length);
+            Assert.Equal((bytes.LongLength, digest, mime),
+                (actual.SizeBytes, actual.Sha256, actual.ContentType));
+            foreach (var bad in new[] { bytes[..^12], bytes[..512],
+                         new byte[] { (byte)(bytes[0] ^ 1) }.Concat(bytes[1..]).ToArray() })
+                Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                    () => verifier.VerifyAsync(new MemoryStream(bad), extension, bad.Length))).Message);
+            Assert.Equal("BLOB_SIZE_EXCEEDED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => verifier.VerifyAsync(new MemoryStream(bytes), extension, bytes.Length - 1))).Message);
+            Assert.Empty(Directory.GetFileSystemEntries(scratch));
+        }
+        finally { Directory.Delete(scratch, recursive: true); }
+    }
+
+    [Fact]
+    public async Task RealLegacyOfficeVerifierChecksLimitsBusyReadinessAndComposite()
+    {
+        if (!OperatingSystem.IsLinux()) return;
+        var scratch = Path.Combine(Path.GetTempPath(), "teaql-legacy-office-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(scratch, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        try
+        {
+            var bytes = ImageFixture("doc");
+            Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => LegacyOfficeVerifier(scratch, maximumConvertedBytes: 1)
+                    .VerifyAsync(new MemoryStream(bytes), "doc", bytes.Length))).Message);
+            var verifier = LegacyOfficeVerifier(scratch, concurrentVerifications: 1);
+            var slow = new PausedReadStream(bytes);
+            var first = verifier.VerifyAsync(slow, "doc", bytes.Length);
+            await slow.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Equal("BLOB_VERIFICATION_BUSY", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => verifier.VerifyAsync(new MemoryStream(bytes), "doc", bytes.Length))).Message);
+            slow.Release.SetResult();
+            Assert.Equal(bytes.LongLength, (await first).SizeBytes);
+            Assert.Equal("BLOB_CAPABILITY_MISSING", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => new LegacyOfficeBlobContentVerifier("/missing/soffice", "/usr/bin/bwrap",
+                    "/usr/bin/prlimit", scratch).ValidateReadyAsync())).Message);
+            File.SetUnixFileMode(scratch, UnixFileMode.UserRead | UnixFileMode.UserWrite |
+                UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute);
+            Assert.Equal("BLOB_CAPABILITY_MISSING", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => verifier.ValidateReadyAsync())).Message);
+            File.SetUnixFileMode(scratch, UnixFileMode.UserRead | UnixFileMode.UserWrite |
+                UnixFileMode.UserExecute);
+            var composite = new CompositeBlobContentVerifier(new Dictionary<string, IBlobContentVerifier> {
+                ["jpg"] = new StbImageBlobContentVerifier(), ["doc"] = verifier, ["xls"] = verifier
+            });
+            await composite.ValidateReadyAsync();
+            Assert.Equal("application/msword", (await composite.VerifyAsync(
+                new MemoryStream(bytes), "doc", bytes.Length)).ContentType);
+        }
+        finally { Directory.Delete(scratch, recursive: true); }
+    }
+
+    [Theory]
+    [InlineData("doc", "application/msword")]
+    [InlineData("xls", "application/vnd.ms-excel")]
+    public async Task RealLegacyOfficeUploadCompletesOnlyAfterSandboxedValidation(string extension, string mime)
+    {
+        if (!OperatingSystem.IsLinux()) return;
+        var root = Path.Combine(Path.GetTempPath(), "teaql-legacy-office-upload-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        var scratch = Path.Combine(root, "scratch");
+        Directory.CreateDirectory(scratch, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(store);
+            var service = new SqliteBlobUploadService(catalog,
+                new UploadAuthorization { Extensions = [extension] }, LegacyOfficeVerifier(scratch), 100_000);
+            var bytes = ImageFixture(extension);
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var good = await service.BeginAsync(actor, target,
+                new BlobUploadInput("sample." + extension, bytes.Length), "legacy-good");
+            await service.WriteAsync(actor, good.UploadId, new MemoryStream(bytes));
+            Assert.Equal(good.Reference, await service.CompleteAsync(actor, good.UploadId));
+            Assert.Equal("uploaded_unbound", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", good.Reference.Key));
+            Assert.Equal(mime, await Scalar(db,
+                "SELECT content_type FROM teaql_blob_catalog WHERE key=@key", good.Reference.Key));
+            Assert.Equal(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),
+                await Scalar(db, "SELECT written_sha256 FROM teaql_blob_upload WHERE upload_id=@key", good.UploadId));
+            var broken = bytes[..^12];
+            var bad = await service.BeginAsync(actor, target,
+                new BlobUploadInput("broken." + extension, broken.Length), "legacy-bad");
+            await service.WriteAsync(actor, bad.UploadId, new MemoryStream(broken));
+            Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, bad.UploadId))).Message);
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", bad.Reference.Key));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     [Fact]
     public async Task RealPdfVerifierRendersAllPagesAndRejectsMalformedInput()
     {

@@ -97,6 +97,8 @@ public class BlobUploadS3Tests
     [InlineData("mp4")]
     [InlineData("docx")]
     [InlineData("xlsx")]
+    [InlineData("doc")]
+    [InlineData("xls")]
     public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay(string format)
     {
         if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BLOB_UPLOAD") != "1") return;
@@ -105,8 +107,17 @@ public class BlobUploadS3Tests
             Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_MEDIA") != "1") return;
         if ((format is "docx" or "xlsx") &&
             Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_OFFICE") != "1") return;
+        if ((format is "doc" or "xls") &&
+            Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_LEGACY_OFFICE") != "1") return;
         if (format == "production-pdf" &&
             Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_PDF") != "1") return;
+        if ((format is "doc" or "xls") && !OperatingSystem.IsLinux()) return;
+        var legacyScratch = Path.Combine(Path.GetTempPath(), "teaql-s3-legacy-office-" + Guid.NewGuid().ToString("N"));
+        if (OperatingSystem.IsLinux() && format is ("doc" or "xls"))
+            Directory.CreateDirectory(legacyScratch, UnixFileMode.UserRead |
+                UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        try
+        {
         var endpoint = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ENDPOINT");
         var bucket = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BUCKET");
         var access = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ACCESS_KEY");
@@ -139,6 +150,9 @@ public class BlobUploadS3Tests
             "mp3" or "mp4" => new FfmpegBlobContentVerifier(
                 "/usr/bin/ffprobe", "/usr/bin/ffmpeg", "/usr/bin/prlimit"),
             "docx" or "xlsx" => new OfficeBlobContentVerifier(),
+            "doc" or "xls" => new LegacyOfficeBlobContentVerifier(
+                "/usr/bin/soffice", "/usr/bin/bwrap", "/usr/bin/prlimit", legacyScratch,
+                maximumInputBytes: 100_000, maximumConvertedBytes: 100_000),
             "production-pdf" => new PopplerBlobContentVerifier(
                 "/usr/bin/pdfinfo", "/usr/bin/pdftoppm", "/usr/bin/prlimit"),
             _ => pdfVerifier
@@ -151,6 +165,7 @@ public class BlobUploadS3Tests
             "jpg" => "image/jpeg", "mp3" => "audio/mpeg", "mp4" => "video/mp4",
             "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "doc" => "application/msword", "xls" => "application/vnd.ms-excel",
             _ => "application/pdf"
         };
         var filename = format == "pdf" ? "report.pdf" : "sample." + extension;
@@ -237,8 +252,13 @@ public class BlobUploadS3Tests
                     new ViewOptions("ordinary", "committed", DateTimeOffset.UtcNow.AddSeconds(60))));
             Assert.Equal("BLOB_READ_DENIED", stale.Code);
             Assert.Equal("committed", stale.BusinessState);
+            if ((format is "doc" or "xls") &&
+                Environment.GetEnvironmentVariable("TEAQL_S3_TEST_LEGACY_OFFICE_MARKER_DIR") is { } marker)
+                File.WriteAllText(Path.Combine(marker, format + ".pass"), "legacy-office-real-gate-passed");
         }
         finally { await store.DeleteAsync(key); }
+        }
+        finally { if (Directory.Exists(legacyScratch)) Directory.Delete(legacyScratch, recursive: true); }
     }
 
     private static async Task<string> Scalar(SqliteConnection db, string sql, string key)
