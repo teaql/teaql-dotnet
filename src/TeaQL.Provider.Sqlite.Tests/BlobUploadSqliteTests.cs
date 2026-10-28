@@ -119,6 +119,45 @@ public class BlobUploadSqliteTests
             ObjectReadUrlOptions options) => inner.GetReadUrlAsync(invocation, key, options);
     }
 
+    private sealed class CloseFailStream(Stream inner, Func<bool> shouldFail) : Stream
+    {
+        public override bool CanRead => inner.CanRead;
+        public override bool CanSeek => inner.CanSeek;
+        public override bool CanWrite => inner.CanWrite;
+        public override long Length => inner.Length;
+        public override long Position { get => inner.Position; set => inner.Position = value; }
+        public override void Flush() => inner.Flush();
+        public override int Read(byte[] buffer, int offset, int count) => inner.Read(buffer, offset, count);
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer,
+            CancellationToken cancellationToken = default) => inner.ReadAsync(buffer, cancellationToken);
+        public override long Seek(long offset, SeekOrigin origin) => inner.Seek(offset, origin);
+        public override void SetLength(long value) => inner.SetLength(value);
+        public override void Write(byte[] buffer, int offset, int count) => inner.Write(buffer, offset, count);
+        public override async ValueTask DisposeAsync()
+        {
+            await inner.DisposeAsync();
+            if (shouldFail()) throw new IOException("PRIVATE-CLOSE-CANARY");
+        }
+    }
+
+    private sealed class CloseFailStore(IObjectStorageProvider inner) : IObjectStorageProvider
+    {
+        public bool FailOnClose = true;
+        public Task<ObjectMetadata> PutAsync(StorageInvocation invocation, ObjectKey key,
+            Stream content, ObjectPutOptions options) => inner.PutAsync(invocation, key, content, options);
+        public async Task<ObjectContent> GetAsync(StorageInvocation invocation, ObjectKey key)
+        {
+            var content = await inner.GetAsync(invocation, key);
+            return new ObjectContent(content.Metadata, new CloseFailStream(content.Stream, () => FailOnClose));
+        }
+        public Task<ObjectMetadata?> HeadAsync(StorageInvocation invocation, ObjectKey key) =>
+            inner.HeadAsync(invocation, key);
+        public Task DeleteAsync(StorageInvocation invocation, ObjectKey key) =>
+            inner.DeleteAsync(invocation, key);
+        public Task<ObjectReadUrl> GetReadUrlAsync(StorageInvocation invocation, ObjectKey key,
+            ObjectReadUrlOptions options) => inner.GetReadUrlAsync(invocation, key, options);
+    }
+
     private sealed class LostCommitTransport(ISqlTransactionTransport inner) : ISqlTransactionTransport
     {
         public bool LoseNextCommitReply;
@@ -902,6 +941,40 @@ public class BlobUploadSqliteTests
             verifier?.Release.TrySetResult();
             Directory.Delete(root, recursive: true);
         }
+    }
+
+    [Fact]
+    public async Task ConfirmCloseFailureKeepsWrittenUploadAndAllowsRetry()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-blob-close-fail-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var file = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var store = new CloseFailStore(file);
+            var actor = new UserContext().WithObjectStorage(store);
+            var service = new SqliteBlobUploadService(catalog, new UploadAuthorization(),
+                new PdfVerifier(), 10_000);
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nclose fails after full verification\n%%EOF");
+            var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
+                new BlobUploadInput("report.pdf", bytes.Length), "close-fail-request");
+            Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId,
+                new MemoryStream(bytes)));
+            Assert.Equal("BLOB_UPLOAD_INCOMPLETE", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, session.UploadId))).Message);
+            Assert.Equal("written", await Scalar(db,
+                "SELECT state FROM teaql_blob_upload WHERE key=@key", session.Reference.Key));
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            store.FailOnClose = false;
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+        }
+        finally { Directory.Delete(root, recursive: true); }
     }
 
     [Fact]
