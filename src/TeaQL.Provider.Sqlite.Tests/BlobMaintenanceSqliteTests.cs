@@ -12,6 +12,35 @@ namespace TeaQL.Provider.Sqlite.Tests;
 public class BlobMaintenanceSqliteTests
 {
     [Fact]
+    public async Task ExpiredDirectUploadsRemainUntouchedWithoutQuiescence()
+    {
+        await using var db = new SqliteConnection("Data Source=:memory:");
+        await db.OpenAsync();
+        var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+        await catalog.EnsureSchemaAsync();
+        var store = new ConditionalStore();
+        var actor = new UserContext().WithObjectStorage(store);
+        var service = new SqliteBlobMaintenanceService(catalog, new Authority(), 10,
+            () => DateTimeOffset.FromUnixTimeMilliseconds(10000));
+        foreach (var (key, state, status) in new[] {
+            ("blob_direct_initiated", "initiated", "initiated"),
+            ("blob_direct_written", "written", "initiated"),
+            ("blob_direct_deleting", "initiated", "deleting") })
+        {
+            await Seed(db, key, state: state, writtenETag: state == "written" ? "etag-direct" : null);
+            await Execute(db, "UPDATE teaql_blob_catalog SET upload_mode='direct',status=@status WHERE key=@key",
+                ("@status", status), ("@key", key));
+            store.Objects["objects/" + key] = "etag-direct";
+        }
+        var batch = await service.RunBatchAsync(actor);
+        Assert.Empty(batch.Outcomes);
+        Assert.Equal(0, store.Deletes);
+        Assert.Equal(3, store.Objects.Count);
+        foreach (var key in new[] { "blob_direct_initiated", "blob_direct_written", "blob_direct_deleting" })
+            Assert.NotEqual("deleted", await Status(db, key));
+    }
+
+    [Fact]
     public async Task RealSqliteAndFileDeleteRecoverReceiptAndPreserveNewGeneration()
     {
         var parent = Path.Combine(Path.GetTempPath(), "teaql-file-maintenance-" + Guid.NewGuid().ToString("N"));

@@ -150,7 +150,8 @@ public sealed class SqliteBlobMaintenanceService
     {
         if (row == null) return false;
         if (row.UploadState is "initiated" or "written")
-            return row.ExpiresMs <= now && row.Status is "initiated" or "deleting";
+            return (row.UploadMode is null or "server_stream") &&
+                row.ExpiresMs <= now && (row.Status is "initiated" or "deleting");
         if (row.UploadState != "completed" ||
             row.Status is not ("uploaded_unbound" or "available" or "deleting") ||
             !ValidScope(row.PolicyProfile) || row.UploadMode != "server_stream" ||
@@ -331,7 +332,8 @@ public sealed class SqliteBlobMaintenanceService
                   ON u.key=c.key AND u.scope=c.scope
                 WHERE c.scope=@p0 AND c.key>@p1 AND (
                   (u.expires_ms<=@p2 AND u.state IN ('initiated','written')
-                    AND c.status IN ('initiated','deleting')) OR
+                    AND c.status IN ('initiated','deleting')
+                    AND (c.upload_mode IS NULL OR c.upload_mode='server_stream')) OR
                   (u.state='completed' AND c.upload_mode='server_stream'
                     AND c.policy_profile IS NOT NULL AND c.completed_at_ms IS NOT NULL
                     AND c.content_version<>'' AND (c.status='deleting' OR
