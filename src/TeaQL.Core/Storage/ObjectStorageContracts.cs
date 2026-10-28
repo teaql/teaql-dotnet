@@ -76,10 +76,24 @@ public sealed record ObjectReadUrlOptions
         Lifetime = lifetime ?? TimeSpan.FromMinutes(5);
         if (Lifetime <= TimeSpan.Zero || Lifetime > TimeSpan.FromDays(7) || Lifetime.Ticks % TimeSpan.TicksPerSecond != 0 || disposition is not (null or "inline" or "attachment"))
             throw new StorageException(StorageErrorCode.InvalidInput);
-        if (filename is not null && (disposition is null || ObjectPutOptions.Header(filename).Any(c => c is '/' or '\\' or '"')))
-            throw new StorageException(StorageErrorCode.InvalidInput);
-        ContentDisposition = disposition + (filename is null ? "" : $"; filename=\"{filename}\"");
+        if (filename is not null)
+        {
+            var valid = disposition is not null && !string.IsNullOrEmpty(filename) &&
+                !filename.Any(c => char.IsControl(c) || c is '/' or '\\' or '"');
+            try { valid = valid && new UTF8Encoding(false, true).GetByteCount(filename) <= 1024; }
+            catch (EncoderFallbackException) { valid = false; }
+            if (!valid) throw new StorageException(StorageErrorCode.InvalidInput);
+        }
         if (disposition is null) ContentDisposition = null;
+        else if (filename is null) ContentDisposition = disposition;
+        else if (filename.All(c => c <= 126))
+            ContentDisposition = $"{disposition}; filename=\"{filename}\"";
+        else
+        {
+            var fallback = new string(filename.Select(c => c <= 126 ? c : '_').ToArray());
+            ContentDisposition = $"{disposition}; filename=\"{fallback}\"; " +
+                $"filename*=UTF-8''{Uri.EscapeDataString(filename)}";
+        }
     }
     public override string ToString() => "ObjectReadUrlOptions[details=masked]";
 }
