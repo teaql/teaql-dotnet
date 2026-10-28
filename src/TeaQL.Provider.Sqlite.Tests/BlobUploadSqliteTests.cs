@@ -845,6 +845,66 @@ public class BlobUploadSqliteTests
     }
 
     [Fact]
+    public async Task PermissionRevocationWaitsForConfirmationParserOwnerAndDeniesReplay()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-blob-revoke-owner-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        PausedVerifier? verifier = null;
+        try
+        {
+            var path = Path.Combine(root, "upload.db");
+            await using var db1 = new SqliteConnection($"Data Source={path};Default Timeout=5");
+            await using var db2 = new SqliteConnection($"Data Source={path};Default Timeout=5");
+            await db1.OpenAsync();
+            await db2.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db1));
+            await catalog.EnsureSchemaAsync();
+            await using (var command = db1.CreateCommand())
+            {
+                command.CommandText = "CREATE TABLE upload_policy (allowed INTEGER NOT NULL); INSERT INTO upload_policy VALUES (1)";
+                await command.ExecuteNonQueryAsync();
+            }
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(store);
+            verifier = new PausedVerifier();
+            var service = new SqliteBlobUploadService(catalog,
+                new UploadAuthorization { CheckSqlPolicy = true }, verifier, 10_000);
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nconcurrent revocation\n%%EOF");
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var session = await service.BeginAsync(actor, target,
+                new BlobUploadInput("report.pdf", bytes.Length, "application/pdf"), "revoke-confirm");
+            Assert.Equal(bytes.Length, await service.WriteAsync(actor, session.UploadId,
+                new MemoryStream(bytes)));
+            var confirmation = service.CompleteAsync(actor, session.UploadId);
+            await verifier.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            var revocation = Task.Run(async () =>
+            {
+                await using var command = db2.CreateCommand();
+                command.CommandText = "UPDATE upload_policy SET allowed=0";
+                await command.ExecuteNonQueryAsync();
+            });
+            await Task.Delay(75);
+            Assert.False(revocation.IsCompleted, "revocation passed the parser's physical SQL owner");
+            verifier.Release.SetResult();
+            Assert.Equal(session.Reference, await confirmation.WaitAsync(TimeSpan.FromSeconds(5)));
+            await revocation.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Equal("BLOB_UPLOAD_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, session.UploadId))).Message);
+            Assert.Equal(1, verifier.Calls);
+            Assert.Equal("completed", await Scalar(db1,
+                "SELECT state FROM teaql_blob_upload WHERE key=@key", session.Reference.Key));
+            Assert.Equal("uploaded_unbound", await Scalar(db1,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+        }
+        finally
+        {
+            verifier?.Release.TrySetResult();
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task CommittedWriteWithLostReplyReplaysOnlySameBytesAndGeneration()
     {
         var root = Path.Combine(Path.GetTempPath(), "teaql-blob-commit-unknown-" + Guid.NewGuid().ToString("N"));
