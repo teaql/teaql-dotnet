@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using TeaQL.BlobReference;
 using TeaQL.Core;
@@ -166,6 +167,44 @@ public class BlobUploadSqliteTests
         command.CommandText = sql;
         command.Parameters.AddWithValue("@key", key);
         return (string)(await command.ExecuteScalarAsync())!;
+    }
+
+    [Fact]
+    public async Task UnicodeUploadHashUsesSharedABIAndReplaysHistoricalDotnetRows()
+    {
+        await using var db = new SqliteConnection("Data Source=:memory:");
+        await db.OpenAsync();
+        var asset = EntityDescriptor.New("Asset").TableName("asset")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+        var actor = new RuntimeModule().Entity(asset).IntoContext().WithDataService(
+            new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(db),
+                new MetadataSchemaProvider(name => name == "Asset" ? asset : null)));
+        await actor.EnsureSchemaAsync();
+        var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+        await catalog.EnsureSchemaAsync();
+        var service = new SqliteBlobUploadService(catalog, new UploadAuthorization(),
+            new PdfVerifier(), 10_000);
+        var target = new BlobUploadTarget("Asset", "1", "file");
+        var input = new BlobUploadInput("报告 & review.pdf", 42);
+        var old = await service.BeginAsync(actor, target, input, "historical");
+        var priorBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new object?[]
+            { "Asset", "1", "file", "报告 & review.pdf", 42, null }));
+        var priorHash = Convert.ToHexString(SHA256.HashData(priorBytes)).ToLowerInvariant();
+        await using (var command = db.CreateCommand())
+        {
+            command.CommandText = "UPDATE teaql_blob_upload SET request_hash=@hash WHERE upload_id=@id";
+            command.Parameters.AddWithValue("@hash", priorHash);
+            command.Parameters.AddWithValue("@id", old.UploadId);
+            Assert.Equal(1, await command.ExecuteNonQueryAsync());
+        }
+        var replay = await service.BeginAsync(actor, target, input, "historical");
+        Assert.Equal(old.UploadId, replay.UploadId);
+        Assert.Equal(old.Reference, replay.Reference);
+        var fresh = await service.BeginAsync(actor, target, input, "canonical");
+        Assert.Equal("49326c668df787833da79c84aa49ae3951ce7604e79a359ffe27cb10e15aea48",
+            await Scalar(db, "SELECT request_hash FROM teaql_blob_upload WHERE key=@key",
+                fresh.Reference.Key));
     }
 
     private static byte[] ImageFixture(string extension) => File.ReadAllBytes(

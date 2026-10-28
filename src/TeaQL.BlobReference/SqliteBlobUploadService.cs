@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TeaQL.Core;
@@ -186,9 +187,16 @@ public sealed class SqliteBlobUploadService
         if (!ValidText(replayKey, 256)) throw Error("BLOB_REFERENCE_INVALID");
         var scope = await Current(actor, target, "Begin", normalized);
         var extension = normalized.FileName.Split('.').Last().ToLowerInvariant();
-        var request = JsonSerializer.Serialize(new object?[] { target.Entity, target.EntityId,
-            target.Field, normalized.FileName, normalized.DeclaredSize, normalized.DeclaredContentType });
+        var parts = new object?[] { target.Entity, target.EntityId,
+            target.Field, normalized.FileName, normalized.DeclaredSize,
+            normalized.DeclaredContentType ?? "" };
+        var request = JsonSerializer.Serialize(parts, new JsonSerializerOptions
+            { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
         var requestHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request))).ToLowerInvariant();
+        var legacyRequest = JsonSerializer.Serialize(new object?[] { target.Entity, target.EntityId,
+            target.Field, normalized.FileName, normalized.DeclaredSize, normalized.DeclaredContentType });
+        var legacyHash = Convert.ToHexString(SHA256.HashData(
+            Encoding.UTF8.GetBytes(legacyRequest))).ToLowerInvariant();
         return await Transaction(async tx =>
         {
             await Current(actor, target, "Begin", normalized, scope, tx);
@@ -201,7 +209,8 @@ public sealed class SqliteBlobUploadService
             if (rows.Count == 1)
             {
                 var old = rows[0];
-                if (old.GetValueOrDefault("request_hash")?.TryText() != requestHash)
+                if (old.GetValueOrDefault("request_hash")?.TryText() is not string priorHash ||
+                    priorHash != requestHash && priorHash != legacyHash)
                     throw Error("BLOB_IDEMPOTENCY_CONFLICT");
                 await Current(actor, target, "Begin", normalized, scope, tx);
                 BlobUploadSession prior;
