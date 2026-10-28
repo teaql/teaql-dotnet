@@ -46,8 +46,12 @@ public class UserContext
             || string.IsNullOrWhiteSpace(evidence.SourceLabel) || normalized.Contains("authorization")
             || normalized.Contains("cookie") || normalized.Contains("token="))
             throw new ArgumentException("Fix evidence must contain only safe framework provenance labels");
-        _currentFixEvidence.Add(evidence);
+        if (_activeGraphSave == null && CheckerFixInvocation.Current(this) is { } invocation)
+            invocation.Record(evidence);
+        else _currentFixEvidence.Add(evidence);
     }
+
+    internal void CompleteStandaloneFixEvidence(IReadOnlyList<FixEvidence> evidence) => _lastFixEvidence = evidence;
     
     public string TraceId { get; set; }
     public string? UserIdentifier { get; set; }
@@ -282,7 +286,10 @@ public class UserContext
         }
         finally
         {
-            _lastFixEvidence = _currentFixEvidence.AsReadOnly();
+            // A read-only view of the active List is not an immutable receipt:
+            // a later standalone Fix must never append to an older result.
+            _lastFixEvidence = Array.AsReadOnly(_currentFixEvidence.ToArray());
+            _currentFixEvidence = new List<FixEvidence>();
             session?.Close();
             _activeGraphSave = null;
             _mutationPolicy.EndGraph();
@@ -554,10 +561,17 @@ public class UserContext
 
     internal void CheckAndFix(MutationRequest request)
     {
+        if (_activeGraphSave != null) { CheckAndFixCore(request); return; }
+        using var invocation = CheckerFixInvocation.Open(this);
+        CheckAndFixCore(request);
+    }
+
+    private void CheckAndFixCore(MutationRequest request)
+    {
         MutationVersionAdmission.Validate(this, request);
         if (request is BatchMutationRequest batch)
         {
-            foreach (var item in batch.Requests) CheckAndFix(item);
+            foreach (var item in batch.Requests) CheckAndFixCore(item);
             MutationVersionAdmission.Validate(this, request);
             return;
         }
@@ -574,7 +588,7 @@ public class UserContext
         var deferredReferences = IntegralScalarAdmission.CaptureDeferred(descriptor, request,
             ReferenceEquals(request.GraphOwner, _activeGraphSave) && _activeGraphSave?.IsPreparing == true);
         var violations = _checkers.TryGetValue(entity, out var checker)
-            ? checker.CheckAndFix(this, request, _graphFixTime ?? BusinessTime).ToList()
+            ? checker.CheckAndFix(this, request, _graphFixTime ?? CheckerFixInvocation.Current(this)?.Now ?? BusinessTime).ToList()
             : new List<CheckResult>();
         MutationVersionAdmission.Validate(this, request);
         CanonicalMutationFields.Validate(this, request);
