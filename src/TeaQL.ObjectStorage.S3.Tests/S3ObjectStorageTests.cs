@@ -53,6 +53,15 @@ public class S3ObjectStorageTests
             if (delay > TimeSpan.Zero) await Task.Delay(delay);
             using var expired = await http.GetAsync(ticket.Url);
             Assert.Equal(HttpStatusCode.Forbidden, expired.StatusCode);
+            var refreshed = await storage.GetReadUrlAsync(key,
+                new(TimeSpan.FromSeconds(30), "attachment", "report.pdf"));
+            Assert.NotEqual(ticket.Url, refreshed.Url);
+            Assert.True(refreshed.ExpiresAt > DateTimeOffset.UtcNow);
+            using var refreshRequest = new HttpRequestMessage(HttpMethod.Get, refreshed.Url);
+            refreshRequest.Headers.Range = new RangeHeaderValue(0, 7);
+            using var refreshResponse = await http.SendAsync(refreshRequest);
+            Assert.Equal(HttpStatusCode.PartialContent, refreshResponse.StatusCode);
+            Assert.Equal(bytes[..8], await refreshResponse.Content.ReadAsByteArrayAsync());
             if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_CREATE_ONLY") == "1")
             {
                 var create = new ObjectPutOptions(bytes.Length, ObjectWriteMode.CreateOnly, "application/pdf");
