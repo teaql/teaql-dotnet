@@ -91,6 +91,7 @@ public class BlobUploadS3Tests
 
     [Theory]
     [InlineData("pdf")]
+    [InlineData("production-pdf")]
     [InlineData("jpg")]
     [InlineData("mp3")]
     [InlineData("mp4")]
@@ -104,6 +105,8 @@ public class BlobUploadS3Tests
             Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_MEDIA") != "1") return;
         if ((format is "docx" or "xlsx") &&
             Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_OFFICE") != "1") return;
+        if (format == "production-pdf" &&
+            Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_PDF") != "1") return;
         var endpoint = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ENDPOINT");
         var bucket = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BUCKET");
         var access = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ACCESS_KEY");
@@ -128,26 +131,29 @@ public class BlobUploadS3Tests
         var store = actor.ObjectStorage("verify S3 Blob upload");
         var catalog = new SqliteBlobCatalog(transport);
         await catalog.EnsureSchemaAsync();
-        var permission = new UploadPermission { Extension = format };
+        var extension = format == "production-pdf" ? "pdf" : format;
+        var permission = new UploadPermission { Extension = extension };
         var pdfVerifier = new PdfVerifier();
         IBlobContentVerifier verifier = format switch {
             "jpg" => new StbImageBlobContentVerifier(),
             "mp3" or "mp4" => new FfmpegBlobContentVerifier(
                 "/usr/bin/ffprobe", "/usr/bin/ffmpeg", "/usr/bin/prlimit"),
             "docx" or "xlsx" => new OfficeBlobContentVerifier(),
+            "production-pdf" => new PopplerBlobContentVerifier(
+                "/usr/bin/pdfinfo", "/usr/bin/pdftoppm", "/usr/bin/prlimit"),
             _ => pdfVerifier
         };
         var service = new SqliteBlobUploadService(catalog, permission, verifier, 10_000);
         var bytes = format == "pdf"
             ? Encoding.UTF8.GetBytes("%PDF-1.7\nreal S3 Blob upload\n%%EOF")
-            : await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." + format));
+            : await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." + extension));
         var contentType = format switch {
             "jpg" => "image/jpeg", "mp3" => "audio/mpeg", "mp4" => "video/mp4",
             "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             _ => "application/pdf"
         };
-        var filename = format == "pdf" ? "report.pdf" : "sample." + format;
+        var filename = format == "pdf" ? "report.pdf" : "sample." + extension;
         var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
             new BlobUploadInput(filename, bytes.Length, contentType),
             Guid.NewGuid().ToString("N"));
@@ -161,7 +167,7 @@ public class BlobUploadS3Tests
             {
                 var uploaded = await store.GetBytesAsync(key, 10_000);
                 Assert.Equal(bytes, uploaded);
-                var decoded = await verifier.VerifyAsync(new MemoryStream(uploaded), format, 10_000);
+                var decoded = await verifier.VerifyAsync(new MemoryStream(uploaded), extension, 10_000);
                 Assert.Equal(contentType, decoded.ContentType);
             }
             permission.Allowed = false;

@@ -93,5 +93,13 @@ limits. It rejects duplicate or traversal part names, DTD/entity directives,
 malformed XML, mismatched Office content types or main relationships, and
 missing Word body or Excel worksheet references. It returns the verified
 DOCX/XLSX MIME. This is bounded OOXML package and XML structure validation,
-not a complete Office application schema or malware scan. Binary DOC/XLS and
-PDF still need production verifiers.
+not a complete Office application schema or malware scan.
+
+For PDF, the host may pass `PopplerBlobContentVerifier` with absolute paths to
+patched Linux `pdfinfo`, `pdftoppm` and `prlimit` binaries. It bounds input,
+page count, rendered PNG output, concurrent calls, child CPU/address space and
+wall time; rejects encrypted or malformed PDFs; renders and fully decodes every
+page from stdin without scratch files; and reports the original byte SHA-256
+and `application/pdf`. The host must check readiness and explicitly allow PDF
+in field policy. This is decodability validation, not malware scanning or full
+PDF conformance. Binary DOC/XLS still need production verifiers.

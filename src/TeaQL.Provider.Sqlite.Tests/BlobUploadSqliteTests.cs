@@ -172,6 +172,104 @@ public class BlobUploadSqliteTests
         Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." +
             (extension == "jpeg" ? "jpg" : extension)));
 
+    private static PopplerBlobContentVerifier ProductionPdfVerifier(int maximumPages = 100,
+        int maximumRenderedBytes = 4 * 1024 * 1024, int concurrentVerifications = 2) =>
+        new("/usr/bin/pdfinfo", "/usr/bin/pdftoppm", "/usr/bin/prlimit",
+            maximumInputBytes: 100_000, maximumPages: maximumPages,
+            maximumRenderedBytes: maximumRenderedBytes,
+            concurrentVerifications: concurrentVerifications);
+
+    [Fact]
+    public async Task RealPdfVerifierRendersAllPagesAndRejectsMalformedInput()
+    {
+        var bytes = ImageFixture("pdf");
+        Assert.Equal("4b6a645a3ed4736baaa092cffa6e06fd3176866f589edd2b748565ad6487731b",
+            Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant());
+        var verifier = ProductionPdfVerifier();
+        await verifier.ValidateReadyAsync();
+        var verified = await verifier.VerifyAsync(new MemoryStream(bytes), "pdf", bytes.Length);
+        Assert.Equal(bytes.Length, verified.SizeBytes);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(), verified.Sha256);
+        Assert.Equal("application/pdf", verified.ContentType);
+        foreach (var invalid in new byte[][] { bytes[..^2], [.. bytes, (byte)'x'],
+                     "%PDF-1.7\nstartxref\n0\n%%EOF"u8.ToArray() })
+            Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => verifier.VerifyAsync(new MemoryStream(invalid), "pdf", invalid.Length))).Message);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), "docx", bytes.Length))).Message);
+        Assert.Equal("BLOB_SIZE_EXCEEDED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), "pdf", bytes.Length - 1))).Message);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => ProductionPdfVerifier(maximumRenderedBytes: 1)
+                .VerifyAsync(new MemoryStream(bytes), "pdf", bytes.Length))).Message);
+        var two = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Fixtures", "two-page.pdf"));
+        Assert.Equal(two.Length, (await verifier.VerifyAsync(new MemoryStream(two), "pdf", two.Length)).SizeBytes);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => ProductionPdfVerifier(maximumPages: 1)
+                .VerifyAsync(new MemoryStream(two), "pdf", two.Length))).Message);
+    }
+
+    [Fact]
+    public async Task RealPdfVerifierChecksReadinessBusyAdmissionAndComposite()
+    {
+        var bytes = ImageFixture("pdf");
+        var verifier = ProductionPdfVerifier(concurrentVerifications: 1);
+        var slow = new PausedReadStream(bytes);
+        var first = verifier.VerifyAsync(slow, "pdf", bytes.Length);
+        await slow.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal("BLOB_VERIFICATION_BUSY", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), "pdf", bytes.Length))).Message);
+        slow.Release.SetResult();
+        Assert.Equal(bytes.Length, (await first).SizeBytes);
+        Assert.Equal("BLOB_CAPABILITY_MISSING", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => new PopplerBlobContentVerifier("/missing/pdfinfo", "/usr/bin/pdftoppm", "/usr/bin/prlimit")
+                .ValidateReadyAsync())).Message);
+        var composite = new CompositeBlobContentVerifier(new Dictionary<string, IBlobContentVerifier> {
+            ["jpg"] = new StbImageBlobContentVerifier(), ["pdf"] = verifier
+        });
+        await composite.ValidateReadyAsync();
+        Assert.Equal("application/pdf", (await composite.VerifyAsync(
+            new MemoryStream(bytes), "pdf", bytes.Length)).ContentType);
+    }
+
+    [Fact]
+    public async Task RealPdfUploadCompletesOnlyAfterProductionValidation()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-pdf-upload-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(store);
+            var service = new SqliteBlobUploadService(catalog,
+                new UploadAuthorization { Extensions = ["pdf"] }, ProductionPdfVerifier(), 100_000);
+            var bytes = ImageFixture("pdf");
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var session = await service.BeginAsync(actor, target,
+                new BlobUploadInput("sample.pdf", bytes.Length), "pdf-valid");
+            await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes));
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal("uploaded_unbound", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            Assert.Equal("application/pdf", await Scalar(db,
+                "SELECT content_type FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            var truncated = bytes[..^12];
+            var invalid = await service.BeginAsync(actor, target,
+                new BlobUploadInput("broken.pdf", truncated.Length), "pdf-truncated");
+            await service.WriteAsync(actor, invalid.UploadId, new MemoryStream(truncated));
+            Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, invalid.UploadId))).Message);
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", invalid.Reference.Key));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     private static byte[] RewriteOfficePart(byte[] data, string name, string replacement)
     {
         using var source = new ZipArchive(new MemoryStream(data), ZipArchiveMode.Read);

@@ -9,5 +9,6 @@
     <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.mp4" Link="Fixtures/sample.mp4" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.docx" Link="Fixtures/sample.docx" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.xlsx" Link="Fixtures/sample.xlsx" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.pdf" Link="Fixtures/sample.pdf" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
