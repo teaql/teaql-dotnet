@@ -15,9 +15,21 @@ public sealed class NativeBlobMutationSqliteTests
     {
         public string CurrentScope = "tenant-a";
         public bool Allowed = true;
+        public string? DenyEntityId;
+        public bool Denied;
+        public readonly List<(string EntityId, string Field)> Visited = [];
         public string Scope(UserContext actor) => CurrentScope;
         public Task<bool> AuthorizeAsync(UserContext actor, BlobBindingTarget target,
-            BlobRef? previous, BlobRef? next, string action) => Task.FromResult(Allowed);
+            BlobRef? previous, BlobRef? next, string action)
+        {
+            Visited.Add((target.EntityId, target.Field));
+            if (target.EntityId == DenyEntityId && target.Field == "legacy_document")
+            {
+                Denied = true;
+                return Task.FromResult(false);
+            }
+            return Task.FromResult(Allowed);
+        }
         public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
             IPhysicalSqlLease lease, BlobBindingTarget target) =>
             Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
@@ -234,6 +246,141 @@ public sealed class NativeBlobMutationSqliteTests
                 }));
             Assert.Equal("BLOB_TRANSACTION_REQUIRED", wrongOwner.Message);
             Assert.Equal(0L, await Scalar(db, "SELECT COUNT(*) FROM native_asset WHERE id=3"));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task MultiEntityBlobGraphRollsBackLateDenialAndOuterRejection()
+    {
+        await using var db = new SqliteConnection("Data Source=:memory:");
+        await db.OpenAsync();
+        var asset = EntityDescriptor.New("Asset").TableName("multi_asset")
+            .Property(PropertyDescriptor.New("id", DataType.U64).Id().NotNull())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+            .Property(PropertyDescriptor.New("document", DataType.Text).Blob(
+                new BlobFieldSpec("Asset", "document", ["pdf"], true, "default")))
+            .Property(PropertyDescriptor.New("legacy_document", DataType.Text).Blob(
+                new BlobFieldSpec("Asset", "legacy_document", ["pdf"], true, "default")));
+        var transport = new SqliteTransport(db);
+        var actor = new RuntimeModule().Entity(asset).IntoContext()
+            .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(), transport,
+                new MetadataSchemaProvider(name => name == "Asset" ? asset : null)));
+        await actor.EnsureSchemaAsync();
+        var catalog = new SqliteBlobCatalog(transport);
+        await catalog.EnsureSchemaAsync();
+        var permission = new BindingPermission();
+        var upload = new SqliteBlobUploadService(catalog, new UploadPermission(),
+            new UnusedVerifier(), 1024);
+        var module = new BlobReferenceModule(catalog, upload, new ReadPermission(), permission);
+        var root = Path.Combine(Path.GetTempPath(), "teaql-dotnet-multi-blob-" + Guid.NewGuid());
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                Enumerable.Repeat((byte)0x42, 32).ToArray());
+            actor.WithObjectStorage(store);
+            module.Install(actor);
+            await module.ReadyAsync(actor);
+            var references = new[] { new BlobRef("blob_multi_first"),
+                new BlobRef("blob_multi_second"), new BlobRef("blob_multi_third") };
+            foreach (var reference in references)
+            {
+                await using var insert = db.CreateCommand();
+                insert.CommandText = """
+                    INSERT INTO teaql_blob_catalog
+                    (key,scope,object_key,content_version,file_name,content_type,size_bytes,status,
+                     completed_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds)
+                    VALUES (@key,'tenant-a',@object,'v1','report.pdf','application/pdf',7,
+                      'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,
+                      'default','server_stream',86400,604800)
+                    """;
+                insert.Parameters.AddWithValue("@key", reference.Key);
+                insert.Parameters.AddWithValue("@object", "objects/" + reference.Key);
+                await insert.ExecuteNonQueryAsync();
+            }
+
+            var ids = new ulong[2];
+            async Task Save(bool catchDenial = false, bool outerReject = false)
+            {
+                permission.Visited.Clear();
+                permission.Denied = false;
+                permission.DenyEntityId = null;
+                var ledger = new EntityRoot();
+                var provisional = new[] { new EntityKey("Asset", -1), new EntityKey("Asset", -2) };
+                foreach (var key in provisional) ledger.MarkAsNew(key);
+                ledger.Set(provisional[0], "document", Value.FromObject(references[0]));
+                ledger.Set(provisional[1], "document", Value.FromObject(references[1]));
+                ledger.Set(provisional[1], "legacy_document", Value.FromObject(references[2]));
+                await actor.ExecuteGraphSaveAsync("save multi-entity Blob graph", async graph =>
+                {
+                    for (var index = 0; index < ids.Length; index++)
+                        ids[index] = await graph.AllocateIdAsync("Asset");
+                    if (catchDenial) permission.DenyEntityId = ids[1].ToString();
+                    for (var index = 0; index < ids.Length; index++)
+                    {
+                        var actual = new EntityKey("Asset", new Value.U64Value(ids[index]));
+                        ledger.Rekey(provisional[index], actual);
+                        Assert.True(ledger.IsNew(actual));
+                        Assert.Equal(Value.FromObject(references[index]), ledger.Change(actual)["document"]);
+                        var command = new InsertCommand("Asset")
+                            .Value("id", ids[index])
+                            .Value("document", ledger.Change(actual)["document"]);
+                        if (index == 1)
+                            command.Value("legacy_document", ledger.Change(actual)["legacy_document"]);
+                        var request = new InsertMutationRequest(command, "save multi-entity Blob graph")
+                        { LedgerRoot = ledger, LedgerKey = actual };
+                        try
+                        {
+                            await graph.MutateAsync(request, graph.Scope("Asset", ids[index], null));
+                        }
+                        catch (InvalidOperationException) when (catchDenial) { return true; }
+                    }
+                    if (outerReject) throw new InvalidOperationException("outer owner rejected");
+                    return true;
+                });
+            }
+
+            async Task AssertRolledBack()
+            {
+                Assert.Equal(0L, await Scalar(db, "SELECT COUNT(*) FROM multi_asset"));
+                Assert.Equal(0L, await Scalar(db, "SELECT COUNT(*) FROM teaql_blob_binding"));
+                Assert.Equal(3L, await Scalar(db,
+                    "SELECT COUNT(*) FROM teaql_blob_catalog WHERE status='uploaded_unbound'"));
+            }
+
+            var denied = await Assert.ThrowsAsync<InvalidOperationException>(() => Save(catchDenial: true));
+            Assert.Equal("GRAPH_TRANSACTION_ROLLBACK_ONLY", denied.Message);
+            Assert.True(permission.Denied);
+            Assert.Equal(new[] { (ids[0].ToString(), "document"),
+                (ids[0].ToString(), "legacy_document"),
+                (ids[1].ToString(), "document"),
+                (ids[1].ToString(), "legacy_document") }, permission.Visited);
+            await AssertRolledBack();
+
+            var rejected = await Assert.ThrowsAsync<InvalidOperationException>(() => Save(outerReject: true));
+            Assert.Equal("outer owner rejected", rejected.Message);
+            await AssertRolledBack();
+
+            await Save();
+            Assert.Equal(references[0].Key, await Scalar(db,
+                $"SELECT document FROM multi_asset WHERE id={ids[0]}"));
+            Assert.Null(await Scalar(db,
+                $"SELECT legacy_document FROM multi_asset WHERE id={ids[0]}"));
+            Assert.Equal(references[1].Key, await Scalar(db,
+                $"SELECT document FROM multi_asset WHERE id={ids[1]}"));
+            Assert.Equal(references[2].Key, await Scalar(db,
+                $"SELECT legacy_document FROM multi_asset WHERE id={ids[1]}"));
+            Assert.Equal(4L, await Scalar(db, "SELECT COUNT(*) FROM teaql_blob_binding"));
+            Assert.Equal(3L, await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_binding WHERE key IS NOT NULL"));
+            Assert.Equal(1L, await Scalar(db,
+                $"SELECT COUNT(*) FROM teaql_blob_binding WHERE entity_id='{ids[0]}' " +
+                "AND field='legacy_document' AND key IS NULL"));
+            Assert.Equal((references[0].Key, 1L), await Binding(db, ids[0].ToString()));
+            Assert.Equal((references[1].Key, 1L), await Binding(db, ids[1].ToString()));
+            Assert.Equal(3L, await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_catalog WHERE status='available'"));
         }
         finally { Directory.Delete(root, recursive: true); }
     }
