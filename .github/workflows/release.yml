@@ -54,6 +54,8 @@ jobs:
           done
       - name: Verify exact release candidates
         run: python3 scripts/verify-release-candidates.py artifacts
+      - name: Run four isolated consumers from exact candidates
+        run: python3 scripts/verify-optional-reference-consumers.py "$PWD" artifacts
       - uses: NuGet/login@v1
         id: login
         with:
