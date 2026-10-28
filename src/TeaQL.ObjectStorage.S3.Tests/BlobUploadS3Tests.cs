@@ -14,10 +14,11 @@ using TeaQL.Runtime;
 using TeaQL.Runtime.Storage;
 using TeaQL.Sql;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace TeaQL.Tests.ObjectStorageS3;
 
-public class BlobUploadS3Tests
+public class BlobUploadS3Tests(ITestOutputHelper output)
 {
     private sealed class UploadPermission : IBlobUploadAuthorization, IBlobUploadPolicyAuthorization
     {
@@ -62,14 +63,23 @@ public class BlobUploadS3Tests
 
     private sealed class BindingPermission : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
     {
+        public BlobRef? Expected;
         public string Scope(UserContext actor) => "f4-s3-upload";
         public Task<bool> AuthorizeAsync(UserContext actor, BlobBindingTarget target,
             BlobRef? previous, BlobRef? next, string action) => Task.FromResult(
                 target.Entity == "Asset" && target.EntityId == "1" && target.Field == "file" &&
-                previous is null && next is not null && action == "Create");
+                (action == "Create" && previous is null && next?.Equals(Expected) == true ||
+                 action == "Update" && previous?.Equals(Expected) == true && next is null));
         public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
             IPhysicalSqlLease lease, BlobBindingTarget target) =>
             Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
+    }
+
+    private sealed class MaintenancePermission : IBlobMaintenanceAuthorization
+    {
+        public string Scope(UserContext actor) => "f4-s3-upload";
+        public Task<bool> CanMaintainAsync(UserContext actor, string scope) =>
+            Task.FromResult(scope == "f4-s3-upload");
     }
 
     private sealed class ReadPermission : IBlobReadAuthorization
@@ -93,6 +103,8 @@ public class BlobUploadS3Tests
     [InlineData("pdf")]
     [InlineData("production-pdf")]
     [InlineData("jpg")]
+    [InlineData("jpeg")]
+    [InlineData("png")]
     [InlineData("mp3")]
     [InlineData("mp4")]
     [InlineData("docx")]
@@ -102,7 +114,8 @@ public class BlobUploadS3Tests
     public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay(string format)
     {
         if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BLOB_UPLOAD") != "1") return;
-        if (format == "jpg" && Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_IMAGE") != "1") return;
+        if (format is "jpg" or "jpeg" or "png" &&
+            Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_IMAGE") != "1") return;
         if ((format is "mp3" or "mp4") &&
             Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_MEDIA") != "1") return;
         if ((format is "docx" or "xlsx") &&
@@ -129,10 +142,12 @@ public class BlobUploadS3Tests
             }), bucket!);
         await using var db = new SqliteConnection("Data Source=:memory:");
         await db.OpenAsync();
+        var clock = DateTimeOffset.UtcNow;
         var asset = EntityDescriptor.New("Asset").TableName("asset")
             .Property(PropertyDescriptor.New("id", DataType.I64).Id())
             .Property(PropertyDescriptor.New("version", DataType.I64).Version())
-            .Property(PropertyDescriptor.New("name", DataType.Text));
+            .Property(PropertyDescriptor.New("name", DataType.Text))
+            .Property(PropertyDescriptor.New("file", DataType.Text));
         var transport = new SqliteTransport(db);
         var actor = new RuntimeModule().Entity(asset).IntoContext().WithDataService(
             new SqlDataServiceExecutor(new SqliteDialect(), transport,
@@ -140,13 +155,13 @@ public class BlobUploadS3Tests
             .WithObjectStorage(provider);
         await actor.EnsureSchemaAsync();
         var store = actor.ObjectStorage("verify S3 Blob upload");
-        var catalog = new SqliteBlobCatalog(transport);
+        var catalog = new SqliteBlobCatalog(transport, () => clock);
         await catalog.EnsureSchemaAsync();
         var extension = format == "production-pdf" ? "pdf" : format;
         var permission = new UploadPermission { Extension = extension };
         var pdfVerifier = new PdfVerifier();
         IBlobContentVerifier verifier = format switch {
-            "jpg" => new StbImageBlobContentVerifier(),
+            "jpg" or "jpeg" or "png" => new StbImageBlobContentVerifier(),
             "mp3" or "mp4" => new FfmpegBlobContentVerifier(
                 "/usr/bin/ffprobe", "/usr/bin/ffmpeg", "/usr/bin/prlimit"),
             "docx" or "xlsx" => new OfficeBlobContentVerifier(),
@@ -157,12 +172,15 @@ public class BlobUploadS3Tests
                 "/usr/bin/pdfinfo", "/usr/bin/pdftoppm", "/usr/bin/prlimit"),
             _ => pdfVerifier
         };
-        var service = new SqliteBlobUploadService(catalog, permission, verifier, 10_000);
+        var service = new SqliteBlobUploadService(catalog, permission, verifier, 10_000,
+            now: () => clock);
         var bytes = format == "pdf"
             ? Encoding.UTF8.GetBytes("%PDF-1.7\nreal S3 Blob upload\n%%EOF")
-            : await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." + extension));
+            : await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures",
+                "sample." + (format == "jpeg" ? "jpg" : extension)));
         var contentType = format switch {
-            "jpg" => "image/jpeg", "mp3" => "audio/mpeg", "mp4" => "video/mp4",
+            "jpg" or "jpeg" => "image/jpeg", "png" => "image/png",
+            "mp3" => "audio/mpeg", "mp4" => "video/mp4",
             "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "doc" => "application/msword", "xls" => "application/vnd.ms-excel",
@@ -205,17 +223,21 @@ public class BlobUploadS3Tests
                 "SELECT size_bytes FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
             Assert.Equal(head.ETag, await Scalar(db,
                 "SELECT content_version FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            var bindingPermission = new BindingPermission { Expected = session.Reference };
             await actor.ExecuteGraphSaveAsync("bind S3 Blob in business graph", async graph =>
             {
                 await graph.MutateAsync(new InsertMutationRequest(new InsertCommand("Asset")
                     .Value("id", new Value.U64Value(1))
-                    .Value("name", new Value.TextValue("document")), "save asset"),
+                    .Value("name", new Value.TextValue("document"))
+                    .Value("file", new Value.TextValue(session.Reference.Key)), "save asset"),
                     graph.Scope("Asset", 1, null));
                 Assert.Equal(1, await catalog.BindInGraphAsync(graph, actor,
                     new BlobBindingChange(new BlobBindingTarget("Asset", "1", "file"),
-                        session.Reference, 0, 1, "Create"), new BindingPermission()));
+                        session.Reference, 0, 1, "Create"), bindingPermission));
                 return true;
             });
+            Assert.Equal(session.Reference.Key, await Scalar(db,
+                "SELECT file FROM asset WHERE id=1", session.Reference.Key));
             Assert.Equal(session.Reference.Key, await Scalar(db,
                 "SELECT key FROM teaql_blob_binding WHERE entity_id='1'", session.Reference.Key));
             Assert.Equal("available", await Scalar(db,
@@ -252,6 +274,74 @@ public class BlobUploadS3Tests
                     new ViewOptions("ordinary", "committed", DateTimeOffset.UtcNow.AddSeconds(60))));
             Assert.Equal("BLOB_READ_DENIED", stale.Code);
             Assert.Equal("committed", stale.BusinessState);
+            if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_END_TO_END_GC") == "1")
+            {
+                await actor.ExecuteGraphSaveAsync("unbind S3 Blob in business graph", async graph =>
+                {
+                    await graph.MutateAsync(new UpdateMutationRequest(new UpdateCommand("Asset",
+                        new Value.U64Value(1)).ExpectedVersion(1)
+                        .Value("file", new Value.NullValue()), "clear asset file"),
+                        graph.Scope("Asset", 1, null));
+                    Assert.Equal(2, await catalog.BindInGraphAsync(graph, actor,
+                        new BlobBindingChange(new BlobBindingTarget("Asset", "1", "file"),
+                            null, 1, 2, "Update"), bindingPermission));
+                    return true;
+                });
+                await using (var business = db.CreateCommand())
+                {
+                    business.CommandText = "SELECT file,version FROM asset WHERE id=1";
+                    await using var row = await business.ExecuteReaderAsync();
+                    Assert.True(await row.ReadAsync());
+                    Assert.True(row.IsDBNull(0));
+                    Assert.Equal(2, row.GetInt64(1));
+                }
+                await using (var binding = db.CreateCommand())
+                {
+                    binding.CommandText = "SELECT key,version FROM teaql_blob_binding WHERE " +
+                        "scope='f4-s3-upload' AND entity='Asset' AND entity_id='1' AND field='file'";
+                    await using var row = await binding.ExecuteReaderAsync();
+                    Assert.True(await row.ReadAsync());
+                    Assert.True(row.IsDBNull(0));
+                    Assert.Equal(2, row.GetInt64(1));
+                }
+                long lastUnbound, effective, floor;
+                await using (var facts = db.CreateCommand())
+                {
+                    facts.CommandText = "SELECT status,last_unbound_at_ms,effective_unref_seconds," +
+                        "retention_floor_until_ms FROM teaql_blob_catalog WHERE key=@key";
+                    facts.Parameters.AddWithValue("@key", session.Reference.Key);
+                    await using var row = await facts.ExecuteReaderAsync();
+                    Assert.True(await row.ReadAsync());
+                    Assert.Equal("available", row.GetString(0));
+                    lastUnbound = row.GetInt64(1);
+                    effective = row.GetInt64(2);
+                    floor = row.GetInt64(3);
+                }
+                Assert.Equal(clock.ToUnixTimeMilliseconds(), lastUnbound);
+                Assert.Equal(604800, effective);
+                Assert.True(floor >= clock.ToUnixTimeMilliseconds() + 3600_000);
+                graphAuthorizer.BindingVersion = 1;
+                var unboundView = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+                    new ViewPreparationService().PrepareAsync(actor, null, options));
+                Assert.Equal("BLOB_READ_DENIED", unboundView.Code);
+
+                var maintenance = new SqliteBlobMaintenanceService(catalog,
+                    new MaintenancePermission(), 10, () => clock);
+                var deadline = BlobRetentionPolicy.UnreferencedEligibleAt(lastUnbound, effective, floor);
+                clock = DateTimeOffset.FromUnixTimeMilliseconds(deadline - 1);
+                Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
+                Assert.NotNull(await store.HeadAsync(key));
+                clock = DateTimeOffset.FromUnixTimeMilliseconds(deadline);
+                var collected = await maintenance.RunBatchAsync(actor);
+                var outcome = Assert.Single(collected.Outcomes);
+                Assert.Equal(session.Reference, outcome.Reference);
+                Assert.Equal("deleted", outcome.Status);
+                Assert.Null(await store.HeadAsync(key));
+                Assert.Equal("deleted", await Scalar(db,
+                    "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+                output.WriteLine("PASS DotNet " + format +
+                    " S3 upload/confirm/graph bind/authorized view/unbind/retention GC");
+            }
             if ((format is "doc" or "xls") &&
                 Environment.GetEnvironmentVariable("TEAQL_S3_TEST_LEGACY_OFFICE_MARKER_DIR") is { } marker)
                 File.WriteAllText(Path.Combine(marker, format + ".pass"), "legacy-office-real-gate-passed");
