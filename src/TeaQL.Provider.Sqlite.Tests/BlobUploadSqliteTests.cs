@@ -924,8 +924,26 @@ public class BlobUploadSqliteTests
             var verifier = new PdfVerifier();
             var service = new SqliteBlobUploadService(catalog, policy, verifier, 10_000);
             var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nSQL commit succeeded, reply lost\n%%EOF");
-            var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
-                new BlobUploadInput("report.pdf", bytes.Length), "unknown-write");
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var input = new BlobUploadInput("report.pdf", bytes.Length);
+            transport.LoseNextCommitReply = true;
+            Assert.Equal("BLOB_CATALOG_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.BeginAsync(actor, target, input, "unknown-write"))).Message);
+            var begunId = await Scalar(db, "SELECT upload_id FROM teaql_blob_upload WHERE replay_key=@key", "unknown-write");
+            var begunKey = await Scalar(db, "SELECT key FROM teaql_blob_upload WHERE replay_key=@key", "unknown-write");
+            var begunExpiry = await Scalar(db,
+                "SELECT CAST(expires_ms AS TEXT) FROM teaql_blob_upload WHERE replay_key=@key", "unknown-write");
+            policy.Allowed = false;
+            Assert.Equal("BLOB_UPLOAD_DENIED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.BeginAsync(actor, target, input, "unknown-write"))).Message);
+            policy.Allowed = true;
+            Assert.Equal("BLOB_IDEMPOTENCY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.BeginAsync(actor, target,
+                    new BlobUploadInput("changed.pdf", bytes.Length), "unknown-write"))).Message);
+            var session = await service.BeginAsync(actor, target, input, "unknown-write");
+            Assert.Equal(begunId, session.UploadId);
+            Assert.Equal(begunKey, session.Reference.Key);
+            Assert.Equal(begunExpiry, session.ExpiresAt.ToUnixTimeMilliseconds().ToString());
             transport.LoseNextCommitReply = true;
             Assert.Equal("BLOB_CATALOG_FAILED", (await Assert.ThrowsAsync<InvalidOperationException>(
                 () => service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)))).Message);
