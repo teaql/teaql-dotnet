@@ -80,7 +80,8 @@ public sealed class NativeBlobMutationSqliteTests
             await module.ReadyAsync(actor);
             var first = new BlobRef("blob_native_first");
             var second = new BlobRef("blob_native_second");
-            foreach (var reference in new[] { first, second })
+            var ledgerRef = new BlobRef("blob_native_ledger");
+            foreach (var reference in new[] { first, second, ledgerRef })
             {
                 await using var insert = db.CreateCommand();
                 insert.CommandText = """
@@ -172,6 +173,47 @@ public sealed class NativeBlobMutationSqliteTests
                     return true;
                 }));
             Assert.Equal(0L, await Scalar(db, "SELECT COUNT(*) FROM native_asset WHERE id=2"));
+
+            ulong abortedId = 0;
+            async Task<ulong> SaveAllocated(bool abort)
+            {
+                var ledger = new EntityRoot();
+                var provisional = new EntityKey("Asset", -1);
+                ledger.MarkAsNew(provisional);
+                ledger.Set(provisional, "document", Value.FromObject(ledgerRef));
+                return await actor.ExecuteGraphSaveAsync("save allocated ledger Blob", async graph =>
+                {
+                    var id = await graph.AllocateIdAsync("Asset");
+                    var actual = new EntityKey("Asset", new Value.U64Value(id));
+                    ledger.Rekey(provisional, actual);
+                    Assert.True(ledger.IsNew(actual));
+                    Assert.Equal(Value.FromObject(ledgerRef), ledger.Change(actual)["document"]);
+                    var request = new InsertMutationRequest(new InsertCommand("Asset")
+                        .Value("id", id).Value("document", ledger.Change(actual)["document"]),
+                        "save allocated ledger Blob") { LedgerRoot = ledger, LedgerKey = actual };
+                    await graph.MutateAsync(request, graph.Scope("Asset", id, null));
+                    if (abort)
+                    {
+                        abortedId = id;
+                        throw new InvalidOperationException("outer owner rejected");
+                    }
+                    return id;
+                });
+            }
+            var outerFailure = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => SaveAllocated(true));
+            Assert.Equal("outer owner rejected", outerFailure.Message);
+            Assert.Equal(0L, await Scalar(db, $"SELECT COUNT(*) FROM native_asset WHERE id={abortedId}"));
+            Assert.Equal(0L, await Scalar(db,
+                $"SELECT COUNT(*) FROM teaql_blob_binding WHERE entity_id='{abortedId}'"));
+            Assert.Equal("uploaded_unbound", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key='blob_native_ledger'"));
+            var committedId = await SaveAllocated(false);
+            Assert.Equal(ledgerRef.Key, await Scalar(db,
+                $"SELECT document FROM native_asset WHERE id={committedId}"));
+            Assert.Equal((ledgerRef.Key, 1L), await Binding(db, committedId.ToString()));
+            Assert.Equal("available", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key='blob_native_ledger'"));
 
             var alien = new RuntimeModule().Entity(asset).Entity(control).IntoContext()
                 .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(),
