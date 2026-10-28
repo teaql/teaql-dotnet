@@ -210,7 +210,8 @@ public class BlobUploadSqliteTests
     [Theory]
     [InlineData("\u2028")]
     [InlineData("\u2029")]
-    public async Task UnicodeSeparatorUploadHashUsesLiteralUtf8AndReplaysPriorDotnetRows(string separator)
+    [InlineData("📄")]
+    public async Task UnicodeUploadHashUsesLiteralUtf8AndReplaysPriorDotnetRows(string separator)
     {
         await using var db = new SqliteConnection("Data Source=:memory:");
         await db.OpenAsync();

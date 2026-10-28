@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -180,28 +181,42 @@ public sealed class SqliteBlobUploadService
         }
     }
 
-    private static string LiteralJsonSeparators(string json)
+    private static void AppendCanonicalJsonString(StringBuilder result, string value)
     {
-        // System.Text.Json escapes U+2028/U+2029 even with the relaxed encoder.
-        // Preserve literal backslash-u text by checking the preceding slash parity.
-        var result = new StringBuilder(json.Length);
-        for (var i = 0; i < json.Length; i++)
+        result.Append('"');
+        foreach (var rune in value.EnumerateRunes())
         {
-            if (i + 6 <= json.Length && json[i] == '\\' && json[i + 1] == 'u' &&
-                json[i + 2] == '2' && json[i + 3] == '0' && json[i + 4] == '2' &&
-                json[i + 5] is '8' or '9')
+            switch (rune.Value)
             {
-                var preceding = 0;
-                for (var j = i - 1; j >= 0 && json[j] == '\\'; j--) preceding++;
-                if (preceding % 2 == 0)
-                {
-                    result.Append(json[i + 5] == '8' ? '\u2028' : '\u2029');
-                    i += 5;
-                    continue;
-                }
+                case '"': result.Append("\\\""); break;
+                case '\\': result.Append("\\\\"); break;
+                case '\b': result.Append("\\b"); break;
+                case '\f': result.Append("\\f"); break;
+                case '\n': result.Append("\\n"); break;
+                case '\r': result.Append("\\r"); break;
+                case '\t': result.Append("\\t"); break;
+                default:
+                    if (rune.Value < 0x20)
+                        result.Append("\\u").Append(rune.Value.ToString("x4", CultureInfo.InvariantCulture));
+                    else result.Append(rune.ToString());
+                    break;
             }
-            result.Append(json[i]);
         }
+        result.Append('"');
+    }
+
+    private static string CanonicalUploadRequest(BlobUploadTarget target, BlobUploadInput input)
+    {
+        var result = new StringBuilder();
+        result.Append('[');
+        foreach (var part in new[] { target.Entity, target.EntityId, target.Field, input.FileName })
+        {
+            AppendCanonicalJsonString(result, part);
+            result.Append(',');
+        }
+        result.Append(input.DeclaredSize.ToString(CultureInfo.InvariantCulture)).Append(',');
+        AppendCanonicalJsonString(result, input.DeclaredContentType ?? "");
+        result.Append(']');
         return result.ToString();
     }
 
@@ -212,15 +227,15 @@ public sealed class SqliteBlobUploadService
         if (!ValidText(replayKey, 256)) throw Error("BLOB_REFERENCE_INVALID");
         var scope = await Current(actor, target, "Begin", normalized);
         var extension = normalized.FileName.Split('.').Last().ToLowerInvariant();
-        var parts = new object?[] { target.Entity, target.EntityId,
-            target.Field, normalized.FileName, normalized.DeclaredSize,
-            normalized.DeclaredContentType ?? "" };
-        var request = JsonSerializer.Serialize(parts, new JsonSerializerOptions
-            { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+        var request = CanonicalUploadRequest(target, normalized);
         var requestHash = Convert.ToHexString(SHA256.HashData(
-            Encoding.UTF8.GetBytes(LiteralJsonSeparators(request)))).ToLowerInvariant();
-        var priorRequestHash = Convert.ToHexString(SHA256.HashData(
             Encoding.UTF8.GetBytes(request))).ToLowerInvariant();
+        var priorRequest = JsonSerializer.Serialize(new object?[] { target.Entity, target.EntityId,
+            target.Field, normalized.FileName, normalized.DeclaredSize,
+            normalized.DeclaredContentType ?? "" }, new JsonSerializerOptions
+            { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+        var priorRequestHash = Convert.ToHexString(SHA256.HashData(
+            Encoding.UTF8.GetBytes(priorRequest))).ToLowerInvariant();
         var legacyRequest = JsonSerializer.Serialize(new object?[] { target.Entity, target.EntityId,
             target.Field, normalized.FileName, normalized.DeclaredSize, normalized.DeclaredContentType });
         var legacyHash = Convert.ToHexString(SHA256.HashData(
