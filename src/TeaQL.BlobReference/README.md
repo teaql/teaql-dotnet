@@ -6,6 +6,13 @@ then installs `BlobReferenceModule` into its `UserContext` and calls
 `ReadyAsync` before serving requests. Storage and schema installation remain
 host responsibilities.
 
+The upload service accepts one trusted `IBlobContentVerifier`. To use the
+optional image and media parsers together, the host can pass a
+`CompositeBlobContentVerifier` with explicit extension-to-parser routes. It
+copies and validates the routes at construction, checks each distinct parser's
+readiness, and rejects an unregistered extension before reading stored bytes.
+The router is passive and does not add formats or optional dependencies.
+
 The host may also construct `SqliteBlobMaintenanceService` with a current
 scope/permission policy and pass it as `maintenance:` to `BlobReferenceModule`.
 It is passive until the host explicitly calls `RunBatchAsync`. The bounded
