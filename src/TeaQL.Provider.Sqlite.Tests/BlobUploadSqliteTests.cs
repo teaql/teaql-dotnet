@@ -171,6 +171,100 @@ public class BlobUploadSqliteTests
         Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." +
             (extension == "jpeg" ? "jpg" : extension)));
 
+    private static FfmpegBlobContentVerifier MediaVerifier(int maximumFrames = 100_000,
+        long maximumVideoPixels = 16_000_000, int concurrentVerifications = 2) =>
+        new("/usr/bin/ffprobe", "/usr/bin/ffmpeg", "/usr/bin/prlimit",
+            maximumFrames: maximumFrames, maximumVideoPixels: maximumVideoPixels,
+            concurrentVerifications: concurrentVerifications);
+
+    [Theory]
+    [InlineData("mp3", "audio/mpeg")]
+    [InlineData("mp4", "video/mp4")]
+    public async Task RealMediaVerifierFullyDecodesAndRejectsIncompleteInput(string extension, string mime)
+    {
+        var bytes = ImageFixture(extension);
+        var verifier = MediaVerifier();
+        await verifier.ValidateReadyAsync();
+        var verified = await verifier.VerifyAsync(new MemoryStream(bytes), extension, 100_000);
+        Assert.Equal(bytes.Length, verified.SizeBytes);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(), verified.Sha256);
+        Assert.Equal(mime, verified.ContentType);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes[..^2]), extension, 100_000))).Message);
+        Assert.Equal("BLOB_SIZE_EXCEEDED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), extension, bytes.Length - 1))).Message);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), extension == "mp3" ? "mp4" : "mp3", 100_000))).Message);
+    }
+
+    [Fact]
+    public async Task RealMediaVerifierBoundsFramesPixelsAndConcurrentAdmissions()
+    {
+        var mp3 = ImageFixture("mp3");
+        var mp4 = ImageFixture("mp4");
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => MediaVerifier(maximumFrames: 1).VerifyAsync(new MemoryStream(mp3), "mp3", 100_000))).Message);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => MediaVerifier(maximumVideoPixels: 1).VerifyAsync(new MemoryStream(mp4), "mp4", 100_000))).Message);
+        var verifier = MediaVerifier(concurrentVerifications: 1);
+        var slow = new PausedReadStream(mp3);
+        var first = verifier.VerifyAsync(slow, "mp3", 100_000);
+        await slow.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal("BLOB_VERIFICATION_BUSY", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(mp3), "mp3", 100_000))).Message);
+        slow.Release.SetResult();
+        Assert.Equal(mp3.Length, (await first).SizeBytes);
+        Assert.Equal("BLOB_CAPABILITY_MISSING", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => new FfmpegBlobContentVerifier("/missing/ffprobe", "/usr/bin/ffmpeg", "/usr/bin/prlimit")
+                .ValidateReadyAsync())).Message);
+    }
+
+    [Fact]
+    public async Task RealMediaVerifierRejectsAudioOnlyMp4()
+    {
+        var bytes = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Fixtures", "audio-only.mp4"));
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => MediaVerifier().VerifyAsync(new MemoryStream(bytes), "mp4", 100_000))).Message);
+    }
+
+    [Theory]
+    [InlineData("mp3")]
+    [InlineData("mp4")]
+    public async Task RealMediaUploadCompletesOnlyAfterFullDecode(string extension)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-media-upload-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(store);
+            var service = new SqliteBlobUploadService(catalog,
+                new UploadAuthorization { Extensions = ["mp3", "mp4"] }, MediaVerifier(), 100_000);
+            var bytes = ImageFixture(extension);
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var session = await service.BeginAsync(actor, target,
+                new BlobUploadInput("sample." + extension, bytes.Length), "media-valid");
+            await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes));
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal("uploaded_unbound", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            var corrupt = bytes[..^2];
+            var invalid = await service.BeginAsync(actor, target,
+                new BlobUploadInput("sample." + extension, corrupt.Length), "media-truncated");
+            await service.WriteAsync(actor, invalid.UploadId, new MemoryStream(corrupt));
+            Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, invalid.UploadId))).Message);
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", invalid.Reference.Key));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     [Theory]
     [InlineData("jpg", "image/jpeg")]
     [InlineData("jpeg", "image/jpeg")]

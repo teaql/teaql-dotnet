@@ -65,3 +65,16 @@ The StbImageSharp dependency lives only in this optional project; core and
 runtime projects do not depend on it. Other allowed Blob formats still need
 separate trusted production verifiers. The test-only PDF verifier in the
 SQLite/S3 suites is not a production parser.
+
+For MP3/MP4, the host may explicitly pass `FfmpegBlobContentVerifier` with
+absolute paths to patched `ffprobe`, `ffmpeg` and Linux `prlimit`. Construction
+and assembly loading start no external work; `BlobReferenceModule.ReadyAsync`
+checks a verifier that implements `IBlobVerifierReadiness`. The verifier
+requires complete MP3 frames or MP4 boxes, forces the demuxer and pipe-only
+protocol, checks actual streams and frame counts, rejects audio-only MP4,
+fully decodes and returns original-byte SHA-256 and actual MIME. Input bytes,
+frames, video pixels, concurrent calls, child CPU (10 seconds), address space
+(512 MiB), wall time (15 seconds) and probe output are bounded. The host must
+separately allow `mp3`/`mp4` in the field policy and keep the executables
+patched. This does not scan for malware. DOC/DOCX/XLS/XLSX/PDF still need
+production verifiers.

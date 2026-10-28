@@ -90,12 +90,16 @@ public class BlobUploadS3Tests
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay(bool realImage)
+    [InlineData("pdf")]
+    [InlineData("jpg")]
+    [InlineData("mp3")]
+    [InlineData("mp4")]
+    public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay(string format)
     {
         if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BLOB_UPLOAD") != "1") return;
-        if (realImage && Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_IMAGE") != "1") return;
+        if (format == "jpg" && Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_IMAGE") != "1") return;
+        if ((format is "mp3" or "mp4") &&
+            Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_MEDIA") != "1") return;
         var endpoint = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ENDPOINT");
         var bucket = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BUCKET");
         var access = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ACCESS_KEY");
@@ -120,15 +124,23 @@ public class BlobUploadS3Tests
         var store = actor.ObjectStorage("verify S3 Blob upload");
         var catalog = new SqliteBlobCatalog(transport);
         await catalog.EnsureSchemaAsync();
-        var permission = new UploadPermission { Extension = realImage ? "jpg" : "pdf" };
+        var permission = new UploadPermission { Extension = format };
         var pdfVerifier = new PdfVerifier();
-        IBlobContentVerifier verifier = realImage ? new StbImageBlobContentVerifier() : pdfVerifier;
+        IBlobContentVerifier verifier = format switch {
+            "jpg" => new StbImageBlobContentVerifier(),
+            "mp3" or "mp4" => new FfmpegBlobContentVerifier(
+                "/usr/bin/ffprobe", "/usr/bin/ffmpeg", "/usr/bin/prlimit"),
+            _ => pdfVerifier
+        };
         var service = new SqliteBlobUploadService(catalog, permission, verifier, 10_000);
-        var bytes = realImage
-            ? await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample.jpg"))
-            : Encoding.UTF8.GetBytes("%PDF-1.7\nreal S3 Blob upload\n%%EOF");
-        var contentType = realImage ? "image/jpeg" : "application/pdf";
-        var filename = realImage ? "sample.jpg" : "report.pdf";
+        var bytes = format == "pdf"
+            ? Encoding.UTF8.GetBytes("%PDF-1.7\nreal S3 Blob upload\n%%EOF")
+            : await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." + format));
+        var contentType = format switch {
+            "jpg" => "image/jpeg", "mp3" => "audio/mpeg", "mp4" => "video/mp4",
+            _ => "application/pdf"
+        };
+        var filename = format == "pdf" ? "report.pdf" : "sample." + format;
         var session = await service.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
             new BlobUploadInput(filename, bytes.Length, contentType),
             Guid.NewGuid().ToString("N"));
@@ -138,11 +150,11 @@ public class BlobUploadS3Tests
         {
             Assert.Equal(bytes.Length,
                 await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
-            if (realImage)
+            if (format != "pdf")
             {
                 var uploaded = await store.GetBytesAsync(key, 10_000);
                 Assert.Equal(bytes, uploaded);
-                var decoded = await verifier.VerifyAsync(new MemoryStream(uploaded), "jpg", 10_000);
+                var decoded = await verifier.VerifyAsync(new MemoryStream(uploaded), format, 10_000);
                 Assert.Equal(contentType, decoded.ContentType);
             }
             permission.Allowed = false;
@@ -151,7 +163,7 @@ public class BlobUploadS3Tests
             permission.Allowed = true;
             Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
             Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
-            if (!realImage) Assert.Equal(1, pdfVerifier.Calls);
+            if (format == "pdf") Assert.Equal(1, pdfVerifier.Calls);
             Assert.Equal(bytes.Length,
                 await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes)));
             Assert.Equal(bytes, await store.GetBytesAsync(key, 10_000));

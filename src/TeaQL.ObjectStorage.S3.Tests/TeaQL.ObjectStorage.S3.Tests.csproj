@@ -5,5 +5,7 @@
     <ProjectReference Include="../TeaQL.BlobReference/TeaQL.BlobReference.csproj" />
     <ProjectReference Include="../TeaQL.Provider.Sqlite/TeaQL.Provider.Sqlite.csproj" />
     <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.jpg" Link="Fixtures/sample.jpg" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.mp3" Link="Fixtures/sample.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.mp4" Link="Fixtures/sample.mp4" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

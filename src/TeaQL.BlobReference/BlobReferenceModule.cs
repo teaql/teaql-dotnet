@@ -32,6 +32,7 @@ public sealed class BlobReferenceModule
                 transactions.Dialect.Kind != DatabaseKind.Sqlite ||
                 !ReferenceEquals(transactions.Transport, module.Catalog.Transport))
                 throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
+            await module.Upload.ValidateVerifierReadyAsync().ConfigureAwait(false);
             await module.Catalog.ValidateSchemaAsync().ConfigureAwait(false);
             using var transaction = await transactions.BeginTransactionAsync().ConfigureAwait(false);
             try

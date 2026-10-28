@@ -37,6 +37,12 @@ public interface IBlobContentVerifier
     Task<BlobVerifiedContent> VerifyAsync(Stream content, string extension, long maximumBytes);
 }
 
+/// <summary>Optional explicit readiness check for verifiers with host executables.</summary>
+public interface IBlobVerifierReadiness
+{
+    Task ValidateReadyAsync();
+}
+
 /// <summary>Explicit SQLite upload journal. Host migration and parser installation are separate.</summary>
 public sealed class SqliteBlobUploadService
 {
@@ -45,6 +51,8 @@ public sealed class SqliteBlobUploadService
     private readonly ISqlTransactionTransport _transport;
     private readonly IBlobUploadAuthorization _authorization;
     private readonly IBlobContentVerifier _verifier;
+    internal Task ValidateVerifierReadyAsync() => _verifier is IBlobVerifierReadiness ready
+        ? ready.ValidateReadyAsync() : Task.CompletedTask;
     private readonly long _maximumBytes;
     private readonly TimeSpan _lease;
     private readonly Func<DateTimeOffset> _now;
