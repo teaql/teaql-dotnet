@@ -143,11 +143,13 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
         await using var db = new SqliteConnection("Data Source=:memory:");
         await db.OpenAsync();
         var clock = DateTimeOffset.UtcNow;
+        var extension = format == "production-pdf" ? "pdf" : format;
+        var spec = new BlobFieldSpec("Asset", "file", [extension], true, "default");
         var asset = EntityDescriptor.New("Asset").TableName("asset")
-            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("id", DataType.U64).Id().NotNull())
             .Property(PropertyDescriptor.New("version", DataType.I64).Version())
             .Property(PropertyDescriptor.New("name", DataType.Text))
-            .Property(PropertyDescriptor.New("file", DataType.Text));
+            .Property(PropertyDescriptor.New("file", DataType.Text).Blob(spec));
         var transport = new SqliteTransport(db);
         var actor = new RuntimeModule().Entity(asset).IntoContext().WithDataService(
             new SqlDataServiceExecutor(new SqliteDialect(), transport,
@@ -157,7 +159,6 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
         var store = actor.ObjectStorage("verify S3 Blob upload");
         var catalog = new SqliteBlobCatalog(transport, () => clock);
         await catalog.EnsureSchemaAsync();
-        var extension = format == "production-pdf" ? "pdf" : format;
         var permission = new UploadPermission { Extension = extension };
         var pdfVerifier = new PdfVerifier();
         IBlobContentVerifier verifier = format switch {
@@ -174,6 +175,14 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
         };
         var service = new SqliteBlobUploadService(catalog, permission, verifier, 10_000,
             now: () => clock);
+        var bindingPermission = new BindingPermission();
+        var readPermission = new ReadPermission();
+        var maintenance = new SqliteBlobMaintenanceService(catalog,
+            new MaintenancePermission(), 10, () => clock);
+        var module = new BlobReferenceModule(catalog, service, readPermission,
+            bindingPermission, 3, maintenance);
+        module.Install(actor);
+        await module.ReadyAsync(actor);
         var bytes = format == "pdf"
             ? Encoding.UTF8.GetBytes("%PDF-1.7\nreal S3 Blob upload\n%%EOF")
             : await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures",
@@ -223,17 +232,33 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
                 "SELECT size_bytes FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
             Assert.Equal(head.ETag, await Scalar(db,
                 "SELECT content_version FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
-            var bindingPermission = new BindingPermission { Expected = session.Reference };
+            bindingPermission.Expected = session.Reference;
+            var ownerFailure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                actor.ExecuteGraphSaveAsync<bool>("reject S3 Blob business graph", async graph =>
+                {
+                    await graph.MutateAsync(new InsertMutationRequest(new InsertCommand("Asset")
+                        .Value("id", new Value.U64Value(1))
+                        .Value("name", new Value.TextValue("document"))
+                        .Value("file", session.Reference), "save asset"),
+                        graph.Scope("Asset", 1, null));
+                    throw new InvalidOperationException("outer owner rejected");
+                }));
+            Assert.Equal("outer owner rejected", ownerFailure.Message);
+            Assert.Equal("0", await Scalar(db,
+                "SELECT COUNT(*) FROM asset WHERE id=1", session.Reference.Key));
+            Assert.Equal("0", await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_binding WHERE key=@key", session.Reference.Key));
+            Assert.Equal("uploaded_unbound", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            Assert.Equal(head.ETag, (await store.HeadAsync(key))?.ETag);
+            output.WriteLine("PASS DotNet " + format + " native module outer owner rollback");
             await actor.ExecuteGraphSaveAsync("bind S3 Blob in business graph", async graph =>
             {
                 await graph.MutateAsync(new InsertMutationRequest(new InsertCommand("Asset")
                     .Value("id", new Value.U64Value(1))
                     .Value("name", new Value.TextValue("document"))
-                    .Value("file", new Value.TextValue(session.Reference.Key)), "save asset"),
+                    .Value("file", session.Reference), "save asset"),
                     graph.Scope("Asset", 1, null));
-                Assert.Equal(1, await catalog.BindInGraphAsync(graph, actor,
-                    new BlobBindingChange(new BlobBindingTarget("Asset", "1", "file"),
-                        session.Reference, 0, 1, "Create"), bindingPermission));
                 return true;
             });
             Assert.Equal(session.Reference.Key, await Scalar(db,
@@ -243,10 +268,7 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
             Assert.Equal("available", await Scalar(db,
                 "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
 
-            var readPermission = new ReadPermission();
             var graphAuthorizer = new GraphAuthorizer(session.Reference);
-            actor.InsertResource<IBlobResponseContributor>(
-                new SqlBlobResponseContributor(catalog, readPermission, 3));
             actor.InsertResource<IResponseGraphAuthorizer>(graphAuthorizer);
             var options = new ViewOptions("ordinary", "read_only", DateTimeOffset.UtcNow.AddSeconds(60));
             var view = await new ViewPreparationService().PrepareAsync(actor, null, options);
@@ -282,9 +304,6 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
                         new Value.U64Value(1)).ExpectedVersion(1)
                         .Value("file", new Value.NullValue()), "clear asset file"),
                         graph.Scope("Asset", 1, null));
-                    Assert.Equal(2, await catalog.BindInGraphAsync(graph, actor,
-                        new BlobBindingChange(new BlobBindingTarget("Asset", "1", "file"),
-                            null, 1, 2, "Update"), bindingPermission));
                     return true;
                 });
                 await using (var business = db.CreateCommand())
@@ -325,8 +344,6 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
                     new ViewPreparationService().PrepareAsync(actor, null, options));
                 Assert.Equal("BLOB_READ_DENIED", unboundView.Code);
 
-                var maintenance = new SqliteBlobMaintenanceService(catalog,
-                    new MaintenancePermission(), 10, () => clock);
                 var deadline = BlobRetentionPolicy.UnreferencedEligibleAt(lastUnbound, effective, floor);
                 clock = DateTimeOffset.FromUnixTimeMilliseconds(deadline - 1);
                 Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
