@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using TeaQL.Core;
 using TeaQL.DataService;
@@ -112,34 +111,100 @@ public sealed class SqliteDocumentCommandJournal(ISqlTransport transport)
     private static string CanonicalRequestHash(SubmittedDocumentCommand command,
         JsonElement body, IReadOnlyList<DocumentBlobSelectionSubmission>? selections)
     {
-        using var stream = new MemoryStream();
-        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions
-        { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
+        var json = new StringBuilder();
+        json.Append('[');
+        AppendCanonicalString(json, command.BusinessId);
+        json.Append(','); AppendCanonicalString(json, command.DocumentToken);
+        json.Append(','); AppendCanonicalString(json, command.CommandId);
+        json.Append(','); AppendCanonicalBody(json, body);
+        if (selections != null)
         {
-            writer.WriteStartArray();
-            writer.WriteStringValue(command.BusinessId);
-            writer.WriteStringValue(command.DocumentToken);
-            writer.WriteStringValue(command.CommandId);
-            body.WriteTo(writer);
-            if (selections != null)
+            json.Append(",[");
+            for (var i = 0; i < selections.Count; i++)
             {
-                writer.WriteStartArray();
-                foreach (var selection in selections)
-                {
-                    writer.WriteStartObject();
-                    writer.WriteString("canonicalField", selection.CanonicalField);
-                    writer.WriteString("kind", selection.Kind);
-                    writer.WriteString("targetEntity", selection.TargetEntity);
-                    writer.WriteString("targetKey", selection.TargetKey);
-                    writer.WriteString("token", selection.Token);
-                    writer.WriteEndObject();
-                }
-                writer.WriteEndArray();
+                if (i != 0) json.Append(',');
+                var selection = selections[i];
+                json.Append('{');
+                AppendCanonicalString(json, "canonicalField"); json.Append(':');
+                AppendCanonicalString(json, selection.CanonicalField); json.Append(',');
+                AppendCanonicalString(json, "kind"); json.Append(':');
+                AppendCanonicalString(json, selection.Kind); json.Append(',');
+                AppendCanonicalString(json, "targetEntity"); json.Append(':');
+                AppendCanonicalString(json, selection.TargetEntity); json.Append(',');
+                AppendCanonicalString(json, "targetKey"); json.Append(':');
+                AppendCanonicalString(json, selection.TargetKey); json.Append(',');
+                AppendCanonicalString(json, "token"); json.Append(':');
+                AppendCanonicalString(json, selection.Token);
+                json.Append('}');
             }
-            writer.WriteEndArray();
+            json.Append(']');
         }
-        if (stream.Length > MaximumBytes) throw Error("DOCUMENT_COMMAND_INVALID");
-        return Convert.ToHexString(SHA256.HashData(stream.ToArray())).ToLowerInvariant();
+        json.Append(']');
+        var bytes = Encoding.UTF8.GetBytes(json.ToString());
+        if (bytes.Length > MaximumBytes) throw Error("DOCUMENT_COMMAND_INVALID");
+        return Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
+    }
+
+    // System.Text.Json escapes astral characters and U+2028/U+2029 even with its
+    // relaxed encoder; the shared digest instead hashes their literal UTF-8 bytes.
+    private static void AppendCanonicalString(StringBuilder json, string value)
+    {
+        json.Append('"');
+        foreach (var ch in value)
+            switch (ch)
+            {
+                case '"': json.Append("\\\""); break;
+                case '\\': json.Append("\\\\"); break;
+                case '\b': json.Append("\\b"); break;
+                case '\t': json.Append("\\t"); break;
+                case '\n': json.Append("\\n"); break;
+                case '\f': json.Append("\\f"); break;
+                case '\r': json.Append("\\r"); break;
+                default:
+                    if (ch < 0x20) json.Append("\\u").Append(((int)ch).ToString("x4"));
+                    else json.Append(ch);
+                    break;
+            }
+        json.Append('"');
+    }
+
+    private static void AppendCanonicalBody(StringBuilder json, JsonElement value)
+    {
+        switch (value.ValueKind)
+        {
+            case JsonValueKind.Object:
+                json.Append('{');
+                var first = true;
+                foreach (var property in value.EnumerateObject().OrderBy(p => p.Name,
+                    Comparer<string>.Create((left, right) =>
+                        Encoding.UTF8.GetBytes(left).AsSpan().SequenceCompareTo(
+                            Encoding.UTF8.GetBytes(right)))))
+                {
+                    if (!first) json.Append(',');
+                    first = false;
+                    AppendCanonicalString(json, property.Name);
+                    json.Append(':');
+                    AppendCanonicalBody(json, property.Value);
+                }
+                json.Append('}'); return;
+            case JsonValueKind.Array:
+                json.Append('[');
+                var index = 0;
+                foreach (var item in value.EnumerateArray())
+                {
+                    if (index++ != 0) json.Append(',');
+                    AppendCanonicalBody(json, item);
+                }
+                json.Append(']'); return;
+            case JsonValueKind.String: AppendCanonicalString(json, value.GetString()!); return;
+            case JsonValueKind.Number:
+                json.Append(value.GetInt64().ToString(System.Globalization.CultureInfo.InvariantCulture));
+                return;
+            case JsonValueKind.True: json.Append("true"); return;
+            case JsonValueKind.False: json.Append("false"); return;
+            case JsonValueKind.Null: json.Append("null"); return;
+            default: throw Error("DOCUMENT_COMMAND_INVALID");
+        }
     }
 
     private static (string Hash, string LegacyHash, SubmittedDocumentCommand Frozen)

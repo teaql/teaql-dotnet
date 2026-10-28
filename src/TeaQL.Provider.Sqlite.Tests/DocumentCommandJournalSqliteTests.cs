@@ -53,8 +53,9 @@ public class DocumentCommandJournalSqliteTests
         await journal.ValidateSchemaAsync();
         var principal = new TrustedReferencePrincipal("oidc", "alice", "Merchant", 7);
         var scope = new ReferenceDocumentScope("edit-10", "edit-order", "Order", 10, 1);
+        var note = "合同 & 📄\u2028\u2029";
         var command = new SubmittedDocumentCommand("ORD-10", "tqd2.fixture", "command-1",
-            JsonSerializer.SerializeToElement(new { quantity = 3, note = "ok" }));
+            JsonSerializer.SerializeToElement(new { quantity = 3, note }));
         var mutations = 0;
 
         async Task<(DocumentCommandReceipt Receipt, bool Replayed)> Apply(SubmittedDocumentCommand input) =>
@@ -95,13 +96,16 @@ public class DocumentCommandJournalSqliteTests
         Assert.Equal(first.Receipt, replay.Receipt);
         Assert.Equal(1, mutations);
         var legacyParts = new[] { "ORD-10", "tqd2.fixture", "command-1",
-            "{\"note\":\"ok\",\"quantity\":3}" };
+            JsonSerializer.SerializeToElement(new { note, quantity = 3 }).GetRawText() };
         var legacyHash = Convert.ToHexString(SHA256.HashData(
             JsonSerializer.SerializeToUtf8Bytes(legacyParts))).ToLowerInvariant();
         await using (var stored = db.CreateCommand())
         {
             stored.CommandText = "SELECT request_hash FROM teaql_document_command_receipt";
-            Assert.NotEqual(legacyHash, (string)(await stored.ExecuteScalarAsync())!);
+            var currentHash = (string)(await stored.ExecuteScalarAsync())!;
+            Assert.Equal("36bcdcd14e5aecd0a2ae480f51bcae7aed8d5c4437337c4681ec94c2e90bd823",
+                currentHash);
+            Assert.NotEqual(legacyHash, currentHash);
             stored.CommandText = "UPDATE teaql_document_command_receipt SET request_hash=@hash";
             stored.Parameters.AddWithValue("@hash", legacyHash);
             Assert.Equal(1, await stored.ExecuteNonQueryAsync());
@@ -111,7 +115,7 @@ public class DocumentCommandJournalSqliteTests
         Assert.Equal(first.Receipt, oldReplay.Receipt);
         Assert.Equal(1, mutations);
         var changedCommand = command with
-        { Body = JsonSerializer.SerializeToElement(new { quantity = 4, note = "ok" }) };
+        { Body = JsonSerializer.SerializeToElement(new { quantity = 4, note }) };
         Assert.Equal("DOCUMENT_REPLAY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
             () => Apply(changedCommand))).Message);
         await Execute(db, "UPDATE document_permission SET can_edit=0 WHERE subject='alice'");
