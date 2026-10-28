@@ -7,7 +7,7 @@ then installs `BlobReferenceModule` into its `UserContext` and calls
 host responsibilities.
 
 The upload service accepts one trusted `IBlobContentVerifier`. To use the
-optional image and media parsers together, the host can pass a
+optional image, media and Office parsers together, the host can pass a
 `CompositeBlobContentVerifier` with explicit extension-to-parser routes. It
 copies and validates the routes at construction, checks each distinct parser's
 readiness, and rejects an unregistered extension before reading stored bytes.
@@ -83,5 +83,15 @@ fully decodes and returns original-byte SHA-256 and actual MIME. Input bytes,
 frames, video pixels, concurrent calls, child CPU (10 seconds), address space
 (512 MiB), wall time (15 seconds) and probe output are bounded. The host must
 separately allow `mp3`/`mp4` in the field policy and keep the executables
-patched. This does not scan for malware. DOC/DOCX/XLS/XLSX/PDF still need
-production verifiers.
+patched. This does not scan for malware.
+
+For DOCX/XLSX, the host may pass `OfficeBlobContentVerifier`. The standard
+library adapter reads and hashes the entire original package, requires an exact
+single-disk ZIP central directory, fully expands every member and checks its
+CRC under input, expanded-byte, part, XML-element, depth and concurrency
+limits. It rejects duplicate or traversal part names, DTD/entity directives,
+malformed XML, mismatched Office content types or main relationships, and
+missing Word body or Excel worksheet references. It returns the verified
+DOCX/XLSX MIME. This is bounded OOXML package and XML structure validation,
+not a complete Office application schema or malware scan. Binary DOC/XLS and
+PDF still need production verifiers.

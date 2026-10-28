@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.IO.Compression;
 using System.Text;
 using Microsoft.Data.Sqlite;
 using TeaQL.BlobReference;
@@ -170,6 +171,122 @@ public class BlobUploadSqliteTests
     private static byte[] ImageFixture(string extension) => File.ReadAllBytes(
         Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." +
             (extension == "jpeg" ? "jpg" : extension)));
+
+    private static byte[] RewriteOfficePart(byte[] data, string name, string replacement)
+    {
+        using var source = new ZipArchive(new MemoryStream(data), ZipArchiveMode.Read);
+        using var output = new MemoryStream();
+        using (var writer = new ZipArchive(output, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            foreach (var part in source.Entries)
+            {
+                var destination = writer.CreateEntry(part.FullName);
+                using var input = part.Open();
+                using var target = destination.Open();
+                if (part.FullName == name)
+                {
+                    var bytes = Encoding.UTF8.GetBytes(replacement);
+                    target.Write(bytes);
+                }
+                else input.CopyTo(target);
+            }
+        }
+        return output.ToArray();
+    }
+
+    [Theory]
+    [InlineData("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")]
+    [InlineData("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+    public async Task RealOfficeVerifierParsesCompletePackagesAndRejectsMalformedInput(string extension, string mime)
+    {
+        var bytes = ImageFixture(extension);
+        var verifier = new OfficeBlobContentVerifier();
+        var verified = await verifier.VerifyAsync(new MemoryStream(bytes), extension, bytes.Length);
+        Assert.Equal(bytes.Length, verified.SizeBytes);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(), verified.Sha256);
+        Assert.Equal(mime, verified.ContentType);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes[..^12]), extension, bytes.Length))).Message);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), extension == "docx" ? "xlsx" : "docx",
+                bytes.Length))).Message);
+        Assert.Equal("BLOB_SIZE_EXCEEDED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(bytes), extension, bytes.Length - 1))).Message);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream([.. bytes, (byte)'x']), extension,
+                bytes.Length + 1))).Message);
+        var limited = new OfficeBlobContentVerifier(maximumDecodedBytes: 100);
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => limited.VerifyAsync(new MemoryStream(bytes), extension, bytes.Length))).Message);
+    }
+
+    [Fact]
+    public async Task RealOfficeVerifierRejectsEntityCrcAndMissingWorksheet()
+    {
+        var docx = ImageFixture("docx");
+        var xlsx = ImageFixture("xlsx");
+        var verifier = new OfficeBlobContentVerifier();
+        var entity = RewriteOfficePart(docx, "word/document.xml",
+            "<!DOCTYPE document [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><document>&x;</document>");
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(entity), "docx", entity.Length))).Message);
+        var worksheet = RewriteOfficePart(xlsx, "xl/worksheets/sheet1.xml", "<wrong/>");
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(worksheet), "xlsx", worksheet.Length))).Message);
+        var crc = (byte[])docx.Clone();
+        var central = crc.AsSpan().IndexOf("PK\x01\x02"u8);
+        Assert.True(central > 0);
+        crc[central + 16] ^= 1;
+        Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => verifier.VerifyAsync(new MemoryStream(crc), "docx", crc.Length))).Message);
+        var busyVerifier = new OfficeBlobContentVerifier(concurrentVerifications: 1);
+        var slow = new PausedReadStream(docx);
+        var first = busyVerifier.VerifyAsync(slow, "docx", docx.Length);
+        await slow.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal("BLOB_VERIFICATION_BUSY", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => busyVerifier.VerifyAsync(new MemoryStream(docx), "docx", docx.Length))).Message);
+        slow.Release.SetResult();
+        Assert.Equal(docx.Length, (await first).SizeBytes);
+    }
+
+    [Theory]
+    [InlineData("docx")]
+    [InlineData("xlsx")]
+    public async Task RealOfficeUploadCompletesOnlyAfterPackageValidation(string extension)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-office-upload-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+            await catalog.EnsureSchemaAsync();
+            await using var store = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            var actor = new UserContext().WithObjectStorage(store);
+            var service = new SqliteBlobUploadService(catalog,
+                new UploadAuthorization { Extensions = ["docx", "xlsx"] },
+                new OfficeBlobContentVerifier(), 100_000);
+            var bytes = ImageFixture(extension);
+            var target = new BlobUploadTarget("Asset", "1", "file");
+            var session = await service.BeginAsync(actor, target,
+                new BlobUploadInput("sample." + extension, bytes.Length), "office-valid");
+            await service.WriteAsync(actor, session.UploadId, new MemoryStream(bytes));
+            Assert.Equal(session.Reference, await service.CompleteAsync(actor, session.UploadId));
+            Assert.Equal("uploaded_unbound", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            var invalidBytes = bytes[..^12];
+            var invalid = await service.BeginAsync(actor, target,
+                new BlobUploadInput("broken." + extension, invalidBytes.Length), "office-truncated");
+            await service.WriteAsync(actor, invalid.UploadId, new MemoryStream(invalidBytes));
+            Assert.Equal("BLOB_FORMAT_NOT_ALLOWED", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteAsync(actor, invalid.UploadId))).Message);
+            Assert.Equal("initiated", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", invalid.Reference.Key));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
 
     private static FfmpegBlobContentVerifier MediaVerifier(int maximumFrames = 100_000,
         long maximumVideoPixels = 16_000_000, int concurrentVerifications = 2) =>

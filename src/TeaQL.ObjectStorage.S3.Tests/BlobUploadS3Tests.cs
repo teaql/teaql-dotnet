@@ -94,12 +94,16 @@ public class BlobUploadS3Tests
     [InlineData("jpg")]
     [InlineData("mp3")]
     [InlineData("mp4")]
+    [InlineData("docx")]
+    [InlineData("xlsx")]
     public async Task RealSQLiteBlobUploadThroughS3CreateOnlyConfirmAndReplay(string format)
     {
         if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BLOB_UPLOAD") != "1") return;
         if (format == "jpg" && Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_IMAGE") != "1") return;
         if ((format is "mp3" or "mp4") &&
             Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_MEDIA") != "1") return;
+        if ((format is "docx" or "xlsx") &&
+            Environment.GetEnvironmentVariable("TEAQL_S3_TEST_REAL_OFFICE") != "1") return;
         var endpoint = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ENDPOINT");
         var bucket = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BUCKET");
         var access = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ACCESS_KEY");
@@ -130,6 +134,7 @@ public class BlobUploadS3Tests
             "jpg" => new StbImageBlobContentVerifier(),
             "mp3" or "mp4" => new FfmpegBlobContentVerifier(
                 "/usr/bin/ffprobe", "/usr/bin/ffmpeg", "/usr/bin/prlimit"),
+            "docx" or "xlsx" => new OfficeBlobContentVerifier(),
             _ => pdfVerifier
         };
         var service = new SqliteBlobUploadService(catalog, permission, verifier, 10_000);
@@ -138,6 +143,8 @@ public class BlobUploadS3Tests
             : await File.ReadAllBytesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." + format));
         var contentType = format switch {
             "jpg" => "image/jpeg", "mp3" => "audio/mpeg", "mp4" => "video/mp4",
+            "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             _ => "application/pdf"
         };
         var filename = format == "pdf" ? "report.pdf" : "sample." + format;
