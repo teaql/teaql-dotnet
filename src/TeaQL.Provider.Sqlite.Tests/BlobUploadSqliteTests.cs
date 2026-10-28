@@ -207,6 +207,52 @@ public class BlobUploadSqliteTests
                 fresh.Reference.Key));
     }
 
+    [Theory]
+    [InlineData("\u2028")]
+    [InlineData("\u2029")]
+    public async Task UnicodeSeparatorUploadHashUsesLiteralUtf8AndReplaysPriorDotnetRows(string separator)
+    {
+        await using var db = new SqliteConnection("Data Source=:memory:");
+        await db.OpenAsync();
+        var asset = EntityDescriptor.New("Asset").TableName("asset")
+            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version());
+        var actor = new RuntimeModule().Entity(asset).IntoContext().WithDataService(
+            new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(db),
+                new MetadataSchemaProvider(name => name == "Asset" ? asset : null)));
+        await actor.EnsureSchemaAsync();
+        var catalog = new SqliteBlobCatalog(new SqliteTransport(db));
+        await catalog.EnsureSchemaAsync();
+        var service = new SqliteBlobUploadService(catalog, new UploadAuthorization(),
+            new PdfVerifier(), 10_000);
+        var target = new BlobUploadTarget("Asset", "1", "file");
+        var fileName = "report" + separator + "x.pdf";
+        var input = new BlobUploadInput(fileName, 42);
+        var old = await service.BeginAsync(actor, target, input, "historical");
+        var priorRequest = JsonSerializer.Serialize(new object?[]
+            { "Asset", "1", "file", fileName, 42, "" }, new JsonSerializerOptions
+            { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+        var priorHash = Convert.ToHexString(SHA256.HashData(
+            Encoding.UTF8.GetBytes(priorRequest))).ToLowerInvariant();
+        await using (var command = db.CreateCommand())
+        {
+            command.CommandText = "UPDATE teaql_blob_upload SET request_hash=@hash WHERE upload_id=@id";
+            command.Parameters.AddWithValue("@hash", priorHash);
+            command.Parameters.AddWithValue("@id", old.UploadId);
+            Assert.Equal(1, await command.ExecuteNonQueryAsync());
+        }
+        var replay = await service.BeginAsync(actor, target, input, "historical");
+        Assert.Equal(old.UploadId, replay.UploadId);
+        Assert.Equal(old.Reference, replay.Reference);
+        Assert.Equal(old.ExpiresAt, replay.ExpiresAt);
+        var fresh = await service.BeginAsync(actor, target, input, "canonical");
+        var canonical = $"[\"Asset\",\"1\",\"file\",\"{fileName}\",42,\"\"]";
+        var canonicalHash = Convert.ToHexString(SHA256.HashData(
+            Encoding.UTF8.GetBytes(canonical))).ToLowerInvariant();
+        Assert.Equal(canonicalHash, await Scalar(db,
+            "SELECT request_hash FROM teaql_blob_upload WHERE key=@key", fresh.Reference.Key));
+    }
+
     private static byte[] ImageFixture(string extension) => File.ReadAllBytes(
         Path.Combine(AppContext.BaseDirectory, "Fixtures", "sample." +
             (extension == "jpeg" ? "jpg" : extension)));

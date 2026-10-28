@@ -180,6 +180,31 @@ public sealed class SqliteBlobUploadService
         }
     }
 
+    private static string LiteralJsonSeparators(string json)
+    {
+        // System.Text.Json escapes U+2028/U+2029 even with the relaxed encoder.
+        // Preserve literal backslash-u text by checking the preceding slash parity.
+        var result = new StringBuilder(json.Length);
+        for (var i = 0; i < json.Length; i++)
+        {
+            if (i + 6 <= json.Length && json[i] == '\\' && json[i + 1] == 'u' &&
+                json[i + 2] == '2' && json[i + 3] == '0' && json[i + 4] == '2' &&
+                json[i + 5] is '8' or '9')
+            {
+                var preceding = 0;
+                for (var j = i - 1; j >= 0 && json[j] == '\\'; j--) preceding++;
+                if (preceding % 2 == 0)
+                {
+                    result.Append(json[i + 5] == '8' ? '\u2028' : '\u2029');
+                    i += 5;
+                    continue;
+                }
+            }
+            result.Append(json[i]);
+        }
+        return result.ToString();
+    }
+
     public async Task<BlobUploadSession> BeginAsync(UserContext actor, BlobUploadTarget target,
         BlobUploadInput input, string replayKey)
     {
@@ -192,7 +217,10 @@ public sealed class SqliteBlobUploadService
             normalized.DeclaredContentType ?? "" };
         var request = JsonSerializer.Serialize(parts, new JsonSerializerOptions
             { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
-        var requestHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request))).ToLowerInvariant();
+        var requestHash = Convert.ToHexString(SHA256.HashData(
+            Encoding.UTF8.GetBytes(LiteralJsonSeparators(request)))).ToLowerInvariant();
+        var priorRequestHash = Convert.ToHexString(SHA256.HashData(
+            Encoding.UTF8.GetBytes(request))).ToLowerInvariant();
         var legacyRequest = JsonSerializer.Serialize(new object?[] { target.Entity, target.EntityId,
             target.Field, normalized.FileName, normalized.DeclaredSize, normalized.DeclaredContentType });
         var legacyHash = Convert.ToHexString(SHA256.HashData(
@@ -210,7 +238,7 @@ public sealed class SqliteBlobUploadService
             {
                 var old = rows[0];
                 if (old.GetValueOrDefault("request_hash")?.TryText() is not string priorHash ||
-                    priorHash != requestHash && priorHash != legacyHash)
+                    priorHash != requestHash && priorHash != priorRequestHash && priorHash != legacyHash)
                     throw Error("BLOB_IDEMPOTENCY_CONFLICT");
                 await Current(actor, target, "Begin", normalized, scope, tx);
                 BlobUploadSession prior;
