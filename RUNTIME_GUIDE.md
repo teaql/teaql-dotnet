@@ -18,6 +18,12 @@ the other instance. The current-context and service/resource checks still run
 for the installed instance. Installation remains passive; schema migration is
 an explicit host action.
 
+Native updates preserve omitted Blob fields without changing their binding or
+catalog records or requesting Blob mutation authorization. Readback still
+rejects a database trigger that changes an omitted Blob value. An explicit Blob
+assignment, including the same Key or null, uses normal Blob authorization;
+ordinary business mutation policy continues to apply.
+
 ## Trace Chain and version compatibility
 
 The 0.3.0 runtime requires request-owned, non-blank Query Comment and Purpose,

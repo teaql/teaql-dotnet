@@ -43,6 +43,11 @@ internal sealed class SqliteBlobMutationParticipant(SqliteBlobCatalog catalog,
             var before = previous is null ? null : Reference(previous, field);
             var after = request is DeleteMutationRequest ? null :
                 persisted is null ? throw Error("BLOB_REFERENCE_INVALID") : Reference(persisted, field);
+            if (request is UpdateMutationRequest update && !update.Command.Values.ContainsKey(field.Name))
+            {
+                if (!Equals(before, after)) throw Error("BLOB_BIND_DENIED");
+                continue;
+            }
             var target = new BlobBindingTarget(entity.Name, id.Value.ToString(), field.Name);
             var binding = await owner.WithPhysicalSqlAsync(async lease =>
             {

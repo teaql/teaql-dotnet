@@ -97,6 +97,8 @@ public sealed class NativeBlobMutationSqliteTests
         var spec = new BlobFieldSpec("Asset", "document", ["pdf"], true, "default");
         var asset = EntityDescriptor.New("Asset").TableName("native_asset")
             .Property(PropertyDescriptor.New("id", DataType.U64).Id().NotNull())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+            .Property(PropertyDescriptor.New("caption", DataType.Text))
             .Property(PropertyDescriptor.New("document", DataType.Text).Blob(spec));
         var control = EntityDescriptor.New("Control").TableName("native_control")
             .Property(PropertyDescriptor.New("id", DataType.U64).Id().NotNull());
@@ -257,6 +259,75 @@ public sealed class NativeBlobMutationSqliteTests
             Assert.Equal((ledgerRef.Key, 1L), await Binding(db, committedId.ToString()));
             Assert.Equal("available", await Scalar(db,
                 "SELECT status FROM teaql_blob_catalog WHERE key='blob_native_ledger'"));
+
+            async Task<string> Snapshot(string sql)
+            {
+                await using var command = db.CreateCommand();
+                command.CommandText = sql;
+                await using var reader = await command.ExecuteReaderAsync();
+                Assert.True(await reader.ReadAsync());
+                var values = Enumerable.Range(0, reader.FieldCount)
+                    .Select(i => reader.IsDBNull(i) ? null : reader.GetValue(i)).ToArray();
+                Assert.False(await reader.ReadAsync());
+                return System.Text.Json.JsonSerializer.Serialize(values);
+            }
+            var bindingSql = $"SELECT * FROM teaql_blob_binding WHERE entity_id='{committedId}'";
+            var catalogSql = "SELECT * FROM teaql_blob_catalog WHERE key='blob_native_ledger'";
+            var bindingBefore = await Snapshot(bindingSql);
+            var catalogBefore = await Snapshot(catalogSql);
+            var partial = new EntityRoot();
+            var partialKey = new EntityKey("Asset", new Value.U64Value(committedId));
+            partial.Set(partialKey, "caption", Value.FromObject("after"));
+            Assert.False(partial.Change(partialKey).ContainsKey("document"));
+            permission.Visited.Clear();
+            permission.Allowed = false;
+            await actor.ExecuteGraphSaveAsync("update caption with unloaded Blob", async graph =>
+            {
+                var request = new UpdateMutationRequest(new UpdateCommand("Asset",
+                    new Value.U64Value(committedId)).ExpectedVersion(1)
+                    .Value("caption", partial.Change(partialKey)["caption"]),
+                    "update caption with unloaded Blob") { LedgerRoot = partial, LedgerKey = partialKey };
+                await graph.MutateAsync(request, graph.Scope("Asset", committedId, null));
+                return true;
+            });
+            Assert.Empty(permission.Visited);
+            Assert.Equal("after", await Scalar(db, $"SELECT caption FROM native_asset WHERE id={committedId}"));
+            Assert.Equal(ledgerRef.Key, await Scalar(db, $"SELECT document FROM native_asset WHERE id={committedId}"));
+            Assert.Equal(2L, await Scalar(db, $"SELECT version FROM native_asset WHERE id={committedId}"));
+            Assert.Equal(bindingBefore, await Snapshot(bindingSql));
+            Assert.Equal(catalogBefore, await Snapshot(catalogSql));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => actor.ExecuteGraphSaveAsync(
+                "deny explicit unchanged Blob", async graph =>
+                {
+                    await graph.MutateAsync(new UpdateMutationRequest(new UpdateCommand("Asset",
+                        new Value.U64Value(committedId)).ExpectedVersion(2)
+                        .Value("document", ledgerRef), "deny explicit unchanged Blob"));
+                    return true;
+                }));
+            permission.Allowed = true;
+            await using (var trigger = db.CreateCommand())
+            {
+                trigger.CommandText = """
+                    CREATE TRIGGER mutate_unassigned_blob AFTER UPDATE OF caption ON native_asset
+                    WHEN NEW.caption='triggered' BEGIN
+                      UPDATE native_asset SET document='blob_native_first' WHERE id=NEW.id;
+                    END
+                    """;
+                await trigger.ExecuteNonQueryAsync();
+            }
+            await Assert.ThrowsAsync<InvalidOperationException>(() => actor.ExecuteGraphSaveAsync(
+                "reject trigger-side omitted Blob mutation", async graph =>
+                {
+                    await graph.MutateAsync(new UpdateMutationRequest(new UpdateCommand("Asset",
+                        new Value.U64Value(committedId)).ExpectedVersion(2)
+                        .Value("caption", "triggered"), "reject trigger-side omitted Blob mutation"));
+                    return true;
+                }));
+            Assert.Equal("after", await Scalar(db, $"SELECT caption FROM native_asset WHERE id={committedId}"));
+            Assert.Equal(ledgerRef.Key, await Scalar(db, $"SELECT document FROM native_asset WHERE id={committedId}"));
+            Assert.Equal(2L, await Scalar(db, $"SELECT version FROM native_asset WHERE id={committedId}"));
+            Assert.Equal(bindingBefore, await Snapshot(bindingSql));
+            Assert.Equal(catalogBefore, await Snapshot(catalogSql));
 
             var alien = new RuntimeModule().Entity(asset).Entity(control).IntoContext()
                 .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(),
