@@ -44,6 +44,7 @@ jobs:
           projects=(
             TeaQL.Core TeaQL.DataService TeaQL.Sql TeaQL.Runtime
             TeaQL.BlobReference TeaQL.SecureDocumentReference
+            TeaQL.ObjectStorage.S3
             TeaQL.Provider.Sqlite TeaQL.Provider.PostgreSql TeaQL.Provider.MySql
             TeaQL.Provider.SqlServer TeaQL.CacheIntegration.Redis
             TeaQL.WebIntegration.AspNetCore TeaQL.TfpEndpoint TeaQL.Telemetry.OpenTelemetry
@@ -54,8 +55,8 @@ jobs:
           done
       - name: Verify exact release candidates
         run: python3 scripts/verify-release-candidates.py artifacts
-      - name: Run four isolated consumers from exact candidates
-        run: python3 scripts/verify-optional-reference-consumers.py "$PWD" artifacts
+      - name: Run optional module and S3 consumers from exact candidates
+        run: python3 scripts/verify-optional-reference-consumers.py "$PWD" artifacts --include-s3
       - uses: NuGet/login@v1
         id: login
         with:

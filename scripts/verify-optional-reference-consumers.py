@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run four isolated apps from the exact local NuGet candidate bytes."""
+"""Run isolated optional-module apps, plus an optional S3 app, from exact NuGet bytes."""
 
 import atexit
 import json
@@ -14,16 +14,20 @@ from shutil import copy2
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
-if len(sys.argv) != 3:
-    raise SystemExit('Usage: verify-optional-reference-consumers.py <source-root> <candidates>')
-source, candidates = map(Path, sys.argv[1:])
+if len(sys.argv) not in (3, 4) or (len(sys.argv) == 4 and sys.argv[3] != '--include-s3'):
+    raise SystemExit('Usage: verify-optional-reference-consumers.py <source-root> <candidates> [--include-s3]')
+include_s3 = len(sys.argv) == 4
+source, candidates = map(Path, sys.argv[1:3])
 version = ET.parse(source / 'Directory.Build.props').findtext('.//Version')
 if not version or not candidates.is_dir():
     raise SystemExit('Source version or candidate directory is missing')
 root = Path(tempfile.mkdtemp(prefix='teaql-dotnet-reference-consumers-'))
 atexit.register(shutil.rmtree, root, ignore_errors=True)
-for name in ('TeaQL.Core', 'TeaQL.DataService', 'TeaQL.Runtime', 'TeaQL.Sql',
-             'TeaQL.BlobReference', 'TeaQL.SecureDocumentReference'):
+candidate_names = ('TeaQL.Core', 'TeaQL.DataService', 'TeaQL.Runtime', 'TeaQL.Sql',
+                   'TeaQL.BlobReference', 'TeaQL.SecureDocumentReference')
+if include_s3:
+    candidate_names += ('TeaQL.ObjectStorage.S3',)
+for name in candidate_names:
     package = candidates / f'{name}.{version}.nupkg'
     if not package.is_file():
         raise SystemExit(f'Missing exact candidate: {package.name}')
@@ -35,10 +39,12 @@ variants = {
     'combined': ('TeaQL.Runtime', 'TeaQL.BlobReference',
                  'TeaQL.SecureDocumentReference'),
 }
+if include_s3:
+    variants['blob-s3'] = ('TeaQL.Runtime', 'TeaQL.BlobReference', 'TeaQL.ObjectStorage.S3')
 candidate_dlls = {}
 candidate_packages = sorted(root.glob('TeaQL.*.nupkg'))
-if len(candidate_packages) != 6:
-    raise SystemExit(f'Expected six TeaQL candidate packages, found {len(candidate_packages)}')
+if len(candidate_packages) != len(candidate_names):
+    raise SystemExit(f'Expected {len(candidate_names)} TeaQL candidate packages, found {len(candidate_packages)}')
 for package in candidate_packages:
     name = package.stem.rsplit('.', 3)[0]
     with ZipFile(package) as archive:
@@ -118,6 +124,9 @@ for variant, packages in variants.items():
     if 'TeaQL.SecureDocumentReference' in packages:
         imports.append('using TeaQL.SecureDocumentReference;')
         type_names.append('typeof(SecureDocumentReferenceModule)')
+    if 'TeaQL.ObjectStorage.S3' in packages:
+        imports.extend(('using TeaQL.ObjectStorage.S3;', 'using Amazon.S3;'))
+        type_names.extend(('typeof(S3ObjectStorage)', 'typeof(AmazonS3Client)'))
     type_expression = ' + " " + '.join(
         name + '.Assembly.GetName().Name' for name in type_names)
     imports.append(f'Console.WriteLine("PASS {variant} " + {type_expression});')
@@ -141,7 +150,7 @@ for variant, packages in variants.items():
     if f'PASS {variant} ' not in result:
         raise SystemExit(f'{variant}: consumer did not run')
     libraries = json.loads((output / 'Consumer.deps.json').read_text(encoding='utf-8'))['libraries']
-    for optional in ('TeaQL.BlobReference', 'TeaQL.SecureDocumentReference'):
+    for optional in ('TeaQL.BlobReference', 'TeaQL.SecureDocumentReference', 'TeaQL.ObjectStorage.S3'):
         expected = optional in packages
         actual = (output / f'{optional}.dll').is_file()
         recorded = any(name.startswith(f'{optional}/') for name in libraries)

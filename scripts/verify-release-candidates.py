@@ -20,6 +20,7 @@ if not version:
 projects = (
     "TeaQL.Core", "TeaQL.DataService", "TeaQL.Sql", "TeaQL.Runtime",
     "TeaQL.BlobReference", "TeaQL.SecureDocumentReference",
+    "TeaQL.ObjectStorage.S3",
     "TeaQL.Provider.Sqlite", "TeaQL.Provider.PostgreSql", "TeaQL.Provider.MySql",
     "TeaQL.Provider.SqlServer", "TeaQL.CacheIntegration.Redis",
     "TeaQL.WebIntegration.AspNetCore", "TeaQL.TfpEndpoint",
@@ -41,6 +42,7 @@ optional_dependencies = {
     "TeaQL.SecureDocumentReference": {
         "TeaQL.Core", "TeaQL.Runtime", "TeaQL.Sql",
     },
+    "TeaQL.ObjectStorage.S3": {"TeaQL.Runtime", "AWSSDK.S3"},
 }
 for filename, name in expected.items():
     package = actual[filename]
