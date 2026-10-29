@@ -110,11 +110,11 @@ public sealed class SecureReferenceProtocolTests
             runtime.ConsumeBlobSelection(actor with { Subject = "bob" }, token, selection, target)).Code);
     }
 
-    private sealed class Assembly(TrustedReferencePrincipal actor, BoundDocumentSnapshot document) : ISecureDocumentAssembly
+    private sealed class Assembly(TrustedReferencePrincipal actor, BoundDocumentSnapshot document, TimeSpan? lifetime = null) : ISecureDocumentAssembly
     {
         public TrustedReferencePrincipal Principal(UserContext _) => actor;
         public Task<PreparedBoundDocument> SnapshotAsync(UserContext _, AuthorizedResponseGraph __)
-            => Task.FromResult(new PreparedBoundDocument(document, TimeSpan.FromSeconds(300)));
+            => Task.FromResult(new PreparedBoundDocument(document, lifetime ?? TimeSpan.FromSeconds(300)));
     }
     private sealed class Authorizer(AuthorizedBlobSlot slot) : IResponseGraphAuthorizer
     {
@@ -159,4 +159,126 @@ public sealed class SecureReferenceProtocolTests
         Assert.Equal("DOCUMENT_PROJECTION_VIOLATION", failure.Code);
         Assert.Equal("committed", failure.BusinessState);
     }
+
+    private static BoundDocumentSnapshot SurfaceDocument(DocumentSnapshot original) => new(
+        original with { Entities = [original.Entities[0] with {
+            LoadedFields = ["attachment", "product_code", "quantity"],
+            WritableFields = ["attachment", "quantity"] }] },
+        [new DocumentBlobBindingSnapshot("item:0", "attachment", "OrderItem",
+            new BlobRef("blob_A"), 4, true, true)]);
+
+    [Theory]
+    [InlineData("writable-unloaded")]
+    [InlineData("duplicate-row")]
+    [InlineData("orphan-relation")]
+    [InlineData("duplicate-relation-row")]
+    [InlineData("readonly-relation-mutation")]
+    [InlineData("binding-unloaded")]
+    [InlineData("binding-readonly")]
+    [InlineData("binding-foreign-entity")]
+    [InlineData("duplicate-binding")]
+    public void IssuedProjectionRejectsInconsistentSnapshot(string scenario)
+    {
+        var (module, actor, original) = DocumentFixture();
+        var d = SurfaceDocument(original);
+        var row = d.Snapshot.Entities[0]; var relation = d.Snapshot.Relations[0]; var binding = d.Bindings[0];
+        switch (scenario)
+        {
+            case "writable-unloaded": row = row with { WritableFields = ["hidden"] }; break;
+            case "orphan-relation": relation = relation with { RowKeys = ["absent"] }; break;
+            case "duplicate-relation-row": relation = relation with { RowKeys = ["item:0", "item:0"] }; break;
+            case "readonly-relation-mutation": relation = relation with { Writable = false }; break;
+            case "binding-unloaded": row = row with { LoadedFields = ["quantity"], WritableFields = ["quantity"] };
+                binding = binding with { Writable = false }; break;
+            case "binding-readonly": row = row with { WritableFields = ["quantity"] }; break;
+            case "binding-foreign-entity": binding = binding with { EntityType = "OtherItem" }; break;
+        }
+        d = d with { Snapshot = d.Snapshot with {
+            Entities = scenario == "duplicate-row" ? [row, row] : [row], Relations = [relation] },
+            Bindings = scenario == "duplicate-binding" ? [binding, binding] : [binding] };
+        Assert.Equal("DOCUMENT_PROJECTION_VIOLATION", Assert.Throws<ReferenceException>(() =>
+            module.IssueBoundDocumentSnapshot(actor, d, TimeSpan.FromMinutes(1))).Code);
+    }
+
+    [Theory]
+    [InlineData("readonly-existing")]
+    [InlineData("hidden-existing")]
+    [InlineData("partial-child")]
+    [InlineData("readonly-child")]
+    [InlineData("no-create-child")]
+    public void SelectionCannotExpandIssuedSurface(string scenario)
+    {
+        var (module, actor, original) = DocumentFixture(); var d = SurfaceDocument(original);
+        var target = new BlobSelectionTarget(d.Snapshot.Scope, "OrderItem", "attachment",
+            "EXISTING_ROW", "item:0", "command-1");
+        if (scenario == "readonly-existing")
+            d = d with { Snapshot = d.Snapshot with { Entities = [d.Snapshot.Entities[0] with {
+                WritableFields = ["quantity"] }] }, Bindings = [d.Bindings[0] with { Writable = false }] };
+        else if (scenario == "hidden-existing") target = target with { CanonicalField = "hidden_attachment" };
+        else
+        {
+            target = target with { Kind = "NEW_CLIENT_KEY", TargetKey = "client-hidden" };
+            var relation = d.Snapshot.Relations[0];
+            relation = scenario switch {
+                "partial-child" => relation with { Completeness = "PARTIAL" },
+                "readonly-child" => relation with { Writable = false, AllowedMutations = [] },
+                _ => relation with { AllowedMutations = ["REMOVE_CHILD"] }
+            };
+            d = d with { Snapshot = d.Snapshot with { Relations = [relation] } };
+        }
+        var token = module.IssueBoundDocumentSnapshot(actor, d, TimeSpan.FromMinutes(1));
+        var decoded = module.ConsumeBoundDocumentSnapshot(actor, token, "Order", "edit-order").Document;
+        Assert.Equal(d.Snapshot.Entities[0].LoadedFields, decoded.Snapshot.Entities[0].LoadedFields);
+        Assert.Equal(d.Snapshot.Entities[0].WritableFields, decoded.Snapshot.Entities[0].WritableFields);
+        Assert.Equal(d.Snapshot.Relations[0].Completeness, decoded.Snapshot.Relations[0].Completeness);
+        Assert.Equal(d.Snapshot.Relations[0].Writable, decoded.Snapshot.Relations[0].Writable);
+        Assert.Equal(d.Snapshot.Relations[0].AllowedMutations, decoded.Snapshot.Relations[0].AllowedMutations);
+        Assert.Equal("DOCUMENT_PROJECTION_VIOLATION", Assert.Throws<ReferenceException>(() =>
+            module.IssueBlobSelection(actor, token, new BlobSelectionClaim(target, new BlobRef("blob_B")),
+                TimeSpan.FromSeconds(30))).Code);
+    }
+
+    private sealed class CeilingProjector(DateTimeOffset deadline) : IBlobResponseContributor
+    {
+        public bool Late;
+        public List<string> Keys = [];
+        public Task<IReadOnlyList<ProjectedBlobUrl>> ProjectBatchAsync(UserContext _,
+            AuthorizedResponseGraph graph, DateTimeOffset? ceiling)
+        {
+            Assert.Equal(deadline, ceiling!.Value);
+            Keys.AddRange(graph.BlobSlots.Select(slot => slot.Reference.Key));
+            return Task.FromResult<IReadOnlyList<ProjectedBlobUrl>>([
+                new ProjectedBlobUrl("https://files.example.invalid/asset",
+                    Late ? deadline.AddMilliseconds(1) : deadline.AddSeconds(-5))]);
+        }
+    }
+
+    [Fact]
+    public async Task GovernedViewHidesBlobAndBoundsUrlByDocumentDeadline()
+    {
+        var (_, actor, original) = DocumentFixture();
+        var now = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+        var deadline = now.AddSeconds(60);
+        var keys = new StaticReferenceKeyProvider("k1", new ReferenceKey("k1", Enumerable.Repeat((byte)0x42, 32).ToArray()));
+        var module = new SecureDocumentReferenceModule("order-service", "test", keys, (_, _, _) => true,
+            () => now, () => Enumerable.Repeat((byte)0x33, 12).ToArray());
+        var visible = new BlobRef("blob_A"); var hidden = new BlobRef("blob_hidden");
+        var source = new Dictionary<string, object?> { ["attachment"] = visible, ["hidden_attachment"] = hidden };
+        var context = new UserContext();
+        module.Install(context, new Assembly(actor, SurfaceDocument(original), TimeSpan.FromSeconds(60)));
+        context.InsertResource<IResponseGraphAuthorizer>(new Authorizer(new AuthorizedBlobSlot(
+            ["attachment"], "OrderItem", "20", "attachment", "tenant-a", 4, visible)));
+        var signer = new CeilingProjector(deadline); context.InsertResource<IBlobResponseContributor>(signer);
+        var options = new ViewOptions("governed", "committed", now.AddSeconds(120));
+        var service = new ViewPreparationService(); var view = await service.PrepareAsync(context, source, options);
+        var body = Assert.IsType<Dictionary<string, object?>>(view.Presentation);
+        Assert.Single(body); Assert.Equal("https://files.example.invalid/asset", body["attachment"]);
+        Assert.Equal(deadline.AddSeconds(-5), view.ExpiresAt);
+        Assert.Equal(new[] { "blob_A" }, signer.Keys); Assert.Equal(hidden, source["hidden_attachment"]);
+        signer.Late = true;
+        var error = await Assert.ThrowsAsync<ViewPreparationException>(() => service.PrepareAsync(context, source, options));
+        Assert.Equal("BLOB_SIGN_FAILED", error.Code); Assert.Equal("committed", error.BusinessState); Assert.Equal("read", error.Retry);
+        Assert.Equal(new[] { "blob_A", "blob_A" }, signer.Keys);
+    }
+
 }

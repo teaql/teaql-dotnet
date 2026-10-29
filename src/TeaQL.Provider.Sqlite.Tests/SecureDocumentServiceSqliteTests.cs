@@ -334,6 +334,7 @@ public class SecureDocumentServiceSqliteTests
         Assert.Equal((3L, 3L), await Order(db));
         Assert.Equal(2, await Receipts(db));
         host.SwitchActorOnApply = false;
+        await Execute(db, "ALTER TABLE document_order ADD COLUMN hidden_note TEXT NOT NULL DEFAULT 'server-only'");
         var beforeUnknown = host.Mutations;
         var unknownOpen = await Open();
         var unknown = new SubmittedDocumentCommand("ORD-10", unknownOpen.DocumentToken,
@@ -363,6 +364,9 @@ public class SecureDocumentServiceSqliteTests
         Assert.Equal(4, recoveredUnknown.NewRevision);
         Assert.Equal(beforeUnknown + 1, host.Mutations);
         Assert.True(await DurableReceipt() == durable, "commit-unknown replay changed its durable receipt");
+        await using var hidden = db.CreateCommand();
+        hidden.CommandText = "SELECT hidden_note FROM document_order WHERE id=10";
+        Assert.Equal("server-only", await hidden.ExecuteScalarAsync());
         Assert.Equal((4L, 3L), await Order(db));
     }
 
