@@ -89,6 +89,121 @@ public sealed class NativeBlobMutationSqliteTests
             long maximumBytes) => throw new NotSupportedException("No upload in this transaction test");
     }
 
+    private sealed class LegacyAudit : IAppAuditEventSink
+    {
+        public List<IReadOnlyDictionary<string, object?>> Events { get; } = [];
+        public Task RecordAsync(IReadOnlyDictionary<string, object?> item, CancellationToken token = default)
+        { Events.Add(item); return Task.CompletedTask; }
+    }
+
+    [Theory]
+    [InlineData("attach")]
+    [InlineData("outer-reject")]
+    [InlineData("clear-null")]
+    [InlineData("delete-null")]
+    [InlineData("non-null-orphan")]
+    public async Task FirstMutationOfMigratedNullColumnStillUsesNativeOwner(string scenario)
+    {
+        await using var db = new SqliteConnection("Data Source=:memory:");
+        await db.OpenAsync();
+        // Existing business row plus an explicitly added nullable column, with
+        // no binding backfill. Non-null missing bindings are still corruption.
+        await Exec(db, "CREATE TABLE migrated_asset(id INTEGER PRIMARY KEY,version INTEGER,document TEXT)");
+        var spec = new BlobFieldSpec("Asset", "document", ["pdf"], true, "default");
+        var asset = EntityDescriptor.New("Asset").TableName("migrated_asset")
+            .Property(PropertyDescriptor.New("id", DataType.U64).Id().NotNull())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+            .Property(PropertyDescriptor.New("document", DataType.Text).Blob(spec));
+        var transport = new SqliteTransport(db);
+        var audit = new LegacyAudit();
+        var actor = new RuntimeModule().Entity(asset).IntoContext()
+            .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(), transport,
+                new MetadataSchemaProvider(name => name == "Asset" ? asset : null)))
+            .WithAppAuditEventSink(audit);
+        var catalog = new SqliteBlobCatalog(transport);
+        await catalog.EnsureSchemaAsync();
+        var permission = new BindingPermission();
+        var module = new BlobReferenceModule(catalog,
+            new SqliteBlobUploadService(catalog, new UploadPermission(), new UnusedVerifier(), 1024),
+            new ReadPermission(), permission);
+        var root = Path.Combine(Path.GetTempPath(), "teaql-dotnet-legacy-null-" + Guid.NewGuid());
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var store = new FileObjectStorage(Path.Combine(root, "objects"), new byte[32]);
+            actor.WithObjectStorage(store);
+            module.Install(actor);
+            await module.ReadyAsync(actor);
+            var reference = new BlobRef("blob_legacy_null_first");
+            await using (var insert = db.CreateCommand())
+            {
+                insert.CommandText = """
+                    INSERT INTO teaql_blob_catalog
+                    (key,scope,object_key,content_version,file_name,content_type,size_bytes,status,
+                     completed_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds)
+                    VALUES (@key,'tenant-a','objects/legacy-null','v1','sample.pdf','application/pdf',7,
+                      'uploaded_unbound',CAST(strftime('%s','now') AS INTEGER)*1000,
+                      'default','server_stream',86400,604800)
+                    """;
+                insert.Parameters.AddWithValue("@key", reference.Key);
+                await insert.ExecuteNonQueryAsync();
+                insert.Parameters.Clear();
+                insert.CommandText = "INSERT INTO migrated_asset(id,version,document) VALUES(7,1,@value)";
+                insert.Parameters.AddWithValue("@value", scenario == "non-null-orphan" ? reference.Key : DBNull.Value);
+                await insert.ExecuteNonQueryAsync();
+            }
+            const string reason = "first native Blob mutation after additive migration";
+            MutationRequest Request() => scenario == "delete-null"
+                ? new DeleteMutationRequest(new DeleteCommand("Asset", new Value.U64Value(7)).HardDelete(), reason)
+                : new UpdateMutationRequest(new UpdateCommand("Asset", new Value.U64Value(7)).ExpectedVersion(1)
+                    .Value("document", scenario is "clear-null" or "non-null-orphan"
+                        ? new Value.NullValue() : new Value.BlobRefValue(reference)), reason);
+            async Task Save(bool reject = false)
+            {
+                await actor.ExecuteGraphSaveAsync(reason, async graph =>
+                {
+                    await graph.MutateAsync(Request());
+                    Assert.Empty(audit.Events);
+                    if (reject) throw new InvalidOperationException("outer owner rejected first legacy bind");
+                    return true;
+                });
+            }
+            if (scenario == "attach")
+            {
+                permission.Allowed = false;
+                var denied = await Assert.ThrowsAsync<InvalidOperationException>(() => Save());
+                Assert.Equal("BLOB_BIND_DENIED", denied.Message);
+                Assert.Empty(audit.Events);
+                permission.Allowed = true;
+            }
+            var rollback = scenario is "outer-reject" or "non-null-orphan";
+            if (scenario == "outer-reject")
+            {
+                var rejected = await Assert.ThrowsAsync<InvalidOperationException>(() => Save(true));
+                Assert.Equal("outer owner rejected first legacy bind", rejected.Message);
+            }
+            else if (scenario == "non-null-orphan")
+            {
+                var denied = await Assert.ThrowsAsync<InvalidOperationException>(() => Save());
+                Assert.Equal("BLOB_BIND_DENIED", denied.Message);
+            }
+            else await Save();
+            Assert.Equal(rollback ? 0L : 1L, await Scalar(db, "SELECT COUNT(*) FROM teaql_blob_binding"));
+            if (scenario == "delete-null") Assert.Equal(0L, await Scalar(db, "SELECT COUNT(*) FROM migrated_asset"));
+            else
+            {
+                Assert.Equal(rollback ? 1L : 2L, await Scalar(db, "SELECT version FROM migrated_asset WHERE id=7"));
+                Assert.Equal(scenario is "attach" or "non-null-orphan" ? reference.Key : null,
+                    await Scalar(db, "SELECT document FROM migrated_asset WHERE id=7"));
+            }
+            if (!rollback) Assert.Equal((scenario == "attach" ? reference.Key : null, 1L), await Binding(db, "7"));
+            Assert.Equal(scenario == "attach" ? "available" : "uploaded_unbound",
+                await Scalar(db, "SELECT status FROM teaql_blob_catalog"));
+            Assert.Equal(rollback ? 0 : 1, audit.Events.Count);
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
     [Fact]
     public async Task ModeledGraphMutationAutomaticallyBindsAndPoisonsCaughtDenial()
     {
@@ -182,7 +297,12 @@ public sealed class NativeBlobMutationSqliteTests
             Assert.Equal((null, 3L), await Binding(db, "1"));
             permission.Allowed = true;
 
-            await Exec(db, "INSERT INTO native_asset(id,document) VALUES (7,NULL)");
+            await using (var orphan = db.CreateCommand())
+            {
+                orphan.CommandText = "INSERT INTO native_asset(id,document) VALUES (7,@key)";
+                orphan.Parameters.AddWithValue("@key", first.Key);
+                await orphan.ExecuteNonQueryAsync();
+            }
             var missing = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 actor.ExecuteGraphSaveAsync("missing old binding", async graph =>
                 {
@@ -191,6 +311,7 @@ public sealed class NativeBlobMutationSqliteTests
                     return true;
                 }));
             Assert.Equal("BLOB_BIND_DENIED", missing.Message);
+            Assert.Equal(first.Key, await Scalar(db, "SELECT document FROM native_asset WHERE id=7"));
             permission.CurrentScope = "tenant-b";
             var crossScope = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 actor.ExecuteGraphSaveAsync("cross scope", async graph =>

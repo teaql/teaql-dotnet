@@ -70,9 +70,12 @@ internal sealed class SqliteBlobMutationParticipant(SqliteBlobCatalog catalog,
             else
             {
                 version = binding?.GetValueOrDefault("version")?.TryI64() ?? 0;
-                if (request is InsertMutationRequest || binding == null || version <= 0 ||
-                    !Equals(CatalogReference(binding), before) ||
-                    before != null && binding.GetValueOrDefault("status")?.TryText() != "available")
+                // An added nullable column on an old row may have no binding
+                // yet. Initialize only a proven SQL NULL, never a non-null orphan.
+                if (request is InsertMutationRequest ||
+                    binding == null && (before != null || !previous.ContainsKey(field.Name)) ||
+                    binding != null && (version <= 0 || !Equals(CatalogReference(binding), before) ||
+                        before != null && binding.GetValueOrDefault("status")?.TryText() != "available"))
                     throw Error("BLOB_BIND_DENIED");
             }
             var action = request switch
@@ -81,7 +84,7 @@ internal sealed class SqliteBlobMutationParticipant(SqliteBlobCatalog catalog,
                 DeleteMutationRequest => "Delete",
                 _ => "Update"
             };
-            if (previous != null && Equals(before, after) && request is not DeleteMutationRequest)
+            if (binding != null && previous != null && Equals(before, after) && request is not DeleteMutationRequest)
             {
                 bool allowed;
                 try { allowed = await authorization.AuthorizeAsync(actor, target, before, after, action); }
