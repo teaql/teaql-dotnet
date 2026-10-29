@@ -1,6 +1,9 @@
 using Microsoft.Data.Sqlite;
+using System.Security.Cryptography;
+using System.Text;
 using TeaQL.BlobReference;
 using TeaQL.Core;
+using TeaQL.Core.Storage;
 using TeaQL.DataService;
 using TeaQL.Runtime;
 using TeaQL.Runtime.Storage;
@@ -13,6 +16,7 @@ public sealed class NativeBlobMutationSqliteTests
 {
     private sealed class BindingPermission : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
     {
+        public BlobRetentionPolicy Policy = new("default", "server_stream", 86400, 604800, 3600);
         public string CurrentScope = "tenant-a";
         public bool Allowed = true;
         public string? DenyEntityId;
@@ -32,7 +36,7 @@ public sealed class NativeBlobMutationSqliteTests
         }
         public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
             IPhysicalSqlLease lease, BlobBindingTarget target) =>
-            Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
+            Task.FromResult(Policy);
     }
 
     private sealed class ReadPermission : IBlobReadAuthorization
@@ -40,8 +44,9 @@ public sealed class NativeBlobMutationSqliteTests
         public Task<bool> AuthorizeAsync(UserContext actor, AuthorizedBlobSlot slot) => Task.FromResult(true);
     }
 
-    private sealed class UploadPermission : IBlobUploadAuthorization
+    private sealed class UploadPermission : IBlobUploadAuthorization, IBlobUploadPolicyAuthorization
     {
+        public BlobRetentionPolicy Policy = new("default", "server_stream", 86400, 604800, 3600);
         public string Scope(UserContext actor) => "tenant-a";
         public BlobFieldSpec Field(UserContext actor, BlobUploadTarget target) =>
             new("Asset", "document", ["pdf"], true, "default");
@@ -50,6 +55,32 @@ public sealed class NativeBlobMutationSqliteTests
         public Task<BlobUploadAuthorizationState> CurrentOnLeaseAsync(UserContext actor,
             BlobUploadTarget target, string action, BlobUploadInput input, ISqlTransport lease) =>
             Task.FromResult(new BlobUploadAuthorizationState(Scope(actor), Field(actor, target), true));
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            ISqlTransport lease, BlobUploadTarget target) => Task.FromResult(Policy);
+    }
+
+    // Fixture-only full-byte check; production PDF parsing is covered elsewhere.
+    private sealed class FixturePdfVerifier : IBlobContentVerifier
+    {
+        public async Task<BlobVerifiedContent> VerifyAsync(Stream content, string extension,
+            long maximumBytes)
+        {
+            using var output = new MemoryStream();
+            await content.CopyToAsync(output);
+            var bytes = output.ToArray();
+            if (extension != "pdf" || bytes.LongLength > maximumBytes ||
+                !Encoding.UTF8.GetString(bytes).StartsWith("%PDF-") ||
+                !Encoding.UTF8.GetString(bytes).Contains("%%EOF"))
+                throw new InvalidOperationException("invalid test PDF");
+            return new BlobVerifiedContent(bytes.LongLength,
+                Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(), "application/pdf");
+        }
+    }
+
+    private sealed class MaintenancePermission : IBlobMaintenanceAuthorization
+    {
+        public string Scope(UserContext actor) => "tenant-a";
+        public Task<bool> CanMaintainAsync(UserContext actor, string scope) => Task.FromResult(true);
     }
 
     private sealed class UnusedVerifier : IBlobContentVerifier
@@ -381,6 +412,132 @@ public sealed class NativeBlobMutationSqliteTests
             Assert.Equal((references[1].Key, 1L), await Binding(db, ids[1].ToString()));
             Assert.Equal(3L, await Scalar(db,
                 "SELECT COUNT(*) FROM teaql_blob_catalog WHERE status='available'"));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task NativeSharedBlobFinalUnbindRetainsRealFileUntilDeadline()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "teaql-dotnet-shared-blob-" + Guid.NewGuid());
+        Directory.CreateDirectory(root);
+        try
+        {
+            await using var db = new SqliteConnection("Data Source=:memory:");
+            await db.OpenAsync();
+            var spec = new BlobFieldSpec("Asset", "document", ["pdf"], true, "default");
+            var asset = EntityDescriptor.New("Asset").TableName("shared_blob_asset")
+                .Property(PropertyDescriptor.New("id", DataType.U64).Id().NotNull())
+                .Property(PropertyDescriptor.New("document", DataType.Text).Blob(spec));
+            var transport = new SqliteTransport(db);
+            var actor = new RuntimeModule().Entity(asset).IntoContext()
+                .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(), transport,
+                    new MetadataSchemaProvider(name => name == "Asset" ? asset : null)));
+            await actor.EnsureSchemaAsync();
+            var now = DateTimeOffset.FromUnixTimeMilliseconds(1_700_000_000_000);
+            var policy = new BlobRetentionPolicy("default", "server_stream", 10, 20, 0);
+            var catalog = new SqliteBlobCatalog(transport, () => now);
+            await catalog.EnsureSchemaAsync();
+            var permission = new BindingPermission { Policy = policy };
+            var upload = new SqliteBlobUploadService(catalog,
+                new UploadPermission { Policy = policy }, new FixturePdfVerifier(), 1024,
+                now: () => now);
+            var maintenance = new SqliteBlobMaintenanceService(catalog,
+                new MaintenancePermission(), now: () => now);
+            var module = new BlobReferenceModule(catalog, upload, new ReadPermission(),
+                permission, maintenance: maintenance);
+            await using var file = new FileObjectStorage(Path.Combine(root, "private"),
+                RandomNumberGenerator.GetBytes(32));
+            actor.WithObjectStorage(file);
+            module.Install(actor);
+            await module.ReadyAsync(actor);
+
+            var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nshared native graph\n%%EOF");
+            var session = await upload.BeginAsync(actor,
+                new BlobUploadTarget("Asset", "", "document"),
+                new BlobUploadInput("shared.pdf", bytes.Length, "application/pdf"),
+                "shared-native");
+            await upload.WriteAsync(actor, session.UploadId, new MemoryStream(bytes));
+            Assert.Equal(session.Reference, await upload.CompleteAsync(actor, session.UploadId));
+            var reference = session.Reference;
+            async Task<object?> CatalogValue(string column)
+            {
+                await using var command = db.CreateCommand();
+                command.CommandText = $"SELECT {column} FROM teaql_blob_catalog WHERE key=@key";
+                command.Parameters.AddWithValue("@key", reference.Key);
+                var value = await command.ExecuteScalarAsync();
+                return value is DBNull ? null : value;
+            }
+            var objectKey = new ObjectKey(Assert.IsType<string>(await CatalogValue("object_key")));
+            Assert.NotNull(await actor.ObjectStorage("shared native graph").HeadAsync(objectKey));
+            Assert.Equal("uploaded_unbound", await CatalogValue("status"));
+
+            var ledger = new EntityRoot();
+            var provisional = new[] { new EntityKey("Asset", -1), new EntityKey("Asset", -2) };
+            foreach (var key in provisional)
+            {
+                ledger.MarkAsNew(key);
+                ledger.Set(key, "document", Value.FromObject(reference));
+            }
+            var ids = new ulong[2];
+            await actor.ExecuteGraphSaveAsync("bind shared native Blob", async graph =>
+            {
+                for (var index = 0; index < 2; index++)
+                {
+                    ids[index] = await graph.AllocateIdAsync("Asset");
+                    var actual = new EntityKey("Asset", new Value.U64Value(ids[index]));
+                    ledger.Rekey(provisional[index], actual);
+                    var request = new InsertMutationRequest(new InsertCommand("Asset")
+                        .Value("id", ids[index]).Value("document", ledger.Change(actual)["document"]),
+                        "bind shared native Blob") { LedgerRoot = ledger, LedgerKey = actual };
+                    await graph.MutateAsync(request, graph.Scope("Asset", ids[index], null));
+                }
+                return true;
+            });
+            Assert.NotEqual(ids[0], ids[1]);
+            Assert.Equal(2L, await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_binding WHERE key IS NOT NULL"));
+            Assert.Equal("available", await CatalogValue("status"));
+            Assert.Null(await CatalogValue("last_unbound_at_ms"));
+
+            async Task Unbind(ulong id, bool rejectOuter = false)
+            {
+                await actor.ExecuteGraphSaveAsync("unbind shared native Blob", async graph =>
+                {
+                    await graph.MutateAsync(new UpdateMutationRequest(new UpdateCommand("Asset",
+                        new Value.U64Value(id)).Value("document", new Value.NullValue()),
+                        "unbind shared native Blob"));
+                    if (rejectOuter) throw new InvalidOperationException("outer owner rejected final unbind");
+                    return true;
+                });
+            }
+            await Unbind(ids[0]);
+            Assert.Equal((null, 2L), await Binding(db, ids[0].ToString()));
+            Assert.Equal((reference.Key, 1L), await Binding(db, ids[1].ToString()));
+            Assert.Null(await CatalogValue("last_unbound_at_ms"));
+            now = now.AddSeconds(40);
+            Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
+            Assert.NotNull(await actor.ObjectStorage("shared native graph").HeadAsync(objectKey));
+
+            var rejected = await Assert.ThrowsAsync<InvalidOperationException>(() => Unbind(ids[1], true));
+            Assert.Equal("outer owner rejected final unbind", rejected.Message);
+            Assert.Equal((reference.Key, 1L), await Binding(db, ids[1].ToString()));
+            Assert.Equal(reference.Key, await Scalar(db,
+                $"SELECT document FROM shared_blob_asset WHERE id={ids[1]}"));
+            Assert.Null(await CatalogValue("last_unbound_at_ms"));
+            Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
+
+            await Unbind(ids[1]);
+            Assert.Equal((null, 2L), await Binding(db, ids[1].ToString()));
+            Assert.Equal("available", await CatalogValue("status"));
+            Assert.Equal(now.ToUnixTimeMilliseconds(), await CatalogValue("last_unbound_at_ms"));
+            now = now.AddMilliseconds(19_999);
+            Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
+            Assert.NotNull(await actor.ObjectStorage("shared native graph").HeadAsync(objectKey));
+            now = now.AddMilliseconds(1);
+            Assert.Equal("deleted", Assert.Single((await maintenance.RunBatchAsync(actor)).Outcomes).Status);
+            Assert.Equal("deleted", await CatalogValue("status"));
+            Assert.Null(await actor.ObjectStorage("shared native graph").HeadAsync(objectKey));
         }
         finally { Directory.Delete(root, recursive: true); }
     }
