@@ -24,6 +24,7 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
     {
         public bool Allowed = true;
         public string Extension = "pdf";
+        public BlobRetentionPolicy Policy = new("default", "server_stream", 86400, 604800, 3600);
         public string Scope(UserContext actor) => "f4-s3-upload";
         public BlobFieldSpec Field(UserContext actor, BlobUploadTarget target) =>
             new("Asset", "file", [Extension], true, "default");
@@ -37,7 +38,7 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
                 await AuthorizeAsync(actor, target, action, input));
         public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
             ISqlTransport lease, BlobUploadTarget target) =>
-            Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
+            Task.FromResult(Policy);
     }
 
     // Fixture-only full-byte parser; production format detection has a separate gate.
@@ -75,6 +76,20 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
             Task.FromResult(new BlobRetentionPolicy("default", "server_stream", 86400, 604800, 3600));
     }
 
+    private sealed class SharedBindingPermission(BlobRef reference, BlobRetentionPolicy policy)
+        : IBlobBindingAuthorization, IBlobBindingPolicyAuthorization
+    {
+        public string Scope(UserContext actor) => "f4-s3-upload";
+        public Task<bool> AuthorizeAsync(UserContext actor, BlobBindingTarget target,
+            BlobRef? previous, BlobRef? next, string action) => Task.FromResult(
+                target.Entity == "Asset" && target.Field == "file" &&
+                ulong.TryParse(target.EntityId, out var id) && id > 0 &&
+                (action == "Create" && previous is null && next?.Equals(reference) == true ||
+                 action == "Update" && previous?.Equals(reference) == true && next is null));
+        public Task<BlobRetentionPolicy> CurrentPolicyOnLeaseAsync(UserContext actor,
+            IPhysicalSqlLease lease, BlobBindingTarget target) => Task.FromResult(policy);
+    }
+
     private sealed class MaintenancePermission : IBlobMaintenanceAuthorization
     {
         public string Scope(UserContext actor) => "f4-s3-upload";
@@ -89,13 +104,13 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
             Task.FromResult(Allowed);
     }
 
-    private sealed class GraphAuthorizer(BlobRef reference) : IResponseGraphAuthorizer
+    private sealed class GraphAuthorizer(BlobRef reference, string entityId = "1") : IResponseGraphAuthorizer
     {
         public long BindingVersion = 1;
         public Task<AuthorizedResponseGraph> AuthorizeAsync(UserContext actor, object? result,
             ViewOptions options) => Task.FromResult(new AuthorizedResponseGraph(
                 new Dictionary<string, object?> { ["document"] = reference },
-                [new AuthorizedBlobSlot(["document"], "Asset", "1", "file",
+                [new AuthorizedBlobSlot(["document"], "Asset", entityId, "file",
                     "f4-s3-upload", BindingVersion, reference)]));
     }
 
@@ -366,6 +381,169 @@ public class BlobUploadS3Tests(ITestOutputHelper output)
         finally { await store.DeleteAsync(key); }
         }
         finally { if (Directory.Exists(legacyScratch)) Directory.Delete(legacyScratch, recursive: true); }
+    }
+
+    [Fact]
+    public async Task RealSQLiteSharedBlobS3FinalUnbindRetainsUntilDeadline()
+    {
+        if (Environment.GetEnvironmentVariable("TEAQL_S3_TEST_SHARED_BLOB") != "1") return;
+        var endpoint = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ENDPOINT");
+        var bucket = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_BUCKET");
+        var access = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_ACCESS_KEY");
+        var secret = Environment.GetEnvironmentVariable("TEAQL_S3_TEST_SECRET_KEY");
+        Assert.All(new[] { endpoint, bucket, access, secret },
+            value => Assert.False(string.IsNullOrEmpty(value)));
+        using var provider = new S3ObjectStorage(new AmazonS3Client(
+            new BasicAWSCredentials(access!, secret!), new AmazonS3Config {
+                ServiceURL = endpoint, AuthenticationRegion = "us-east-1", ForcePathStyle = true
+            }), bucket!);
+        await using var db = new SqliteConnection("Data Source=:memory:");
+        await db.OpenAsync();
+        var spec = new BlobFieldSpec("Asset", "file", ["pdf"], true, "default");
+        var asset = EntityDescriptor.New("Asset").TableName("shared_s3_asset")
+            .Property(PropertyDescriptor.New("id", DataType.U64).Id().NotNull())
+            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
+            .Property(PropertyDescriptor.New("file", DataType.Text).Blob(spec));
+        var transport = new SqliteTransport(db);
+        var actor = new RuntimeModule().Entity(asset).IntoContext().WithDataService(
+            new SqlDataServiceExecutor(new SqliteDialect(), transport,
+                new MetadataSchemaProvider(name => name == "Asset" ? asset : null)))
+            .WithObjectStorage(provider);
+        await actor.EnsureSchemaAsync();
+        var now = DateTimeOffset.UtcNow;
+        var policy = new BlobRetentionPolicy("default", "server_stream", 10, 20, 0);
+        var catalog = new SqliteBlobCatalog(transport, () => now);
+        await catalog.EnsureSchemaAsync();
+        var upload = new SqliteBlobUploadService(catalog,
+            new UploadPermission { Policy = policy }, new PdfVerifier(), 1024, now: () => now);
+        var readPermission = new ReadPermission();
+        var maintenance = new SqliteBlobMaintenanceService(catalog,
+            new MaintenancePermission(), now: () => now);
+        var bytes = Encoding.UTF8.GetBytes("%PDF-1.7\nshared S3 native graph\n%%EOF");
+        var session = await upload.BeginAsync(actor, new BlobUploadTarget("Asset", "1", "file"),
+            new BlobUploadInput("shared.pdf", bytes.Length, "application/pdf"),
+            Guid.NewGuid().ToString("N"));
+        var key = new ObjectKey(await Scalar(db,
+            "SELECT object_key FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+        var storage = actor.ObjectStorage("shared native S3 graph");
+        try
+        {
+            var module = new BlobReferenceModule(catalog, upload, readPermission,
+                new SharedBindingPermission(session.Reference, policy), maintenance: maintenance);
+            module.Install(actor);
+            await module.ReadyAsync(actor);
+            await upload.WriteAsync(actor, session.UploadId, new MemoryStream(bytes));
+            Assert.Equal(session.Reference, await upload.CompleteAsync(actor, session.UploadId));
+            Assert.Equal(bytes, await storage.GetBytesAsync(key, 1024));
+            var version = (await storage.HeadAsync(key))?.ETag;
+            Assert.NotNull(version);
+
+            var ledger = new EntityRoot();
+            var provisional = new[] { new EntityKey("Asset", -1), new EntityKey("Asset", -2) };
+            foreach (var item in provisional)
+            {
+                ledger.MarkAsNew(item);
+                ledger.Set(item, "file", Value.FromObject(session.Reference));
+            }
+            var ids = new ulong[2];
+            await actor.ExecuteGraphSaveAsync("bind shared S3 Blob", async graph =>
+            {
+                for (var index = 0; index < 2; index++)
+                {
+                    ids[index] = await graph.AllocateIdAsync("Asset");
+                    var actual = new EntityKey("Asset", new Value.U64Value(ids[index]));
+                    ledger.Rekey(provisional[index], actual);
+                    var request = new InsertMutationRequest(new InsertCommand("Asset")
+                        .Value("id", ids[index]).Value("file", ledger.Change(actual)["file"]),
+                        "bind shared S3 Blob") { LedgerRoot = ledger, LedgerKey = actual };
+                    await graph.MutateAsync(request, graph.Scope("Asset", ids[index], null));
+                }
+                return true;
+            });
+            Assert.NotEqual(ids[0], ids[1]);
+            Assert.Equal("2", await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_binding WHERE key=@key", session.Reference.Key));
+            Assert.Equal("available", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+
+            async Task<long?> LastUnbound()
+            {
+                await using var command = db.CreateCommand();
+                command.CommandText = "SELECT last_unbound_at_ms FROM teaql_blob_catalog WHERE key=@key";
+                command.Parameters.AddWithValue("@key", session.Reference.Key);
+                var value = await command.ExecuteScalarAsync();
+                return value is DBNull or null ? null : Convert.ToInt64(value);
+            }
+            async Task Unbind(ulong id, bool rejectOuter = false)
+            {
+                await actor.ExecuteGraphSaveAsync("unbind shared S3 Blob", async graph =>
+                {
+                    await graph.MutateAsync(new UpdateMutationRequest(new UpdateCommand("Asset",
+                        new Value.U64Value(id)).ExpectedVersion(1)
+                        .Value("file", new Value.NullValue()), "unbind shared S3 Blob"),
+                        graph.Scope("Asset", id, null));
+                    if (rejectOuter)
+                        throw new InvalidOperationException("outer owner rejected final S3 unbind");
+                    return true;
+                });
+            }
+            await Unbind(ids[0]);
+            Assert.Equal("1", await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_binding WHERE key=@key", session.Reference.Key));
+            Assert.Null(await LastUnbound());
+            Assert.Equal(version, (await storage.HeadAsync(key))?.ETag);
+
+            var authorizer = new GraphAuthorizer(session.Reference, ids[1].ToString());
+            actor.InsertResource<IResponseGraphAuthorizer>(authorizer);
+            var options = new ViewOptions("ordinary", "read_only", DateTimeOffset.UtcNow.AddSeconds(60));
+            var view = await new ViewPreparationService().PrepareAsync(actor, null, options);
+            var link = Assert.IsType<string>(
+                Assert.IsType<Dictionary<string, object?>>(view.Presentation)["document"]);
+            using (var http = new HttpClient(new HttpClientHandler { UseProxy = false }))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, link))
+            {
+                request.Headers.TryAddWithoutValidation("Range", "bytes=0-7");
+                using var response = await http.SendAsync(request);
+                Assert.Equal(HttpStatusCode.PartialContent, response.StatusCode);
+                Assert.Equal(bytes.AsSpan(0, 8).ToArray(), await response.Content.ReadAsByteArrayAsync());
+            }
+            readPermission.Allowed = false;
+            var denied = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+                new ViewPreparationService().PrepareAsync(actor, null, options));
+            Assert.Equal("BLOB_READ_DENIED", denied.Code);
+            readPermission.Allowed = true;
+
+            now = now.AddSeconds(40);
+            Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
+            var rejected = await Assert.ThrowsAsync<InvalidOperationException>(() => Unbind(ids[1], true));
+            Assert.Equal("outer owner rejected final S3 unbind", rejected.Message);
+            Assert.Equal(session.Reference.Key, await Scalar(db,
+                $"SELECT file FROM shared_s3_asset WHERE id={ids[1]}", session.Reference.Key));
+            Assert.Equal("1", await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_binding WHERE key=@key", session.Reference.Key));
+            Assert.Null(await LastUnbound());
+            Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
+            Assert.Equal(version, (await storage.HeadAsync(key))?.ETag);
+
+            await Unbind(ids[1]);
+            Assert.Equal("0", await Scalar(db,
+                "SELECT COUNT(*) FROM teaql_blob_binding WHERE key=@key", session.Reference.Key));
+            Assert.Equal(now.ToUnixTimeMilliseconds(), await LastUnbound());
+            var oldView = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+                new ViewPreparationService().PrepareAsync(actor, null, options));
+            Assert.Equal("BLOB_READ_DENIED", oldView.Code);
+            now = now.AddMilliseconds(19_999);
+            Assert.Empty((await maintenance.RunBatchAsync(actor)).Outcomes);
+            Assert.Equal(version, (await storage.HeadAsync(key))?.ETag);
+            now = now.AddMilliseconds(1);
+            var deleted = Assert.Single((await maintenance.RunBatchAsync(actor)).Outcomes);
+            Assert.Equal("deleted", deleted.Status);
+            Assert.Equal("deleted", await Scalar(db,
+                "SELECT status FROM teaql_blob_catalog WHERE key=@key", session.Reference.Key));
+            Assert.Null(await storage.HeadAsync(key));
+            output.WriteLine("PASS DotNet shared S3 native graph/final unbind/authorized Range/retention GC");
+        }
+        finally { await storage.DeleteAsync(key); }
     }
 
     private static async Task<string> Scalar(SqliteConnection db, string sql, string key)
