@@ -7,6 +7,17 @@ Current published versions and acceptance status are tracked in
 [TeaQL Conformance](https://github.com/teaql/teaql-conformance). Individual
 verification notes below describe their own scope, not all-provider parity.
 
+## Optional module readiness
+
+`BlobReferenceModule.ReadyAsync(context)` and
+`SecureDocumentReferenceModule.ReadyAsync(context)` validate the installation
+made by that exact module instance. A separate instance cannot borrow the
+installed module's readiness, even with identical configuration. It returns
+`BLOB_CAPABILITY_MISSING` or `DOCUMENT_CONFIGURATION` before validation work on
+the other instance. The current-context and service/resource checks still run
+for the installed instance. Installation remains passive; schema migration is
+an explicit host action.
+
 ## Trace Chain and version compatibility
 
 The 0.3.0 runtime requires request-owned, non-blank Query Comment and Purpose,

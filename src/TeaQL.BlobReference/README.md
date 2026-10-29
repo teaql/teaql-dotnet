@@ -1,5 +1,11 @@
 # Optional Blob reference module
 
+Call `ReadyAsync` on the same `BlobReferenceModule` instance that installed the
+services in the supplied context. A newly constructed module cannot validate
+another module's installation, even when its configuration is identical; it
+fails with `BLOB_CAPABILITY_MISSING` before activating the verifier. Installation
+remains passive, and catalog migration remains an explicit host action.
+
 `TeaQL.BlobReference` is an explicit, passive module. The host constructs a
 `SqliteBlobCatalog`, `SqliteBlobUploadService`, read and binding authorizers,
 then installs `BlobReferenceModule` into its `UserContext` and calls

@@ -55,6 +55,19 @@ public sealed class SecureReferenceProtocolTests
     private static string Sha(string text) => Convert.ToHexString(SHA256.HashData(System.Text.Encoding.ASCII.GetBytes(text))).ToLowerInvariant();
 
     [Fact]
+    public async Task SecureModuleReadyRejectsAnotherModuleInstallation()
+    {
+        var (installed, principal, snapshot) = DocumentFixture();
+        var (foreign, _, _) = DocumentFixture();
+        var context = new UserContext();
+        installed.Install(context, new Assembly(principal, new BoundDocumentSnapshot(snapshot, [])));
+        await installed.ReadyAsync(context);
+        Assert.Equal("DOCUMENT_CONFIGURATION", (await Assert.ThrowsAsync<ViewPreparationException>(
+            () => foreign.ReadyAsync(context))).Code);
+        await installed.ReadyAsync(context);
+    }
+
+    [Fact]
     public void Tqd1MatchesRustHashAndReauthorizesOnConsumption()
     {
         var (runtime, actor, snapshot) = DocumentFixture();

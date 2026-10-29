@@ -18,6 +18,7 @@ public sealed class BlobReferenceModule
         IBlobMutationParticipant participant) : IRuntimeCapabilityResource
     {
         public string Capability => "blob.v1";
+        public bool BelongsTo(BlobReferenceModule candidate) => ReferenceEquals(module, candidate);
         public async Task ValidateReadyAsync(UserContext context)
         {
             if (!ReferenceEquals(owner, context) ||
@@ -88,10 +89,12 @@ public sealed class BlobReferenceModule
         if (Maintenance is not null) context.InsertResource(Maintenance);
     }
 
+    /// <summary>Validate this exact module's installation in the supplied context.</summary>
     public Task ReadyAsync(UserContext context)
     {
         var capability = context?.GetNamedResource<IRuntimeCapabilityResource>("teaql.runtime.capability:blob.v1") as BlobCapability;
-        if (capability == null) throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
+        if (capability == null || !capability.BelongsTo(this))
+            throw new InvalidOperationException("BLOB_CAPABILITY_MISSING");
         return capability.ValidateReadyAsync(context!);
     }
 }

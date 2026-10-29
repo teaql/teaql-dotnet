@@ -16,6 +16,7 @@ public partial class SecureDocumentReferenceModule
     private sealed class SecureCapability(SecureDocumentReferenceModule module, UserContext owner) : IRuntimeCapabilityResource
     {
         public string Capability => "secure_document.v1";
+        public bool BelongsTo(SecureDocumentReferenceModule candidate) => ReferenceEquals(module, candidate);
         public Contributor? Contributor { get; set; }
         public Task ValidateReadyAsync(UserContext context)
         {
@@ -91,10 +92,12 @@ public partial class SecureDocumentReferenceModule
         context.InsertResource<ISecureDocumentContributor>(contributor);
     }
 
+    /// <summary>Validate this exact module's installation in the supplied context.</summary>
     public Task ReadyAsync(UserContext context)
     {
         var capability = context?.GetNamedResource<IRuntimeCapabilityResource>("teaql.runtime.capability:secure_document.v1") as SecureCapability;
-        if (capability == null) throw new ViewPreparationException("DOCUMENT_CONFIGURATION");
+        if (capability == null || !capability.BelongsTo(this))
+            throw new ViewPreparationException("DOCUMENT_CONFIGURATION");
         return capability.ValidateReadyAsync(context!);
     }
 }

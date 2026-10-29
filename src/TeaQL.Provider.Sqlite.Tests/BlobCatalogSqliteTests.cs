@@ -76,10 +76,33 @@ public class BlobCatalogSqliteTests
             BlobUploadTarget target, string action, BlobUploadInput input, ISqlTransport lease) =>
             Task.FromResult(new BlobUploadAuthorizationState(Scope(actor), Field(actor, target), true));
     }
-    private sealed class ModuleVerifier : IBlobContentVerifier
+    private sealed class ModuleVerifier : IBlobContentVerifier, IBlobVerifierReadiness
     {
+        public int ReadyCalls { get; private set; }
+        public Task ValidateReadyAsync() { ReadyCalls++; return Task.CompletedTask; }
         public Task<BlobVerifiedContent> VerifyAsync(Stream _, string __, long ___) =>
             throw new NotSupportedException("No upload occurs in the readiness test");
+    }
+
+    [Fact]
+    public async Task BlobModuleReadyRejectsAnotherModuleInstallation()
+    {
+        var (db, actor, catalog) = await Fixture();
+        await using (db)
+        {
+            var verifier = new ModuleVerifier();
+            var upload = new SqliteBlobUploadService(catalog, new ModuleUploadAuthorization(), verifier, 10_000);
+            var installed = new BlobReferenceModule(catalog, upload, new ReadAuthorization(true), new Authorization("tenant-a"));
+            var foreign = new BlobReferenceModule(catalog, upload, new ReadAuthorization(true), new Authorization("tenant-a"));
+            actor.WithObjectStorage(new SignedStore());
+            installed.Install(actor);
+            Assert.Equal(0, verifier.ReadyCalls);
+            Assert.Equal("BLOB_CAPABILITY_MISSING", (await Assert.ThrowsAsync<InvalidOperationException>(
+                () => foreign.ReadyAsync(actor))).Message);
+            Assert.Equal(0, verifier.ReadyCalls);
+            await installed.ReadyAsync(actor);
+            Assert.Equal(1, verifier.ReadyCalls);
+        }
     }
     private sealed class MaintenancePermission : IBlobMaintenanceAuthorization
     {
