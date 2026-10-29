@@ -13,6 +13,32 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class SecureDocumentServiceSqliteTests
 {
+    private sealed class LostDocumentCommitReply(ISqlTransactionTransport inner) : ISqlTransactionTransport
+    {
+        public bool LoseNextCommitReply;
+        public Task<List<TeaQL.Core.Record>> FetchAllSqlAsync(CompiledQuery query) => inner.FetchAllSqlAsync(query);
+        public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+        public async Task<ISqlTransaction> BeginSqlAsync()
+        {
+            var transaction = await inner.BeginSqlAsync();
+            if (!LoseNextCommitReply) return transaction;
+            LoseNextCommitReply = false;
+            return new CommitThenFail(transaction);
+        }
+        private sealed class CommitThenFail(ISqlTransaction inner) : ISqlTransaction
+        {
+            public Task<List<TeaQL.Core.Record>> FetchAllSqlAsync(CompiledQuery query) => inner.FetchAllSqlAsync(query);
+            public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+            public async Task CommitSqlAsync()
+            {
+                await inner.CommitSqlAsync();
+                throw new IOException("document commit acknowledgement unavailable");
+            }
+            public Task RollbackSqlAsync() => inner.RollbackSqlAsync();
+            public void Dispose() => inner.Dispose();
+        }
+    }
+
     private sealed class Host : ISqliteContextBoundDocumentHost, ISqliteDocumentBlobSelectionHost,
         ISqliteDocumentNewBlobSelectionHost
     {
@@ -233,7 +259,7 @@ public class SecureDocumentServiceSqliteTests
         await Execute(db, "CREATE TABLE document_permission(subject TEXT PRIMARY KEY,can_edit INTEGER NOT NULL)");
         await Execute(db, "INSERT INTO document_order VALUES(10,'ORD-10',1,1)");
         await Execute(db, "INSERT INTO document_permission VALUES('alice',1)");
-        var transport = new SqliteTransport(db);
+        var transport = new LostDocumentCommitReply(new SqliteTransport(db));
         var actor = new RuntimeModule().IntoContext().WithDataService(
             new SqlDataServiceExecutor(new SqliteDialect(), transport,
                 new MetadataSchemaProvider(_ => null)));
@@ -307,6 +333,37 @@ public class SecureDocumentServiceSqliteTests
         host.Actor = host.Actor with { Subject = "alice" };
         Assert.Equal((3L, 3L), await Order(db));
         Assert.Equal(2, await Receipts(db));
+        host.SwitchActorOnApply = false;
+        var beforeUnknown = host.Mutations;
+        var unknownOpen = await Open();
+        var unknown = new SubmittedDocumentCommand("ORD-10", unknownOpen.DocumentToken,
+            "command-commit-unknown", JsonSerializer.SerializeToElement(new { quantity = 3 }));
+        transport.LoseNextCommitReply = true;
+        var commitError = await Assert.ThrowsAsync<SqlExecutorException>(() => Accept(unknown));
+        Assert.IsType<IOException>(commitError.InnerException);
+        Assert.Contains("document commit acknowledgement unavailable", commitError.Message);
+        Assert.Equal((4L, 3L), await Order(db));
+        Assert.Equal(3, await Receipts(db));
+        Assert.Equal(beforeUnknown + 1, host.Mutations);
+        async Task<string> DurableReceipt()
+        {
+            await using var command = db.CreateCommand();
+            command.CommandText = "SELECT response FROM teaql_document_command_receipt WHERE command_id='command-commit-unknown'";
+            return (string)(await command.ExecuteScalarAsync())!;
+        }
+        var durable = await DurableReceipt();
+        await Execute(db, "UPDATE document_permission SET can_edit=0 WHERE subject='alice'");
+        Assert.Equal("DOCUMENT_AUTHORIZATION_REQUIRED", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => Accept(unknown))).Message);
+        await Execute(db, "UPDATE document_permission SET can_edit=1 WHERE subject='alice'");
+        Assert.Equal("DOCUMENT_REPLAY_CONFLICT", (await Assert.ThrowsAsync<InvalidOperationException>(
+            () => Accept(unknown with { Body = JsonSerializer.SerializeToElement(new { quantity = 4 }) }))).Message);
+        var recoveredUnknown = await Accept(unknown);
+        Assert.True(recoveredUnknown.Replayed);
+        Assert.Equal(4, recoveredUnknown.NewRevision);
+        Assert.Equal(beforeUnknown + 1, host.Mutations);
+        Assert.True(await DurableReceipt() == durable, "commit-unknown replay changed its durable receipt");
+        Assert.Equal((4L, 3L), await Order(db));
     }
 
     [Fact]

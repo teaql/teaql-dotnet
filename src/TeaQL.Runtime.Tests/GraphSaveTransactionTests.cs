@@ -81,6 +81,39 @@ public class GraphSaveTransactionTests
     }
 
     [Fact]
+    public async Task RollbackFailurePreservesCommitFailureAndReleasesTheGraph()
+    {
+        var commitFailure = new IOException("commit acknowledgement unavailable");
+        var rollbackFailure = new InvalidOperationException("transaction already completed");
+        var provider = new RecordingTransactionExecutor
+        {
+            OnCommit = () => throw commitFailure,
+            OnRollback = () => throw rollbackFailure
+        };
+        var context = new UserContext().WithDataService(provider);
+        var restored = false;
+        var completed = false;
+        var error = await Assert.ThrowsAsync<IOException>(() => context.ExecuteGraphSaveAsync(
+            "save graph with uncertain commit", graph =>
+            {
+                graph.AfterRollback(() => restored = true);
+                graph.AfterCommit(() => completed = true);
+                return Task.FromResult(1);
+            }));
+        Assert.Same(commitFailure, error);
+        Assert.Same(rollbackFailure, error.Data["TeaQL.RollbackException"]);
+        Assert.True(restored);
+        Assert.False(completed);
+        Assert.Equal(new[] { "provider-commit", "provider-rollback" }, provider.Events);
+
+        provider.OnCommit = null;
+        provider.OnRollback = null;
+        Assert.Equal(2, await context.ExecuteGraphSaveAsync("save after uncertain commit",
+            graph => Task.FromResult(2)).WaitAsync(TimeSpan.FromSeconds(2)));
+        Assert.Equal(2, provider.BeginCount);
+    }
+
+    [Fact]
     public async Task UntaggedMutationsAndExpiredOrForeignCapabilitiesFailClosed()
     {
         var context = new UserContext().WithDataService(new RecordingTransactionExecutor());
@@ -209,6 +242,8 @@ public class GraphSaveTransactionTests
         public int BeginCount { get; private set; }
         public List<string> Events { get; } = new();
         public Action? OnDispose { get; set; }
+        public Action? OnCommit { get; set; }
+        public Action? OnRollback { get; set; }
         public DataServiceCapabilities Capabilities { get; } = new() { Transaction = true };
         public Task<QueryResult> QueryAsync(QueryRequest request) => Task.FromResult(new QueryResult());
         public Task<MutationResult> MutateAsync(MutationRequest request) => Task.FromResult(new MutationResult { AffectedRows = 1 });
@@ -223,8 +258,8 @@ public class GraphSaveTransactionTests
             public DataServiceCapabilities Capabilities => owner.Capabilities;
             public Task<QueryResult> QueryAsync(QueryRequest request) => owner.QueryAsync(request);
             public Task<MutationResult> MutateAsync(MutationRequest request) => owner.MutateAsync(request);
-            public Task CommitAsync() { owner.Events.Add("provider-commit"); return Task.CompletedTask; }
-            public Task RollbackAsync() { owner.Events.Add("provider-rollback"); return Task.CompletedTask; }
+            public Task CommitAsync() { owner.Events.Add("provider-commit"); owner.OnCommit?.Invoke(); return Task.CompletedTask; }
+            public Task RollbackAsync() { owner.Events.Add("provider-rollback"); owner.OnRollback?.Invoke(); return Task.CompletedTask; }
             public void Dispose() => owner.OnDispose?.Invoke();
         }
     }

@@ -265,9 +265,16 @@ public class UserContext
                 session.EnsureCommittable();
                 await transaction.CommitAsync().ConfigureAwait(false);
             }
-            catch
+            catch (Exception failure)
             {
                 try { await transaction.RollbackAsync().ConfigureAwait(false); }
+                catch (Exception rollbackFailure)
+                {
+                    // COMMIT can succeed before its acknowledgement is lost.
+                    // Keep that original failure when a completed transaction
+                    // also rejects the best-effort rollback.
+                    failure.Data["TeaQL.RollbackException"] = rollbackFailure;
+                }
                 finally { session.Restore(); }
                 throw;
             }
