@@ -17,7 +17,13 @@ public class BlobReferenceValueTests
             var reference = JsonSerializer.Deserialize<BlobRef>(element.GetRawText())!;
             Assert.Equal(key, reference.Key);
             Assert.Equal(reference, BlobRef.FromSqlText(key));
-            Assert.Equal(key, Value.FromObject(reference).TryText());
+            var value = Value.FromObject(reference);
+            var typed = Assert.IsType<Value.BlobRefValue>(value);
+            Assert.Same(reference, typed.Reference);
+            Assert.Equal(key, typed.Reference.ToSqlText());
+            Assert.Null(value.TryText());
+            Assert.Equal("BLOB_PRESENTATION_REQUIRED", Assert.Throws<InvalidOperationException>(
+                () => value.ToJsonValue()).Message);
             Assert.Equal("BlobRef[masked]", reference.ToString());
             Assert.Throws<JsonException>(() => JsonSerializer.Serialize(reference));
         }
