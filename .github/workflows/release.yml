@@ -74,6 +74,7 @@ jobs:
         run: |
           python3 scripts/test_verify_signed_release_tag.py
           python3 scripts/test_verify_public_release_absence.py
+          python3 scripts/test_verify_public_release_integrity.py
       - name: Run optional module and S3 consumers from exact candidates
         run: python3 scripts/verify-optional-reference-consumers.py "$PWD" artifacts --include-s3
       - name: Refuse any version already present on NuGet
@@ -87,3 +88,5 @@ jobs:
           dotnet nuget push "artifacts/*.nupkg"
           --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
+      - name: Verify exact signed public package payloads
+        run: python3 scripts/verify-public-release-integrity.py artifacts
