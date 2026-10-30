@@ -11,8 +11,8 @@ internal sealed class TypePlatformChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "TypePlatform", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "TypePlatform", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
 
         return results;
@@ -43,44 +43,44 @@ internal sealed class ScalarTypeProbeChecker : IEntityChecker
         }
 
 
-        if ((creating && !values.ContainsKey("type_platform")) || (values.TryGetValue("type_platform", out var checkTypePlatform) && checkTypePlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("type_platform") });
+        if ((creating && !values.ContainsKey("type_platform")) || (values.TryGetValue("type_platform", out var checkTypePlatform) && checkTypePlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("type_platform") });
 
-        if ((creating && !values.ContainsKey("required_string")) || (values.TryGetValue("required_string", out var checkRequiredString) && checkRequiredString is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_string") });
-        if (values.TryGetValue("required_string", out var maxLenRequiredString) && maxLenRequiredString.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("required_string") });
+        if ((creating && !values.ContainsKey("required_string")) || (values.TryGetValue("required_string", out var checkRequiredString) && checkRequiredString is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_string") });
+        if (values.TryGetValue("required_string", out var maxLenRequiredString) && maxLenRequiredString.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_string"), SystemValue = 100 });
 
-        if (values.TryGetValue("optional_string", out var maxLenOptionalString) && maxLenOptionalString.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("optional_string") });
-
-
-        if ((creating && !values.ContainsKey("required_boolean")) || (values.TryGetValue("required_boolean", out var checkRequiredBoolean) && checkRequiredBoolean is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_boolean") });
+        if (values.TryGetValue("optional_string", out var maxLenOptionalString) && maxLenOptionalString.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_string"), SystemValue = 100 });
 
 
-        if ((creating && !values.ContainsKey("required_integer")) || (values.TryGetValue("required_integer", out var checkRequiredInteger) && checkRequiredInteger is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_integer") });
+        if ((creating && !values.ContainsKey("required_boolean")) || (values.TryGetValue("required_boolean", out var checkRequiredBoolean) && checkRequiredBoolean is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_boolean") });
 
 
-        if ((creating && !values.ContainsKey("required_long")) || (values.TryGetValue("required_long", out var checkRequiredLong) && checkRequiredLong is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_long") });
+        if ((creating && !values.ContainsKey("required_integer")) || (values.TryGetValue("required_integer", out var checkRequiredInteger) && checkRequiredInteger is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_integer") });
 
 
-        if ((creating && !values.ContainsKey("required_decimal")) || (values.TryGetValue("required_decimal", out var checkRequiredDecimal) && checkRequiredDecimal is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_decimal") });
+        if ((creating && !values.ContainsKey("required_long")) || (values.TryGetValue("required_long", out var checkRequiredLong) && checkRequiredLong is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_long") });
 
 
-        if ((creating && !values.ContainsKey("required_float")) || (values.TryGetValue("required_float", out var checkRequiredFloat) && checkRequiredFloat is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_float") });
+        if ((creating && !values.ContainsKey("required_decimal")) || (values.TryGetValue("required_decimal", out var checkRequiredDecimal) && checkRequiredDecimal is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_decimal") });
 
 
-        if ((creating && !values.ContainsKey("required_double")) || (values.TryGetValue("required_double", out var checkRequiredDouble) && checkRequiredDouble is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_double") });
+        if ((creating && !values.ContainsKey("required_float")) || (values.TryGetValue("required_float", out var checkRequiredFloat) && checkRequiredFloat is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_float") });
 
 
-        if ((creating && !values.ContainsKey("required_date")) || (values.TryGetValue("required_date", out var checkRequiredDate) && checkRequiredDate is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_date") });
+        if ((creating && !values.ContainsKey("required_double")) || (values.TryGetValue("required_double", out var checkRequiredDouble) && checkRequiredDouble is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_double") });
 
 
-        if ((creating && !values.ContainsKey("required_time")) || (values.TryGetValue("required_time", out var checkRequiredTime) && checkRequiredTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_time") });
+        if ((creating && !values.ContainsKey("required_date")) || (values.TryGetValue("required_date", out var checkRequiredDate) && checkRequiredDate is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_date") });
 
 
-        if ((creating && !values.ContainsKey("required_datetime")) || (values.TryGetValue("required_datetime", out var checkRequiredDatetime) && checkRequiredDatetime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("required_datetime") });
+        if ((creating && !values.ContainsKey("required_time")) || (values.TryGetValue("required_time", out var checkRequiredTime) && checkRequiredTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_time") });
 
 
-        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("create_time") });
+        if ((creating && !values.ContainsKey("required_datetime")) || (values.TryGetValue("required_datetime", out var checkRequiredDatetime) && checkRequiredDatetime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_datetime") });
 
-        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("update_time") });
+
+        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("create_time") });
+
+        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("update_time") });
 
 
         return results;

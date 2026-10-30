@@ -337,27 +337,27 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Platform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("SchoolType"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("school_type"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("school_type"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Address"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("address"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("address"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("EstablishedDate"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("established_date"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("established_date"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("StudentCapacity"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("student_capacity"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("student_capacity"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Active"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("active"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("active"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("CreateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("UpdateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();

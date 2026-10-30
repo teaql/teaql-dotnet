@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TeaQL.Runtime;
 
@@ -21,13 +22,31 @@ public sealed class CheckResult
     public string ModelPath => Location.ModelPath;
     public string NativePath => Location.NativePath;
     public string InstancePath => Location.InstancePath;
-    public string? EntityType {get;init;}
+    private string? _entityType;
+    public string? EntityType {get => _entityType;init => _entityType=value;}
     public string? SourceInstancePath {get;init;}
     public object? InputValue {get;init;} public object? SystemValue {get;init;} public string? Message {get;set;}
     public WireCheckResult ToWire(JsonFieldNamingProfile profile=JsonFieldNamingProfile.CamelCase)=>new(RuleId,EntityType,Location.Segments,Location.InstancePathWith(profile),SourceInstancePath,InputValue,SystemValue,Message);
+
+    // A checker can cache/reuse a result. Binding and localization belong to this
+    // invocation, never to the customer's object or a previous failure snapshot.
+    internal CheckResult ForDeclaringEntity(string entityType)
+    {
+        var copy = (CheckResult)MemberwiseClone();
+        if (string.IsNullOrWhiteSpace(copy._entityType)) copy._entityType = entityType;
+        return copy;
+    }
 }
 
-public sealed record WireCheckResult(string RuleId,string? EntityType,IReadOnlyList<ObjectLocationSegment> Location,string InstancePath,string? SourceInstancePath,object? InputValue,object? SystemValue,string? Message);
+public sealed record WireCheckResult(
+    [property: JsonPropertyName("ruleId")] string RuleId,
+    [property: JsonPropertyName("entityType")] string? EntityType,
+    [property: JsonPropertyName("location")] IReadOnlyList<ObjectLocationSegment> Location,
+    [property: JsonPropertyName("instancePath")] string InstancePath,
+    [property: JsonPropertyName("sourceInstancePath")] string? SourceInstancePath,
+    [property: JsonPropertyName("inputValue")] object? InputValue,
+    [property: JsonPropertyName("systemValue")] object? SystemValue,
+    [property: JsonPropertyName("message")] string? Message);
 
 public sealed class CheckException(IReadOnlyList<CheckResult> violations)
     : Exception("Check failed: " + string.Join("; ", violations.Select(x => x.Message ?? $"{x.RuleId}:{x.Location}")))
@@ -45,5 +64,26 @@ public sealed class I18nCatalog
     public static I18nCatalog FromJson(Stream stream,I18nCatalog? fallback=null){using var doc=JsonDocument.Parse(stream);if(doc.RootElement.GetProperty("schema").GetString()!="teaql.i18n/v1")throw new ArgumentException("Unsupported i18n schema");var locales=new Dictionary<string,LocaleData>();foreach(var locale in doc.RootElement.GetProperty("locales").EnumerateObject()){var code=TeaQLLocales.Parse(locale.Name).Code();var messages=locale.Value.GetProperty("messages").EnumerateObject().ToDictionary(x=>x.Name,x=>x.Value.GetString()!);var vocabulary=locale.Value.GetProperty("vocabulary").EnumerateObject().ToDictionary(x=>x.Name,x=>x.Value.GetString()!);locales[code]=new(messages,vocabulary);}return new(locales,fallback);}
     private string? Find(string code,string key)=>_locales.TryGetValue(code,out var locale)&&locale.Messages.TryGetValue(key,out var value)?value:null;
     public string Message(TeaQLLocale locale,string key)=>Find(locale.Code(),key)??_fallback?.Find(locale.Code(),key)??Find("en",key)??_fallback?.Find("en",key)??key;
-    public CheckResult Translate(CheckResult result,TeaQLLocale locale){var keys=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase){{"required","checker.required"},{"min","checker.min"},{"max","checker.max"},{"min_str_len","checker.minLength"},{"min_length","checker.minLength"},{"max_str_len","checker.maxLength"},{"max_length","checker.maxLength"}};var key=keys.TryGetValue(result.RuleId,out var found)?found:$"checker.{result.RuleId.ToLowerInvariant()}";var input=result.InputValue?.ToString()??"null";result.Message=Message(locale,key).Replace("{location}",result.NativePath).Replace("{system}",result.SystemValue?.ToString()??"null").Replace("{input}",input).Replace("{input_len}",input.Length.ToString());return result;}
+    public CheckResult Translate(CheckResult result, TeaQLLocale locale)
+    {
+        var keys = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"required", "checker.required"}, {"min", "checker.min"}, {"max", "checker.max"},
+            {"min_str_len", "checker.minLength"}, {"min_length", "checker.minLength"},
+            {"max_str_len", "checker.maxLength"}, {"max_length", "checker.maxLength"}
+        };
+        var key = keys.TryGetValue(result.RuleId, out var found) ? found : $"checker.{result.RuleId.ToLowerInvariant()}";
+        var template = Message(locale, key);
+        // Prefixing or localization must not erase a customer's explanation
+        // when this catalog does not define their rule.
+        if (template == key && !string.IsNullOrWhiteSpace(result.Message)) return result;
+        // Generated Checkers deliberately omit potentially sensitive input.
+        // An absent diagnostic value is not evidence of a null, or length 4.
+        var input = result.InputValue?.ToString();
+        result.Message = template.Replace("{location}", result.NativePath)
+            .Replace("{system}", result.SystemValue?.ToString() ?? "[omitted]")
+            .Replace("{input}", input ?? "[omitted]")
+            .Replace("{input_len}", input?.Length.ToString() ?? "[omitted]");
+        return result;
+    }
 }

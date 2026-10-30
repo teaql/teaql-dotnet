@@ -365,25 +365,25 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OrderNumber"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("order_number"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("order_number"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OrderDate"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("order_date"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("order_date"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("TotalAmount"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("total_amount"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("total_amount"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Status"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("status"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("status"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Customer"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("customer"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("customer"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("CommercePlatform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("commerce_platform"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("commerce_platform"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("CreateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("UpdateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -404,8 +404,8 @@ namespace Generated.Models
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("order_line_list").Index(index);
-                    throw new CheckException(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                    throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
                 }
             }
         }
@@ -420,8 +420,8 @@ namespace Generated.Models
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("order_line_list").Index(index);
-                    throw new CheckException(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                    throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
                 }
             }
         }
@@ -534,8 +534,8 @@ namespace Generated.Models
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("order_line_list").Index(index);
-                    throw new CheckException(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                    throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
                 }
             }
             await global::System.Threading.Tasks.Task.CompletedTask;

@@ -249,13 +249,13 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Customer", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Platform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Customer", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Customer", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Customer", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -276,8 +276,8 @@ namespace Generated.Models
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("customer_order_list").Index(index);
-                    throw new CheckException(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                    throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
                 }
             }
         }
@@ -292,8 +292,8 @@ namespace Generated.Models
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("customer_order_list").Index(index);
-                    throw new CheckException(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                    throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
                 }
             }
         }
@@ -388,8 +388,8 @@ namespace Generated.Models
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("customer_order_list").Index(index);
-                    throw new CheckException(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray());
+                    throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
+                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
                 }
             }
             await global::System.Threading.Tasks.Task.CompletedTask;

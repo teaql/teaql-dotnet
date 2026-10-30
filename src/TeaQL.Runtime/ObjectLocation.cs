@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace TeaQL.Runtime;
 
 public enum JsonFieldNamingProfile
@@ -18,12 +21,52 @@ public static class JsonFieldNamingProfiles
     };
 }
 
+[JsonConverter(typeof(ObjectLocationSegmentJsonConverter))]
 public abstract record ObjectLocationSegment
 {
     private ObjectLocationSegment() { }
 
     public sealed record Property(string Name) : ObjectLocationSegment;
     public sealed record Index(int Value) : ObjectLocationSegment;
+}
+
+// The abstract record has no serializable members. Without an explicit codec,
+// System.Text.Json emits {} for each segment, silently losing path identity.
+internal sealed class ObjectLocationSegmentJsonConverter : JsonConverter<ObjectLocationSegment>
+{
+    public ObjectLocationSegmentJsonConverter() { }
+
+    public override ObjectLocationSegment Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        using var document = JsonDocument.ParseValue(ref reader);
+        var value = document.RootElement;
+        if (value.ValueKind != JsonValueKind.Object) throw new JsonException("Invalid object-location segment");
+        var fields = value.EnumerateObject().Select(property => property.Name).ToArray();
+        if (fields.Length != 2 || fields.Distinct(StringComparer.Ordinal).Count() != 2
+            || !value.TryGetProperty("kind", out var kind) || kind.ValueKind != JsonValueKind.String)
+            throw new JsonException("Invalid object-location segment");
+        if (kind.GetString() == "property" && value.TryGetProperty("name", out var name)
+            && name.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(name.GetString()))
+            return new ObjectLocationSegment.Property(name.GetString()!);
+        if (kind.GetString() == "index" && value.TryGetProperty("index", out var index)
+            && index.ValueKind == JsonValueKind.Number && index.TryGetInt32(out var number) && number >= 0)
+            return new ObjectLocationSegment.Index(number);
+        throw new JsonException("Invalid object-location segment");
+    }
+
+    public override void Write(Utf8JsonWriter writer, ObjectLocationSegment value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        switch (value)
+        {
+            case ObjectLocationSegment.Property property:
+                writer.WriteString("kind", "property"); writer.WriteString("name", property.Name); break;
+            case ObjectLocationSegment.Index index:
+                writer.WriteString("kind", "index"); writer.WriteNumber("index", index.Value); break;
+            default: throw new JsonException("Invalid object-location segment");
+        }
+        writer.WriteEndObject();
+    }
 }
 
 /// <summary>A casing-neutral checker location expressed with canonical KSML names.</summary>

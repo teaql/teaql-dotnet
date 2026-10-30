@@ -1,21 +1,28 @@
 {
   "schema": "teaql.generated-example-fixture/v1",
   "language": "dotnet",
-  "generatorCommit": "67a452018063f946719cf2c93a846c46a6d9464c",
-  "generatorSourceContentsSha256": "323a29dd57f147c143a7433ec8af5d8be87be40139b02df689fb3d6cc26b686d",
+  "generatorCommit": "63eb1da8f2272682dd83f79fea504777c332d3c2",
+  "generatorSourceContentsSha256": "8100032eb1a5c884307b3bb70dec223b84f667efe70a460e05eaff62917da20b",
   "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
-  "producerReceiptSha256": "b7ec2a37c69836232bc5de3b8ce968dd3fff777b7a62fb0433923893f02dbd82",
+  "producerReceiptSha256": "d5f3d1adbbf37d924818999a72ce647b55e663d8926709f4e981994c42ae19c8",
   "producerManifestSha256": "8e8aad053d047e10e78375e8a64923e100ea4a779927f72a4c21626f82d9418b",
   "files": {
+    "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
+    "GeneratedRuntimeModule.cs": "cb33eaa11c316ef446bbfc40a7cf76c9d51cb894dde6e1922f79f2d0509af7c0",
+    "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28",
+    "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
     "Requests/TypePlatformRequest.cs": "29cf013cd28d4cb4fcc9964f9b40c45fe3e426fbaf7c82d4367244d038b00881",
     "Requests/ScalarTypeProbeRequest.cs": "8d67c51a89e03669370a1681a352df32ac33027dfbb61e03f52cca13cddeb89a",
-    "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
-    "GeneratedRuntimeModule.cs": "c8b1074f6da25d7eb5e946f78ff8ef252c1ec3309e285b88c80a74433ba7a389",
-    "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
-    "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28",
     "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
     "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "Models/TypePlatform.cs": "559517aa42723328f6edb60e9197c7854f70cfb81f358f2c3f014143a35e5615",
-    "Models/ScalarTypeProbe.cs": "ff00696f50bc8574527c0490a130e94d6730eacbfe1c484f798eed54acd74c5e"
-  }
+    "Models/TypePlatform.cs": "b087e3383cdca5f35b14f5a3a3f4c1bf77409a44a258df0c3cd8421882ebf0cf",
+    "Models/ScalarTypeProbe.cs": "befbce6ca2142e092653e333c01cded6dafdc3ce0bb7b70c256177eca7ffec02"
+  },
+  "producerSource": {
+    "commit": "63eb1da8f2272682dd83f79fea504777c332d3c2",
+    "diff": "0f564063c1dc81ad4ef12af376c678893e9db48c277b0a4319e8e7c9ab887e6c",
+    "status": "8589a1b3a8a58d25baf4cce8388e1faa150fde153a341b3137ea801efd520a39",
+    "sourceContentsSha256": "8100032eb1a5c884307b3bb70dec223b84f667efe70a460e05eaff62917da20b"
+  },
+  "generatedManifestSha256": "9a8c57932b07849c39685ffe3c0a45f89e4b8520fc853279557e6de2b99c2e18"
 }

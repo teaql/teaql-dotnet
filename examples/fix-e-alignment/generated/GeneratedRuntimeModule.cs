@@ -11,9 +11,9 @@ internal sealed class TenantChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var minLenName) && minLenName.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Tenant", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var minLenName) && minLenName.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", EntityType = "Tenant", Location = ObjectLocation.Property("name"), SystemValue = 1 });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", EntityType = "Tenant", Location = ObjectLocation.Property("name"), SystemValue = 80 });
 
 
         return results;
@@ -35,10 +35,10 @@ internal sealed class PurchaseOrderChecker : IEntityChecker
                 values["tenant"] = new Value.I64Value(root.Id);
                 context.RecordFixEvidence(new FixEvidence("PurchaseOrder", "tenant", FixEvidenceSource.Context, "activeRoot:Tenant"));
             }
-            else if (Convert.ToInt64(suppliedTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", Location = ObjectLocation.Property("tenant") });
+            else if (Convert.ToInt64(suppliedTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("tenant") });
         } else if (updating && values.TryGetValue("tenant", out var suppliedUpdateTenant) && suppliedUpdateTenant is not Value.NullValue) {
             var root = context.RequireActiveRoot("Tenant");
-            if (Convert.ToInt64(suppliedUpdateTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", Location = ObjectLocation.Property("tenant") });
+            if (Convert.ToInt64(suppliedUpdateTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("tenant") });
         }
 
 
@@ -58,17 +58,17 @@ internal sealed class PurchaseOrderChecker : IEntityChecker
         }
 
 
-        if ((creating && !values.ContainsKey("tenant")) || (values.TryGetValue("tenant", out var checkTenant) && checkTenant is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("tenant") });
+        if ((creating && !values.ContainsKey("tenant")) || (values.TryGetValue("tenant", out var checkTenant) && checkTenant is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("tenant") });
 
-        if ((creating && !values.ContainsKey("contact_phone")) || (values.TryGetValue("contact_phone", out var checkContactPhone) && checkContactPhone is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("contact_phone") });
-        if (values.TryGetValue("contact_phone", out var minLenContactPhone) && minLenContactPhone.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", Location = ObjectLocation.Property("contact_phone") });
-        if (values.TryGetValue("contact_phone", out var maxLenContactPhone) && maxLenContactPhone.Raw?.ToString()?.Length > 32) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("contact_phone") });
+        if ((creating && !values.ContainsKey("contact_phone")) || (values.TryGetValue("contact_phone", out var checkContactPhone) && checkContactPhone is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("contact_phone") });
+        if (values.TryGetValue("contact_phone", out var minLenContactPhone) && minLenContactPhone.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("contact_phone"), SystemValue = 1 });
+        if (values.TryGetValue("contact_phone", out var maxLenContactPhone) && maxLenContactPhone.Raw?.ToString()?.Length > 32) results.Add(new CheckResult { RuleId = "max_length", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("contact_phone"), SystemValue = 32 });
 
-        if (values.TryGetValue("internal_note", out var maxLenInternalNote) && maxLenInternalNote.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("internal_note") });
+        if (values.TryGetValue("internal_note", out var maxLenInternalNote) && maxLenInternalNote.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("internal_note"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("create_time") });
+        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("create_time") });
 
-        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("update_time") });
+        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("update_time") });
 
 
         return results;
@@ -90,10 +90,10 @@ internal sealed class OrderItemChecker : IEntityChecker
                 values["tenant"] = new Value.I64Value(root.Id);
                 context.RecordFixEvidence(new FixEvidence("OrderItem", "tenant", FixEvidenceSource.Context, "activeRoot:Tenant"));
             }
-            else if (Convert.ToInt64(suppliedTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", Location = ObjectLocation.Property("tenant") });
+            else if (Convert.ToInt64(suppliedTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", EntityType = "OrderItem", Location = ObjectLocation.Property("tenant") });
         } else if (updating && values.TryGetValue("tenant", out var suppliedUpdateTenant) && suppliedUpdateTenant is not Value.NullValue) {
             var root = context.RequireActiveRoot("Tenant");
-            if (Convert.ToInt64(suppliedUpdateTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", Location = ObjectLocation.Property("tenant") });
+            if (Convert.ToInt64(suppliedUpdateTenant.Raw) != root.Id) results.Add(new CheckResult { RuleId = "context_root_mismatch", EntityType = "OrderItem", Location = ObjectLocation.Property("tenant") });
         }
 
 
@@ -113,21 +113,21 @@ internal sealed class OrderItemChecker : IEntityChecker
         }
 
 
-        if ((creating && !values.ContainsKey("purchase_order")) || (values.TryGetValue("purchase_order", out var checkPurchaseOrder) && checkPurchaseOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("purchase_order") });
+        if ((creating && !values.ContainsKey("purchase_order")) || (values.TryGetValue("purchase_order", out var checkPurchaseOrder) && checkPurchaseOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("purchase_order") });
 
-        if ((creating && !values.ContainsKey("tenant")) || (values.TryGetValue("tenant", out var checkTenant) && checkTenant is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("tenant") });
+        if ((creating && !values.ContainsKey("tenant")) || (values.TryGetValue("tenant", out var checkTenant) && checkTenant is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("tenant") });
 
-        if ((creating && !values.ContainsKey("product_name")) || (values.TryGetValue("product_name", out var checkProductName) && checkProductName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("product_name") });
-        if (values.TryGetValue("product_name", out var minLenProductName) && minLenProductName.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", Location = ObjectLocation.Property("product_name") });
-        if (values.TryGetValue("product_name", out var maxLenProductName) && maxLenProductName.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("product_name") });
+        if ((creating && !values.ContainsKey("product_name")) || (values.TryGetValue("product_name", out var checkProductName) && checkProductName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("product_name") });
+        if (values.TryGetValue("product_name", out var minLenProductName) && minLenProductName.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", EntityType = "OrderItem", Location = ObjectLocation.Property("product_name"), SystemValue = 1 });
+        if (values.TryGetValue("product_name", out var maxLenProductName) && maxLenProductName.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", EntityType = "OrderItem", Location = ObjectLocation.Property("product_name"), SystemValue = 80 });
 
-        if ((creating && !values.ContainsKey("unit_price")) || (values.TryGetValue("unit_price", out var checkUnitPrice) && checkUnitPrice is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("unit_price") });
-        if (values.TryGetValue("unit_price", out var minUnitPrice) && minUnitPrice is not Value.NullValue && Convert.ToDecimal(minUnitPrice.Raw).CompareTo(0.01m) == -1) results.Add(new CheckResult { RuleId = "min", Location = ObjectLocation.Property("unit_price") });
-        if (values.TryGetValue("unit_price", out var maxUnitPrice) && maxUnitPrice is not Value.NullValue && Convert.ToDecimal(maxUnitPrice.Raw) > 1000000m) results.Add(new CheckResult { RuleId = "max", Location = ObjectLocation.Property("unit_price") });
+        if ((creating && !values.ContainsKey("unit_price")) || (values.TryGetValue("unit_price", out var checkUnitPrice) && checkUnitPrice is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("unit_price") });
+        if (values.TryGetValue("unit_price", out var minUnitPrice) && minUnitPrice is not Value.NullValue && Convert.ToDecimal(minUnitPrice.Raw).CompareTo(0.01m) == -1) results.Add(new CheckResult { RuleId = "min", EntityType = "OrderItem", Location = ObjectLocation.Property("unit_price"), SystemValue = 0.01m });
+        if (values.TryGetValue("unit_price", out var maxUnitPrice) && maxUnitPrice is not Value.NullValue && Convert.ToDecimal(maxUnitPrice.Raw) > 1000000m) results.Add(new CheckResult { RuleId = "max", EntityType = "OrderItem", Location = ObjectLocation.Property("unit_price"), SystemValue = 1000000m });
 
-        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("create_time") });
+        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("create_time") });
 
-        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("update_time") });
+        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("update_time") });
 
 
         return results;

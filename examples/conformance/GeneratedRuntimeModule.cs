@@ -11,8 +11,8 @@ internal sealed class PlatformChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Platform", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "Platform", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
 
         return results;
@@ -28,13 +28,13 @@ internal sealed class WorkItemChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("title")) || (values.TryGetValue("title", out var checkTitle) && checkTitle is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("title") });
-        if (values.TryGetValue("title", out var minLenTitle) && minLenTitle.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", Location = ObjectLocation.Property("title") });
-        if (values.TryGetValue("title", out var maxLenTitle) && maxLenTitle.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("title") });
+        if ((creating && !values.ContainsKey("title")) || (values.TryGetValue("title", out var checkTitle) && checkTitle is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "WorkItem", Location = ObjectLocation.Property("title") });
+        if (values.TryGetValue("title", out var minLenTitle) && minLenTitle.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", EntityType = "WorkItem", Location = ObjectLocation.Property("title"), SystemValue = 1 });
+        if (values.TryGetValue("title", out var maxLenTitle) && maxLenTitle.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", EntityType = "WorkItem", Location = ObjectLocation.Property("title"), SystemValue = 80 });
 
-        if (values.TryGetValue("description", out var maxLenDescription) && maxLenDescription.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("description") });
+        if (values.TryGetValue("description", out var maxLenDescription) && maxLenDescription.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "WorkItem", Location = ObjectLocation.Property("description"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "WorkItem", Location = ObjectLocation.Property("platform") });
 
 
         return results;

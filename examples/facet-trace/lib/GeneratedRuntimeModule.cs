@@ -26,15 +26,15 @@ internal sealed class PlatformChecker : IEntityChecker
         }
 
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Platform", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "Platform", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("base_url")) || (values.TryGetValue("base_url", out var checkBaseUrl) && checkBaseUrl is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("base_url") });
-        if (values.TryGetValue("base_url", out var maxLenBaseUrl) && maxLenBaseUrl.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("base_url") });
+        if ((creating && !values.ContainsKey("base_url")) || (values.TryGetValue("base_url", out var checkBaseUrl) && checkBaseUrl is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Platform", Location = ObjectLocation.Property("base_url") });
+        if (values.TryGetValue("base_url", out var maxLenBaseUrl) && maxLenBaseUrl.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "Platform", Location = ObjectLocation.Property("base_url"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("create_time") });
+        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Platform", Location = ObjectLocation.Property("create_time") });
 
-        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("update_time") });
+        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Platform", Location = ObjectLocation.Property("update_time") });
 
 
         return results;
@@ -50,16 +50,16 @@ internal sealed class SchoolTypeChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "SchoolType", Location = ObjectLocation.Property("platform") });
 
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "SchoolType", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "SchoolType", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("code")) || (values.TryGetValue("code", out var checkCode) && checkCode is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("code") });
-        if (values.TryGetValue("code", out var maxLenCode) && maxLenCode.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("code") });
+        if ((creating && !values.ContainsKey("code")) || (values.TryGetValue("code", out var checkCode) && checkCode is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "SchoolType", Location = ObjectLocation.Property("code") });
+        if (values.TryGetValue("code", out var maxLenCode) && maxLenCode.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "SchoolType", Location = ObjectLocation.Property("code"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("display_order")) || (values.TryGetValue("display_order", out var checkDisplayOrder) && checkDisplayOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("display_order") });
+        if ((creating && !values.ContainsKey("display_order")) || (values.TryGetValue("display_order", out var checkDisplayOrder) && checkDisplayOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "SchoolType", Location = ObjectLocation.Property("display_order") });
 
 
         return results;
@@ -90,25 +90,25 @@ internal sealed class SchoolChecker : IEntityChecker
         }
 
 
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("platform") });
 
-        if ((creating && !values.ContainsKey("school_type")) || (values.TryGetValue("school_type", out var checkSchoolType) && checkSchoolType is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("school_type") });
+        if ((creating && !values.ContainsKey("school_type")) || (values.TryGetValue("school_type", out var checkSchoolType) && checkSchoolType is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("school_type") });
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "School", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("address")) || (values.TryGetValue("address", out var checkAddress) && checkAddress is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("address") });
-        if (values.TryGetValue("address", out var maxLenAddress) && maxLenAddress.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("address") });
+        if ((creating && !values.ContainsKey("address")) || (values.TryGetValue("address", out var checkAddress) && checkAddress is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("address") });
+        if (values.TryGetValue("address", out var maxLenAddress) && maxLenAddress.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "School", Location = ObjectLocation.Property("address"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("established_date")) || (values.TryGetValue("established_date", out var checkEstablishedDate) && checkEstablishedDate is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("established_date") });
+        if ((creating && !values.ContainsKey("established_date")) || (values.TryGetValue("established_date", out var checkEstablishedDate) && checkEstablishedDate is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("established_date") });
 
-        if ((creating && !values.ContainsKey("student_capacity")) || (values.TryGetValue("student_capacity", out var checkStudentCapacity) && checkStudentCapacity is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("student_capacity") });
+        if ((creating && !values.ContainsKey("student_capacity")) || (values.TryGetValue("student_capacity", out var checkStudentCapacity) && checkStudentCapacity is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("student_capacity") });
 
-        if ((creating && !values.ContainsKey("active")) || (values.TryGetValue("active", out var checkActive) && checkActive is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("active") });
+        if ((creating && !values.ContainsKey("active")) || (values.TryGetValue("active", out var checkActive) && checkActive is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("active") });
 
-        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("create_time") });
+        if ((creating && !values.ContainsKey("create_time")) || (values.TryGetValue("create_time", out var checkCreateTime) && checkCreateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("create_time") });
 
-        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("update_time") });
+        if ((creating && !values.ContainsKey("update_time")) || (values.TryGetValue("update_time", out var checkUpdateTime) && checkUpdateTime is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "School", Location = ObjectLocation.Property("update_time") });
 
 
         return results;

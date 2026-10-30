@@ -11,8 +11,8 @@ internal sealed class PlatformChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Platform", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "Platform", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
 
         return results;
@@ -28,19 +28,19 @@ internal sealed class OrderStatusChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderStatus", Location = ObjectLocation.Property("platform") });
 
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderStatus", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "OrderStatus", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("code")) || (values.TryGetValue("code", out var checkCode) && checkCode is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("code") });
-        if (values.TryGetValue("code", out var maxLenCode) && maxLenCode.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("code") });
+        if ((creating && !values.ContainsKey("code")) || (values.TryGetValue("code", out var checkCode) && checkCode is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderStatus", Location = ObjectLocation.Property("code") });
+        if (values.TryGetValue("code", out var maxLenCode) && maxLenCode.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "OrderStatus", Location = ObjectLocation.Property("code"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("color")) || (values.TryGetValue("color", out var checkColor) && checkColor is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("color") });
-        if (values.TryGetValue("color", out var maxLenColor) && maxLenColor.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("color") });
+        if ((creating && !values.ContainsKey("color")) || (values.TryGetValue("color", out var checkColor) && checkColor is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderStatus", Location = ObjectLocation.Property("color") });
+        if (values.TryGetValue("color", out var maxLenColor) && maxLenColor.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "OrderStatus", Location = ObjectLocation.Property("color"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("display_order")) || (values.TryGetValue("display_order", out var checkDisplayOrder) && checkDisplayOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("display_order") });
+        if ((creating && !values.ContainsKey("display_order")) || (values.TryGetValue("display_order", out var checkDisplayOrder) && checkDisplayOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderStatus", Location = ObjectLocation.Property("display_order") });
 
 
         return results;
@@ -56,10 +56,10 @@ internal sealed class CustomerChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("platform") });
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Customer", Location = ObjectLocation.Property("platform") });
 
-        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("name") });
-        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("name") });
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Customer", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "Customer", Location = ObjectLocation.Property("name"), SystemValue = 100 });
 
 
         return results;
@@ -75,16 +75,16 @@ internal sealed class CustomerOrderChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("customer")) || (values.TryGetValue("customer", out var checkCustomer) && checkCustomer is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("customer") });
+        if ((creating && !values.ContainsKey("customer")) || (values.TryGetValue("customer", out var checkCustomer) && checkCustomer is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "CustomerOrder", Location = ObjectLocation.Property("customer") });
 
-        if ((creating && !values.ContainsKey("status")) || (values.TryGetValue("status", out var checkStatus) && checkStatus is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("status") });
+        if ((creating && !values.ContainsKey("status")) || (values.TryGetValue("status", out var checkStatus) && checkStatus is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "CustomerOrder", Location = ObjectLocation.Property("status") });
 
-        if ((creating && !values.ContainsKey("order_number")) || (values.TryGetValue("order_number", out var checkOrderNumber) && checkOrderNumber is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("order_number") });
-        if (values.TryGetValue("order_number", out var maxLenOrderNumber) && maxLenOrderNumber.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("order_number") });
+        if ((creating && !values.ContainsKey("order_number")) || (values.TryGetValue("order_number", out var checkOrderNumber) && checkOrderNumber is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "CustomerOrder", Location = ObjectLocation.Property("order_number") });
+        if (values.TryGetValue("order_number", out var maxLenOrderNumber) && maxLenOrderNumber.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "CustomerOrder", Location = ObjectLocation.Property("order_number"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("order_date")) || (values.TryGetValue("order_date", out var checkOrderDate) && checkOrderDate is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("order_date") });
+        if ((creating && !values.ContainsKey("order_date")) || (values.TryGetValue("order_date", out var checkOrderDate) && checkOrderDate is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "CustomerOrder", Location = ObjectLocation.Property("order_date") });
 
-        if ((creating && !values.ContainsKey("total_amount")) || (values.TryGetValue("total_amount", out var checkTotalAmount) && checkTotalAmount is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("total_amount") });
+        if ((creating && !values.ContainsKey("total_amount")) || (values.TryGetValue("total_amount", out var checkTotalAmount) && checkTotalAmount is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "CustomerOrder", Location = ObjectLocation.Property("total_amount") });
 
 
         return results;
@@ -100,14 +100,14 @@ internal sealed class OrderItemChecker : IEntityChecker
         var creating = request is InsertMutationRequest;
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
-        if ((creating && !values.ContainsKey("customer_order")) || (values.TryGetValue("customer_order", out var checkCustomerOrder) && checkCustomerOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("customer_order") });
+        if ((creating && !values.ContainsKey("customer_order")) || (values.TryGetValue("customer_order", out var checkCustomerOrder) && checkCustomerOrder is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("customer_order") });
 
-        if ((creating && !values.ContainsKey("product_name")) || (values.TryGetValue("product_name", out var checkProductName) && checkProductName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("product_name") });
-        if (values.TryGetValue("product_name", out var maxLenProductName) && maxLenProductName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", Location = ObjectLocation.Property("product_name") });
+        if ((creating && !values.ContainsKey("product_name")) || (values.TryGetValue("product_name", out var checkProductName) && checkProductName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("product_name") });
+        if (values.TryGetValue("product_name", out var maxLenProductName) && maxLenProductName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "OrderItem", Location = ObjectLocation.Property("product_name"), SystemValue = 100 });
 
-        if ((creating && !values.ContainsKey("quantity")) || (values.TryGetValue("quantity", out var checkQuantity) && checkQuantity is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("quantity") });
+        if ((creating && !values.ContainsKey("quantity")) || (values.TryGetValue("quantity", out var checkQuantity) && checkQuantity is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("quantity") });
 
-        if ((creating && !values.ContainsKey("unit_price")) || (values.TryGetValue("unit_price", out var checkUnitPrice) && checkUnitPrice is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", Location = ObjectLocation.Property("unit_price") });
+        if ((creating && !values.ContainsKey("unit_price")) || (values.TryGetValue("unit_price", out var checkUnitPrice) && checkUnitPrice is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "OrderItem", Location = ObjectLocation.Property("unit_price") });
 
 
         return results;

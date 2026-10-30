@@ -495,57 +495,57 @@ namespace Generated.Models
             if (!creating && !_markedForDeletion)
             {
                 if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("TypePlatform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("type_platform"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("type_platform"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredString"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_string"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_string"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalString"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_string"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_string"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("LargeText"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("large_text"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("large_text"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredBoolean"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_boolean"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_boolean"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalBoolean"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_boolean"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_boolean"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredInteger"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_integer"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_integer"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalInteger"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_integer"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_integer"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredLong"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_long"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_long"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalLong"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_long"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_long"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredDecimal"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_decimal"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_decimal"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalDecimal"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_decimal"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_decimal"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredFloat"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_float"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_float"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalFloat"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_float"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_float"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredDouble"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_double"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_double"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalDouble"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_double"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_double"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredDate"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_date"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_date"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalDate"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_date"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_date"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("RequiredDatetime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("required_datetime"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("required_datetime"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("OptionalDatetime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("optional_datetime"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("optional_datetime"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("CreateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("UpdateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
                 if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ScalarTypeProbe", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();

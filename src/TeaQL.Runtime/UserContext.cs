@@ -607,6 +607,8 @@ public class UserContext
                         Location = ObjectLocation.Property(field),
                         Message = "Expected a finite Float/Double value" });
         violations.AddRange(IntegralScalarAdmission.Check(descriptor, request, deferredReferences));
+        for (var index = 0; index < violations.Count; index++)
+            violations[index] = violations[index].ForDeclaringEntity(entity);
         TranslateCheckResults(violations);
         if (violations.Count != 0) throw new CheckException(violations);
     }

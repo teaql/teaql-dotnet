@@ -2,29 +2,30 @@
   "schema": "teaql.generated-example-fixture/v1",
   "language": "dotnet",
   "modelSha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
-  "generatedManifestSha256": "dd770d206d9eb8c645c7131c470c28aaebd8ae0803e964782d80fdc3e76f90fa",
-  "producerReceiptSha256": "077f60e4ff1706ac5b5a374be04ebba11b7e3a366b0a74ff9928627281541730",
+  "generatedManifestSha256": "65502cef6b49a9a28e19053ed91911e986ee2ff65d0b00a8511232b1b2c9051a",
+  "producerReceiptSha256": "f45b7da6c4a38abb84f90a0fd65d9279cd86b02d5b088f23833fc6b081100e58",
   "producerSource": {
-    "commit": "67a452018063f946719cf2c93a846c46a6d9464c",
-    "diff": "aa31713b4813f8f2512cd829c3a78742889ace2330cd14d71f7a845fb8e00cdd",
-    "status": "347f15a197a38399705005c106776a481ab53883291a59df158c4ea52a3bcd74",
-    "sourceContentsSha256": "323a29dd57f147c143a7433ec8af5d8be87be40139b02df689fb3d6cc26b686d"
+    "commit": "63eb1da8f2272682dd83f79fea504777c332d3c2",
+    "diff": "0f564063c1dc81ad4ef12af376c678893e9db48c277b0a4319e8e7c9ab887e6c",
+    "status": "8589a1b3a8a58d25baf4cce8388e1faa150fde153a341b3137ea801efd520a39",
+    "sourceContentsSha256": "8100032eb1a5c884307b3bb70dec223b84f667efe70a460e05eaff62917da20b"
   },
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
   "evaluationWarnings": 4,
   "files": {
     "teaql-i18n.json": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014",
+    "GeneratedRuntimeModule.cs": "62cff10632e131911f3f6264716decb877f4fb98860c54d7a4daabb94b990eef",
+    "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e",
     "GeneratedSearchModels.cs": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c",
     "checker-fix-advanced-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
     "Requests/TenantRequest.cs": "27a713908c56f86ed2698081ab997a94b159a83e370e5b82087aa088edf7f10c",
     "Requests/PurchaseOrderRequest.cs": "2355e20af012d133463855f4aeb4707fd61c99a5e86d717ed9349516bf3b8e86",
     "Requests/OrderItemRequest.cs": "ef012eebf8c999a654f1c5dc54769967e5356c8769ff3908721f3a71b991f07f",
-    "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e",
-    "Models/Tenant.cs": "eb7d947f7b1517d0fbb3b14c7cd7aee383a18e5bc874df290761e76c7e825b75",
-    "Models/PurchaseOrder.cs": "b2f57b715e1e167a5c87edc46d6e91502b3c1175053f691915bc257cf23373f2",
-    "Models/OrderItem.cs": "da45c9d5f40e1eabb73a730d157c12156c9824f49d9f913298fbade293783c7f",
     "E.cs": "8260775859cc9cd523543f8822a529a94f7c9841d6bcff72ebced453c41f9078",
-    "GeneratedRuntimeModule.cs": "6805a52518b6ed6e6b734b7d60f9dadf34efc62271dc9e35313d9ba4a00c1f77"
-  }
+    "Models/Tenant.cs": "71e1a6722bcf1dea3d28f00c0051c3cc92ff34837e08a5b580dd21e9b435970b",
+    "Models/PurchaseOrder.cs": "891b7a92ef5a5881f2982b045734c5bd31efd2a287be5adbcc7869a5d617d80e",
+    "Models/OrderItem.cs": "3888c295d88cdd773f3ad16e01e045d2c0cd9dc01d40241263cfe4d408954fe9"
+  },
+  "generatorSourceContentsSha256": "8100032eb1a5c884307b3bb70dec223b84f667efe70a460e05eaff62917da20b"
 }
