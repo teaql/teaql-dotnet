@@ -24,6 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.release_tag || github.ref }}
+          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -36,6 +37,20 @@ jobs:
           expected="${TEAQL_RELEASE_TAG#dotnet-v}"
           actual="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props)"
           test "$expected" = "$actual"
+      - name: Require a verified signed release tag
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          tagged_commit="$(git rev-list -n 1 "$TEAQL_RELEASE_TAG")"
+          test -n "$tagged_commit"
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            test "$tagged_commit" = "$GITHUB_SHA"
+          fi
+          GITHUB_REF_NAME="$TEAQL_RELEASE_TAG" GITHUB_SHA="$tagged_commit" \
+            python3 scripts/verify_signed_release_tag.py
+      - name: Test signed release tag verifier
+        run: python3 scripts/test_verify_signed_release_tag.py
       - name: Verify every source test project (including Core)
         run: bash scripts/verify-trace-chain-source-tests.sh artifacts/test-results -c Release -p:UseSharedCompilation=false
       - name: Pack public projects
@@ -55,8 +70,14 @@ jobs:
           done
       - name: Verify exact release candidates
         run: python3 scripts/verify-release-candidates.py artifacts
+      - name: Test release identity and absence guards
+        run: |
+          python3 scripts/test_verify_signed_release_tag.py
+          python3 scripts/test_verify_public_release_absence.py
       - name: Run optional module and S3 consumers from exact candidates
         run: python3 scripts/verify-optional-reference-consumers.py "$PWD" artifacts --include-s3
+      - name: Refuse any version already present on NuGet
+        run: python3 scripts/verify-public-release-absence.py artifacts
       - uses: NuGet/login@v1
         id: login
         with:
@@ -66,4 +87,3 @@ jobs:
           dotnet nuget push "artifacts/*.nupkg"
           --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
-          --skip-duplicate
