@@ -9,13 +9,26 @@ public class ObjectStorageContractTests
     private sealed class Stub : IObjectStorageProvider
     {
         public long Size = 3;
+        public int Deletes;
         public StorageErrorCode? Error;
         public StorageInvocation? Seen;
         public Task<ObjectMetadata> PutAsync(StorageInvocation invocation, ObjectKey key, Stream content, ObjectPutOptions options) { Seen = invocation; return Task.FromResult(new ObjectMetadata(key, options.Size)); }
         public Task<ObjectContent> GetAsync(StorageInvocation invocation, ObjectKey key) => Task.FromResult(new ObjectContent(new(key, Size), new MemoryStream([1, 2, 3])));
         public Task<ObjectMetadata?> HeadAsync(StorageInvocation invocation, ObjectKey key) { Seen = invocation; if (Error is { } error) throw new StorageException(error); return Task.FromResult<ObjectMetadata?>(null); }
-        public Task DeleteAsync(StorageInvocation invocation, ObjectKey key) => Task.CompletedTask;
+        public Task DeleteAsync(StorageInvocation invocation, ObjectKey key) { Deletes++; return Task.CompletedTask; }
         public Task<ObjectReadUrl> GetReadUrlAsync(StorageInvocation invocation, ObjectKey key, ObjectReadUrlOptions options) => throw new StorageException(StorageErrorCode.Unsupported);
+    }
+    [Fact]
+    public async Task ConditionalDeleteRequiresProviderCapability()
+    {
+        var stub = new Stub();
+        var api = new UserContext().WithObjectStorage(stub).ObjectStorage("conditional delete");
+        var key = new ObjectKey("f4/conditional");
+        Assert.Equal(StorageErrorCode.InvalidInput,
+            (await Assert.ThrowsAsync<StorageException>(() => api.DeleteIfVersionAsync(key, "*"))).Code);
+        Assert.Equal(StorageErrorCode.Unsupported,
+            (await Assert.ThrowsAsync<StorageException>(() => api.DeleteIfVersionAsync(key, "\"etag\""))).Code);
+        Assert.Equal(0, stub.Deletes);
     }
     private sealed class Observer : IObjectStorageObserver
     {
@@ -55,6 +68,18 @@ public class ObjectStorageContractTests
         Assert.Throws<StorageException>(() => new ObjectPutOptions(0, ObjectWriteMode.CreateOnly, metadata: new Dictionary<string, string> { ["Bad Key"] = "value" }));
         foreach (var lifetime in new[] { TimeSpan.Zero, TimeSpan.FromTicks(1), TimeSpan.FromDays(8) }) Assert.Throws<StorageException>(() => new ObjectReadUrlOptions(lifetime));
         Assert.Throws<StorageException>(() => new ObjectReadUrlOptions(filename: "bad\nname", disposition: "attachment"));
+        Assert.Throws<StorageException>(() => new ObjectReadUrlOptions(filename: "bad\r\nname", disposition: "attachment"));
+        Assert.Throws<StorageException>(() => new ObjectReadUrlOptions(filename: "bad/name", disposition: "attachment"));
+        Assert.Throws<StorageException>(() => new ObjectReadUrlOptions(filename: "\ud800", disposition: "attachment"));
+        Assert.Equal("inline; filename=\"sample.jpg\"",
+            new ObjectReadUrlOptions(disposition: "inline", filename: "sample.jpg").ContentDisposition);
+        var unicodeDisposition = new ObjectReadUrlOptions(disposition: "inline",
+            filename: "报告 & 📄\u2028mid\u2029x.jpg").ContentDisposition!;
+        Assert.StartsWith("inline; filename=\"__ & _", unicodeDisposition);
+        Assert.Contains("filename*=UTF-8''%E6%8A%A5%E5%91%8A%20%26%20%F0%9F%93%84",
+            unicodeDisposition);
+        Assert.DoesNotContain('\r', unicodeDisposition);
+        Assert.DoesNotContain('\n', unicodeDisposition);
         var keyValue = new ObjectKey("PRIVATE-KEY-CANARY"); var source = new Dictionary<string, string> { ["tag"] = "PRIVATE-METADATA-CANARY" }; var options = new ObjectPutOptions(0, ObjectWriteMode.CreateOnly, metadata: source); source["tag"] = "changed"; Assert.Equal("PRIVATE-METADATA-CANARY", options.Metadata["tag"]);
         foreach (var value in new object[] { keyValue, options, new ObjectMetadata(keyValue, 0), new ObjectReadUrl(new Uri("https://example.invalid/PRIVATE-URL-CANARY"), DateTimeOffset.UtcNow) }) Assert.DoesNotContain("CANARY", value.ToString());
     }

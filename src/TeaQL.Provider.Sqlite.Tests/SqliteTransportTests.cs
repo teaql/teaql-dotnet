@@ -30,6 +30,37 @@ namespace TeaQL.Provider.Sqlite.Tests
         }
 
         [Fact]
+        public async Task SQLTransactionReservesPhysicalWriterBeforeExternalIO()
+        {
+            var root = Path.Combine(Path.GetTempPath(), $"teaql-immediate-owner-{Guid.NewGuid():N}");
+            Directory.CreateDirectory(root);
+            try
+            {
+                var path = Path.Combine(root, "owner.db");
+                await using var firstConnection = new SqliteConnection($"Data Source={path};Default Timeout=5");
+                await using var secondConnection = new SqliteConnection($"Data Source={path};Default Timeout=5");
+                await firstConnection.OpenAsync();
+                await secondConnection.OpenAsync();
+                var first = new SqliteTransport(firstConnection);
+                var second = new SqliteTransport(secondConnection);
+                using var held = await first.BeginSqlAsync();
+                var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                var waiter = Task.Run(async () =>
+                {
+                    started.SetResult();
+                    using var next = await second.BeginSqlAsync();
+                    await next.RollbackSqlAsync();
+                });
+                await started.Task;
+                await Task.Delay(50);
+                Assert.False(waiter.IsCompleted, "second connection entered before the first writer released");
+                await held.CommitSqlAsync();
+                await waiter.WaitAsync(TimeSpan.FromSeconds(5));
+            }
+            finally { Directory.Delete(root, recursive: true); }
+        }
+
+        [Fact]
         public async Task OptimisticIdSpaceIsSharedAcrossExecutors()
         {
             var path = Path.Combine(Path.GetTempPath(), $"teaql-id-space-{Guid.NewGuid():N}.db");

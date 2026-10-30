@@ -24,6 +24,8 @@ public class UserContext
     
     private readonly ConcurrentDictionary<Type, object> _typedResources = new();
     private readonly ConcurrentDictionary<string, object> _namedResources = new();
+    private readonly ConcurrentDictionary<string, IRuntimeCapabilityResource> _runtimeCapabilities = new();
+    private IReadOnlyList<string> _requiredCapabilities = Array.Empty<string>();
     private readonly ConcurrentDictionary<string, Value> _locals = new();
     private readonly ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
     private readonly ConcurrentBag<object> _managedEntities = new();
@@ -31,6 +33,13 @@ public class UserContext
     private readonly MutationPolicyRuntimeState _mutationPolicy = new();
     private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
     private GraphMutationSession? _activeGraphSave;
+
+    /// <summary>Maintenance cannot wait on this context's own graph SQL owner.</summary>
+    public void RequireNoActiveGraphSql()
+    {
+        if (System.Threading.Volatile.Read(ref _activeGraphSave) is not null)
+            throw new InvalidOperationException("BLOB_TRANSACTION_REQUIRED");
+    }
     private DateTimeOffset? _graphFixTime;
     private IBusinessClock _businessClock = SystemBusinessClock.Instance;
     private ISchemaExecutor? _dataServiceSchemaExecutor;
@@ -241,6 +250,7 @@ public class UserContext
         GraphMutationSession? session = null;
         try
         {
+            await ValidateCapabilitiesAsync().ConfigureAwait(false);
             transaction = await RequireResource<ITransactionExecutor>()
                 .BeginTransactionAsync().ConfigureAwait(false);
             session = new GraphMutationSession(this, transaction, intent);
@@ -252,11 +262,19 @@ public class UserContext
             try
             {
                 result = await work(session).ConfigureAwait(false);
+                session.EnsureCommittable();
                 await transaction.CommitAsync().ConfigureAwait(false);
             }
-            catch
+            catch (Exception failure)
             {
                 try { await transaction.RollbackAsync().ConfigureAwait(false); }
+                catch (Exception rollbackFailure)
+                {
+                    // COMMIT can succeed before its acknowledgement is lost.
+                    // Keep that original failure when a completed transaction
+                    // also rejects the best-effort rollback.
+                    failure.Data["TeaQL.RollbackException"] = rollbackFailure;
+                }
                 finally { session.Restore(); }
                 throw;
             }
@@ -506,6 +524,7 @@ public class UserContext
 
     public async Task EnsureSchemaAsync()
     {
+        await ValidateCapabilitiesAsync().ConfigureAwait(false);
         var provider = _schemaExecutorOverride ?? _dataServiceSchemaExecutor
             ?? GetResource<ISchemaExecutor>()
             ?? throw new InvalidOperationException("Missing resource of type ISchemaExecutor");
@@ -520,6 +539,38 @@ public class UserContext
 
     internal void InstallGeneratedBootstrap(Func<UserContext, Task>? callback) =>
         _generatedBootstrap = callback;
+
+    internal void InstallRequiredCapabilities(IReadOnlyList<string> names) =>
+        _requiredCapabilities = names.ToArray();
+
+    public void InstallRuntimeCapability(IRuntimeCapabilityResource resource)
+    {
+        ArgumentNullException.ThrowIfNull(resource);
+        if (string.IsNullOrWhiteSpace(resource.Capability) || resource.Capability != resource.Capability.Trim())
+            throw new ArgumentException("RUNTIME_CAPABILITY_INVALID", nameof(resource));
+        if (!_runtimeCapabilities.TryAdd(resource.Capability, resource))
+            throw new InvalidOperationException("RUNTIME_CAPABILITY_DUPLICATE");
+    }
+
+    public async Task ValidateCapabilitiesAsync()
+    {
+        foreach (var name in _requiredCapabilities)
+        {
+            if (!_runtimeCapabilities.TryGetValue(name, out var resource)
+                || !string.Equals(resource.Capability, name, StringComparison.Ordinal))
+                throw MissingCapability(name);
+            try { await resource.ValidateReadyAsync(this).ConfigureAwait(false); }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            { throw MissingCapability(name); }
+        }
+    }
+
+    private static InvalidOperationException MissingCapability(string name) => new(name switch
+    {
+        "blob.v1" => "BLOB_CAPABILITY_MISSING",
+        "secure_document.v1" => "DOCUMENT_CONFIGURATION",
+        _ => "RUNTIME_CAPABILITY_MISSING"
+    });
 
     public UserContext WithModule(RuntimeModule module)
     {

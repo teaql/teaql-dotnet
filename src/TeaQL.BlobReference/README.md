@@ -1,0 +1,122 @@
+# Optional Blob reference module
+
+Call `ReadyAsync` on the same `BlobReferenceModule` instance that installed the
+services in the supplied context. A newly constructed module cannot validate
+another module's installation, even when its configuration is identical; it
+fails with `BLOB_CAPABILITY_MISSING` before activating the verifier. Installation
+remains passive, and catalog migration remains an explicit host action.
+
+`TeaQL.BlobReference` is an explicit, passive module. The host constructs a
+`SqliteBlobCatalog`, `SqliteBlobUploadService`, read and binding authorizers,
+then installs `BlobReferenceModule` into its `UserContext` and calls
+`ReadyAsync` before serving requests. Storage and schema installation remain
+host responsibilities.
+
+The upload service accepts one trusted `IBlobContentVerifier`. To use the
+optional image, media and Office parsers together, the host can pass a
+`CompositeBlobContentVerifier` with explicit extension-to-parser routes. It
+copies and validates the routes at construction, checks each distinct parser's
+readiness, and rejects an unregistered extension before reading stored bytes.
+The router is passive and does not add formats or optional dependencies.
+
+The host may also construct `SqliteBlobMaintenanceService` with a current
+scope/permission policy and pass it as `maintenance:` to `BlobReferenceModule`.
+It is passive until the host explicitly calls `RunBatchAsync`. The bounded
+service collects expired incomplete uploads and policy-backed completed,
+unbound server-stream objects after their retention deadlines. Formerly bound
+objects use the final-unbind time and the longest accepted duration/minimum
+floor. Active bindings, unknown-policy legacy rows and direct uploads are
+excluded. An explicit catalog migration adds the unique object-key index and
+nullable time/policy fields; historical rows keep unknown facts NULL. The
+service claims candidates in SQLite's physical write transaction,
+pins the observed ETag, deletes through a version-conditional S3 or File
+provider API, and retries a failed final catalog acknowledgment. File storage
+uses a persistent per-object OS lock for manifest updates and conditional
+deletion across processes. Its ETag includes an immutable generation token,
+so a same-byte replacement cannot match an older version. The matching
+current File generation is removed. The host may separately call
+`FileObjectStorage.SweepOldGenerationsAsync(key)` for a known key to remove
+inaccessible older immutable data generations. This sweep waits for a
+persistent writer lock before taking the manifest lock and preserves the
+current generation; all processes sharing the private root must first run a
+writer-lock-capable version. Scheduling and retry remain host responsibilities.
+For catalog-driven cleanup of those old File generations, the host can
+separately construct `SqliteBlobFileGenerationSweepService` after explicitly
+asserting all writers on the private root have upgraded, then call
+`RunBatchAsync(actor, provider, cursor)` outside graph SQL. It scans only the
+actor's currently authorized scope and `server_stream` catalog rows, including
+terminal `deleted` rows, and rechecks permission per key. The provider must
+be the exact `FileObjectStorage` installed in the actor. Failures report the
+stable `BLOB_STORE_FAILED` code and can be retried from the beginning; the
+service does not start a worker or collect direct-upload objects.
+Keep Blob object keys unique and immutable; direct-upload
+quiescence needs separate implementation.
+
+For retention-aware uploads, the host can implement
+`IBlobUploadPolicyAuthorization.CurrentPolicyOnLeaseAsync`. The service
+snapshots its immutable `BlobRetentionPolicy` on the physical begin-upload
+SQLite lease; server-stream upload rejects direct mode. Confirmation records
+the completion time in the same catalog transaction, and replay does not
+change the accepted snapshot. New graph bindings require a current target
+policy through `IBlobBindingPolicyAuthorization` on the graph SQL lease.
+They reject expired or unknown-policy sources and accumulate the maximum
+accepted unreferenced duration and minimum retention floor. Final unbind
+records its own time while the catalog row remains `available`; rebind clears
+that time. Shared policy vectors are pinned by SHA-256 in the SQLite tests.
+
+For JPEG/PNG uploads, pass `new StbImageBlobContentVerifier()` to
+`SqliteBlobUploadService`. It accepts only `jpg`, `jpeg` and `png`. The host's
+`BlobFieldSpec` must separately allow those extensions. Input bytes, decoded
+RGBA output and concurrent verifications have explicit constructor limits.
+The verifier consumes the whole source, checks complete JPEG/PNG containers
+and PNG chunk CRCs, preflights dimensions, fully decodes pixels, and returns
+the original-byte SHA-256 plus actual MIME type. A failed validation leaves
+the upload unconfirmed. This is an in-process parser with resource bounds,
+not a separate CPU-isolated worker.
+
+The StbImageSharp dependency lives only in this optional project; core and
+runtime projects do not depend on it. Other allowed Blob formats still need
+separate trusted production verifiers. The test-only PDF verifier in the
+SQLite/S3 suites is not a production parser.
+
+For MP3/MP4, the host may explicitly pass `FfmpegBlobContentVerifier` with
+absolute paths to patched `ffprobe`, `ffmpeg` and Linux `prlimit`. Construction
+and assembly loading start no external work; `BlobReferenceModule.ReadyAsync`
+checks a verifier that implements `IBlobVerifierReadiness`. The verifier
+requires complete MP3 frames or MP4 boxes, forces the demuxer and pipe-only
+protocol, checks actual streams and frame counts, rejects audio-only MP4,
+fully decodes and returns original-byte SHA-256 and actual MIME. Input bytes,
+frames, video pixels, concurrent calls, child CPU (10 seconds), address space
+(512 MiB), wall time (15 seconds) and probe output are bounded. The host must
+separately allow `mp3`/`mp4` in the field policy and keep the executables
+patched. This does not scan for malware.
+
+For DOCX/XLSX, the host may pass `OfficeBlobContentVerifier`. The standard
+library adapter reads and hashes the entire original package, requires an exact
+single-disk ZIP central directory, fully expands every member and checks its
+CRC under input, expanded-byte, part, XML-element, depth and concurrency
+limits. It rejects duplicate or traversal part names, DTD/entity directives,
+malformed XML, mismatched Office content types or main relationships, and
+missing Word body or Excel worksheet references. It returns the verified
+DOCX/XLSX MIME. This is bounded OOXML package and XML structure validation,
+not a complete Office application schema or malware scan.
+
+For PDF, the host may pass `PopplerBlobContentVerifier` with absolute paths to
+patched Linux `pdfinfo`, `pdftoppm` and `prlimit` binaries. It bounds input,
+page count, rendered PNG output, concurrent calls, child CPU/address space and
+wall time; rejects encrypted or malformed PDFs; renders and fully decodes every
+page from stdin without scratch files; and reports the original byte SHA-256
+and `application/pdf`. The host must check readiness and explicitly allow PDF
+in field policy. This is decodability validation, not malware scanning or full
+PDF conformance.
+
+For binary DOC/XLS, the host may pass `LegacyOfficeBlobContentVerifier` with
+absolute paths to patched Linux LibreOffice (`soffice`), `bwrap` and `prlimit`
+executables and a private `0700` scratch directory. It checks the original
+CFB header and sector layout, converts in a network/PID-isolated bubblewrap
+namespace with read-only system mounts and only per-upload writable scratch,
+then validates the DOCX/XLSX output through the bounded OOXML verifier. Child
+CPU/address-space/file-size and parent wall-time limits apply. Successful
+uploads retain original DOC/XLS bytes, SHA-256 and MIME. Host readiness checks
+the tools and scratch before accepting uploads. This is decodability validation,
+not malware or macro detection.

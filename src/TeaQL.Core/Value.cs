@@ -15,6 +15,7 @@ public abstract record Value
     public sealed record F64Value(double Value) : Value;
     public sealed record DecimalValue(decimal Value) : Value;
     public sealed record TextValue(string Value) : Value;
+    public sealed record BlobRefValue(BlobRef Reference) : Value;
     public sealed record JsonValue(JsonNode? Value) : Value;
     public sealed record DateValue(DateTime Value) : Value;
     public sealed record TimestampValue(long Milliseconds) : Value;
@@ -37,6 +38,7 @@ public abstract record Value
         F64Value(var value) => value,
         DecimalValue(var value) => value,
         TextValue(var value) => value,
+        BlobRefValue(var value) => value,
         JsonValue(var value) => value,
         DateValue(var value) => value,
         TimestampValue(var value) => value,
@@ -64,6 +66,7 @@ public abstract record Value
         double item => new F64Value(item),
         decimal item => new DecimalValue(item),
         string item => new TextValue(item),
+        BlobRef item => new BlobRefValue(item),
         DateTime item => new TimestampValue(new DateTimeOffset(item).ToUnixTimeMilliseconds()),
         DateTimeOffset item => new TimestampValue(item.ToUnixTimeMilliseconds()),
         Record item => new ObjectValue(item),
@@ -145,6 +148,7 @@ public abstract record Value
         F64Value(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
         DecimalValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v.ToString()),
         TextValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v),
+        BlobRefValue => throw new InvalidOperationException("BLOB_PRESENTATION_REQUIRED"),
         Value.JsonValue(var v) => v?.DeepClone(),
         DateValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v.ToString("yyyy-MM-dd")),
         TimestampValue(var v) => System.Text.Json.Nodes.JsonValue.Create(v),

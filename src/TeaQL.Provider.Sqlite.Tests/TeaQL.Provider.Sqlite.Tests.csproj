@@ -25,6 +25,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeaQL.Provider.Sqlite\TeaQL.Provider.Sqlite.csproj" />
+    <ProjectReference Include="..\TeaQL.BlobReference\TeaQL.BlobReference.csproj" />
+    <ProjectReference Include="..\TeaQL.SecureDocumentReference\TeaQL.SecureDocumentReference.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fixtures/sample.jpg;Fixtures/sample.png;Fixtures/sample.mp3;Fixtures/sample.mp4;Fixtures/sample.doc;Fixtures/sample.docx;Fixtures/sample.xls;Fixtures/sample.xlsx;Fixtures/sample.pdf;Fixtures/two-page.pdf;Fixtures/audio-only.mp4" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../test-vectors/blob-policy-cases.json" Link="Fixtures/blob-policy-cases.json"
+             CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

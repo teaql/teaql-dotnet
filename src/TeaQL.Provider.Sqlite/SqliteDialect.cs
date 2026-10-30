@@ -32,6 +32,7 @@ public class SqliteDialect : SqlDialect
             DataType.F64 => "REAL",
             DataType.Decimal => "NUMERIC",
             DataType.Text => "VARCHAR(255)",
+            DataType.BlobRef => "VARCHAR(128)",
             DataType.LargeText => "TEXT",
             DataType.Json => "JSON",
             DataType.Date => "DATE",

@@ -208,6 +208,9 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             case Value.TextValue t:
                 p.Value = t.Value;
                 break;
+            case Value.BlobRefValue b:
+                p.Value = b.Reference.ToSqlText();
+                break;
             case Value.JsonValue j:
                 p.Value = j.Value?.ToJsonString() ?? "null";
                 break;

@@ -1,1 +1,5 @@
 test-vectors/*.tsv whitespace=-blank-at-eol
+*.csproj whitespace=cr-at-eol
+src/TeaQL.Provider.Sqlite.Tests/Fixtures/*.pdf binary
+src/TeaQL.Provider.Sqlite.Tests/Fixtures/*.doc binary
+src/TeaQL.Provider.Sqlite.Tests/Fixtures/*.xls binary

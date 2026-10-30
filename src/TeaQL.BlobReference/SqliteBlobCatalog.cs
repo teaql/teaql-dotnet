@@ -1,0 +1,330 @@
+using System.Text;
+using TeaQL.Core;
+using TeaQL.DataService;
+using TeaQL.Runtime;
+using TeaQL.Sql;
+
+namespace TeaQL.BlobReference;
+
+public sealed record BlobBindingTarget(string Entity, string EntityId, string Field);
+public sealed record BlobBindingChange(BlobBindingTarget Target, BlobRef? Next,
+    long ExpectedVersion, long NextVersion, string Action);
+public sealed record BlobCatalogRead(string ObjectKey, string ContentVersion,
+    string FileName, string ContentType, long SizeBytes);
+
+public interface IBlobBindingAuthorization
+{
+    string Scope(UserContext context);
+    Task<bool> AuthorizeAsync(UserContext context, BlobBindingTarget target,
+        BlobRef? previous, BlobRef? next, string action);
+}
+
+/// <summary>SQLite-only authoritative catalog. Schema installation is an explicit host action.</summary>
+public sealed class SqliteBlobCatalog(ISqlTransport transport, Func<DateTimeOffset>? now = null)
+{
+    internal ISqlTransport Transport => transport;
+    private readonly Func<DateTimeOffset> _now = now ?? (() => DateTimeOffset.UtcNow);
+    private static InvalidOperationException Error(string code) => new(code);
+    private static CompiledQuery Query(string sql, params Value[] values) => new(sql, values.ToList());
+    private long NowMs()
+    {
+        var value = _now().ToUnixTimeMilliseconds();
+        if (!BlobRetentionPolicy.ValidTime(value)) throw Error("BLOB_POLICY_INVALID");
+        return value;
+    }
+
+    public async Task EnsureSchemaAsync()
+    {
+        foreach (var sql in new[] {
+            """
+            CREATE TABLE IF NOT EXISTS teaql_blob_catalog (
+              key TEXT PRIMARY KEY, scope TEXT NOT NULL, object_key TEXT NOT NULL,
+              content_version TEXT NOT NULL, file_name TEXT NOT NULL,
+              content_type TEXT NOT NULL, size_bytes BIGINT NOT NULL,
+              completed_at_ms BIGINT, last_unbound_at_ms BIGINT,
+              policy_profile TEXT, upload_mode TEXT, unbound_retention_seconds BIGINT,
+              effective_unref_seconds BIGINT, retention_floor_until_ms BIGINT,
+              status TEXT NOT NULL CHECK (status IN
+                ('initiated','uploaded_unbound','available','deleting','deleted')))
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS teaql_blob_binding (
+              scope TEXT NOT NULL, entity TEXT NOT NULL, entity_id TEXT NOT NULL,
+              field TEXT NOT NULL, key TEXT, version BIGINT NOT NULL,
+              PRIMARY KEY (scope,entity,entity_id,field),
+              FOREIGN KEY (key) REFERENCES teaql_blob_catalog(key))
+            """,
+            "CREATE INDEX IF NOT EXISTS teaql_blob_binding_key ON teaql_blob_binding(key)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS teaql_blob_catalog_object_key ON teaql_blob_catalog(object_key)",
+            """
+            CREATE TABLE IF NOT EXISTS teaql_blob_upload (
+              upload_id TEXT PRIMARY KEY, scope TEXT NOT NULL, replay_key TEXT NOT NULL,
+              request_hash TEXT NOT NULL, key TEXT NOT NULL, entity TEXT NOT NULL,
+              entity_id TEXT NOT NULL, field TEXT NOT NULL, file_name TEXT NOT NULL,
+              extension TEXT NOT NULL, declared_size BIGINT NOT NULL,
+              expires_ms BIGINT NOT NULL, state TEXT NOT NULL CHECK
+                (state IN ('initiated','written','completed')),
+              written_sha256 TEXT, written_etag TEXT,
+              UNIQUE(scope,replay_key), FOREIGN KEY(key) REFERENCES teaql_blob_catalog(key))
+            """
+        })
+            try { await transport.ExecuteSqlAsync(Query(sql)); }
+            catch { throw Error("BLOB_CATALOG_FAILED"); }
+        // An old row cannot inherit a policy or completion time by inference.
+        foreach (var (name, kind) in new (string Name, string Kind)[] {
+            ("completed_at_ms", "BIGINT"), ("last_unbound_at_ms", "BIGINT"),
+            ("policy_profile", "TEXT"), ("upload_mode", "TEXT"),
+            ("unbound_retention_seconds", "BIGINT"), ("effective_unref_seconds", "BIGINT"),
+            ("retention_floor_until_ms", "BIGINT") })
+        {
+            try
+            {
+                var columns = await transport.FetchAllSqlAsync(Query("PRAGMA table_info(teaql_blob_catalog)"));
+                if (columns.Any(row => row.GetValueOrDefault("name")?.TryText() == name)) continue;
+                try { await transport.ExecuteSqlAsync(Query($"ALTER TABLE teaql_blob_catalog ADD COLUMN {name} {kind}")); }
+                catch
+                {
+                    columns = await transport.FetchAllSqlAsync(Query("PRAGMA table_info(teaql_blob_catalog)"));
+                    if (!columns.Any(row => row.GetValueOrDefault("name")?.TryText() == name)) throw;
+                }
+            }
+            catch { throw Error("BLOB_CATALOG_FAILED"); }
+        }
+    }
+
+    public async Task ValidateSchemaAsync()
+    {
+        try
+        {
+            await transport.FetchAllSqlAsync(Query("SELECT key,scope,object_key,content_version,file_name,content_type,size_bytes,completed_at_ms,last_unbound_at_ms,policy_profile,upload_mode,unbound_retention_seconds,effective_unref_seconds,retention_floor_until_ms,status FROM teaql_blob_catalog WHERE 1 = 0"));
+            await transport.FetchAllSqlAsync(Query("SELECT scope,entity,entity_id,field,key,version FROM teaql_blob_binding WHERE 1 = 0"));
+            await transport.FetchAllSqlAsync(Query("SELECT upload_id,scope,replay_key,request_hash,key,entity,entity_id,field,file_name,extension,declared_size,expires_ms,state,written_sha256,written_etag FROM teaql_blob_upload WHERE 1 = 0"));
+            var columns = await transport.FetchAllSqlAsync(Query("PRAGMA table_info(teaql_blob_binding)"));
+            var key = columns.SingleOrDefault(row => row.GetValueOrDefault("name")?.TryText() == "key");
+            var version = columns.SingleOrDefault(row => row.GetValueOrDefault("name")?.TryText() == "version");
+            if (key?.GetValueOrDefault("notnull")?.TryI64() != 0 ||
+                version?.GetValueOrDefault("notnull")?.TryI64() != 1)
+                throw Error("BLOB_SCHEMA_MISSING");
+            var indexes = await transport.FetchAllSqlAsync(Query("PRAGMA index_list(teaql_blob_catalog)"));
+            if (!indexes.Any(row => row.GetValueOrDefault("name")?.TryText() == "teaql_blob_catalog_object_key" &&
+                                    row.GetValueOrDefault("unique")?.TryI64() == 1))
+                throw Error("BLOB_SCHEMA_MISSING");
+            var objectKeyColumns = await transport.FetchAllSqlAsync(Query("PRAGMA index_info(teaql_blob_catalog_object_key)"));
+            if (objectKeyColumns.Count != 1 || objectKeyColumns[0].GetValueOrDefault("name")?.TryText() != "object_key")
+                throw Error("BLOB_SCHEMA_MISSING");
+        }
+        catch { throw Error("BLOB_SCHEMA_MISSING"); }
+    }
+
+    /// <summary>Recheck the exact current binding; a stable Key grants no read authority.</summary>
+    public async Task<BlobCatalogRead> CurrentReadAsync(AuthorizedBlobSlot slot)
+    {
+        if (slot == null || !Scope(slot.Scope) || !Name(slot.Entity) ||
+            !EntityId(slot.EntityId) || !Name(slot.Field) || slot.BindingVersion < 1 ||
+            slot.Reference == null)
+            throw Error("BLOB_READ_DENIED");
+        List<Record> rows;
+        try
+        {
+            rows = await transport.FetchAllSqlAsync(Query("""
+                SELECT c.object_key, c.content_version, c.file_name,
+                  c.content_type, c.size_bytes FROM teaql_blob_binding b
+                JOIN teaql_blob_catalog c ON c.key = b.key
+                WHERE b.scope = @p0 AND b.entity = @p1 AND b.entity_id = @p2
+                  AND b.field = @p3 AND b.key = @p4 AND b.version = @p5
+                  AND c.scope = b.scope AND c.status = 'available'
+                """, new Value.TextValue(slot.Scope), new Value.TextValue(slot.Entity),
+                new Value.TextValue(slot.EntityId), new Value.TextValue(slot.Field),
+                new Value.TextValue(slot.Reference.Key), new Value.I64Value(slot.BindingVersion)));
+        }
+        catch { throw Error("BLOB_CATALOG_FAILED"); }
+        if (rows.Count != 1) throw Error("BLOB_READ_DENIED");
+        var row = rows[0];
+        var objectKey = row.GetValueOrDefault("object_key")?.TryText();
+        var version = row.GetValueOrDefault("content_version")?.TryText();
+        var fileName = row.GetValueOrDefault("file_name")?.TryText();
+        var contentType = row.GetValueOrDefault("content_type")?.TryText();
+        var size = row.GetValueOrDefault("size_bytes")?.TryI64();
+        if (string.IsNullOrWhiteSpace(objectKey) || string.IsNullOrWhiteSpace(version) ||
+            string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(contentType) ||
+            size == null || size < 0)
+            throw Error("BLOB_CATALOG_FAILED");
+        return new BlobCatalogRead(objectKey, version, fileName, contentType, size.Value);
+    }
+
+    private static bool Name(string? value) => !string.IsNullOrWhiteSpace(value) &&
+        value == value.Trim() && value.EnumerateRunes().Count() <= 128 &&
+        !value.Any(char.IsControl);
+
+    private static bool Scope(string? value) => !string.IsNullOrWhiteSpace(value) &&
+        value == value.Trim() && Encoding.UTF8.GetByteCount(value) <= 256 &&
+        !value.Any(char.IsControl);
+
+    private static bool EntityId(string? value) => ulong.TryParse(value, out var id) &&
+        id > 0 && id.ToString() == value;
+
+    /// <summary>Bind one target inside the caller's native graph physical transaction.</summary>
+    public Task<long> BindInGraphAsync(GraphMutationSession graph, UserContext actor,
+        BlobBindingChange change, IBlobBindingAuthorization authorization)
+    {
+        if (!graph.BelongsTo(actor)) throw Error("BLOB_BIND_DENIED");
+        return BindInOwnerAsync(graph, actor, change, authorization);
+    }
+
+    internal Task<long> BindInOwnerAsync(IPhysicalSqlOwner owner, UserContext actor,
+        BlobBindingChange change, IBlobBindingAuthorization authorization) =>
+        owner.WithPhysicalSqlAsync(lease => BindOnLeaseCoreAsync(lease, actor, change, authorization));
+
+    /// <summary>Use a trusted host's already-borrowed graph SQL lease. Reborrowing
+    /// the owner would poison the current graph. Failure must reach its callback.</summary>
+    public Task<long> BindOnGraphLeaseAsync(GraphMutationSession graph, UserContext actor,
+        IPhysicalSqlLease lease, BlobBindingChange change, IBlobBindingAuthorization authorization)
+    {
+        if (graph == null || lease == null || !graph.IsCurrentPhysicalSqlLease(actor, lease))
+            throw Error("BLOB_TRANSACTION_REQUIRED");
+        return BindOnLeaseCoreAsync(lease, actor, change, authorization);
+    }
+
+    private async Task<long> BindOnLeaseCoreAsync(IPhysicalSqlLease lease, UserContext actor,
+        BlobBindingChange change, IBlobBindingAuthorization authorization)
+    {
+            if (change?.Target == null || authorization == null ||
+                !Name(change.Target.Entity) || !Name(change.Target.Field) || !EntityId(change.Target.EntityId) ||
+                change.ExpectedVersion < 0 || change.NextVersion <= change.ExpectedVersion ||
+                change.Action is not ("Create" or "Update" or "Delete") ||
+                change.Action == "Create" && change.ExpectedVersion != 0 ||
+                change.Action == "Delete" && change.Next != null)
+                throw Error("BLOB_REFERENCE_INVALID");
+            string scope;
+            try { scope = authorization.Scope(actor); }
+            catch { throw Error("BLOB_BIND_DENIED"); }
+            if (!Scope(scope)) throw Error("BLOB_BIND_DENIED");
+            var target = change.Target;
+            Value[] identity = [new Value.TextValue(scope), new Value.TextValue(target.Entity),
+                new Value.TextValue(target.EntityId), new Value.TextValue(target.Field)];
+            List<Record> rows;
+            try { rows = await lease.FetchAllAsync("SELECT key,version FROM teaql_blob_binding WHERE scope = @p0 AND entity = @p1 AND entity_id = @p2 AND field = @p3", identity); }
+            catch { throw Error("BLOB_CATALOG_FAILED"); }
+            if (rows.Count > 1) throw Error("BLOB_CATALOG_FAILED");
+            var row = rows.FirstOrDefault();
+            var version = row?.GetValueOrDefault("version")?.TryI64() ?? 0;
+            if (version < 0 || version != change.ExpectedVersion) throw Error("BLOB_BIND_DENIED");
+            BlobRef? previous = null;
+            if (row != null && row.GetValueOrDefault("key") is not (null or Value.NullValue))
+            {
+                try { previous = new BlobRef(row["key"].TryText()!); }
+                catch { throw Error("BLOB_CATALOG_FAILED"); }
+            }
+            bool allowed;
+            try { allowed = await authorization.AuthorizeAsync(actor, target, previous, change.Next, change.Action); }
+            catch { throw Error("BLOB_BIND_DENIED"); }
+            if (!allowed) throw Error("BLOB_BIND_DENIED");
+            BlobRetentionPolicy? acceptedPolicy = null;
+            long acceptedFloor = 0;
+            if (change.Next != null)
+            {
+                List<Record> available;
+                try { available = await lease.FetchAllAsync("""
+                    SELECT key,status,completed_at_ms,last_unbound_at_ms,policy_profile,
+                      upload_mode,unbound_retention_seconds,effective_unref_seconds,
+                      retention_floor_until_ms FROM teaql_blob_catalog
+                    WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')
+                    """,
+                    [new Value.TextValue(change.Next.Key), new Value.TextValue(scope)]); }
+                catch { throw Error("BLOB_CATALOG_FAILED"); }
+                if (available.Count != 1) throw Error("BLOB_BIND_DENIED");
+                var blob = available[0];
+                var status = blob.GetValueOrDefault("status")?.TryText();
+                var profile = blob.GetValueOrDefault("policy_profile")?.TryText();
+                var mode = blob.GetValueOrDefault("upload_mode")?.TryText();
+                var completed = blob.GetValueOrDefault("completed_at_ms")?.TryI64();
+                var unbound = blob.GetValueOrDefault("unbound_retention_seconds")?.TryI64();
+                var effective = blob.GetValueOrDefault("effective_unref_seconds")?.TryI64();
+                if (string.IsNullOrEmpty(profile) || mode != "server_stream" ||
+                    completed is null || !BlobRetentionPolicy.ValidTime(completed.Value) ||
+                    unbound is null || !BlobRetentionPolicy.ValidSeconds(unbound.Value) ||
+                    effective is null || !BlobRetentionPolicy.ValidSeconds(effective.Value) ||
+                    authorization is not IBlobBindingPolicyAuthorization policySource)
+                    throw Error("BLOB_BIND_DENIED");
+                BlobRetentionPolicy policy;
+                try { policy = await policySource.CurrentPolicyOnLeaseAsync(actor, lease, target); }
+                catch { throw Error("BLOB_BIND_DENIED"); }
+                if (policy == null || policy.UploadMode != "server_stream")
+                    throw Error("BLOB_BIND_DENIED");
+                var nowMs = NowMs();
+                long? eligibleAt = null;
+                if (status == "available")
+                {
+                    List<Record> bindings;
+                    try { bindings = await lease.FetchAllAsync(
+                        "SELECT 1 FROM teaql_blob_binding WHERE key=@p0 LIMIT 1",
+                        [new Value.TextValue(change.Next.Key)]); }
+                    catch { throw Error("BLOB_CATALOG_FAILED"); }
+                    if (bindings.Count == 0)
+                    {
+                        var last = blob.GetValueOrDefault("last_unbound_at_ms")?.TryI64();
+                        var floor = blob.GetValueOrDefault("retention_floor_until_ms")?.TryI64();
+                        if (last is null || !BlobRetentionPolicy.ValidTime(last.Value) ||
+                            floor is not null && !BlobRetentionPolicy.ValidTime(floor.Value))
+                            throw Error("BLOB_BIND_DENIED");
+                        eligibleAt = BlobRetentionPolicy.UnreferencedEligibleAt(last.Value,
+                            effective.Value, floor);
+                    }
+                }
+                BlobRetentionPolicy.RequireBindable(status!, nowMs, completed,
+                    unbound.Value, eligibleAt);
+                acceptedPolicy = policy;
+                acceptedFloor = BlobRetentionPolicy.Deadline(nowMs,
+                    policy.MinimumRetentionSeconds);
+            }
+            Value next = change.Next is null ? new Value.NullValue() : new Value.TextValue(change.Next.Key);
+            ulong affected;
+            try
+            {
+                affected = row != null
+                    ? await lease.ExecuteAsync("UPDATE teaql_blob_binding SET key = @p0, version = @p1 WHERE scope = @p2 AND entity = @p3 AND entity_id = @p4 AND field = @p5 AND version = @p6",
+                        [next, new Value.I64Value(change.NextVersion), ..identity, new Value.I64Value(version)])
+                    : await lease.ExecuteAsync("INSERT INTO teaql_blob_binding (scope,entity,entity_id,field,key,version) VALUES (@p0,@p1,@p2,@p3,@p4,@p5)",
+                        [..identity, next, new Value.I64Value(change.NextVersion)]);
+            }
+            catch { throw Error("BLOB_CATALOG_FAILED"); }
+            if (affected != 1) throw Error("BLOB_BIND_DENIED");
+            if (change.Next != null)
+            {
+                ulong promoted;
+                try { promoted = await lease.ExecuteAsync(
+                    "UPDATE teaql_blob_catalog SET status = 'available', last_unbound_at_ms=NULL " +
+                    "WHERE key = @p0 AND scope = @p1 AND status IN ('uploaded_unbound','available')",
+                    [new Value.TextValue(change.Next.Key), new Value.TextValue(scope)]); }
+                catch { throw Error("BLOB_CATALOG_FAILED"); }
+                if (promoted != 1) throw Error("BLOB_BIND_DENIED");
+                if (acceptedPolicy is not null)
+                {
+                    ulong retained;
+                    try { retained = await lease.ExecuteAsync("""
+                        UPDATE teaql_blob_catalog SET
+                          effective_unref_seconds=MAX(effective_unref_seconds,@p0),
+                          retention_floor_until_ms=CASE WHEN retention_floor_until_ms IS NULL
+                            OR retention_floor_until_ms<@p1 THEN @p1 ELSE retention_floor_until_ms END
+                        WHERE key=@p2 AND scope=@p3 AND upload_mode='server_stream'
+                          AND effective_unref_seconds IS NOT NULL
+                        """, [new Value.I64Value(acceptedPolicy.UnreferencedRetentionSeconds),
+                            new Value.I64Value(acceptedFloor), new Value.TextValue(change.Next.Key),
+                            new Value.TextValue(scope)]); }
+                    catch { throw Error("BLOB_CATALOG_FAILED"); }
+                    if (retained != 1) throw Error("BLOB_BIND_DENIED");
+                }
+            }
+            if (previous != null && !previous.Equals(change.Next))
+            {
+                try { await lease.ExecuteAsync(
+                    "UPDATE teaql_blob_catalog SET last_unbound_at_ms=@p0 " +
+                    "WHERE key=@p1 AND scope=@p2 AND status='available' " +
+                    "AND NOT EXISTS (SELECT 1 FROM teaql_blob_binding WHERE key=@p3)",
+                    [new Value.I64Value(NowMs()), new Value.TextValue(previous.Key),
+                     new Value.TextValue(scope), new Value.TextValue(previous.Key)]); }
+                catch { throw Error("BLOB_CATALOG_FAILED"); }
+            }
+            return change.NextVersion;
+    }
+}

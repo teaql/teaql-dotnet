@@ -15,6 +15,32 @@ public class SqlMaskingPolicyTests
     };
 
     [Fact]
+    public void TypedBlobKeysStayPrivateDuringPreflightAndSqlProjection()
+    {
+        var reference = new BlobRef("blob_runtime_private_canary");
+        var spec = new BlobFieldSpec("Asset", "document", ["pdf"], false, "default");
+        var entity = EntityDescriptor.New("Asset")
+            .Property(PropertyDescriptor.New("document", DataType.BlobRef).Blob(spec))
+            .AuditMaskFields([]);
+        var context = new RuntimeModule().Entity(entity).IntoContext();
+        var request = new InsertMutationRequest(new InsertCommand("Asset")
+            .Value("document", reference), "private Blob audit");
+        Assert.Single(RuntimeDataService.PrivateMutationValues(request, context));
+        Assert.Equal("redacted [REDACTED]", LogPrivacy.ScrubAuditText(
+            "redacted " + reference.Key, [new Value.BlobRefValue(reference)]));
+
+        var source = Entry("SELECT ?", new Value.BlobRefValue(reference));
+        source.GeneratedSql = true;
+        source.ParameterLogPolicies = [SqlParameterLogPolicy.Plain];
+        source.Comment = "lookup " + reference.Key;
+        var projected = LogPrivacy.Project(source, true);
+        Assert.True(projected.MaskedParameters[0]);
+        Assert.Equal("[REDACTED]", projected.Parameters[0].TryText());
+        Assert.DoesNotContain(reference.Key, projected.DebugQuery);
+        Assert.DoesNotContain(reference.Key, projected.Comment);
+    }
+
+    [Fact]
     public void MixedPoliciesKeepKnownValuesAndHideUnknownAndCredentialsUnderDebug()
     {
         var source = Entry("SELECT ?, ?, ?, ?", Value.FromObject("Ordinary"), Value.FromObject("Riverside"),

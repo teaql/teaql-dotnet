@@ -11,5 +11,6 @@ public enum DataType
     LargeText,
     Json,
     Date,
-    Timestamp
+    Timestamp,
+    BlobRef
 }

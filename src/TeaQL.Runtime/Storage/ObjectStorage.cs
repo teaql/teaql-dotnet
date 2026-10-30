@@ -15,6 +15,11 @@ public interface IObjectStorageProvider
     Task DeleteAsync(StorageInvocation invocation, ObjectKey key);
     Task<ObjectReadUrl> GetReadUrlAsync(StorageInvocation invocation, ObjectKey key, ObjectReadUrlOptions options);
 }
+public enum ObjectConditionalDeleteResult { Deleted, AlreadyMissing, VersionMismatch }
+public interface IObjectStorageConditionalDeleter
+{
+    Task<ObjectConditionalDeleteResult> DeleteIfVersionAsync(StorageInvocation invocation, ObjectKey key, string contentVersion);
+}
 public sealed record ObjectStorageEvent(string Operation, string Comment, string TraceId, string Outcome, double ElapsedMs);
 public interface IObjectStorageObserver { void Record(ObjectStorageEvent observation); }
 public static class ObjectStorageContextExtensions
@@ -55,6 +60,7 @@ public sealed class ObjectStorage
     private readonly UserContext _context;
     private readonly string _comment;
     private readonly IObjectStorageProvider _provider;
+    public bool SupportsVersionConditionalDelete => _provider is IObjectStorageConditionalDeleter;
     internal ObjectStorage(UserContext context, string comment)
     {
         if (string.IsNullOrWhiteSpace(comment)) throw new StorageException(StorageErrorCode.InvalidInput);
@@ -111,6 +117,17 @@ public sealed class ObjectStorage
     public Task<ObjectMetadata?> HeadAsync(ObjectKey key, CancellationToken token = default) => Execute("head", () => _provider.HeadAsync(Invocation(token), key));
     public async Task<bool> ExistsAsync(ObjectKey key, CancellationToken token = default) => await HeadAsync(key, token).ConfigureAwait(false) is not null;
     public Task DeleteAsync(ObjectKey key, CancellationToken token = default) => Execute("delete", async () => { await _provider.DeleteAsync(Invocation(token), key).ConfigureAwait(false); return true; });
+    public Task<ObjectConditionalDeleteResult> DeleteIfVersionAsync(ObjectKey key, string contentVersion, CancellationToken token = default) => Execute("delete_if_version", async () =>
+    {
+        if (string.IsNullOrEmpty(contentVersion) || contentVersion.Length > 256 || contentVersion == "*" ||
+            contentVersion.Trim() != contentVersion || contentVersion.Any(char.IsControl))
+            throw new StorageException(StorageErrorCode.InvalidInput);
+        if (_provider is not IObjectStorageConditionalDeleter conditional)
+            throw new StorageException(StorageErrorCode.Unsupported);
+        var result = await conditional.DeleteIfVersionAsync(Invocation(token), key, contentVersion).ConfigureAwait(false);
+        if (!Enum.IsDefined(result)) throw new StorageException(StorageErrorCode.Unavailable);
+        return result;
+    });
     public Task<ObjectReadUrl> GetReadUrlAsync(ObjectKey key, ObjectReadUrlOptions? options = null, CancellationToken token = default) => Execute("read_url", () => _provider.GetReadUrlAsync(Invocation(token), key, options ?? new()));
 }
 internal sealed class ObservedObjectStream(Stream inner, long remaining, StorageReceipt receipt) : Stream

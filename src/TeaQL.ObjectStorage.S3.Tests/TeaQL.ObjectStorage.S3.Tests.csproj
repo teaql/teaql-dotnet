@@ -1,4 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><IsPackable>false</IsPackable><IsTestProject>true</IsTestProject></PropertyGroup>
   <ItemGroup><ProjectReference Include="../TeaQL.ObjectStorage.S3/TeaQL.ObjectStorage.S3.csproj" /><PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" /><PackageReference Include="xunit" Version="2.4.2" /><PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../TeaQL.BlobReference/TeaQL.BlobReference.csproj" />
+    <ProjectReference Include="../TeaQL.Provider.Sqlite/TeaQL.Provider.Sqlite.csproj" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.jpg" Link="Fixtures/sample.jpg" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.png" Link="Fixtures/sample.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.mp3" Link="Fixtures/sample.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.mp4" Link="Fixtures/sample.mp4" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.docx" Link="Fixtures/sample.docx" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.doc" Link="Fixtures/sample.doc" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.xls" Link="Fixtures/sample.xls" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.xlsx" Link="Fixtures/sample.xlsx" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TeaQL.Provider.Sqlite.Tests/Fixtures/sample.pdf" Link="Fixtures/sample.pdf" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

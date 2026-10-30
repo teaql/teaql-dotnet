@@ -13,6 +13,7 @@ public record PropertyDescriptor(
 )
 {
     public string ColumnNameString { get; init; } = string.IsNullOrEmpty(ColumnNameValue) ? Name : ColumnNameValue;
+    public BlobFieldSpec? BlobSpec { get; init; }
 
     public static PropertyDescriptor New(string name, DataType dataType)
     {
@@ -23,6 +24,12 @@ public record PropertyDescriptor(
     public PropertyDescriptor NotNull() => this with { Nullable = false };
     public PropertyDescriptor Id() => this with { IsId = true };
     public PropertyDescriptor Version() => this with { IsVersion = true };
+    public PropertyDescriptor Blob(BlobFieldSpec spec) => this with
+    {
+        DataType = DataType.BlobRef,
+        Nullable = spec.Nullable,
+        BlobSpec = spec
+    };
 }
 
 public record RelationDescriptor(
@@ -95,4 +102,5 @@ public record EntityDescriptor
     public PropertyDescriptor? IdProperty() => Properties.FirstOrDefault(p => p.IsId);
     public PropertyDescriptor? VersionProperty() => Properties.FirstOrDefault(p => p.IsVersion);
     public IEnumerable<PropertyDescriptor> WritableProperties() => Properties.Where(p => !p.IsId);
+    public bool HasBlobFields() => Properties.Any(p => p.DataType == DataType.BlobRef || p.BlobSpec != null);
 }
