@@ -117,6 +117,29 @@ public class BlobViewPreparationTests
         Assert.DoesNotContain("secret.invalid", second.Message);
     }
 
+    [Theory]
+    [InlineData(" https://files.example.invalid/read")]
+    [InlineData("https://files.example.invalid/read file")]
+    [InlineData("https://files.example.invalid/read\n")]
+    [InlineData("https://files.example.invalid/\tread")]
+    [InlineData("https://files.example.invalid/read\u2028next")]
+    [InlineData("https://files.example.invalid/read\u2029next")]
+    public async Task ProviderUrlWithRawWhitespaceOrControlFailsAfterCommit(string invalidUrl)
+    {
+        var reference = new BlobRef("blob_asset_1");
+        var context = new UserContext();
+        context.InsertResource<IResponseGraphAuthorizer>(new Authorizer((_, _, _) =>
+            new AuthorizedResponseGraph(new Dictionary<string, object?> { ["document"] = reference },
+                new[] { new AuthorizedBlobSlot(new object[] { "document" }, "Asset", "1",
+                    "document", "tenant-a", 4, reference) })));
+        context.InsertResource<IBlobResponseContributor>(new Blob((_, _, _) =>
+            new[] { new ProjectedBlobUrl(invalidUrl, DateTimeOffset.UtcNow.AddSeconds(30)) }));
+        var failure = await Assert.ThrowsAsync<ViewPreparationException>(() =>
+            new ViewPreparationService().PrepareAsync(context, null, new ViewOptions("ordinary", "committed")));
+        Assert.Equal("BLOB_SIGN_FAILED", failure.Code);
+        Assert.Equal("committed", failure.BusinessState);
+    }
+
     private sealed class Authorizer(
         Func<UserContext, object?, ViewOptions, AuthorizedResponseGraph> work) : IResponseGraphAuthorizer
     {

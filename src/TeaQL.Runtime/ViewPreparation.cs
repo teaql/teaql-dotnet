@@ -119,7 +119,10 @@ public sealed class ViewPreparationService
                 for (var index = 0; index < urls.Count; index++)
                 {
                     var signed = urls[index];
-                    if (!Uri.TryCreate(signed.Url, UriKind.Absolute, out var uri)
+                    // Uri.TryCreate normalizes raw whitespace; do not project those original bytes.
+                    if (string.IsNullOrEmpty(signed.Url)
+                        || signed.Url.Any(ch => char.IsWhiteSpace(ch) || char.IsControl(ch))
+                        || !Uri.TryCreate(signed.Url, UriKind.Absolute, out var uri)
                         || uri.Scheme is not ("http" or "https") || string.IsNullOrEmpty(uri.Host)
                         || signed.ExpiresAt <= DateTimeOffset.UtcNow
                         || ceiling is { } limit && signed.ExpiresAt > limit)
