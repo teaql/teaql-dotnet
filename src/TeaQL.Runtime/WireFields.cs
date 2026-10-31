@@ -32,7 +32,16 @@ public static class WireFields
         return new NormalizedWireInput(values,paths);
     }
 
-    public static IReadOnlyList<CheckResult> RetainSubmittedPaths(IEnumerable<CheckResult> results,NormalizedWireInput normalized)=>results.Select(result=>{var canonical=result.Location.Segments.OfType<ObjectLocationSegment.Property>().FirstOrDefault()?.Name;return new CheckResult{RuleId=result.RuleId,Location=result.Location,EntityType=result.EntityType,SourceInstancePath=canonical is not null&&normalized.SourceInstancePaths.TryGetValue(canonical,out var path)?path:result.SourceInstancePath,InputValue=result.InputValue,SystemValue=result.SystemValue,Message=result.Message};}).ToList();
+    public static IReadOnlyList<CheckResult> RetainSubmittedPaths(IEnumerable<CheckResult> results, NormalizedWireInput normalized) => results.Select(result =>
+    {
+        // Normalization is object-local; a parent alias is not a descendant's
+        // complete pointer. Keep provenance attached by its own child boundary.
+        var segments = result.Location.Segments;
+        var canonical = segments.Count == 1 && segments[0] is ObjectLocationSegment.Property property ? property.Name : null;
+        return new CheckResult { RuleId=result.RuleId, Location=result.Location, EntityType=result.EntityType,
+            SourceInstancePath=canonical is not null && normalized.SourceInstancePaths.TryGetValue(canonical,out var path) ? path : result.SourceInstancePath,
+            InputValue=result.InputValue, SystemValue=result.SystemValue, Message=result.Message };
+    }).ToList();
     private static string Escape(string value)=>value.Replace("~","~0").Replace("/","~1");
     private static string Render(string value,JsonFieldNamingProfile profile){if(profile==JsonFieldNamingProfile.SnakeCase)return value;var parts=value.Split('_');var camel=parts[0]+string.Concat(parts.Skip(1).Select(x=>char.ToUpperInvariant(x[0])+x[1..]));return profile==JsonFieldNamingProfile.PascalCase?char.ToUpperInvariant(camel[0])+camel[1..]:camel;}
 }
