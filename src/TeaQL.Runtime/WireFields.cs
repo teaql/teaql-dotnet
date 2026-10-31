@@ -28,7 +28,15 @@ public static class WireFields
     {
         var lookup=new Dictionary<string,WireFieldMetadata>();foreach(var field in metadata.Fields.Values){lookup[field.WireName]=field;foreach(var alias in field.Aliases)lookup[alias]=field;}
         var values=new Dictionary<string,object?>();var paths=new Dictionary<string,string>();var submitted=new Dictionary<string,string>();
-        foreach(var (name,value) in input){var pointer=$"{parentPointer}/{Escape(name)}";if(!lookup.TryGetValue(name,out var field))throw new WireInputException("WIRE_UNKNOWN_FIELD",pointer,$"Unknown {metadata.EntityType} field '{name}'");if(submitted.TryGetValue(field.CanonicalName,out var previous))throw new WireInputException("WIRE_FIELD_COLLISION",pointer,$"Fields '{previous}' and '{name}' both map to canonical field '{field.CanonicalName}'");submitted[field.CanonicalName]=name;values[field.CanonicalName]=value;if(name!=field.WireName)paths[field.CanonicalName]=pointer;}
+        foreach(var (name,value) in input)
+        {
+            var pointer=$"{parentPointer}/{Escape(name)}";
+            if(!lookup.TryGetValue(name,out var field))throw new WireInputException("WIRE_UNKNOWN_FIELD",pointer,$"Unknown {metadata.EntityType} field '{name}'");
+            if(submitted.TryGetValue(field.CanonicalName,out var previous))throw new WireInputException("WIRE_FIELD_COLLISION",pointer,$"Fields '{previous}' and '{name}' both map to canonical field '{field.CanonicalName}'");
+            submitted[field.CanonicalName]=name;values[field.CanonicalName]=value;
+            // The supplied ancestor boundary is already escaped, even for a standard leaf spelling.
+            if(name!=field.WireName || parentPointer.Length!=0)paths[field.CanonicalName]=pointer;
+        }
         return new NormalizedWireInput(values,paths);
     }
 
