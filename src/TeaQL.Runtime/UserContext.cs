@@ -78,7 +78,8 @@ public class UserContext
     public UserContext SetLocaleCode(string code) { var locale = TeaQLLocales.Parse(code); Locale = locale; return this; }
     public UserContext SetLanguageCode(string code) => SetLocaleCode(code);
     public UserContext InstallI18nCatalog(I18nCatalog catalog) { I18nCatalog = catalog ?? throw new ArgumentNullException(nameof(catalog)); return this; }
-    public IReadOnlyList<CheckResult> TranslateCheckResults(IReadOnlyList<CheckResult> results) { foreach(var result in results) I18nCatalog.Translate(result, Locale); return results; }
+    public IReadOnlyList<CheckResult> TranslateCheckResults(IReadOnlyList<CheckResult> results) =>
+        CheckerPrivacy.Translate(results, I18nCatalog, Locale, this);
 
     public UserContext()
     {
@@ -587,9 +588,15 @@ public class UserContext
         var descriptor = Metadata?.GetEntity(entity);
         var deferredReferences = IntegralScalarAdmission.CaptureDeferred(descriptor, request,
             ReferenceEquals(request.GraphOwner, _activeGraphSave) && _activeGraphSave?.IsPreparing == true);
-        var violations = _checkers.TryGetValue(entity, out var checker)
-            ? checker.CheckAndFix(this, request, _graphFixTime ?? CheckerFixInvocation.Current(this)?.Now ?? BusinessTime).ToList()
-            : new List<CheckResult>();
+        var diagnosticSecrets = CheckerPrivacy.RequestSecrets(this, request).ToList();
+        List<CheckResult> violations;
+        try
+        {
+            violations = _checkers.TryGetValue(entity, out var checker)
+                ? checker.CheckAndFix(this, request, _graphFixTime ?? CheckerFixInvocation.Current(this)?.Now ?? BusinessTime).ToList()
+                : new List<CheckResult>();
+        }
+        catch (CheckException error) { violations = error.Violations.ToList(); }
         MutationVersionAdmission.Validate(this, request);
         CanonicalMutationFields.Validate(this, request);
         // Runtime admission is independent of generated/custom checker presence.
@@ -609,7 +616,8 @@ public class UserContext
         violations.AddRange(IntegralScalarAdmission.Check(descriptor, request, deferredReferences));
         for (var index = 0; index < violations.Count; index++)
             violations[index] = violations[index].ForDeclaringEntity(entity);
-        TranslateCheckResults(violations);
+        diagnosticSecrets.AddRange(CheckerPrivacy.RequestSecrets(this, request));
+        CheckerPrivacy.Translate(violations, I18nCatalog, Locale, this, diagnosticSecrets);
         if (violations.Count != 0) throw new CheckException(violations);
     }
 
