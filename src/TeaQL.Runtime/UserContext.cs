@@ -617,7 +617,7 @@ public class UserContext
         for (var index = 0; index < violations.Count; index++)
             violations[index] = violations[index].ForDeclaringEntity(entity);
         diagnosticSecrets.AddRange(CheckerPrivacy.RequestSecrets(this, request));
-        CheckerPrivacy.Translate(violations, I18nCatalog, Locale, this, diagnosticSecrets);
+        CheckerPrivacy.Translate(violations, I18nCatalog, Locale, this, diagnosticSecrets, entity);
         if (violations.Count != 0) throw new CheckException(violations);
     }
 

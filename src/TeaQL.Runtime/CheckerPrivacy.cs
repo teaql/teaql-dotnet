@@ -20,10 +20,11 @@ internal static class CheckerPrivacy
     private sealed record Inspected(object? Value, bool Credential);
 
     internal static IReadOnlyList<CheckResult> Translate(IReadOnlyList<CheckResult> results,
-        I18nCatalog catalog, TeaQLLocale locale, UserContext? context = null, IEnumerable<string>? additional = null)
+        I18nCatalog catalog, TeaQLLocale locale, UserContext? context = null, IEnumerable<string>? additional = null,
+        string? requestEntityType = null)
     {
         var secrets = new HashSet<string>(additional ?? [], StringComparer.Ordinal);
-        var prepared = results.Select(result => Prepare(result, context, secrets)).ToArray();
+        var prepared = results.Select(result => Prepare(result, context, secrets, requestEntityType)).ToArray();
         foreach (var result in prepared)
         {
             result.Message = Scrub(result.Message, secrets);
@@ -58,14 +59,18 @@ internal static class CheckerPrivacy
         return secrets.ToArray();
     }
 
-    private static CheckResult Prepare(CheckResult result, UserContext? context, HashSet<string> secrets)
+    private static CheckResult Prepare(CheckResult result, UserContext? context, HashSet<string> secrets, string? requestEntityType = null)
     {
         var input = Inspect(result.InputValue); var expected = Inspect(result.SystemValue);
-        var policy = FieldPolicy(context, result.EntityType,
-            result.Location.Segments.OfType<ObjectLocationSegment.Property>().Select(p => p.Name).ToArray());
+        var fields = result.Location.Segments.OfType<ObjectLocationSegment.Property>().Select(p => p.Name).ToArray();
+        var policy = FieldPolicy(context, result.EntityType, fields);
+        // The declared type is diagnostic identity, not authority to weaken the
+        // actual mutation owner's policy. This owner is invocation-local.
+        var owner = FieldPolicy(context, requestEntityType, fields, allowLeafShortcut: false);
         var previous = result.Presentation;
-        var credential = input.Credential || policy.Credential || previous?.Credential == true;
-        var masked = policy.Masked || previous?.Masked == true;
+        var credential = input.Credential || policy.Credential || owner.Credential || previous?.Credential == true;
+        var masked = policy.Masked || owner.Masked || previous?.Masked == true
+            || HasModeledMask(context, policy.ValueDescriptor, input.Value) || HasModeledMask(context, owner.ValueDescriptor, input.Value);
         var hide = credential || masked && !LogPrivacy.PlaintextEnabled();
         var same = previous?.Fingerprint != null && previous.Fingerprint == Fingerprint(input.Value);
         int? length = same ? previous!.OriginalLength : InputLength(input.Value);
@@ -83,12 +88,14 @@ internal static class CheckerPrivacy
         return result;
     }
 
-    private static (bool Masked, bool Credential) FieldPolicy(UserContext? context, string? entity, IReadOnlyList<string> fields)
+    private static (bool Masked, bool Credential, EntityDescriptor? ValueDescriptor) FieldPolicy(UserContext? context, string? entity,
+        IReadOnlyList<string> fields, bool allowLeafShortcut = true)
     {
         bool masked = false, credential = fields.Any(SensitiveLogNames.IsCredential);
         var descriptor = entity == null ? null : context?.GetEntity(entity);
         // An explicit declaring child type can accompany an already-prefixed path.
-        var start = descriptor?.PropertyByName(fields.LastOrDefault() ?? "") != null ? fields.Count - 1 : 0;
+        var start = allowLeafShortcut && fields.Count > 0 && descriptor?.RelationByName(fields[0]) == null
+            && descriptor?.PropertyByName(fields[^1]) != null ? fields.Count - 1 : 0;
         for (var i = start; i < fields.Count; i++)
         {
             var field = fields[i]; var property = descriptor?.PropertyByName(field);
@@ -97,9 +104,41 @@ internal static class CheckerPrivacy
             var aliases = new[] { field, property?.Name, property?.ColumnNameString, relation?.LocalKeyValue, stored?.ColumnNameString };
             credential |= aliases.Any(a => a != null && SensitiveLogNames.IsCredential(a));
             masked |= aliases.Any(a => a != null && descriptor?.AuditMaskFieldList.Contains(a) == true);
-            if (relation != null) descriptor = context?.GetEntity(relation.TargetEntity);
+            // A scalar (including JSON) is not another namespace of this entity.
+            descriptor = relation == null ? null : context?.GetEntity(relation.TargetEntity);
         }
-        return (masked, credential);
+        return (masked, credential, descriptor);
+    }
+
+    private static bool HasModeledMask(UserContext? context, EntityDescriptor? descriptor, object? value)
+    {
+        if (context == null || descriptor == null) return false;
+        if (value is IList<object?> list) return list.Any(item => HasModeledMask(context, descriptor, item));
+        if (value is not IDictionary<string, object?> fields) return false;
+        foreach (var (key, item) in fields)
+        {
+            var canonical = ModelValueField(descriptor, key);
+            if (canonical == null) continue;
+            var policy = FieldPolicy(context, descriptor.Name, [canonical], allowLeafShortcut: false);
+            if (policy.Masked || policy.Credential || HasModeledMask(context, policy.ValueDescriptor, item)) return true;
+        }
+        return false;
+    }
+
+    private static string? ModelValueField(EntityDescriptor descriptor, string key)
+    {
+        var names = descriptor.Properties.Select(p => p.Name).Concat(descriptor.Relations.Select(r => r.Name))
+            .Concat(descriptor.AuditMaskFieldList).Distinct(StringComparer.Ordinal);
+        foreach (var name in names)
+        {
+            if (key == name || descriptor.PropertyByName(name)?.ColumnNameString == key) return name;
+            foreach (var profile in Enum.GetValues<JsonFieldNamingProfile>())
+            {
+                var rendered = ObjectLocation.Property(name).InstancePathWith(profile)[1..].Replace("~1", "/").Replace("~0", "~");
+                if (key == rendered) return name;
+            }
+        }
+        return null;
     }
 
     private static Inspected Inspect(object? value) => Inspect(value, new HashSet<object>(ReferenceEqualityComparer.Instance), 0);
