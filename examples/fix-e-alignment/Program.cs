@@ -89,6 +89,8 @@ await VersionProbe.Verify(context, connection);
 await CheckerMetadataProbe.Verify(connection);
 await ExpressionBoundaryProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
     ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".expression-boundaries.sqlite");
+await PartialAncestorProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
+    ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".partial-ancestors.sqlite");
 Console.WriteLine("FIX_E_EXAMPLE=" + JsonSerializer.Serialize(new {
     language = "dotnet", passed = true, normalGeneratedSave = true, createTimePreserved = true,
     updateTimeAdvanced = true, declaredContextRootInjected = true,
