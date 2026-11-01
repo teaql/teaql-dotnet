@@ -156,6 +156,7 @@ await VerifyTrustedTfpAsync();
 VerifyOpaqueReference();
 VerifyBusinessClock();
 VerifyQueryPolicy();
+await OperationalClockProbe.RunAsync();
 Console.WriteLine("PASS .NET security foundations example");
 
 sealed class ExampleDataService : IDataService

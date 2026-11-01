@@ -12,7 +12,12 @@ and fails closed if any of these backend security contracts regress:
 4. a fixed, context-owned Business Clock drives both business time and business
    date without changing any process-global clock; and
 5. Query Policy governs a cloned root-and-relation query graph exactly once,
-   leaving the caller-owned request reusable.
+   leaving the caller-owned request reusable; and
+6. a default opaque-reference codec and the local cache keep operational time
+   separate from future, unreadable and backdated Business Clocks. The cache
+   actually expires, a loaded empty array remains a hit, and a business-time
+   rewind cannot revive it. The structured clock marker contains no token,
+   internal identity, key material or cache key.
 
 Run it from the repository root:
 
