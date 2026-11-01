@@ -28,6 +28,8 @@ public class UserContext
     private readonly ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
     private readonly ConcurrentBag<object> _managedEntities = new();
     private readonly ConcurrentDictionary<string, IEntityChecker> _checkers = new();
+    internal IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> ContextRootFields { get; private set; }
+        = new Dictionary<string, IReadOnlyDictionary<string, string>>();
     private readonly MutationPolicyRuntimeState _mutationPolicy = new();
     private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
     private GraphMutationSession? _activeGraphSave;
@@ -560,6 +562,14 @@ public class UserContext
         foreach (var checker in checkers) _checkers[checker.Key] = checker.Value;
     }
 
+    internal void InstallContextRootFields(IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> fields)
+    {
+        // Values have already been validated and frozen by RuntimeModule. Applying
+        // another module replaces metadata; it cannot retain stale ownership rules.
+        ContextRootFields = new System.Collections.ObjectModel.ReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>(
+            fields.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal));
+    }
+
     internal void CheckAndFix(MutationRequest request)
     {
         if (_activeGraphSave != null) { CheckAndFixCore(request); return; }
@@ -585,6 +595,9 @@ public class UserContext
             _ => ""
         };
         CanonicalMutationFields.Validate(this, request);
+        var contextRoots = ContextRootAdmission.Capture(this, request);
+        contextRoots?.Validate();
+        contextRoots?.ApplyCreateDefaults();
         var descriptor = Metadata?.GetEntity(entity);
         var deferredReferences = IntegralScalarAdmission.CaptureDeferred(descriptor, request,
             ReferenceEquals(request.GraphOwner, _activeGraphSave) && _activeGraphSave?.IsPreparing == true);
@@ -599,6 +612,7 @@ public class UserContext
         catch (CheckException error) { violations = error.Violations.ToList(); }
         MutationVersionAdmission.Validate(this, request);
         CanonicalMutationFields.Validate(this, request);
+        contextRoots?.Validate(final: true);
         // Runtime admission is independent of generated/custom checker presence.
         // Inspect final values after Fix, allowing a custom checker to repair them.
         var values = request switch

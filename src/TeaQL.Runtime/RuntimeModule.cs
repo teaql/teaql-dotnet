@@ -10,6 +10,8 @@ public class RuntimeModule
     public InMemoryMetadataStore Metadata { get; } = new();
     public InMemoryEntityRegistry EntityRegistry { get; } = new();
     internal Dictionary<string, IEntityChecker> Checkers { get; } = new();
+    // Shared immutable model declarations, not per-record state or a mutation ledger.
+    internal Dictionary<string, IReadOnlyDictionary<string, string>> ContextRootFields { get; } = new();
     internal Func<UserContext, Task>? GeneratedBootstrapCallback { get; private set; }
     public Dictionary<string, WireEntityMetadata> WireMetadata { get; } = new();
 
@@ -24,7 +26,8 @@ public class RuntimeModule
         IReadOnlyDictionary<string, IReadOnlyList<RelationDescriptor>>? relations = null,
         IReadOnlyDictionary<string, string>? tableNames = null,
         IReadOnlyDictionary<string, IReadOnlyList<string>>? integer32Fields = null,
-        IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>? immutableUpdateFields = null)
+        IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>? immutableUpdateFields = null,
+        IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>? contextRootFields = null)
     {
         foreach (var entity in entities)
         {
@@ -63,6 +66,28 @@ public class RuntimeModule
             Entity(descriptor);
         }
         foreach (var (entity, checker) in checkers) Checker(entity, checker);
+        if (contextRootFields != null)
+            foreach (var (entity, fields) in contextRootFields) AddContextRootFields(entity, fields);
+    }
+
+    private void AddContextRootFields(string entity, IReadOnlyDictionary<string, string> fields)
+    {
+        if (fields.Count == 0) return;
+        var descriptor = Metadata.GetEntity(entity) ?? throw new ArgumentException("Context-root metadata requires a modeled entity");
+        var merged = ContextRootFields.TryGetValue(entity, out var previous)
+            ? previous.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal)
+            : new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var (field, target) in fields)
+        {
+            var property = descriptor.PropertyByName(field);
+            if (string.IsNullOrWhiteSpace(target) || property == null || property.DataType != DataType.I64 || property.IsId || property.IsVersion
+                || !descriptor.Relations.Any(r => !r.IsMany && r.LocalKeyValue == field && r.ForeignKeyValue == "id" && r.TargetEntity == target))
+                throw new ArgumentException("Context-root metadata requires a canonical modeled forward reference");
+            if (merged.TryGetValue(field, out var existing) && existing != target)
+                throw new ArgumentException("Conflicting context-root metadata");
+            merged[field] = target;
+        }
+        ContextRootFields[entity] = new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(merged);
     }
 
     private static DataType DataTypeFor(Value value) => value switch
@@ -118,6 +143,8 @@ public class RuntimeModule
         foreach (var metadata in other.WireMetadata.Values) combined.WireEntity(metadata);
         foreach (var checker in Checkers) combined.Checker(checker.Key, checker.Value);
         foreach (var checker in other.Checkers) combined.Checker(checker.Key, checker.Value);
+        foreach (var (entity, fields) in ContextRootFields) combined.AddContextRootFields(entity, fields);
+        foreach (var (entity, fields) in other.ContextRootFields) combined.AddContextRootFields(entity, fields);
         if (GeneratedBootstrapCallback != null) combined.GeneratedBootstrap(GeneratedBootstrapCallback);
         if (other.GeneratedBootstrapCallback != null) combined.GeneratedBootstrap(other.GeneratedBootstrapCallback);
         return combined;
@@ -135,6 +162,7 @@ public class RuntimeModule
         context.Metadata = Metadata;
         context.EntityRegistry = EntityRegistry;
         context.InstallCheckers(Checkers);
+        context.InstallContextRootFields(ContextRootFields);
         context.InstallGeneratedBootstrap(GeneratedBootstrapCallback);
     }
 

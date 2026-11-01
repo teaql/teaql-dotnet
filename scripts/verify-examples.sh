@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-expected=(business-id conformance facet-trace fix-e-alignment internal-id-customization mutation-policy object-storage order-management runtime-logging scalar-type-probe schema-customization school-management security-foundations task_board trace-chain)
+expected=(business-id conformance expression-profiles facet-trace fix-e-alignment internal-id-customization mutation-policy object-storage order-management runtime-logging scalar-type-probe schema-customization school-management security-foundations task_board trace-chain)
 mapfile -t actual < <(find "$repo/examples" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n' | sort)
 if [[ "${actual[*]}" != "${expected[*]}" ]]; then
   echo "example inventory changed; update scripts/verify-examples.sh: ${actual[*]}" >&2
@@ -26,6 +26,7 @@ export DOTNET_CLI_USE_MSBUILD_SERVER=0
 export MSBUILDDISABLENODEREUSE=1
 export UseSharedCompilation=false
 node "$repo/examples/fix-e-alignment/verify-local.cjs"
+TEAQL_GENERATED_E_PROFILE_EVIDENCE_DIR="$inventory_evidence/expression-profiles" node "$repo/examples/expression-profiles/verify-local.cjs"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify.sh"
 TEAQL_EMPTY_EVIDENCE_DIR="$inventory_evidence/empty-aggregates" TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify-empty.sh"
 bash "$repo/examples/object-storage/verify.sh"

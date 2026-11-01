@@ -5,6 +5,8 @@
     "en": {
       "messages": {
         "checker.required": "The {location} is required",
+        "checker.context_root_missing": "A valid active context root and loaded ownership are required",
+        "checker.context_root_mismatch": "Context-bound root must match the active context",
         "checker.invalid_version_state": "The {location} has an invalid state for this mutation: {input}",
         "checker.invalid_deletion_state": "Soft delete requires a positive {location}, got {input}",
         "checker.version_exhausted": "The {location} has no representable successor for this mutation: {input}",
@@ -18,6 +20,8 @@
     "zh-CN": {
       "messages": {
         "checker.required": "{location} 是必填项",
+        "checker.context_root_missing": "需要有效的活动上下文根和已装载的归属信息",
+        "checker.context_root_mismatch": "上下文绑定的根必须与活动上下文一致",
         "checker.invalid_version_state": "{location} 的状态不允许本次修改：{input}",
         "checker.invalid_deletion_state": "软删除要求 {location} 为正数，实际为 {input}",
         "checker.version_exhausted": "{location} 在本次修改后将超出可表示范围：{input}",
