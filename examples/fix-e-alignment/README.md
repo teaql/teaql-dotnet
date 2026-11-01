@@ -20,6 +20,17 @@ relation. E/JSON perform no hidden I/O. Failed saves preserve the original versi
 and business intent; only the exact managed BusinessClock Fix may remain added.
 All generated implementation files remain unchanged and hash-checked.
 
+`UnchangedViewsProbe.cs` exercises restored value/null edits and repeated clean
+saves with sparse fixed fields, a loaded sparse relation, query-only null/zero/
+empty properties and row-owned alias values. Every no-op preserves JSON, E load
+state, optimistic baseline and lineage with zero provider/transaction/policy/
+audit/SQL-log effects. Saving one row preserves another row's pending intent;
+invalid alias selection leaves the prior view intact. A genuine write control
+must return authoritative values, not reinstall stale derived data. Two rounds
+share an unreset SQLite store, independently checked by read-only SQL. This
+does not claim typed dynamic schemas, persistent dynamic fields or a public
+outer-transaction API that this runtime does not expose.
+
 `PartialRootProbe.cs` additionally loads a complete child owned by one active
 root through two unchanged partial ancestors. Saving under another persisted
 root must reject twice without SQL, transactions, ID reservations, policy

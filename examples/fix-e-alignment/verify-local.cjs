@@ -30,6 +30,7 @@ try {
   report.partialAncestorApplicationSha256 = sha(fs.readFileSync(path.join(example, 'PartialAncestorProbe.cs')));
   report.partialRootApplicationSha256 = sha(fs.readFileSync(path.join(example, 'PartialRootProbe.cs')));
   report.projectionApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ProjectionViewsProbe.cs')));
+  report.unchangedViewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'UnchangedViewsProbe.cs')));
   const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
   fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
   for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
@@ -68,6 +69,16 @@ try {
     assert.deepEqual(projections.map(v => v.case).sort(), ['independent-query-projection-boundary',
       'same-identity-independent-mutation-ledgers', 'intra-query-repeated-identity-projection-boundary'].sort());
     assert(projections.every(v => v.passed && v.round === round));
+    const unchanged = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_UNCHANGED_VIEW_CASE='))
+      .map(line => JSON.parse(line.slice('DOTNET_UNCHANGED_VIEW_CASE='.length)));
+    assert.equal(unchanged.length, 5);
+    assert.equal(new Set(unchanged.map(v => v.case)).size, 5);
+    assert(unchanged.every(v => v.passed && v.round === round && !v.pending && v.jsonPreserved
+      && Object.values(v.effects).every(count => count === 0)));
+    for (const marker of ['DOTNET_UNCHANGED_VIEW_WRITE=', 'DOTNET_UNCHANGED_VIEW_PHYSICAL=']) {
+      const rows = log.split(/\r?\n/).filter(line => line.startsWith(marker)).map(line => JSON.parse(line.slice(marker.length)));
+      assert.equal(rows.length, 1); assert(rows[0].passed && rows[0].round === round);
+    }
     assert.deepEqual(fingerprint(), m);
   }
   report.databaseSha256 = sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite'))); report.passed = true;
@@ -79,6 +90,8 @@ try {
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.partial-root.sqlite')))};
   report.projectionDatabase = {file: 'fixture.sqlite.projection-views.sqlite',
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.projection-views.sqlite')))};
+  report.unchangedViewDatabase = {file: 'fixture.sqlite.unchanged-views.sqlite',
+    sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.unchanged-views.sqlite')))};
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
 } catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {
