@@ -12,6 +12,14 @@ partial unchanged ancestors with a complete modified child. The same database
 is used for two rounds. Compact logs and SQLite files are retained; disposable
 consumer builds are removed.
 
+`ProjectionViewsProbe.cs` adds three generated-query combinations twice on a
+separate unreset store: a later full query cannot widen a sparse view; two full
+views retain independent pending mutations and reject a stale second save; and
+a sparse root stays sparse when the same ID also appears as a complete nested
+relation. E/JSON perform no hidden I/O. Failed saves preserve the original version
+and business intent; only the exact managed BusinessClock Fix may remain added.
+All generated implementation files remain unchanged and hash-checked.
+
 `PartialRootProbe.cs` additionally loads a complete child owned by one active
 root through two unchanged partial ancestors. Saving under another persisted
 root must reject twice without SQL, transactions, ID reservations, policy

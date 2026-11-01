@@ -93,6 +93,8 @@ await PartialAncestorProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX
     ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".partial-ancestors.sqlite");
 await PartialRootProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
     ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".partial-root.sqlite");
+await ProjectionViewsProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
+    ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".projection-views.sqlite");
 Console.WriteLine("FIX_E_EXAMPLE=" + JsonSerializer.Serialize(new {
     language = "dotnet", passed = true, normalGeneratedSave = true, createTimePreserved = true,
     updateTimeAdvanced = true, declaredContextRootInjected = true,

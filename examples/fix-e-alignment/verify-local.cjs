@@ -29,6 +29,7 @@ try {
   report.expressionBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ExpressionBoundaryProbe.cs')));
   report.partialAncestorApplicationSha256 = sha(fs.readFileSync(path.join(example, 'PartialAncestorProbe.cs')));
   report.partialRootApplicationSha256 = sha(fs.readFileSync(path.join(example, 'PartialRootProbe.cs')));
+  report.projectionApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ProjectionViewsProbe.cs')));
   const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
   fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
   for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
@@ -61,6 +62,12 @@ try {
       const values = log.split(/\r?\n/).filter(line => line.startsWith(marker)).map(line => JSON.parse(line.slice(marker.length)));
       assert.equal(values.length, 1, marker); assert.equal(values[0].passed, true, marker);
     }
+    const projections = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_PROJECTION_VIEW_CASE='))
+      .map(line => JSON.parse(line.slice('DOTNET_PROJECTION_VIEW_CASE='.length)));
+    assert.equal(projections.length, 3);
+    assert.deepEqual(projections.map(v => v.case).sort(), ['independent-query-projection-boundary',
+      'same-identity-independent-mutation-ledgers', 'intra-query-repeated-identity-projection-boundary'].sort());
+    assert(projections.every(v => v.passed && v.round === round));
     assert.deepEqual(fingerprint(), m);
   }
   report.databaseSha256 = sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite'))); report.passed = true;
@@ -70,6 +77,8 @@ try {
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.partial-ancestors.sqlite')))};
   report.partialRootDatabase = {file: 'fixture.sqlite.partial-root.sqlite',
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.partial-root.sqlite')))};
+  report.projectionDatabase = {file: 'fixture.sqlite.projection-views.sqlite',
+    sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.projection-views.sqlite')))};
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
 } catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {
