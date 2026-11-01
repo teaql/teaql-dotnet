@@ -81,7 +81,11 @@ internal sealed class ContextRootAdmission
         foreach (var (field, targetType) in _fields)
             if (!insert.Command.Values.TryGetValue(field, out var value)
                 || value is Value.NullValue or Value.TypedNullValue)
+            {
                 insert.Command.Values[field] = new Value.I64Value(_context.RequireActiveRoot(targetType).Id);
+                _context.RecordFixEvidence(new FixEvidence(_entity, field,
+                    FixEvidenceSource.Context, "activeRoot:" + targetType));
+            }
     }
 
     private void Reject(string field, string rule)
