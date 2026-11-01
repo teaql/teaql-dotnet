@@ -6,6 +6,33 @@ namespace TeaQL.Runtime.Tests;
 public class ExpressionPathTests
 {
     [Fact]
+    public void LiteralPunctuationAndIndicesPreserveCanonicalIdentityInAllWireProfiles()
+    {
+        foreach (var (profile, label, pointer) in new[] {
+            (JsonFieldNamingProfile.CamelCase, "camelCase", "/schoolType/2/a~0~1b.c"),
+            (JsonFieldNamingProfile.SnakeCase, "snake_case", "/school_type/2/a~0~1b.c"),
+            (JsonFieldNamingProfile.PascalCase, "PascalCase", "/SchoolType/2/A~0~1b.c") })
+        {
+            var path = ExpressionPath.Root("E.Node(<root>)", profile).Member("school_type", "SchoolType")
+                .At(2).Member("a~/b.c", "SafeField").MarkMissing();
+            var wire = new TeaQLNotLoadedException(path, "a~/b.c").Terminal("Eval()").ToWire();
+            Assert.Equal(pointer, wire.InstancePath);
+            Assert.Equal(pointer, wire.AttemptedInstancePath);
+            Assert.Equal(new[] { new ExpressionWireLocationSegment("property", "school_type", null),
+                new ExpressionWireLocationSegment("index", null, 2), new ExpressionWireLocationSegment("property", "a~/b.c", null) }, wire.Location);
+            Assert.Equal(wire.Location, wire.AttemptedLocation);
+            Assert.Equal(wire.Location, wire.SuggestedFix.Location);
+            Assert.Equal(2, wire.BreakPointIndex);
+            Assert.Equal("a~/b.c", wire.BreakPoint);
+            Assert.Equal("E.Node(<root>).SchoolType().Get(2).SafeField()<broken>.Eval()", wire.ExpressionWithBrokenPoint);
+            var record = JsonSerializer.Serialize(new { language="dotnet", profile=label, wire });
+            Console.WriteLine("E_POINTER_PROFILE_CASE=" + record);
+            if (Environment.GetEnvironmentVariable("TEAQL_POINTER_PROFILE_EVIDENCE") is string output)
+                File.AppendAllText(output, record + "\n");
+        }
+    }
+
+    [Fact]
     public void EarlyRepeatedRelationPreservesSuffixAndOnePositionalBreakpoint()
     {
         var parent = ExpressionPath.Root("E.Node(<root>)").Member("parent", "Parent").MarkMissing();
