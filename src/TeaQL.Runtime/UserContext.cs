@@ -595,6 +595,7 @@ public class UserContext
             _ => ""
         };
         CanonicalMutationFields.Validate(this, request);
+        var beforeFix = MutationFixLedger.Capture(request);
         var contextRoots = ContextRootAdmission.Capture(this, request);
         contextRoots?.Validate();
         contextRoots?.ApplyCreateDefaults();
@@ -633,6 +634,7 @@ public class UserContext
         diagnosticSecrets.AddRange(CheckerPrivacy.RequestSecrets(this, request));
         CheckerPrivacy.Translate(violations, I18nCatalog, Locale, this, diagnosticSecrets, entity);
         if (violations.Count != 0) throw new CheckException(violations);
+        MutationFixLedger.WriteBack(request, beforeFix);
     }
 
     /// <summary>Generated graph infrastructure validates/fixes every node before its first provider mutation.</summary>
