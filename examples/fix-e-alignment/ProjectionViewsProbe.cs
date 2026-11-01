@@ -106,6 +106,9 @@ static class ProjectionViewsProbe
         Require(E.PurchaseOrder(other).Version().Eval() == 1 && Ledger(other).OriginalVersion(Key(other)) == 1
             && pending["internal_note"] == new Value.TextValue("pending-other-view"), "Rejection lost pending business intent or changed its original version");
         var derived = pending.Keys.Where(k => k != "internal_note").OrderBy(k => k).ToArray();
+        Console.WriteLine("DOTNET_PENDING_VIEW_OBSERVATION=" + JsonSerializer.Serialize(new { round,
+            keys = pending.Keys.OrderBy(k => k).ToArray(), values = pending.ToDictionary(p => p.Key,
+                p => new { type = p.Value.GetType().Name, value = p.Value.ToJsonValue() }) }));
         Require(derived.SequenceEqual(new[] { "update_time" }) && pending["update_time"] == new Value.TimestampValue(second.ToUnixTimeMilliseconds()),
             "Only the exact managed BusinessClock Fix may be added to pending intent");
         Case("same-identity-independent-mutation-ledgers", two, new { separateViews = true, otherPendingEditRetained = true,
