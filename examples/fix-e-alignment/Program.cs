@@ -87,6 +87,8 @@ await LoadingProbe.Verify(context, orderId);
 await OwnershipProbe.Verify(context);
 await VersionProbe.Verify(context, connection);
 await CheckerMetadataProbe.Verify(connection);
+await CheckerBoundaryProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
+    ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".checker-boundaries.sqlite");
 await ExpressionBoundaryProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
     ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".expression-boundaries.sqlite");
 await PartialAncestorProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")

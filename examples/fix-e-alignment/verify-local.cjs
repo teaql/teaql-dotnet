@@ -31,6 +31,7 @@ try {
   report.partialRootApplicationSha256 = sha(fs.readFileSync(path.join(example, 'PartialRootProbe.cs')));
   report.projectionApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ProjectionViewsProbe.cs')));
   report.unchangedViewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'UnchangedViewsProbe.cs')));
+  report.checkerBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CheckerBoundaryProbe.cs')));
   const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
   fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
   for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
@@ -59,10 +60,13 @@ try {
   report.binarySha256 = sha(fs.readFileSync(executable)); report.localProjectDependencies = true;
   for (const round of [1, 2]) {
     const log = await run(['dotnet', executable], 'round-' + round + '.log');
-    for (const marker of ['FIX_E_EXAMPLE=', 'CORE_LOAD_EXAMPLE=', 'CORE_MUTATION_OWNERSHIP=', 'CORE_MUTATION_PAGING=', 'DOTNET_VERSION_BOUNDARIES=', 'DOTNET_CHECKER_METADATA=', 'CORE_DOTNET_E_BOUNDARY_RESULT=', 'CORE_DOTNET_PARTIAL_ANCESTORS_RESULT=', 'CORE_DOTNET_PARTIAL_ROOT_RESULT=']) {
+    for (const marker of ['FIX_E_EXAMPLE=', 'CORE_LOAD_EXAMPLE=', 'CORE_MUTATION_OWNERSHIP=', 'CORE_MUTATION_PAGING=', 'DOTNET_VERSION_BOUNDARIES=', 'DOTNET_CHECKER_METADATA=', 'DOTNET_CHECKER_BOUNDARY_RESULT=', 'CORE_DOTNET_E_BOUNDARY_RESULT=', 'CORE_DOTNET_PARTIAL_ANCESTORS_RESULT=', 'CORE_DOTNET_PARTIAL_ROOT_RESULT=']) {
       const values = log.split(/\r?\n/).filter(line => line.startsWith(marker)).map(line => JSON.parse(line.slice(marker.length)));
       assert.equal(values.length, 1, marker); assert.equal(values[0].passed, true, marker);
     }
+    const boundary = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_CHECKER_BOUNDARY_CASE='))
+      .map(line => JSON.parse(line.slice('DOTNET_CHECKER_BOUNDARY_CASE='.length)));
+    assert.equal(boundary.length, 28); assert(boundary.every(v => v.passed && v.round === round));
     const projections = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_PROJECTION_VIEW_CASE='))
       .map(line => JSON.parse(line.slice('DOTNET_PROJECTION_VIEW_CASE='.length)));
     assert.equal(projections.length, 3);
@@ -92,6 +96,8 @@ try {
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.projection-views.sqlite')))};
   report.unchangedViewDatabase = {file: 'fixture.sqlite.unchanged-views.sqlite',
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.unchanged-views.sqlite')))};
+  report.checkerBoundaryDatabase = {file: 'fixture.sqlite.checker-boundaries.sqlite',
+    sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.checker-boundaries.sqlite')))};
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
 } catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {
