@@ -87,7 +87,8 @@ static class CheckerBoundaryProbe
             catch (CheckException error)
             {
                 Require(error.Violations.Any(v => v.RuleId == "required" && v.ModelPath == "contact_phone"), "Wrong schema-free rule");
-                Require(observed.Statements == 0 && observed.Begins == 0 && state.CheckerCalls > 0, "Schema-free rejection used SQL or no Checker");
+                Require(observed.Statements == 0 && observed.Begins == 0 && state.CheckerCalls > 0
+                    && state.Policies == 0 && audit.Calls == 0, "Schema-free rejection used SQL/policy/audit or no Checker");
             }
             using var tables = empty.CreateCommand(); tables.CommandText = "SELECT count(*) FROM sqlite_master WHERE type='table'";
             Require(Convert.ToInt32(await tables.ExecuteScalarAsync(), CultureInfo.InvariantCulture) == 0, "Schema-free check created tables");
@@ -134,6 +135,8 @@ static class CheckerBoundaryProbe
         await completeRoot.AuditAs("Save a complete mutation through an unmodified partial root").SaveAsync(context);
         Require(transport.Begins == 1 && transport.ParentInserts == 0 && transport.ChildInserts == 0 && audit.Calls == 1,
             "Valid partial-ancestor save performed unrelated inserts/audits");
+        Require(E.PurchaseOrder(completeRoot.PurchaseOrderList.Single()).Version().Eval() == 2
+            && E.Tenant(completeRoot).Version().Eval() == 1, "Partial-root save modified an untouched ancestor");
         Emit("unmodified-partial-ancestor", new { parentId, childVersion = E.PurchaseOrder(completeRoot.PurchaseOrderList.Single()).Version().Eval(),
             rootVersion = E.Tenant(completeRoot).Version().Eval(), effects = Counts() });
 
@@ -169,10 +172,11 @@ static class CheckerBoundaryProbe
                 // colliding spellings cannot reach mapping, Checker or Save.
                 var text = JsonSerializer.Serialize(new Dictionary<string, object?> { ["payload/order"] = leaf });
                 using var document = JsonDocument.Parse(text);
-                var input = document.RootElement.GetProperty("payload/order").EnumerateObject().ToDictionary(p => p.Name,
-                    p => p.Value.ValueKind == JsonValueKind.Null ? null : (object?)p.Value.GetString());
+                var input = document.RootElement.GetProperty("payload/order").EnumerateObject()
+                    .ToDictionary(p => p.Name, p => (object?)p.Value.Clone());
                 var normalized = WireFields.Normalize(input, metadata, "/payload~1order"); state.Mapped++;
-                var row = Parent(context); row.UpdateContactPhone(normalized.Values["contact_phone"] as string ?? null!); state.Saves++;
+                var value = (JsonElement)normalized.Values["contact_phone"]!;
+                var row = Parent(context); row.UpdateContactPhone(value.ValueKind == JsonValueKind.Null ? null! : value.GetString()!); state.Saves++;
                 try { await row.AuditAs("Save a normalized object-local JSON request").SaveAsync(context); }
                 catch (CheckException error) { throw new SubmittedViolation(error, normalized); }
                 return (row, normalized);
@@ -193,7 +197,7 @@ static class CheckerBoundaryProbe
             foreach (var name in new[] { "unknown", "equal-forward", "equal-reverse", "unequal-forward", "unequal-reverse" })
             {
                 var input = new Dictionary<string, object?>(); var reverse = name.EndsWith("reverse", StringComparison.Ordinal);
-                if (name == "unknown") input["unknown/field~"] = "PRIVATE_UNKNOWN";
+                if (name == "unknown") input["unknown/field~"] = new Dictionary<string, object?> { ["not_a_phone"] = 42 };
                 else
                 {
                     input[reverse ? "legacy/phone~" : standard] = "5550100";
@@ -216,10 +220,11 @@ static class CheckerBoundaryProbe
             Emit("wire-positive-control", new { id = positive.row.Id, parentInserts = 1 }, Profile(profile));
         }
         Require(observations == 28, "Boundary inventory changed");
+        using var physicalReport = JsonDocument.Parse(await Physical(connection));
         Console.WriteLine("DOTNET_CHECKER_BOUNDARY_RESULT=" + JsonSerializer.Serialize(new { language = "dotnet", passed = true,
             round, observations, sameDatabase = true, requiredAndRangeObserveActualFix = true,
             realJsonInputAdapter = "application-owned-object-local-composition", recursiveGeneratedHttpAdapterAccepted = false,
-            fullCheckerContractAccepted = false, allP0P1Complete = false, physical = JsonDocument.Parse(await Physical(connection)).RootElement }, Json));
+            fullCheckerContractAccepted = false, allP0P1Complete = false, physical = physicalReport.RootElement }, Json));
     }
 
     sealed class SubmittedViolation(CheckException original, NormalizedWireInput normalized) : Exception
