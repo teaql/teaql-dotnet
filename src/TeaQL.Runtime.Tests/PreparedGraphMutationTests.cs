@@ -136,9 +136,33 @@ public class PreparedGraphMutationTests
         Assert.Equal("mutation_changed_after_preparation", Assert.Single(error.Violations).RuleId);
         Assert.Equal(1, provider.Begins); Assert.Equal(1, provider.Rollbacks); Assert.Equal(0, provider.Commits);
         Assert.Equal(stage == "review" ? 0 : 1, provider.Requests.Count);
-        var pending = new EntityKey("Probe", 1);
+        var pending = request.LedgerKey!;
         if (delete) Assert.True(request.LedgerRoot.IsDeleted(pending));
         else Assert.Equal(999, request.LedgerRoot.Change(pending)["amount"].TryF64());
+    }
+
+    [Fact]
+    public async Task ReservedPreparedIdentityRekeysTheLedgerAndRollbackRestoresItsOriginalOwner()
+    {
+        var provider = new Provider(); var context = new UserContext().WithDataService(provider);
+        var request = Insert("Probe", -1); var owner = new object(); var original = request.LedgerKey!;
+        request.LedgerRoot!.MarkAsNew(original);
+        request.LedgerRoot.Set(original, "amount", new Value.F64Value(1.0));
+        await Assert.ThrowsAsync<OperationCanceledException>(() => context.ExecuteGraphSaveAsync<int>(
+            "verify runtime-owned ledger identity binding", graph => {
+                graph.PrepareInput(owner, request); graph.SealPreparedGraph(); return Task.CompletedTask;
+            }, async graph => {
+                var id = await graph.ReservePreparedIdAsync(owner); var assigned = new EntityKey("Probe", checked((long)id));
+                Assert.True(request.LedgerRoot.IsNew(assigned)); Assert.False(request.LedgerRoot.IsNew(original));
+                Assert.Equal(1.0, request.LedgerRoot.Change(assigned)["amount"].TryF64());
+                Assert.Empty(request.LedgerRoot.Change(original));
+                throw new OperationCanceledException();
+            }));
+        Assert.True(request.LedgerRoot.IsNew(original));
+        Assert.Equal(1.0, request.LedgerRoot.Change(original)["amount"].TryF64());
+        Assert.False(request.LedgerRoot.IsNew(new EntityKey("Probe", 1)));
+        Assert.Empty(request.LedgerRoot.Change(new EntityKey("Probe", 1)));
+        Assert.Equal(1, provider.Begins); Assert.Equal(1, provider.Rollbacks); Assert.Equal(0, provider.Commits);
     }
 
     [Fact]

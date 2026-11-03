@@ -82,6 +82,15 @@ public sealed partial class GraphMutationSession
         if (id == 0 || id > long.MaxValue) throw new InvalidOperationException("GRAPH_ID_MUST_BE_POSITIVE");
         prepared.Key = new EntityKey(insert.Command.Entity, checked((long)id));
         _assignedIds[prepared.Input.LedgerKey!] = prepared.Key.Id;
+        var originalKey = prepared.Input.LedgerKey!;
+        var assignedKey = prepared.Key;
+        if (originalKey != assignedKey)
+        {
+            // Ledger identity is runtime state. Generated adapters may repeat
+            // this idempotent rekey, but correctness must not depend on it.
+            prepared.Input.LedgerRoot!.Rekey(originalKey, assignedKey);
+            AfterRollback(() => prepared.Input.LedgerRoot!.Rekey(assignedKey, originalKey));
+        }
         prepared.IdReserved = true;
         return id;
     }
