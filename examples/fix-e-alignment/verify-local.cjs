@@ -32,6 +32,7 @@ try {
   report.projectionApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ProjectionViewsProbe.cs')));
   report.unchangedViewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'UnchangedViewsProbe.cs')));
   report.checkerBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CheckerBoundaryProbe.cs')));
+  report.graphFixLifecycleApplicationSha256 = sha(fs.readFileSync(path.join(example, 'GraphFixLifecycleProbe.cs')));
   const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
   fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
   for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
@@ -83,6 +84,13 @@ try {
       const rows = log.split(/\r?\n/).filter(line => line.startsWith(marker)).map(line => JSON.parse(line.slice(marker.length)));
       assert.equal(rows.length, 1); assert(rows[0].passed && rows[0].round === round);
     }
+    const graph = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_GRAPH_LIFECYCLE_CASE='))
+      .map(line => JSON.parse(line.slice('DOTNET_GRAPH_LIFECYCLE_CASE='.length)));
+    assert.equal(graph.length, 12); assert.equal(new Set(graph.map(row => row.case)).size, 12);
+    assert(graph.every(row => row.passed && row.round === round && row.clockCalls === 1));
+    const graphResult = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_GRAPH_LIFECYCLE_RESULT='))
+      .map(line => JSON.parse(line.slice('DOTNET_GRAPH_LIFECYCLE_RESULT='.length)));
+    assert.equal(graphResult.length, 1); assert(graphResult[0].passed && graphResult[0].round === round && graphResult[0].cases === 12);
     assert.deepEqual(fingerprint(), m);
   }
   report.databaseSha256 = sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite'))); report.passed = true;
@@ -98,6 +106,8 @@ try {
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.unchanged-views.sqlite')))};
   report.checkerBoundaryDatabase = {file: 'fixture.sqlite.checker-boundaries.sqlite',
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.checker-boundaries.sqlite')))};
+  report.graphFixLifecycleDatabase = {file: 'fixture.sqlite.graph-fix-lifecycle.sqlite',
+    sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.graph-fix-lifecycle.sqlite')))};
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
 } catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {

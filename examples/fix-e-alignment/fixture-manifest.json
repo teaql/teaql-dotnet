@@ -2,19 +2,20 @@
   "schema": "teaql.generated-example-fixture/v1",
   "language": "dotnet",
   "modelSha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
-  "generatedManifestSha256": "5d8645707521bceecc08f9c270ea3fb1c2e5a62e4d3699c94dd8107bca92d1fe",
+  "generatedManifestSha256": "8ec7c5bc7b9abf40a25849bb91917c219b58d1ec157d25bd3e9409a67913b3a3",
+  "previousGeneratedManifestSha256": "5d8645707521bceecc08f9c270ea3fb1c2e5a62e4d3699c94dd8107bca92d1fe",
   "previousProducerReceiptSha256": "f45b7da6c4a38abb84f90a0fd65d9279cd86b02d5b088f23833fc6b081100e58",
   "producerSource": {
-    "commit": "531110789ddb4e0aa26ea8503f53f9504f14e49b",
-    "sourceContentsSha256": "312763445a8b8d2b74f35dc8639ed67b9865d91daea6f544c86099605cf0959c"
+    "commit": "2f4deaa38795039e0f54e2fbb673699b94ef4e11",
+    "sourceContentsSha256": "984cadb159d0bda13d65ddffdc77c06de68278c2308bc1219579e18849f283e7"
   },
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
   "evaluationWarnings": 4,
   "files": {
-    "Models/Tenant.cs": "71e1a6722bcf1dea3d28f00c0051c3cc92ff34837e08a5b580dd21e9b435970b",
-    "Models/PurchaseOrder.cs": "891b7a92ef5a5881f2982b045734c5bd31efd2a287be5adbcc7869a5d617d80e",
-    "Models/OrderItem.cs": "3888c295d88cdd773f3ad16e01e045d2c0cd9dc01d40241263cfe4d408954fe9",
+    "Models/Tenant.cs": "90418cc4f4d402591d1926edc8c3da745d86de03fc8c16edf3ca19c58d825d01",
+    "Models/PurchaseOrder.cs": "4c18ab2676fff6b7e1638bf81f6a59581803cdc892f5fe1128d0db6ecc5fe691",
+    "Models/OrderItem.cs": "6e21e2e90dd100b22bb7ba85ff8b6e7b4117299ee2d9fbb0eaa1c0e6cac1b15e",
     "teaql-i18n.json": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014",
     "Requests/TenantRequest.cs": "27a713908c56f86ed2698081ab997a94b159a83e370e5b82087aa088edf7f10c",
     "Requests/PurchaseOrderRequest.cs": "2355e20af012d133463855f4aeb4707fd61c99a5e86d717ed9349516bf3b8e86",
@@ -25,6 +26,7 @@
     "GeneratedSearchModels.cs": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c",
     "checker-fix-advanced-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
   },
-  "generatorSourceContentsSha256": "312763445a8b8d2b74f35dc8639ed67b9865d91daea6f544c86099605cf0959c",
-  "producerReportSha256": "609813c10b4399aff3d7491d4308b4054bfc90188e4049537f2fa2e1ca53649b"
+  "generatorSourceContentsSha256": "984cadb159d0bda13d65ddffdc77c06de68278c2308bc1219579e18849f283e7",
+  "producerReportSha256": "60896282735356dc63ab9b439b33d218d952037c9d89248dacd4191694aeaf9f",
+  "qualificationReportSha256": "423a30c61fa2c04b6074ee15428d76b1aa0d8775a19aee9887cf44ab7906f5e7"
 }
