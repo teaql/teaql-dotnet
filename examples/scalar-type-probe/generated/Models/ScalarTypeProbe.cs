@@ -409,13 +409,13 @@ namespace Generated.Models
                     {
                         entity.MarkLoaded("RequiredTime");
                         if (requiredTimeValue.Raw != null)
-                            entity.RequiredTime = requiredTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(requiredTimeValue.Raw), System.Globalization.CultureInfo.InvariantCulture);
+                            entity.RequiredTime = requiredTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(requiredTimeValue.Raw) ?? throw new InvalidOperationException("Expected a non-null time representation for required_time"), System.Globalization.CultureInfo.InvariantCulture);
                     }
                     if (record.TryGetValue("optional_time", out var optionalTimeValue))
                     {
                         entity.MarkLoaded("OptionalTime");
                         if (optionalTimeValue.Raw != null)
-                            entity.OptionalTime = optionalTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(optionalTimeValue.Raw), System.Globalization.CultureInfo.InvariantCulture);
+                            entity.OptionalTime = optionalTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(optionalTimeValue.Raw) ?? throw new InvalidOperationException("Expected a non-null time representation for optional_time"), System.Globalization.CultureInfo.InvariantCulture);
                     }
                     if (record.TryGetValue("required_datetime", out var requiredDatetimeValue))
                     {
@@ -487,6 +487,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Prepare)) return;
             graph.DiscardRestoredFields("ScalarTypeProbe", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
@@ -561,12 +562,14 @@ namespace Generated.Models
 
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Preflight)) return;
             if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
                 graph.PreflightPrepared(this);
         }
 
         internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Reserve)) return;
             var creating = !Id.HasValue || _teaqlForceCreate;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
             {
@@ -659,6 +662,7 @@ namespace Generated.Models
         internal async global::System.Threading.Tasks.Task<ScalarTypeProbe> TeaqlSaveWithinGraphAsync(UserContext context,
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Write)) return this;
             var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
             {
