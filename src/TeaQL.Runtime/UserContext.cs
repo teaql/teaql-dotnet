@@ -577,12 +577,12 @@ public class UserContext
         CheckAndFixCore(request);
     }
 
-    private void CheckAndFixCore(MutationRequest request)
+    private void CheckAndFixCore(MutationRequest request, bool invokeChecker = true)
     {
         MutationVersionAdmission.Validate(this, request);
         if (request is BatchMutationRequest batch)
         {
-            foreach (var item in batch.Requests) CheckAndFixCore(item);
+            foreach (var item in batch.Requests) CheckAndFixCore(item, invokeChecker);
             MutationVersionAdmission.Validate(this, request);
             return;
         }
@@ -595,10 +595,10 @@ public class UserContext
             _ => ""
         };
         CanonicalMutationFields.Validate(this, request);
-        var beforeFix = MutationFixLedger.Capture(request);
+        var beforeFix = invokeChecker ? MutationFixLedger.Capture(request) : null;
         var contextRoots = ContextRootAdmission.Capture(this, request);
         contextRoots?.Validate();
-        contextRoots?.ApplyCreateDefaults();
+        if (invokeChecker) contextRoots?.ApplyCreateDefaults();
         var descriptor = Metadata?.GetEntity(entity);
         var deferredReferences = IntegralScalarAdmission.CaptureDeferred(descriptor, request,
             ReferenceEquals(request.GraphOwner, _activeGraphSave) && _activeGraphSave?.IsPreparing == true);
@@ -606,7 +606,7 @@ public class UserContext
         List<CheckResult> violations;
         try
         {
-            violations = _checkers.TryGetValue(entity, out var checker)
+            violations = invokeChecker && _checkers.TryGetValue(entity, out var checker)
                 ? checker.CheckAndFix(this, request, _graphFixTime ?? CheckerFixInvocation.Current(this)?.Now ?? BusinessTime).ToList()
                 : new List<CheckResult>();
         }
@@ -641,6 +641,17 @@ public class UserContext
     internal void PreflightMutation(MutationRequest request)
     {
         CheckAndFix(request);
+        _mutationPolicy.RecordPreflight(request);
+    }
+
+    // A generated input has already run the customer's Checker/Fix exactly once.
+    // Revalidate framework-owned identity/reference/scalar admission after ID
+    // binding, without repeating business corrections or clock provenance.
+    internal void PreflightPreparedMutation(MutationRequest request)
+    {
+        if (_activeGraphSave == null || !ReferenceEquals(request.GraphOwner, _activeGraphSave))
+            throw new InvalidOperationException("GRAPH_CAPABILITY_OWNER_MISMATCH");
+        CheckAndFixCore(request, invokeChecker: false);
         _mutationPolicy.RecordPreflight(request);
     }
 

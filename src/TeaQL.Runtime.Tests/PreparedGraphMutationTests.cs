@@ -53,7 +53,7 @@ public class PreparedGraphMutationTests
     }
 
     [Fact]
-    public async Task PersistsTheFinalReviewedSnapshotWithoutAThirdFixOrMutableAliases()
+    public async Task PersistsTheFirstCheckedSnapshotWithoutAnotherFixOrMutableAliases()
     {
         var provider = new Provider(); var fix = new ChangingFix(); var policy = new Policy();
         var context = new UserContext().Install(new RuntimeModule().Checker("Probe", fix))
@@ -73,9 +73,9 @@ public class PreparedGraphMutationTests
                 graph.MutatePreparedAsync(owner))).Message);
             return 1;
         });
-        Assert.Equal(2, fix.Calls);
-        Assert.Equal(7.5, Assert.IsType<InsertMutationRequest>(Assert.Single(provider.Requests)).Command.Values["amount"].TryF64());
-        Assert.Equal(7.5, Assert.Single(Assert.Single(policy.Plans).Operations).ChangedValues["amount"].TryF64());
+        Assert.Equal(1, fix.Calls);
+        Assert.Equal(7.25, Assert.IsType<InsertMutationRequest>(Assert.Single(provider.Requests)).Command.Values["amount"].TryF64());
+        Assert.Equal(7.25, Assert.Single(Assert.Single(policy.Plans).Operations).ChangedValues["amount"].TryF64());
     }
 
     [Fact]

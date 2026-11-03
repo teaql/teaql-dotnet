@@ -105,7 +105,7 @@ public sealed partial class GraphMutationSession
                     && _assignedIds.TryGetValue(new EntityKey(relation.TargetEntity, oldId), out var assigned))
                     values[relation.LocalKeyValue] = assigned;
         _context.ValidateGraphMutation(captured, this);
-        _context.PreflightMutation(captured);
+        _context.PreflightPreparedMutation(captured);
         if (captured is InsertMutationRequest &&
             (!values!.TryGetValue("id", out var checkedId) || checkedId.TryI64() != prepared.Key.Id.TryI64()))
             throw new CheckException(new[] {new CheckResult {RuleId = "invalid_type", EntityType = entityType,
@@ -141,7 +141,7 @@ public sealed partial class GraphMutationSession
 
     private void ClearPreparedMutations()
     {
-        _prepared.Clear(); _assignedIds.Clear(); _preparedDispatch.Clear();
+        _prepared.Clear(); _assignedIds.Clear(); _preparedDispatch.Clear(); _traversal.Clear();
     }
 
     private static Record CopyValues(Record values) => new LoadedScalarSnapshot(values).CopyValues();
