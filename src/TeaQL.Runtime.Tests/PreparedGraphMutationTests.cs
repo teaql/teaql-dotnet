@@ -78,6 +78,33 @@ public class PreparedGraphMutationTests
         Assert.Equal(7.25, Assert.Single(Assert.Single(policy.Plans).Operations).ChangedValues["amount"].TryF64());
     }
 
+    [Theory]
+    [InlineData("revisit", "field")]
+    [InlineData("seal", "field")]
+    [InlineData("revisit", "delete")]
+    [InlineData("seal", "delete")]
+    public async Task ChangedPreparedLedgerIsRejectedBeforeOpeningATransaction(string checkpoint, string edit)
+    {
+        var provider = new Provider(); var context = new UserContext().WithDataService(provider);
+        var owner = new object(); var request = Insert("Probe", -1);
+        var error = await Assert.ThrowsAsync<CheckException>(() => context.ExecuteGraphSaveAsync(
+            "reject a rebound or changed checked entity", graph => {
+                Assert.True(graph.VisitEntity(owner, GraphMutationTraversal.Prepare));
+                graph.PrepareInput(owner, request);
+                if (edit == "delete") request.LedgerRoot!.MarkAsDeleted(request.LedgerKey!);
+                else request.LedgerRoot!.Set(request.LedgerKey!, "parent_id", new Value.I64Value(-2));
+                if (checkpoint == "revisit") graph.VisitEntity(owner, GraphMutationTraversal.Prepare);
+                else graph.SealPreparedGraph();
+                return Task.CompletedTask;
+            }, _ => Task.FromResult(0)));
+        var violation = Assert.Single(error.Violations);
+        Assert.Equal("mutation_changed_after_preparation", violation.RuleId);
+        Assert.Equal("Probe", violation.EntityType);
+        Assert.Equal(edit == "field" ? "parent_id" : "", violation.Location.ModelPath);
+        Assert.Equal(0, provider.Begins);
+        Assert.Empty(provider.Requests);
+    }
+
     [Fact]
     public async Task ResolvesTypedTemporaryIdentitiesAndOnlyModeledReferenceFields()
     {

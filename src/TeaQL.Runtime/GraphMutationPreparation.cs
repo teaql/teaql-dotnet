@@ -13,6 +13,10 @@ public sealed partial class GraphMutationSession
         internal bool IdReserved { get; set; }
         internal MutationRequest? Final { get; set; }
         internal bool Executed { get; set; }
+        internal Record LedgerValues { get; } = CopyValues(input.LedgerRoot!.Change(input.LedgerKey!));
+        internal long? LedgerVersion { get; } = input.LedgerRoot!.OriginalVersion(input.LedgerKey!);
+        internal bool LedgerNew { get; } = input.LedgerRoot!.IsNew(input.LedgerKey!);
+        internal bool LedgerDeleted { get; } = input.LedgerRoot!.IsDeleted(input.LedgerKey!);
     }
     private readonly Dictionary<object, PreparedMutation> _prepared = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<EntityKey, Value> _assignedIds = new();
@@ -26,6 +30,7 @@ public sealed partial class GraphMutationSession
         RequireActive();
         if (_transaction != null || _preparedGraphSealed)
             throw new InvalidOperationException("GRAPH_INPUT_PREPARATION_CLOSED");
+        foreach (var entity in _prepared.Keys) ValidatePreparedInputUnchanged(entity);
         _preparedGraphSealed = true;
     }
 
@@ -137,6 +142,30 @@ public sealed partial class GraphMutationSession
         RequireActive();
         return _prepared.TryGetValue(entity, out var prepared) ? prepared
             : throw new InvalidOperationException("GRAPH_ENTITY_NOT_PREPARED");
+    }
+
+    // Reaching one instance twice is legal only while its checked mutation intent
+    // is unchanged. In particular, a child cannot silently move between parents
+    // after its first Fix. This check is preparation-only: subsequent runtime ID
+    // reservation/rekeying is intentional and must not be confused with an edit.
+    private void ValidatePreparedInputUnchanged(object entity)
+    {
+        if (!_prepared.TryGetValue(entity, out var prepared)) return;
+        var ledger = prepared.Input.LedgerRoot!;
+        var key = prepared.Input.LedgerKey!;
+        var current = ledger.Change(key);
+        var fields = current.Keys.Concat(prepared.LedgerValues.Keys).Distinct(StringComparer.Ordinal);
+        var changedField = fields.FirstOrDefault(field =>
+            !current.TryGetValue(field, out var value)
+            || !prepared.LedgerValues.TryGetValue(field, out var original)
+            || !LoadedScalarSnapshot.SameValue(value, original));
+        if (changedField == null && ledger.OriginalVersion(key) == prepared.LedgerVersion
+            && ledger.IsNew(key) == prepared.LedgerNew && ledger.IsDeleted(key) == prepared.LedgerDeleted) return;
+        throw new CheckException(new[] {new CheckResult {
+            RuleId = "mutation_changed_after_preparation", EntityType = key.EntityType,
+            Location = changedField == null ? ObjectLocation.Root() : ObjectLocation.Property(changedField),
+            Message = "Mutation intent changed after this entity was checked; prepare a new graph save"
+        }});
     }
 
     private void ClearPreparedMutations()

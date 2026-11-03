@@ -21,7 +21,11 @@ public sealed partial class GraphMutationSession
             throw new ArgumentOutOfRangeException(nameof(phase));
         var bit = (byte)(1 << (int)phase);
         _traversal.TryGetValue(entity, out var prior);
-        if ((prior & bit) != 0) return false;
+        if ((prior & bit) != 0)
+        {
+            if (phase == GraphMutationTraversal.Prepare) ValidatePreparedInputUnchanged(entity);
+            return false;
+        }
         _traversal[entity] = (byte)(prior | bit);
         return true;
     }
