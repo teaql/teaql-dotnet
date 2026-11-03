@@ -6,7 +6,7 @@ namespace TeaQL.Runtime;
 // Invocation-owned generated adapter state, never a Context or entity field.
 public sealed partial class GraphMutationSession
 {
-    private sealed class PreparedMutation(MutationRequest input)
+    internal sealed class PreparedMutation(MutationRequest input)
     {
         internal MutationRequest Input { get; } = input;
         internal EntityKey Key { get; set; } = input.LedgerKey!;
@@ -20,7 +20,8 @@ public sealed partial class GraphMutationSession
     }
     private readonly Dictionary<object, PreparedMutation> _prepared = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<EntityKey, Value> _assignedIds = new();
-    private readonly HashSet<MutationRequest> _preparedDispatch = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<MutationRequest, PreparedMutation> _preparedDispatch = new(ReferenceEqualityComparer.Instance);
+    private bool _preparedWriteAdmitted;
     private bool _preparedGraphSealed;
     internal bool IsSealedEmpty => _preparedGraphSealed && _prepared.Count == 0;
 
@@ -131,11 +132,32 @@ public sealed partial class GraphMutationSession
         var service = _service ?? throw new InvalidOperationException("GRAPH_PREPARATION_CANNOT_MUTATE");
         var request = Request(CopyRequest(prepared.Final), scope);
         prepared.Executed = true;
-        _preparedDispatch.Add(request);
+        _preparedDispatch.Add(request, prepared);
         return service.MutateAsync(request);
     }
 
-    internal bool ConsumePreparedMutation(MutationRequest request) => _preparedDispatch.Remove(request);
+    internal PreparedMutation? ConsumePreparedMutation(MutationRequest request) =>
+        _preparedDispatch.Remove(request, out var prepared) ? prepared : null;
+
+    internal void ValidatePreparedMutationForWrite(PreparedMutation prepared)
+    {
+        RequireActive();
+        if (!_preparedWriteAdmitted)
+        {
+            // The first policy callback can edit any reached node. Check the
+            // whole plan once before its first write, not once per operation.
+            ValidatePreparedGraphBeforeCommit();
+            _preparedWriteAdmitted = true;
+        }
+        else ValidatePreparedLedgerUnchanged(prepared, identitiesBound: true);
+    }
+
+    internal void ValidatePreparedGraphBeforeCommit()
+    {
+        RequireActive();
+        foreach (var prepared in _prepared.Values)
+            ValidatePreparedLedgerUnchanged(prepared, identitiesBound: true);
+    }
 
     private PreparedMutation Prepared(object entity)
     {
@@ -151,14 +173,19 @@ public sealed partial class GraphMutationSession
     private void ValidatePreparedInputUnchanged(object entity)
     {
         if (!_prepared.TryGetValue(entity, out var prepared)) return;
+        ValidatePreparedLedgerUnchanged(prepared, identitiesBound: false);
+    }
+
+    private void ValidatePreparedLedgerUnchanged(PreparedMutation prepared, bool identitiesBound)
+    {
         var ledger = prepared.Input.LedgerRoot!;
-        var key = prepared.Input.LedgerKey!;
+        var key = identitiesBound ? prepared.Key : prepared.Input.LedgerKey!;
         var current = ledger.Change(key);
         var fields = current.Keys.Concat(prepared.LedgerValues.Keys).Distinct(StringComparer.Ordinal);
         var changedField = fields.FirstOrDefault(field =>
             !current.TryGetValue(field, out var value)
             || !prepared.LedgerValues.TryGetValue(field, out var original)
-            || !LoadedScalarSnapshot.SameValue(value, original));
+            || !LoadedScalarSnapshot.SameValue(BoundField(field, value), BoundField(field, original)));
         if (changedField == null && ledger.OriginalVersion(key) == prepared.LedgerVersion
             && ledger.IsNew(key) == prepared.LedgerNew && ledger.IsDeleted(key) == prepared.LedgerDeleted) return;
         throw new CheckException(new[] {new CheckResult {
@@ -166,11 +193,21 @@ public sealed partial class GraphMutationSession
             Location = changedField == null ? ObjectLocation.Root() : ObjectLocation.Property(changedField),
             Message = "Mutation intent changed after this entity was checked; prepare a new graph save"
         }});
+
+        Value BoundField(string field, Value value)
+        {
+            if (identitiesBound && _context.Metadata?.GetEntity(key.EntityType) is { } metadata)
+                foreach (var relation in metadata.Relations)
+                    if (!relation.IsMany && relation.ForeignKeyValue == "id" && relation.LocalKeyValue == field
+                        && _assignedIds.TryGetValue(new EntityKey(relation.TargetEntity, value), out var assigned))
+                        return assigned;
+            return value;
+        }
     }
 
     private void ClearPreparedMutations()
     {
-        _prepared.Clear(); _assignedIds.Clear(); _preparedDispatch.Clear(); _traversal.Clear();
+        _prepared.Clear(); _assignedIds.Clear(); _preparedDispatch.Clear(); _traversal.Clear(); _preparedWriteAdmitted = false;
     }
 
     private static Record CopyValues(Record values) => new LoadedScalarSnapshot(values).CopyValues();

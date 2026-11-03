@@ -262,11 +262,13 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     {
         _context.ValidateGraphMutation(request, _graph);
         MutationVersionAdmission.Validate(_context, request);
-        if (_graph?.ConsumePreparedMutation(request) != true) _context.CheckAndFix(request);
+        var prepared = _graph?.ConsumePreparedMutation(request);
+        if (prepared == null) _context.CheckAndFix(request);
         MutationVersionAdmission.Validate(_context, request);
         request.InheritedIntentValues = request.InheritedIntentValues
             .Concat(LoadedPrivateValues(request, _context)).ToArray();
         using var mutationGovernance = _context.EnterMutationPolicyExecution(request);
+        if (prepared != null) _graph!.ValidatePreparedMutationForWrite(prepared);
         MutationVersionAdmission.Validate(_context, request);
         var entity = EntityName(request);
         var result = await _context.RuntimeTelemetry.ObserveAsync(

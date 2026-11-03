@@ -276,6 +276,7 @@ public class UserContext
                     session.AttachTransaction(transaction);
                 }
                 result = await work(session).ConfigureAwait(false);
+                session.ValidatePreparedGraphBeforeCommit();
                 if (transaction != null) await transaction.CommitAsync().ConfigureAwait(false);
             }
             catch

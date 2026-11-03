@@ -105,6 +105,42 @@ public class PreparedGraphMutationTests
         Assert.Empty(provider.Requests);
     }
 
+    [Theory]
+    [InlineData("review", false)]
+    [InlineData("review", true)]
+    [InlineData("provider", false)]
+    [InlineData("provider", true)]
+    public async Task LatePolicyOrProviderEditsCannotDisappearIntoACheckedCommit(string stage, bool delete)
+    {
+        var provider = new Provider(); var policy = new Policy();
+        var context = new UserContext().WithDataService(provider).WithMutationPolicyRegistry(policy);
+        var owner = new object(); var request = Insert("Probe", -1);
+        request.LedgerRoot!.Set(request.LedgerKey!, "amount", new Value.F64Value(1.0));
+        request.LedgerRoot.MarkAsNew(request.LedgerKey!);
+        void Edit()
+        {
+            var assignedKey = new EntityKey("Probe", 1);
+            if (delete) request.LedgerRoot.MarkAsDeleted(assignedKey);
+            else request.LedgerRoot.Set(assignedKey, "amount", new Value.F64Value(999));
+        }
+        if (stage == "review") policy.OnReview = Edit;
+        else provider.OnMutation = Edit;
+        var error = await Assert.ThrowsAsync<CheckException>(() => context.ExecuteGraphSaveAsync(
+            "reject late edits to a checked graph", graph => {
+                graph.PrepareInput(owner, request); graph.SealPreparedGraph(); return Task.CompletedTask;
+            }, async graph => {
+                var id = await graph.ReservePreparedIdAsync(owner);
+                request.LedgerRoot.Rekey(request.LedgerKey!, new EntityKey("Probe", checked((long)id)));
+                graph.PreflightPrepared(owner); await graph.MutatePreparedAsync(owner); return 1;
+            }));
+        Assert.Equal("mutation_changed_after_preparation", Assert.Single(error.Violations).RuleId);
+        Assert.Equal(1, provider.Begins); Assert.Equal(1, provider.Rollbacks); Assert.Equal(0, provider.Commits);
+        Assert.Equal(stage == "review" ? 0 : 1, provider.Requests.Count);
+        var pending = new EntityKey("Probe", 1);
+        if (delete) Assert.True(request.LedgerRoot.IsDeleted(pending));
+        else Assert.Equal(999, request.LedgerRoot.Change(pending)["amount"].TryF64());
+    }
+
     [Fact]
     public async Task ResolvesTypedTemporaryIdentitiesAndOnlyModeledReferenceFields()
     {
@@ -117,12 +153,17 @@ public class PreparedGraphMutationTests
         var rootRequest = Insert("Parent", -1);
         rootRequest.Command.Values["quantity"] = new Value.I64Value(-1);
         var childRequest = Insert("Child", -1); childRequest.Command.Values["parent_id"] = new Value.I64Value(-1);
+        rootRequest.LedgerRoot!.Set(rootRequest.LedgerKey!, "quantity", new Value.I64Value(-1));
+        childRequest.LedgerRoot!.Set(childRequest.LedgerKey!, "parent_id", new Value.I64Value(-1));
         await context.ExecuteGraphSaveAsync("save typed equal numeric identities", graph => {
             graph.PrepareInput(parent, rootRequest); graph.PrepareInput(child, childRequest);
             return Task.CompletedTask;
         }, async graph => {
             Assert.Equal(1UL, await graph.ReservePreparedIdAsync(parent));
             Assert.Equal(1UL, await graph.ReservePreparedIdAsync(child));
+            rootRequest.LedgerRoot.Rekey(rootRequest.LedgerKey!, new EntityKey("Parent", 1));
+            childRequest.LedgerRoot.Rekey(childRequest.LedgerKey!, new EntityKey("Child", 1));
+            childRequest.LedgerRoot.Set(new EntityKey("Child", 1), "parent_id", new Value.I64Value(1));
             graph.PreflightPrepared(parent);
             Assert.Equal("GRAPH_PREFLIGHT_INCOMPLETE", (await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 graph.MutatePreparedAsync(parent))).Message);
@@ -203,17 +244,21 @@ public class PreparedGraphMutationTests
     {
         public MutationPolicyIdentity Identity {get;} = new("fixture", "1", "frozen-v1");
         public List<MutationPlan> Plans {get;} = [];
+        public Action? OnReview;
         public IMutationPolicy? Resolve(string requestKey) => this;
-        public MutationDecision Review(UserContext context, MutationPlan plan) {Plans.Add(plan); return MutationDecision.Allowed();}
+        public MutationDecision Review(UserContext context, MutationPlan plan) {Plans.Add(plan); OnReview?.Invoke(); return MutationDecision.Allowed();}
     }
     private sealed class Provider : IDataService, ITransactionExecutor
     {
         public int Begins {get; private set;}
+        public int Commits {get; private set;}
+        public int Rollbacks {get; private set;}
+        public Action? OnMutation;
         public List<MutationRequest> Requests {get;} = [];
         private readonly Dictionary<string, ulong> _ids = new();
         public DataServiceCapabilities Capabilities => new() {Mutation = true, Transaction = true};
         public Task<QueryResult> QueryAsync(QueryRequest request) => throw new Exception("unexpected query");
-        public Task<MutationResult> MutateAsync(MutationRequest request) {Requests.Add(request); return Task.FromResult(new MutationResult {AffectedRows = 1});}
+        public Task<MutationResult> MutateAsync(MutationRequest request) {Requests.Add(request); OnMutation?.Invoke(); return Task.FromResult(new MutationResult {AffectedRows = 1});}
         public Task<ITransaction> BeginTransactionAsync() {Begins++; return Task.FromResult<ITransaction>(new Transaction(this));}
         private sealed class Transaction(Provider owner) : ITransaction, IInternalIdAllocator
         {
@@ -222,8 +267,8 @@ public class PreparedGraphMutationTests
             public Task<MutationResult> MutateAsync(MutationRequest request) => owner.MutateAsync(request);
             public Task<ulong> NextIdAsync(string entity) {owner._ids.TryGetValue(entity, out var id); owner._ids[entity] = ++id; return Task.FromResult(id);}
             public Task EnsureIdFloorAsync(string entity, ulong floor) => Task.CompletedTask;
-            public Task CommitAsync() => Task.CompletedTask;
-            public Task RollbackAsync() => Task.CompletedTask;
+            public Task CommitAsync() {owner.Commits++; return Task.CompletedTask;}
+            public Task RollbackAsync() {owner.Rollbacks++; return Task.CompletedTask;}
             public void Dispose() { }
         }
     }
