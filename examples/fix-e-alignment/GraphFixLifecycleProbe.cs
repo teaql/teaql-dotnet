@@ -52,7 +52,7 @@ static class GraphFixLifecycleProbe
             var row = new { @case = name, round, passed = passed && once && clock.Calls == 1,
                 clockCalls = clock.Calls, instantMillis = clock.Base.ToUnixTimeMilliseconds(), visits = visits.ToArray(),
                 effects, auditCalls = audit.Calls, policyCalls = policy.Calls,
-                error = failure?.GetType().Name, rules = failure is CheckException error
+                error = failure?.GetType().Name, cause = failure?.GetBaseException().GetType().Name, rules = failure is CheckException error
                     ? error.Violations.Select(v => new { rule = v.RuleId, path = v.ModelPath }).ToArray() : null };
             Console.WriteLine("DOTNET_GRAPH_LIFECYCLE_CASE=" + JsonSerializer.Serialize(row, Json));
             Require(row.passed, "Graph lifecycle case failed: " + name); emitted++;
@@ -116,7 +116,8 @@ static class GraphFixLifecycleProbe
             var error = await Failed(graph.Parent); effects = transport.Counts(); transport.AfterChildInsert = null;
             Emit(cancelled ? "provider-cancellation" : "provider-write-failure", effects is { ParentWrites: 1, ChildWrites: 1, Begins: 1, Commits: 0, Rollbacks: 1 }
                 && graph.Parent.Id is null && graph.Child.Id is null && audit.Calls == 0
-                && (cancelled ? error is OperationCanceledException : error is InjectedWriteFailure), effects, 2, error);
+                && (cancelled ? error is OperationCanceledException
+                    : error is SqlExecutorException { InnerException: InjectedWriteFailure }), effects, 2, error);
             var absent = await Q.OrderItems().WithProductNameIs((cancelled ? "cancel-retry" : "provider-retry") + "-" + round)
                 .Limit(1).Comment("Confirm a failed graph left no persisted child")
                 .Purpose("Independently verify real SQLite rollback").ExecuteForListAsync(context);
