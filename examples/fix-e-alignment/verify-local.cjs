@@ -33,6 +33,7 @@ try {
   report.unchangedViewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'UnchangedViewsProbe.cs')));
   report.checkerBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CheckerBoundaryProbe.cs')));
   report.graphFixLifecycleApplicationSha256 = sha(fs.readFileSync(path.join(example, 'GraphFixLifecycleProbe.cs')));
+  report.concurrentQueryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ConcurrentQueryProbe.cs')));
   const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
   fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
   for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
@@ -91,6 +92,11 @@ try {
     const graphResult = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_GRAPH_LIFECYCLE_RESULT='))
       .map(line => JSON.parse(line.slice('DOTNET_GRAPH_LIFECYCLE_RESULT='.length)));
     assert.equal(graphResult.length, 1); assert(graphResult[0].passed && graphResult[0].round === round && graphResult[0].cases === 12);
+    const concurrency = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_CONCURRENT_QUERY='))
+      .map(line => JSON.parse(line.slice('DOTNET_CONCURRENT_QUERY='.length)));
+    assert.equal(concurrency.length, 1); assert(concurrency[0].passed && concurrency[0].observation.round === round);
+    assert(concurrency[0].observation.bothLive && concurrency[0].observation.sameContext && concurrency[0].observation.distinctRoots);
+    assert.equal(concurrency[0].observation.physicalQueries, 6); assert.equal(concurrency[0].observation.providerRootCalls, 3);
     assert.deepEqual(fingerprint(), m);
   }
   report.databaseSha256 = sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite'))); report.passed = true;
@@ -108,6 +114,8 @@ try {
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.checker-boundaries.sqlite')))};
   report.graphFixLifecycleDatabase = {file: 'fixture.sqlite.graph-fix-lifecycle.sqlite',
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.graph-fix-lifecycle.sqlite')))};
+  report.concurrentQueryDatabase = {file: 'fixture.sqlite.concurrent-query.sqlite',
+    sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.concurrent-query.sqlite')))};
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
 } catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {
