@@ -37,7 +37,7 @@ static class ConcurrentQueryProbe
         Require(previous is 0 or 2, "Unexpected concurrent-query round boundary");
         var round = previous / 2 + 1;
         sink.Clear(); transport.Reset();
-        var ids = new Dictionary<string, ulong>(); var childIds = new Dictionary<string, ulong>();
+        var ids = new Dictionary<string, long>(); var childIds = new Dictionary<string, long>();
         foreach (var label in new[] { "alpha", "beta" })
         {
             var parent = Q.PurchaseOrders().Comment("Prepare the " + label + " query fixture")
@@ -59,7 +59,7 @@ static class ConcurrentQueryProbe
         using var overlapping = new OverlappingService(service);
         context.WithDataService(overlapping);
         var contexts = new ConcurrentQueue<UserContext>();
-        async Task<PurchaseOrder> Load(string label, ulong id, UserContext supplied)
+        async Task<PurchaseOrder> Load(string label, long id, UserContext supplied)
         {
             contexts.Enqueue(supplied);
             return (await Q.PurchaseOrders().WithIdIs(id)
