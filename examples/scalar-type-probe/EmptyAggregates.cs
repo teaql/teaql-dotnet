@@ -87,7 +87,7 @@ internal static class EmptyAggregates
             foreach (var includeAll in new[] { true, false })
             {
                 var facet = Q.ScalarTypeProbesWithMinimalFields().FilterByTypePlatformIn(bucketIds.Select(id => (object)id).ToArray())
-                    .FacetByTypePlatformAs("buckets", Q.TypePlatformsWithMinimalFields().WithIdIn(bucketIds.Select(id => (object)id).ToArray()).SelectName()
+                    .FacetByTypePlatformAs("buckets", Q.TypePlatformsWithMinimalFields().WithIdIn(bucketIds.ToArray()).SelectName()
                         .CountAs("rows").SumOptionalIntegerOfScalarTypeProbesAs("total", Contributions()).OrderByIdAscending().Limit(10)
                         .Comment("load facet candidate buckets"), includeAll)
                     .OrderByIdAscending().Limit(1).Comment("inspect EA-06 complete membership behind one visible row");
