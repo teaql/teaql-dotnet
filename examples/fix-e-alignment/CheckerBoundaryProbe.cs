@@ -18,6 +18,13 @@ using Record = TeaQL.Core.Record;
 // replaces model constraints with application-written validation.
 static class CheckerBoundaryProbe
 {
+    private sealed class SchemaFreeIdentityAllocator : IInternalIdAllocator
+    {
+        private ulong level;
+        public Task<ulong> NextIdAsync(string entity) => Task.FromResult(++level);
+        public Task EnsureIdFloorAsync(string entity, ulong floor)
+        { level = Math.Max(level, floor); return Task.CompletedTask; }
+    }
     static readonly JsonSerializerOptions Json = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
     static string Profile(JsonFieldNamingProfile profile) => profile switch {
@@ -56,9 +63,9 @@ static class CheckerBoundaryProbe
         Effects Counts() => new(transport.Statements, transport.Begins, transport.ParentInserts, transport.ChildInserts,
             state.CheckerCalls, state.Mapped, state.Saves, state.Policies, audit.Calls);
         void Reset() { transport.Reset(); state.ResetCounts(); audit.Calls = 0; }
-        PurchaseOrder Parent(UserContext ctx) => (await Q.PurchaseOrders().Comment("Prepare a bounded Checker fixture")
+        async Task<PurchaseOrder> ParentAsync(UserContext ctx) => (await Q.PurchaseOrders().Comment("Prepare a bounded Checker fixture")
             .Purpose("Verify generated graph admission before persistence").NewEntityAsync(ctx));
-        OrderItem Child(UserContext ctx, string? name = "Boundary item")
+        async Task<OrderItem> ChildAsync(UserContext ctx, string? name = "Boundary item")
         {
             var row = (await Q.OrderItems().Comment("Prepare a real child constraint")
                 .Purpose("Keep business writes in generated mutation APIs").NewEntityAsync(ctx));
@@ -80,8 +87,11 @@ static class CheckerBoundaryProbe
         // calls EnsureSchema. Installation alone must provide generated checks.
         await using (var empty = new SqliteConnection("Data Source=:memory:"))
         {
-            await empty.OpenAsync(); var observed = new Transport(new SqliteTransport(empty)); var isolated = Context(observed);
-            var row = Parent(isolated); Reset(); observed.Reset();
+            await empty.OpenAsync(); var observed = new Transport(new SqliteTransport(empty));
+            // Creation reserves an ID before returning; this schema-free probe
+            // deliberately selects a memory allocator, not an uninitialized SQL ID space.
+            var isolated = Context(observed).WithInternalIdAllocator(new SchemaFreeIdentityAllocator());
+            var row = (await ParentAsync(isolated)); Reset(); observed.Reset();
             try { await row.AuditAs("Reject invalid input without schema initialization").SaveAsync(isolated);
                 throw new InvalidOperationException("Schema-free Checker did not reject"); }
             catch (CheckException error)
@@ -95,7 +105,7 @@ static class CheckerBoundaryProbe
             Emit("module-checker-without-schema", new { schemaCalled = false, tablesCreated = false, checkerCalls = state.CheckerCalls, zeroProviderIO = true });
         }
 
-        var parent = Parent(context); parent.UpdateContactPhone("5550100"); var child = Child(context); parent.OrderItemList.Add(child);
+        var parent = (await ParentAsync(context)); parent.UpdateContactPhone("5550100"); var child = (await ChildAsync(context)); parent.OrderItemList.Add(child);
         Reset(); await parent.AuditAs("Calibrate exactly-once graph persistence").SaveAsync(context); var calibration = Counts();
         Require(calibration.parentInserts == 1 && calibration.childInserts == 1 && calibration.transactions == 1
             && calibration.audits == 2 && calibration.checkers > 0 && calibration.policies > 0, "Positive observers were not calibrated");
@@ -103,7 +113,7 @@ static class CheckerBoundaryProbe
         var childId = child.Id ?? throw new InvalidOperationException("No child ID");
         Emit("exact-provider-calibration", new { parentId, childId, effects = calibration });
 
-        var missingRelation = Child(context);
+        var missingRelation = (await ChildAsync(context));
         var relationError = await Reject("required-relation", async () => {
             await missingRelation.AuditAs("Reject a missing required parent reference").SaveAsync(context);
         }, "required", "purchase_order");
@@ -140,7 +150,7 @@ static class CheckerBoundaryProbe
         Emit("unmodified-partial-ancestor", new { parentId, childVersion = E.PurchaseOrder(completeRoot.PurchaseOrderList.Single()).Version().Eval(),
             rootVersion = E.Tenant(completeRoot).Version().Eval(), effects = Counts() });
 
-        var invalidParent = Parent(context); invalidParent.UpdateContactPhone("5550100"); var invalidChild = Child(context);
+        var invalidParent = (await ParentAsync(context)); invalidParent.UpdateContactPhone("5550100"); var invalidChild = (await ChildAsync(context));
         invalidParent.OrderItemList.Add(invalidChild); state.FixMode = "reject";
         var fixError = await Reject("post-fix-rejection", async () => {
             await invalidParent.AuditAs("Reject a range violation introduced by customer Fix").SaveAsync(context);
@@ -150,7 +160,7 @@ static class CheckerBoundaryProbe
         Require(E.OrderItem(invalidChild).UnitPrice().Eval() == 10.00m, "Rejected Fix destroyed pending input");
         Emit("post-fix-rejection", new { originalPrice = "10.00", fixedPrice = "0", originalInputRetained = true, zeroProviderIO = true });
 
-        var fixedParent = Parent(context); fixedParent.UpdateContactPhone("5550100"); var fixedChild = Child(context, null);
+        var fixedParent = (await ParentAsync(context)); fixedParent.UpdateContactPhone("5550100"); var fixedChild = (await ChildAsync(context, null));
         fixedParent.OrderItemList.Add(fixedChild); state.FixMode = "repair"; Reset();
         await fixedParent.AuditAs("Allow customer Fix to supply required and exact Decimal values").SaveAsync(context);
         var fixedEffects = Counts(); state.FixMode = null;
@@ -176,7 +186,7 @@ static class CheckerBoundaryProbe
                     .ToDictionary(p => p.Name, p => (object?)p.Value.Clone());
                 var normalized = WireFields.Normalize(input, metadata, "/payload~1order"); state.Mapped++;
                 var value = (JsonElement)normalized.Values["contact_phone"]!;
-                var row = Parent(context); row.UpdateContactPhone(value.ValueKind == JsonValueKind.Null ? null! : value.GetString()!); state.Saves++;
+                var row = (await ParentAsync(context)); row.UpdateContactPhone(value.ValueKind == JsonValueKind.Null ? null! : value.GetString()!); state.Saves++;
                 try { await row.AuditAs("Save a normalized object-local JSON request").SaveAsync(context); }
                 catch (CheckException error) { throw new SubmittedViolation(error, normalized); }
                 return (row, normalized);

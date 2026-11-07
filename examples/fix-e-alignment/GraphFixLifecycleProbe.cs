@@ -57,7 +57,7 @@ static class GraphFixLifecycleProbe
             Console.WriteLine("DOTNET_GRAPH_LIFECYCLE_CASE=" + JsonSerializer.Serialize(row, Json));
             Require(row.passed, "Graph lifecycle case failed: " + name); emitted++;
         }
-        (PurchaseOrder Parent, OrderItem Child) NewGraph(string label, bool valid = true)
+        async Task<(PurchaseOrder Parent, OrderItem Child)> NewGraphAsync(string label, bool valid = true)
         {
             var parent = (await Q.PurchaseOrders().Comment("Prepare a graph lifecycle parent")
                 .Purpose("Verify generated graph save boundaries").NewEntityAsync(context));
@@ -87,7 +87,7 @@ static class GraphFixLifecycleProbe
             throw new InvalidOperationException("The controlled failure unexpectedly committed");
         }
 
-        var primary = NewGraph("customer-fix"); Begin();
+        var primary = (await NewGraphAsync("customer-fix")); Begin();
         await primary.Parent.AuditAs("Create a graph with a repeated child reference").SaveAsync(context);
         var effects = transport.Counts();
         Emit("customer-fix-create-duplicate", effects is { ParentWrites: 1, ChildWrites: 1, Begins: 1, Commits: 1, Rollbacks: 0 }
@@ -110,7 +110,7 @@ static class GraphFixLifecycleProbe
 
         foreach (var cancelled in new[] { false, true })
         {
-            var graph = NewGraph(cancelled ? "cancel-retry" : "provider-retry"); Begin();
+            var graph = (await NewGraphAsync(cancelled ? "cancel-retry" : "provider-retry")); Begin();
             transport.AfterChildInsert = cancelled ? () => throw new OperationCanceledException(new CancellationToken(true))
                 : () => throw new InjectedWriteFailure();
             var error = await Failed(graph.Parent); effects = transport.Counts(); transport.AfterChildInsert = null;
@@ -128,7 +128,7 @@ static class GraphFixLifecycleProbe
             await Check(graph.Parent, 10.01m, 1, 1);
         }
 
-        var invalid = NewGraph("missing-input", false); Begin(); var missing = await Failed(invalid.Parent); effects = transport.Counts();
+        var invalid = (await NewGraphAsync("missing-input", false)); Begin(); var missing = await Failed(invalid.Parent); effects = transport.Counts();
         Emit("missing-child-input-before-io", effects.IsZero && missing is CheckException
             && invalid.Parent.Id is null && invalid.Child.Id is null && audit.Calls == 0 && policy.Calls == 0, effects, 2, missing);
         invalid.Child.UpdateProductName("repaired-input-" + round); Begin();
@@ -138,7 +138,7 @@ static class GraphFixLifecycleProbe
 
         var root = (await Q.Tenants().WithIdIs(1).Limit(1).Comment("Load the root for a conflicting-parent graph")
             .Purpose("Reject mutation changes after one child has been checked").ExecuteForListAsync(context)).Single();
-        var a = NewGraph("conflicting-parent"); var b = NewGraph("unused-child"); b.Parent.OrderItemList.Clear();
+        var a = (await NewGraphAsync("conflicting-parent")); var b = (await NewGraphAsync("unused-child")); b.Parent.OrderItemList.Clear();
         b.Parent.OrderItemList.Add(a.Child); root.PurchaseOrderList.Add(a.Parent); root.PurchaseOrderList.Add(b.Parent);
         Begin(); Exception? conflict = null;
         try { await root.AuditAs("Reject a child rebound after its first preparation").SaveAsync(context); }

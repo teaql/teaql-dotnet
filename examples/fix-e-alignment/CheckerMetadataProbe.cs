@@ -28,9 +28,9 @@ static class CheckerMetadataProbe
             .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(), transport, new ModuleSchemaProvider(runtimeModule)))
             .WithAppAuditEventSink(audit);
         var context = Context(module);
-        PurchaseOrder Parent(UserContext ctx) => (await Q.PurchaseOrders().Comment("Prepare synthetic Checker metadata")
+        async Task<PurchaseOrder> ParentAsync(UserContext ctx) => (await Q.PurchaseOrders().Comment("Prepare synthetic Checker metadata")
             .Purpose("Verify model checks precede all database work").NewEntityAsync(ctx));
-        OrderItem Child(UserContext ctx, string? name, decimal price)
+        async Task<OrderItem> ChildAsync(UserContext ctx, string? name, decimal price)
         {
             var child = (await Q.OrderItems().Comment("Prepare a synthetic child constraint")
                 .Purpose("Verify indexed graph diagnostics").NewEntityAsync(ctx));
@@ -38,7 +38,7 @@ static class CheckerMetadataProbe
             child.UpdateUnitPrice(price);
             return child;
         }
-        var calibrated = Parent(context); calibrated.UpdateContactPhone("5550970");
+        var calibrated = (await ParentAsync(context)); calibrated.UpdateContactPhone("5550970");
         transport.Reset(); audit.Calls = 0;
         calibrated = await calibrated.AuditAs("Calibrate the successful generated save").SaveAsync(context);
         Require(transport.Statements > 0 && transport.Begins > 0 && audit.Calls == 1,
@@ -93,8 +93,8 @@ static class CheckerMetadataProbe
                 physicalStateUnchanged = true, wires });
         }
 
-        await Reject("required-parent", context, Parent(context), "required", "contact_phone", "PurchaseOrder");
-        var longPhone = Parent(context); longPhone.UpdateContactPhone(new string('7', 33));
+        await Reject("required-parent", context, (await ParentAsync(context)), "required", "contact_phone", "PurchaseOrder");
+        var longPhone = (await ParentAsync(context)); longPhone.UpdateContactPhone(new string('7', 33));
         await Reject("length-parent", context, longPhone, "max_length", "contact_phone", "PurchaseOrder", 32);
         var rows = await Q.PurchaseOrders().WithIdIs(id).Limit(1).Comment("Load a complete update target")
             .Purpose("Verify explicit null fails before SQL").ExecuteForListAsync(context);
@@ -116,26 +116,26 @@ static class CheckerMetadataProbe
             ("exact-above-maximum", "synthetic", 1000000.000000000000000001m, "max", "unit_price", 1000000m)
         })
         {
-            var owner = Parent(context); owner.UpdateContactPhone("5550972");
-            owner.OrderItemList.Add(Child(context, "valid preceding item", 10m));
-            owner.OrderItemList.Add(Child(context, item.Product, item.Price));
+            var owner = (await ParentAsync(context)); owner.UpdateContactPhone("5550972");
+            owner.OrderItemList.Add((await ChildAsync(context, "valid preceding item", 10m)));
+            owner.OrderItemList.Add((await ChildAsync(context, item.Product, item.Price)));
             await Reject(item.Name, context, owner, item.Rule, "order_item_list[1]." + item.Field, "OrderItem", item.Bound);
         }
-        await Reject("localized-required", context.SetLocaleCode("zh-CN"), Parent(context),
+        await Reject("localized-required", context.SetLocaleCode("zh-CN"), (await ParentAsync(context)),
             "required", "contact_phone", "PurchaseOrder");
         context.SetLocaleCode("en");
 
         var specialContext = Context(module.And(new RuntimeModule().Checker("OrderItem", new SpecializedChecker())));
-        var special = Parent(specialContext); special.UpdateContactPhone("5550973");
-        special.OrderItemList.Add(Child(specialContext, "valid preceding item", 10m));
-        special.OrderItemList.Add(Child(specialContext, "specialized synthetic item", 10m));
+        var special = (await ParentAsync(specialContext)); special.UpdateContactPhone("5550973");
+        special.OrderItemList.Add((await ChildAsync(specialContext, "valid preceding item", 10m)));
+        special.OrderItemList.Add((await ChildAsync(specialContext, "specialized synthetic item", 10m)));
         await Reject("custom-specialized-child", specialContext, special, "max_length",
             "order_item_list[1].product_name", "ReviewedOrderItem", 80, specialized: true);
 
         var endpoints = new List<string>();
         foreach (var price in new[] { 0.01m, 1000000m })
         {
-            var child = Child(context, "inclusive endpoint", price); child.UpdatePurchaseOrderId(id);
+            var child = (await ChildAsync(context, "inclusive endpoint", price)); child.UpdatePurchaseOrderId(id);
             transport.Reset(); audit.Calls = 0;
             var saved = await child.AuditAs("Accept the exact inclusive modeled endpoint").SaveAsync(context);
             Require(E.OrderItem(saved).UnitPrice().Eval() == price && transport.Statements > 0
