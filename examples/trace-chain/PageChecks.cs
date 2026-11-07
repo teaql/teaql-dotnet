@@ -29,10 +29,10 @@ static class PageChecks
         var originals = new List<CustomerOrder>();
         for (var i = 0; i < 4; i++)
         {
-            var root = Q.CustomerOrders().Comment("prepare page graph").Purpose("verify page ownership").NewEntity(context)
+            var root = (await Q.CustomerOrders().Comment("prepare page graph").Purpose("verify page ownership").NewEntityAsync(context))
                 .UpdatePlatformId(1).UpdateOrderNumber(prefix + "-" + i).UpdateDescription("original");
-            root.OrderItemList.Add(Q.OrderItems().Comment("prepare page child").Purpose("verify child ownership")
-                .NewEntity(context).UpdateName(secret));
+            root.OrderItemList.Add((await Q.OrderItems().Comment("prepare page child").Purpose("verify child ownership")
+                .NewEntityAsync(context)).UpdateName(secret));
             await root.AuditAs("seed page graph").SaveAsync(context);
             originals.Add(root);
         }

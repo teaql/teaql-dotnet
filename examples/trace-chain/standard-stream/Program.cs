@@ -18,10 +18,10 @@ try
     await context.EnsureSchemaAsync(); var first = audits.Count;
     await context.EnsureSchemaAsync(); Require(first is 0 or 1 && audits.Count == first, "audited idempotent bootstrap");
     var secret = "STREAM-PRIVATE-" + Guid.NewGuid().ToString("N");
-    var parent = Q.CustomerOrders().Comment("prepare standard stream parent").Purpose("own bounded stream rows")
-        .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber(secret).UpdateDescription("stream fixture");
-    for (var index = 0; index < 3; index++) parent.OrderItemList.Add(Q.OrderItems().Comment("prepare standard streamed entity")
-        .Purpose("seed bounded stream rows").NewEntity(context).UpdateName(secret));
+    var parent = (await Q.CustomerOrders().Comment("prepare standard stream parent").Purpose("own bounded stream rows")
+        .NewEntityAsync(context)).UpdatePlatformId(1).UpdateOrderNumber(secret).UpdateDescription("stream fixture");
+    for (var index = 0; index < 3; index++) parent.OrderItemList.Add((await Q.OrderItems().Comment("prepare standard streamed entity")
+        .Purpose("seed bounded stream rows").NewEntityAsync(context)).UpdateName(secret));
     await parent.AuditAs("seed standard stream graph").SaveAsync(context);
     _ = Q.OrderItems().WithNameIs(secret).Limit(3).Comment("unpolled standard stream")
         .Purpose("verify lazy standard stream").ExecuteForStreamAsync(context, chunkSize: 2);

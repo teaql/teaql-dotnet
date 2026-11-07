@@ -14,10 +14,10 @@ static class LoadedPrivacyRollbackChecks
         var alphabetic = string.Concat(nonce.Select(c => (char)('A' + Convert.ToInt32(c.ToString(), 16))));
         var oldValue = "PRIVATE-ROLLBACK-OLD-" + alphabetic;
         var nextValue = "PRIVATE-ROLLBACK-NEW-" + alphabetic;
-        var root = Q.CustomerOrders().Comment("prepare rollback privacy graph").Purpose("exercise generated rollback and retry")
-            .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber("rollback-" + nonce).UpdateDescription("before retry");
-        var child = Q.OrderItems().Comment("prepare rollback private child").Purpose("persist an original private value")
-            .NewEntity(context).UpdateName(oldValue);
+        var root = (await Q.CustomerOrders().Comment("prepare rollback privacy graph").Purpose("exercise generated rollback and retry")
+            .NewEntityAsync(context)).UpdatePlatformId(1).UpdateOrderNumber("rollback-" + nonce).UpdateDescription("before retry");
+        var child = (await Q.OrderItems().Comment("prepare rollback private child").Purpose("persist an original private value")
+            .NewEntityAsync(context)).UpdateName(oldValue);
         root.OrderItemList.Add(child);
         await root.AuditAs("seed rollback privacy graph").SaveAsync(context);
         var rootId = E.CustomerOrder(root).Id().Eval()!.Value;

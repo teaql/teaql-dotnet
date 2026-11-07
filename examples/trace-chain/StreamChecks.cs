@@ -30,10 +30,10 @@ static class StreamChecks
     {
         var nonce=Guid.NewGuid().ToString("N");
         var secret="STREAM-GENERATED-PRIVATE-"+nonce;
-        var parent=Q.CustomerOrders().Comment("prepare stream parent").Purpose("own test items").NewEntity(context)
+        var parent=(await Q.CustomerOrders().Comment("prepare stream parent").Purpose("own test items").NewEntityAsync(context))
             .UpdatePlatformId(1).UpdateOrderNumber("stream-"+nonce).UpdateDescription("stream fixture");
-        for(var i=0;i<8;i++) parent.OrderItemList.Add(Q.OrderItems().Comment("prepare streamed entity")
-            .Purpose("verify independent stream mutation").NewEntity(context).UpdateName(secret));
+        for(var i=0;i<8;i++) parent.OrderItemList.Add((await Q.OrderItems().Comment("prepare streamed entity")
+            .Purpose("verify independent stream mutation").NewEntityAsync(context)).UpdateName(secret));
         await parent.AuditAs("seed stream graph").SaveAsync(context);
         var ids=parent.OrderItemList.Select(item=>E.OrderItem(item).Id().Eval()!.Value).Order().ToArray();
         var policy=new Scope(ids[4]);

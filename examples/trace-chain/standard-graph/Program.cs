@@ -23,9 +23,9 @@ try
     Require(firstSeedAudits is 0 or 1, "first audited platform seed");
     await context.EnsureSchemaAsync(); Require(audit.Count == firstSeedAudits, "repeated seed is idempotent");
     var secret = "GRAPH-PRIVATE-" + Guid.NewGuid().ToString("N");
-    var order = NewOrder(secret + "-simple");
-    var payment = NewPayment(secret + "-payment").AuditAs("authorize standard payment");
-    var attempt = NewAttempt(secret + "-attempt");
+    var order = (await NewOrderAsync(secret + "-simple"));
+    var payment = (await NewPaymentAsync(secret + "-payment")).AuditAs("authorize standard payment");
+    var attempt = (await NewAttemptAsync(secret + "-attempt"));
     payment.PaymentAttemptList.Add(attempt); order.PaymentList.Add(payment);
     await order.AuditAs("submit standard graph").SaveAsync(context);
     Require(audit.Count == firstSeedAudits + 3, "three independently committed audit records");
@@ -45,10 +45,10 @@ try
     Require(E.Platform(loadedPlatform).Name().Eval() == "Trace Chain Verification", "four-level typed graph");
 
     // A separate graph covers update, deletion, new children and local reasons.
-    var mixed = NewOrder(secret + "-mixed");
-    mixed.OrderItemList.Add(NewItem(secret + "-available"));
-    mixed.OrderItemList.Add(NewItem(secret + "-unavailable"));
-    mixed.PaymentList.Add(NewPayment(secret + "-prepared"));
+    var mixed = (await NewOrderAsync(secret + "-mixed"));
+    mixed.OrderItemList.Add((await NewItemAsync(secret + "-available")));
+    mixed.OrderItemList.Add((await NewItemAsync(secret + "-unavailable")));
+    mixed.PaymentList.Add((await NewPaymentAsync(secret + "-prepared")));
     await mixed.AuditAs("prepare standard mixed graph").SaveAsync(context);
     var rootOnly = await Q.CustomerOrders().WithIdIs(E.CustomerOrder(mixed).Id().Eval()!.Value).Limit(1)
         .Comment("load independent standard root revision").Purpose("distinguish typed optimistic versions")
@@ -70,8 +70,8 @@ try
     current.UpdateDescription("Submitted detail"); ordinaryItem.UpdateName(secret + "-fulfilled");
     removed.MarkForDeletion().AuditAs("remove standard unavailable item");
     currentPayment.UpdateReferenceCode(secret + "-authorized").AuditAs("authorize standard mixed payment");
-    currentPayment.PaymentAttemptList.Add(NewAttempt(secret + "-mixed-attempt"));
-    current.ShipmentList.Add(NewShipment(secret + "-shipment").AuditAs("dispatch standard shipment"));
+    currentPayment.PaymentAttemptList.Add((await NewAttemptAsync(secret + "-mixed-attempt")));
+    current.ShipmentList.Add((await NewShipmentAsync(secret + "-shipment")).AuditAs("dispatch standard shipment"));
     var beforeMixed = audit.Count;
     await current.AuditAs("submit standard mixed graph").SaveAsync(context);
     Require(audit.Count == beforeMixed + 6, "six mixed mutations have committed audit");
@@ -123,8 +123,8 @@ try
         var lateRows = await Q.CustomerOrdersWithMinimalFields().WithIdIs(id).SelectOrderNumber().Limit(1)
             .Comment("load order after telemetry shutdown").Purpose("verify business continuity").ExecuteForListAsync(context);
         Require(lateRows.Count == 1 && E.CustomerOrder(lateRows[0]).OrderNumber().Eval() == secret + "-mixed", "late typed Q/E");
-        var lateOrder = NewOrder(secret + "-after-shutdown");
-        lateOrder.PaymentList.Add(NewPayment(secret + "-late-payment").AuditAs("authorize payment after telemetry shutdown"));
+        var lateOrder = (await NewOrderAsync(secret + "-after-shutdown"));
+        lateOrder.PaymentList.Add((await NewPaymentAsync(secret + "-late-payment")).AuditAs("authorize payment after telemetry shutdown"));
         await lateOrder.AuditAs("save after telemetry shutdown").SaveAsync(context);
         Require(audit.Count == firstSeedAudits + 16 && ordinary.Count == 0, "late audit independent of telemetry");
         Console.WriteLine("DOTNET_POST_SHUTDOWN_READ " + System.Text.Json.JsonSerializer.Serialize(new {
@@ -140,16 +140,16 @@ if (context.RuntimeTelemetry is StandardTelemetry finalPipeline)
         finalPipeline.ExportQueues, finalPipeline.QueueLosses, finalPipeline.ExportResources
     }));
 
-CustomerOrder NewOrder(string number) => Q.CustomerOrders().Comment("prepare standard order").Purpose("compose standard graph")
-    .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber(number).UpdateDescription("Draft detail");
-OrderItem NewItem(string name) => Q.OrderItems().Comment("prepare standard item").Purpose("compose standard graph")
-    .NewEntity(context).UpdateName(name);
-Payment NewPayment(string code) => Q.Payments().Comment("prepare standard payment").Purpose("compose standard graph")
-    .NewEntity(context).UpdateReferenceCode(code);
-PaymentAttempt NewAttempt(string code) => Q.PaymentAttempts().Comment("prepare standard attempt").Purpose("compose standard graph")
-    .NewEntity(context).UpdateReferenceCode(code);
-Shipment NewShipment(string code) => Q.Shipments().Comment("prepare standard shipment").Purpose("compose standard graph")
-    .NewEntity(context).UpdateReferenceCode(code);
+async Task<CustomerOrder> NewOrderAsync(string number) => (await Q.CustomerOrders().Comment("prepare standard order").Purpose("compose standard graph")
+    .NewEntityAsync(context)).UpdatePlatformId(1).UpdateOrderNumber(number).UpdateDescription("Draft detail");
+async Task<OrderItem> NewItemAsync(string name) => (await Q.OrderItems().Comment("prepare standard item").Purpose("compose standard graph")
+    .NewEntityAsync(context)).UpdateName(name);
+async Task<Payment> NewPaymentAsync(string code) => (await Q.Payments().Comment("prepare standard payment").Purpose("compose standard graph")
+    .NewEntityAsync(context)).UpdateReferenceCode(code);
+async Task<PaymentAttempt> NewAttemptAsync(string code) => (await Q.PaymentAttempts().Comment("prepare standard attempt").Purpose("compose standard graph")
+    .NewEntityAsync(context)).UpdateReferenceCode(code);
+async Task<Shipment> NewShipmentAsync(string code) => (await Q.Shipments().Comment("prepare standard shipment").Purpose("compose standard graph")
+    .NewEntityAsync(context)).UpdateReferenceCode(code);
 static void Require(bool condition, string reason) { if (!condition) throw new InvalidOperationException(reason); }
 sealed class Audits : IAppAuditEventSink
 {

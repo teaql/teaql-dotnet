@@ -25,13 +25,13 @@ static class CheckerOverlapChecks
         .GetField("_entityRoot", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(entity)
         ?? throw new Exception("Generated entity omitted its runtime-owned ledger"));
 
-    private static CustomerOrder NewOrder(UserContext context, string label) => Q.CustomerOrders()
+    private static async Task<CustomerOrder> NewOrderAsync(UserContext context, string label) => (await Q.CustomerOrders()
         .Comment("initialize checker overlap root").Purpose("exercise installed generated checker")
-        .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber(label).UpdateDescription("original " + label);
+        .NewEntityAsync(context)).UpdatePlatformId(1).UpdateOrderNumber(label).UpdateDescription("original " + label);
 
-    private static OrderItem NewItem(UserContext context) => Q.OrderItems()
+    private static async Task<OrderItem> NewItemAsync(UserContext context) => (await Q.OrderItems()
         .Comment("initialize checker overlap child").Purpose("exercise genuine required-field validation")
-        .NewEntity(context);
+        .NewEntityAsync(context));
 
     private static async Task<CustomerOrder> LoadAsync(UserContext context, long id) =>
         await Q.CustomerOrders().WithIdIs(id).SelectPlatformWith(Q.Platforms().Limit(1))
@@ -105,8 +105,8 @@ static class CheckerOverlapChecks
     {
         context.EnableQuerySqlLog().EnableMutationSqlLog();
         var nonce = Guid.NewGuid().ToString("N");
-        var goodSeed = NewOrder(context, nonce + "-good");
-        var badSeed = NewOrder(context, nonce + "-bad");
+        var goodSeed = (await NewOrderAsync(context, nonce + "-good"));
+        var badSeed = (await NewOrderAsync(context, nonce + "-bad"));
         await goodSeed.AuditAs("prepare accepted checker graph").SaveAsync(context);
         await badSeed.AuditAs("prepare rejected checker graph").SaveAsync(context);
         var sharedUses = transport.SharedPlatformUses;
@@ -128,8 +128,8 @@ static class CheckerOverlapChecks
         var badOriginal = E.CustomerOrder(bad).Description().Eval();
         good.UpdateDescription("accepted overlap " + nonce);
         bad.UpdateDescription("rejected pending " + nonce);
-        var goodChild = NewItem(context).UpdateName("valid checked child " + nonce).AuditAs("accept checked child");
-        var badChild = NewItem(context).AuditAs("reject incomplete child"); // No UpdateName: genuine required-field violation.
+        var goodChild = (await NewItemAsync(context)).UpdateName("valid checked child " + nonce).AuditAs("accept checked child");
+        var badChild = (await NewItemAsync(context)).AuditAs("reject incomplete child"); // No UpdateName: genuine required-field violation.
         good.OrderItemList.Add(goodChild); bad.OrderItemList.Add(badChild);
         if (!logging) context.DisableQuerySqlLog().DisableMutationSqlLog();
         Clear(capture, sink, transport);

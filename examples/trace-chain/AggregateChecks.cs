@@ -14,14 +14,14 @@ static class AggregateChecks
     public static async Task RunAsync(UserContext context, CapturingExecutor capture, EvidenceSink sink, FaultTransport transport)
     {
         var secret = "PRIVATE-AGGREGATE-" + Guid.NewGuid().ToString("N");
-        var order = Q.CustomerOrders().Comment("prepare aggregate root").Purpose("verify generated counts")
-            .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber("AGG-" + Guid.NewGuid().ToString("N"))
+        var order = (await Q.CustomerOrders().Comment("prepare aggregate root").Purpose("verify generated counts")
+            .NewEntityAsync(context)).UpdatePlatformId(1).UpdateOrderNumber("AGG-" + Guid.NewGuid().ToString("N"))
             .UpdateDescription("original aggregate root");
         foreach (var name in new[] { secret, "public item" })
-            order.OrderItemList.Add(Q.OrderItems().Comment("prepare aggregate item").Purpose("verify generated counts")
-                .NewEntity(context).UpdateName(name));
-        var payment = Q.Payments().Comment("prepare payment").Purpose("verify nested count")
-            .NewEntity(context).UpdateReferenceCode("AGG-PAY-" + Guid.NewGuid().ToString("N"));
+            order.OrderItemList.Add((await Q.OrderItems().Comment("prepare aggregate item").Purpose("verify generated counts")
+                .NewEntityAsync(context)).UpdateName(name));
+        var payment = (await Q.Payments().Comment("prepare payment").Purpose("verify nested count")
+            .NewEntityAsync(context)).UpdateReferenceCode("AGG-PAY-" + Guid.NewGuid().ToString("N"));
         order.PaymentList.Add(payment);
         await order.AuditAs("seed aggregate graph").SaveAsync(context);
         var orderId = E.CustomerOrder(order).Id().Eval()!.Value;

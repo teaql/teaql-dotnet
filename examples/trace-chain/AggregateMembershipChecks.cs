@@ -16,14 +16,14 @@ static class AggregateMembershipChecks
     {
         const string secret = "DOTNET-PRIVATE-AGGREGATE-MEMBERSHIP";
         const string purpose = "verify aggregate membership and physical ancestry";
-        var order = Q.CustomerOrders().Comment("prepare membership root").Purpose(purpose)
-            .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber("MEM-" + Guid.NewGuid().ToString("N"))
+        var order = (await Q.CustomerOrders().Comment("prepare membership root").Purpose(purpose)
+            .NewEntityAsync(context)).UpdatePlatformId(1).UpdateOrderNumber("MEM-" + Guid.NewGuid().ToString("N"))
             .UpdateDescription("complete membership root");
         foreach (var name in new[] { secret, "public membership item" })
-            order.OrderItemList.Add(Q.OrderItems().Comment("prepare membership item").Purpose(purpose)
-                .NewEntity(context).UpdateName(name));
-        var payment = Q.Payments().Comment("prepare membership outer root").Purpose(purpose)
-            .NewEntity(context).UpdateReferenceCode("MEM-PAY-" + Guid.NewGuid().ToString("N"));
+            order.OrderItemList.Add((await Q.OrderItems().Comment("prepare membership item").Purpose(purpose)
+                .NewEntityAsync(context)).UpdateName(name));
+        var payment = (await Q.Payments().Comment("prepare membership outer root").Purpose(purpose)
+            .NewEntityAsync(context)).UpdateReferenceCode("MEM-PAY-" + Guid.NewGuid().ToString("N"));
         order.PaymentList.Add(payment);
         await order.AuditAs("seed membership graph").SaveAsync(context);
         var id = E.CustomerOrder(order).Id().Eval()!.Value;

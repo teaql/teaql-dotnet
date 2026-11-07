@@ -32,12 +32,12 @@ try
     Require(firstSeedAudits is 0 or 4, "one platform and three constant audited seeds, or existing database");
     await context.EnsureSchemaAsync();
     Require(audits.Count == firstSeedAudits, "repeated schema must not seed again");
-    var customer = Q.Customers().Comment("create fixture customer").Purpose("prepare operational order queue").NewEntity(context)
+    var customer = (await Q.Customers().Comment("create fixture customer").Purpose("prepare operational order queue").NewEntityAsync(context))
         .UpdatePlatformId(1).UpdateName("North Star Retail").UpdateVersion(1);
     customer = await customer.AuditAs("seed fixture customer").SaveAsync(context);
     for (var index = 1; index <= 4; index++)
     {
-        var order = Q.CustomerOrders().Comment("create fixture order").Purpose("prepare operational order queue").NewEntity(context)
+        var order = (await Q.CustomerOrders().Comment("create fixture order").Purpose("prepare operational order queue").NewEntityAsync(context))
             .UpdateCustomerId(customer.Id).UpdateStatusId(index == 1 ? 1001 : 1002)
             .UpdateOrderNumber(index == 4 ? "OTHER-004" : $"{privateNeedle}-{index:000}")
             .UpdateOrderDate(new DateTime(2026, 10, index, 0, 0, 0, DateTimeKind.Utc))
@@ -45,7 +45,7 @@ try
         order = await order.AuditAs("seed operational queue order").SaveAsync(context);
         for (var item = 1; item <= 5; item++)
         {
-            var line = Q.OrderItems().Comment("create fixture item").Purpose("prepare bounded item previews").NewEntity(context)
+            var line = (await Q.OrderItems().Comment("create fixture item").Purpose("prepare bounded item previews").NewEntityAsync(context))
                 .UpdateCustomerOrderId(order.Id).UpdateProductName($"Box {item}").UpdateQuantity(item)
                 .UpdateUnitPrice(20m).UpdateVersion(1);
             await line.AuditAs("seed operational queue item").SaveAsync(context);

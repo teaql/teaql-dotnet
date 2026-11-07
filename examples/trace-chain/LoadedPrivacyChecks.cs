@@ -10,10 +10,10 @@ static class LoadedPrivacyChecks
         var nonce = Guid.NewGuid().ToString("N");
         var alphabetic = string.Concat(nonce.Select(c => (char)('A' + Convert.ToInt32(c.ToString(), 16))));
         var oldValue = "PRIVATE-LOADED-" + alphabetic;
-        var root = Q.CustomerOrders().Comment("prepare loaded privacy graph").Purpose("verify old scalar provenance")
-            .NewEntity(context).UpdatePlatformId(1).UpdateOrderNumber("loaded-" + nonce).UpdateDescription("initial");
-        var child = Q.OrderItems().Comment("prepare private child").Purpose("verify old scalar provenance")
-            .NewEntity(context).UpdateName(oldValue);
+        var root = (await Q.CustomerOrders().Comment("prepare loaded privacy graph").Purpose("verify old scalar provenance")
+            .NewEntityAsync(context)).UpdatePlatformId(1).UpdateOrderNumber("loaded-" + nonce).UpdateDescription("initial");
+        var child = (await Q.OrderItems().Comment("prepare private child").Purpose("verify old scalar provenance")
+            .NewEntityAsync(context)).UpdateName(oldValue);
         root.OrderItemList.Add(child);
         await root.AuditAs("seed loaded privacy graph").SaveAsync(context);
         var rootId = E.CustomerOrder(root).Id().Eval()!.Value;

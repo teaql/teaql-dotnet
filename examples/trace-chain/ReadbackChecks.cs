@@ -8,11 +8,11 @@ static class ReadbackChecks
     public static async Task RunAsync(UserContext context,CapturingExecutor capture,EvidenceSink sink)
     {
         var nonce=Guid.NewGuid().ToString("N");
-        var root=Q.CustomerOrders().Comment("prepare readback parent").Purpose("verify graph provenance").NewEntity(context)
+        var root=(await Q.CustomerOrders().Comment("prepare readback parent").Purpose("verify graph provenance").NewEntityAsync(context))
             .UpdatePlatformId(1).UpdateOrderNumber("readback-"+nonce).UpdateDescription("new parent");
-        var child=Q.OrderItems().Comment("prepare private child").Purpose("verify future sibling masking").NewEntity(context).UpdateName("pending");
+        var child=(await Q.OrderItems().Comment("prepare private child").Purpose("verify future sibling masking").NewEntityAsync(context)).UpdateName("pending");
         root.OrderItemList.Add(child);
-        var payment=Q.Payments().Comment("prepare sibling").Purpose("verify sibling readback").NewEntity(context).UpdateReferenceCode("readback-payment-"+nonce);
+        var payment=(await Q.Payments().Comment("prepare sibling").Purpose("verify sibling readback").NewEntityAsync(context)).UpdateReferenceCode("readback-payment-"+nonce);
         root.PaymentList.Add(payment);
         for(var round=0;round<2;round++)
         {

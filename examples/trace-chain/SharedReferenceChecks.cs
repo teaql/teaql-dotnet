@@ -34,11 +34,11 @@ static class SharedReferenceChecks
     private static bool Pending(EntityRoot ledger, EntityKey key) =>
         ledger.Change(key).Count > 0 || ledger.IsNew(key) || ledger.IsDeleted(key);
 
-    private static CustomerOrder NewOrder(UserContext context, string label) => Q.CustomerOrders()
-        .Comment("prepare ownership order").Purpose("test graph ownership").NewEntity(context)
+    private static async Task<CustomerOrder> NewOrderAsync(UserContext context, string label) => (await Q.CustomerOrders()
+        .Comment("prepare ownership order").Purpose("test graph ownership").NewEntityAsync(context))
         .UpdatePlatformId(1).UpdateOrderNumber(label).UpdateDescription("Original " + label);
-    private static OrderItem NewItem(UserContext context, string label) => Q.OrderItems()
-        .Comment("prepare ownership item").Purpose("test graph ownership").NewEntity(context).UpdateName(label);
+    private static async Task<OrderItem> NewItemAsync(UserContext context, string label) => (await Q.OrderItems()
+        .Comment("prepare ownership item").Purpose("test graph ownership").NewEntityAsync(context)).UpdateName(label);
 
     private static async Task<CustomerOrder> LoadAsync(UserContext context, long id, bool platform = false)
     {
@@ -51,8 +51,8 @@ static class SharedReferenceChecks
 
     private static async Task<CustomerOrder> SeedAsync(UserContext context, string label, int children)
     {
-        var order = NewOrder(context, label);
-        for (var i = 0; i < children; i++) order.OrderItemList.Add(NewItem(context, label + "-item-" + i));
+        var order = (await NewOrderAsync(context, label));
+        for (var i = 0; i < children; i++) order.OrderItemList.Add((await NewItemAsync(context, label + "-item-" + i)));
         await order.AuditAs("prepare ownership graph").SaveAsync(context);
         return order;
     }

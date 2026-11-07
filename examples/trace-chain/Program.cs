@@ -104,17 +104,17 @@ await AggregateChecks.RunAsync(context, capture, sink, faults);
 await AggregateMembershipChecks.RunAsync(context, capture, sink, faults);
 await CheckerOverlapChecks.RunAsync(context, capture, sink, faults);
 
-CustomerOrder NewOrder(string label) => Q.CustomerOrders().Comment("prepare a test order")
-    .Purpose("compose a generated graph").NewEntity(context)
+async Task<CustomerOrder> NewOrderAsync(string label) => (await Q.CustomerOrders().Comment("prepare a test order")
+    .Purpose("compose a generated graph").NewEntityAsync(context))
     .UpdatePlatformId(1).UpdateOrderNumber(label).UpdateDescription("Draft detail");
-OrderItem NewItem(string name) => Q.OrderItems().Comment("prepare an item")
-    .Purpose("compose a generated child").NewEntity(context).UpdateName(name);
-Payment NewPayment(string code) => Q.Payments().Comment("prepare a payment")
-    .Purpose("compose a generated child").NewEntity(context).UpdateReferenceCode(code);
-PaymentAttempt NewAttempt(string code) => Q.PaymentAttempts().Comment("prepare an attempt")
-    .Purpose("compose a generated grandchild").NewEntity(context).UpdateReferenceCode(code);
-Shipment NewShipment(string code) => Q.Shipments().Comment("prepare a shipment")
-    .Purpose("compose a generated child").NewEntity(context).UpdateReferenceCode(code);
+async Task<OrderItem> NewItemAsync(string name) => (await Q.OrderItems().Comment("prepare an item")
+    .Purpose("compose a generated child").NewEntityAsync(context)).UpdateName(name);
+async Task<Payment> NewPaymentAsync(string code) => (await Q.Payments().Comment("prepare a payment")
+    .Purpose("compose a generated child").NewEntityAsync(context)).UpdateReferenceCode(code);
+async Task<PaymentAttempt> NewAttemptAsync(string code) => (await Q.PaymentAttempts().Comment("prepare an attempt")
+    .Purpose("compose a generated grandchild").NewEntityAsync(context)).UpdateReferenceCode(code);
+async Task<Shipment> NewShipmentAsync(string code) => (await Q.Shipments().Comment("prepare a shipment")
+    .Purpose("compose a generated child").NewEntityAsync(context)).UpdateReferenceCode(code);
 
 void ClearEvidence() { capture.Clear(); sink.Clear(); }
 async Task IdentityGuard()
@@ -141,7 +141,7 @@ async Task IdentityGuard()
 async Task IntentGate()
 {
     ClearEvidence(); context.DisableQuerySqlLog().DisableMutationSqlLog();
-    var order = NewOrder(nonce + "-intent");
+    var order = (await NewOrderAsync(nonce + "-intent"));
     await Verify.Throws<RequestIntentException>(() => order.SaveAsync(context), "missing mutation reason");
     await Verify.Throws<RequestIntentException>(() => Task.FromResult(order.AuditAs(" \t")), "blank mutation reason");
     await Verify.Throws<RequestIntentException>(() => Q.CustomerOrders().Limit(1).Purpose("inspect")
@@ -162,10 +162,10 @@ async Task<(CustomerOrder Order, Payment Payment, PaymentAttempt Attempt)> Norma
     var floor = Math.Max(await provider.NextIdAsync("CustomerOrder"), await provider.NextIdAsync("Payment"));
     await provider.EnsureIdFloorAsync("CustomerOrder", floor);
     await provider.EnsureIdFloorAsync("Payment", floor);
-    var order = NewOrder(nonce + "-normative");
-    order.OrderItemList.Add(NewItem("Available stock"));
-    order.OrderItemList.Add(NewItem("Unavailable stock"));
-    order.PaymentList.Add(NewPayment(nonce + "-normative-payment"));
+    var order = (await NewOrderAsync(nonce + "-normative"));
+    order.OrderItemList.Add((await NewItemAsync("Available stock")));
+    order.OrderItemList.Add((await NewItemAsync("Unavailable stock")));
+    order.PaymentList.Add((await NewPaymentAsync(nonce + "-normative-payment")));
     await order.AuditAs("prepare order").SaveAsync(context);
     var rootOnly = await Q.CustomerOrders().WithIdIs(order.Id!.Value).Limit(1)
         .Comment("load only the root for an independent revision").Purpose("distinguish same-ID optimistic versions")
@@ -189,8 +189,8 @@ async Task<(CustomerOrder Order, Payment Payment, PaymentAttempt Attempt)> Norma
     current.UpdateDescription("Submitted detail"); item.UpdateName("Fulfilled stock");
     removed.MarkForDeletion().AuditAs("remove unavailable item");
     payment.UpdateReferenceCode(nonce + "-authorized").AuditAs("authorize payment");
-    var attempt = NewAttempt(nonce + "-attempt"); payment.PaymentAttemptList.Add(attempt);
-    var shipment = NewShipment(nonce + "-shipment").AuditAs("dispatch shipment");
+    var attempt = (await NewAttemptAsync(nonce + "-attempt")); payment.PaymentAttemptList.Add(attempt);
+    var shipment = (await NewShipmentAsync(nonce + "-shipment")).AuditAs("dispatch shipment");
     current.ShipmentList.Add(shipment);
     ClearEvidence();
     await current.AuditAs("submit order").SaveAsync(context);
@@ -328,9 +328,9 @@ async Task ThreeLevelQuery((CustomerOrder Order, Payment Payment, PaymentAttempt
 async Task ProviderRollback()
 {
     var label = nonce + "-rollback";
-    var order = NewOrder(label);
-    var payment = NewPayment(label).AuditAs("authorize risky payment");
-    order.PaymentList.Add(payment); order.PaymentList.Add(NewPayment(label).AuditAs("duplicate payment check"));
+    var order = (await NewOrderAsync(label));
+    var payment = (await NewPaymentAsync(label)).AuditAs("authorize risky payment");
+    order.PaymentList.Add(payment); order.PaymentList.Add((await NewPaymentAsync(label)).AuditAs("duplicate payment check"));
     ClearEvidence();
     await Verify.Throws<SqlExecutorException>(() => order.AuditAs("rollback order").SaveAsync(context), "actual SQLite UNIQUE failure");
     Verify.Equal(0, sink.Audit.Count, "rolled back graph has no committed audit");
@@ -345,9 +345,9 @@ async Task ProviderRollback()
 
 async Task ReadbackFailure()
 {
-    var order = NewOrder(nonce + "-readback");
-    var payment = NewPayment(nonce + "-readback-payment").AuditAs("authorize readback payment");
-    payment.PaymentAttemptList.Add(NewAttempt(nonce + "-readback-attempt")); order.PaymentList.Add(payment);
+    var order = (await NewOrderAsync(nonce + "-readback"));
+    var payment = (await NewPaymentAsync(nonce + "-readback-payment")).AuditAs("authorize readback payment");
+    payment.PaymentAttemptList.Add((await NewAttemptAsync(nonce + "-readback-attempt"))); order.PaymentList.Add(payment);
     ClearEvidence(); faults.FailAttemptReadback = true;
     try { await Verify.Throws<SqlExecutorException>(() => order.AuditAs("readback order").SaveAsync(context), "post-write fetch failure"); }
     finally { faults.FailAttemptReadback = false; }
@@ -364,9 +364,9 @@ async Task ReadbackFailure()
 
 async Task ConcurrentGraphs()
 {
-    ClearEvidence(); var first = NewOrder(nonce + "-first"); var second = NewOrder(nonce + "-second");
-    first.PaymentList.Add(NewPayment(nonce + "-first-payment").AuditAs("first payment branch"));
-    second.PaymentList.Add(NewPayment(nonce + "-second-payment").AuditAs("second payment branch"));
+    ClearEvidence(); var first = (await NewOrderAsync(nonce + "-first")); var second = (await NewOrderAsync(nonce + "-second"));
+    first.PaymentList.Add((await NewPaymentAsync(nonce + "-first-payment")).AuditAs("first payment branch"));
+    second.PaymentList.Add((await NewPaymentAsync(nonce + "-second-payment")).AuditAs("second payment branch"));
     var pause = capture.PauseNextBegin();
     var firstTask = Task.Run(() => first.AuditAs("first order branch").SaveAsync(context));
     await pause.Entered.Task.WaitAsync(TimeSpan.FromSeconds(10));
