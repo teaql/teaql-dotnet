@@ -1538,55 +1538,55 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest WithRequiredDateIs(DateTime val)
                 {
-                    _query.AndFilter(Expr.Eq("required_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq("required_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateIsNot(DateTime val)
                 {
-                    _query.AndFilter(Expr.Ne("required_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne("required_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateNotIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateGreaterThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gt("required_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt("required_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateGreaterThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gte("required_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte("required_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateLessThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lt("required_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt("required_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateLessThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lte("required_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte("required_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithRequiredDateBetween(DateTime lower, DateTime upper)
                 {
-                    _query.AndFilter(Expr.Between("required_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between("required_date", new Value.DateValue(lower), new Value.DateValue(upper)));
                     return this;
                 }
 
@@ -1604,55 +1604,55 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest WithOptionalDateIs(DateTime val)
                 {
-                    _query.AndFilter(Expr.Eq("optional_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq("optional_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateIsNot(DateTime val)
                 {
-                    _query.AndFilter(Expr.Ne("optional_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne("optional_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateNotIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateGreaterThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gt("optional_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt("optional_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateGreaterThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gte("optional_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte("optional_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateLessThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lt("optional_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt("optional_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateLessThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lte("optional_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte("optional_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public ScalarTypeProbeRequest WithOptionalDateBetween(DateTime lower, DateTime upper)
                 {
-                    _query.AndFilter(Expr.Between("optional_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between("optional_date", new Value.DateValue(lower), new Value.DateValue(upper)));
                     return this;
                 }
 

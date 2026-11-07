@@ -453,55 +453,55 @@ namespace Generated.Requests
 
                 public CustomerOrderRequest WithOrderDateIs(DateTime val)
                 {
-                    _query.AndFilter(Expr.Eq("order_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq("order_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateIsNot(DateTime val)
                 {
-                    _query.AndFilter(Expr.Ne("order_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne("order_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.In("order_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("order_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateNotIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("order_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("order_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateGreaterThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gt("order_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt("order_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateGreaterThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gte("order_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte("order_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateLessThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lt("order_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt("order_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateLessThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lte("order_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte("order_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public CustomerOrderRequest WithOrderDateBetween(DateTime lower, DateTime upper)
                 {
-                    _query.AndFilter(Expr.Between("order_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between("order_date", new Value.DateValue(lower), new Value.DateValue(upper)));
                     return this;
                 }
 

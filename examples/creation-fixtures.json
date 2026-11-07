@@ -1,48 +1,49 @@
 {
   "schema": "teaql.dotnet-creation-fixture-import/v1",
-  "generatorCommit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
-  "generatorGitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e",
-  "producerReportSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
-  "producerManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
-  "rawExport": "dotnet-creation-fixtures-v1",
+  "generatorCommit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
+  "generatorGitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5",
+  "producerReportSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
+  "producerManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
+  "rawExport": "dotnet-creation-fixtures-v3",
   "previousManifests": [
     {
       "file": "examples/conformance/fixture-manifest.json",
-      "sha256": "a79aef99d80512b0e02ec84aa82e596cd4b706d418abcc09c01a72a987a4cf65"
+      "sha256": "9d50286e691d1785a2416192f898eefd2d40392bb00afd0ff5744374d16684f7"
     },
     {
       "file": "examples/trace-chain/lib/fixture-manifest.json",
-      "sha256": "06e3ebe2a31595ef20d9e5428a4210f5f7895882022aeb56a592f072ef55a673"
+      "sha256": "42eeaa3ef07dc91470ae4f17882964c015e7db67a6001c577ca26cf52be3d3fe"
     },
     {
       "file": "examples/facet-trace/lib/fixture-manifest.json",
-      "sha256": "7cd1ae133566e07bc19dfea7327eb0c6246dc19f1ccda0334ba6249aa0a1e965"
+      "sha256": "dcc1ad78eced6794c25682bcd2cd7931e0c654768c4906365ef785a0a26fedae"
     },
     {
       "file": "examples/school-management/fixture-manifest.json",
-      "sha256": "60f146f7f93ee81a19ff444e95759ce9fb47b6217279a5be204ad37f306c8a37"
+      "sha256": "95075bd771a242feec103056c81093a21141538c624548c31c255514e3b1f823"
     },
     {
       "file": "examples/order-management/dotnet-lib-core/fixture-manifest.json",
-      "sha256": "3a9b3db7e95515d8a26b7aaa43f84be682d32d08ee7a8b7671ecb379d3375ec5"
+      "sha256": "bcb9566c7367a518c10e7185156896c98d18384669a91fe3f2679ec6d26d88d5"
     },
     {
       "file": "examples/trace-chain/standard-graph/lib/fixture-manifest.json",
-      "sha256": "8e23b5cc4c6b945b94a6237bfca8fcd8a432e8f59ea24450424c3b49c90f30b7"
+      "sha256": "c0cb77cab094a4f83de190d47eef5e157103abfae31e703797825059c548b745"
     },
     {
       "file": "examples/trace-chain/standard-order/lib/fixture-manifest.json",
-      "sha256": "9bbf6000a316bbe2cf8abcc7ecff39bf95462b490253f88c49c047726c6022be"
+      "sha256": "2f06289f9e09ac40e091d4322503b3dbd915ff3e190c06ccf3e3f712dd2e563a"
     },
     {
       "file": "examples/fix-e-alignment/fixture-manifest.json",
-      "sha256": "289f9b483111c378597d8b0dcaf8cf931f22e3fe38b7ab6b99f4efa6ec78da8f"
+      "sha256": "436d3828b69d797fce257b3b6d74d336d277b30c97a932a01d6f765cb462e9e6"
     },
     {
       "file": "examples/scalar-type-probe/time-hydration-provenance.json",
-      "sha256": "374944b9b6fcb9943e5aa30ecb730fe318cf635043f7478d2ee6cc575da1a6ac"
+      "sha256": "32f40ab0e3d099274f3b57a1650957c26c0a65d60e4b052562343fe14333a27f"
     }
   ],
+  "previousImportSha256": "239c13f6ce56ed13421bd17f445aaa4761e43bb42b14b4e3b464db0e13ed54d0",
   "fixtures": [
     {
       "id": "conformance",
@@ -97,7 +98,7 @@
         "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
         "Requests/PlatformRequest.cs": "a5e573662e0fedae4a7adb3199e26a6e21ec8bfa83c8532798e558f6862a6ac7",
         "Requests/SchoolTypeRequest.cs": "0379c0af7ee94b47a5646daba788eb71feaacdad5108c327e79f06e818d0d2d0",
-        "Requests/SchoolRequest.cs": "ad5b363571175f06f2726684c81a84b69dd48c0d4f461d9e30d6ce2f377eafdd",
+        "Requests/SchoolRequest.cs": "f96087f22f1561b635e0b15631fad4ac4ad145eb048817ddfa43406fb02e9168",
         "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
         "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "edb727b9b6d4046b7dac1b841fc17e0947e315f8867a218e5cdb20784e5c1b0f",
@@ -117,7 +118,7 @@
         "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
         "Requests/PlatformRequest.cs": "a5e573662e0fedae4a7adb3199e26a6e21ec8bfa83c8532798e558f6862a6ac7",
         "Requests/SchoolTypeRequest.cs": "0379c0af7ee94b47a5646daba788eb71feaacdad5108c327e79f06e818d0d2d0",
-        "Requests/SchoolRequest.cs": "ad5b363571175f06f2726684c81a84b69dd48c0d4f461d9e30d6ce2f377eafdd",
+        "Requests/SchoolRequest.cs": "f96087f22f1561b635e0b15631fad4ac4ad145eb048817ddfa43406fb02e9168",
         "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
         "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "8fa82e014d85f09cb4a6187ea0a9ed5cebaa3ced5a4a238c13d7404d02c30edf",
@@ -138,7 +139,7 @@
         "Requests/CommercePlatformRequest.cs": "683bfaf6af925aa479ef3b2cbdf928c99201dfc1556b2c19de028e7dcaf3f9ae",
         "Requests/CustomerRequest.cs": "6579a3588b7b87db3b143b6ad5bba51a5830529fc97af0bebb8522e5ad5e1fb2",
         "Requests/OrderStatusRequest.cs": "abfd2d5b464a8540224a5745bc38b1529b58420a0026560b7561a8f630fb0589",
-        "Requests/CustomerOrderRequest.cs": "03db50637eab9afc0f2f25c1e724dd3857c14898819f788d92f002b9c5209682",
+        "Requests/CustomerOrderRequest.cs": "8283a2015ba9e58bd59d0ef5760e9db9c40b3ed00a1c62b8ce767b6736a5dabc",
         "Requests/ProductRequest.cs": "556839bf15838d97b7ac9ea72cbdcb2876078bd0299f71c5533885f90741eaf7",
         "Requests/OrderLineRequest.cs": "e8d1158d38e413b539c19c2341132807ef3e691b9b05f1ba71e68214d45ea2e3",
         "Requests/OrderSearchPresetRequest.cs": "81b277da0fff3390da083acfca1e1c52a0bffd34dbbe3810397fd2f23e00037d",
@@ -192,7 +193,7 @@
         "Requests/PlatformRequest.cs": "32ed52df3cfcece677889580e35ee4dfd18bc396003cdaa862d0f619cff4048f",
         "Requests/OrderStatusRequest.cs": "8c0f5648f559590f6719d6ca94da18c43dddca95d8b1c8f86ba3e39951f60564",
         "Requests/CustomerRequest.cs": "32afb8f1b445377816dcce646c402d02bf599e704aeeaeb42a09c0ea219fd956",
-        "Requests/CustomerOrderRequest.cs": "d9b259d8e68409a227ce437d4244eb73ed5051dd6c62acf50177235f53dc94b5",
+        "Requests/CustomerOrderRequest.cs": "096fb76bf0699e006147290b7baad6dc3d017e091e91e3729ec69f6243509976",
         "Requests/OrderItemRequest.cs": "a743280b912ad73d8b42fac40595236756060c1fba3c51d6fdba64b8db209338",
         "GeneratedSearchModels.cs": "9048fb8f3e24d4cad00ebff0d626589d6e57c066d1dfa75b97063b355b1191c0",
         "request-tree-order-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
@@ -234,7 +235,7 @@
       "files": {
         "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
         "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
         "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
         "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "21a30d920579f0461cfd9e6f9aca5498410cb2cfc1a57c946130e701bcaf1bd0",
@@ -252,7 +253,7 @@
       "files": {
         "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
         "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
         "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
         "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "21a30d920579f0461cfd9e6f9aca5498410cb2cfc1a57c946130e701bcaf1bd0",
@@ -270,7 +271,7 @@
       "files": {
         "E.cs": "874b7102377dbf8e96a4e6e3f6a04499b763214e09ff7ff3a8c17978db0933ab",
         "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
         "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
         "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "aca1c7bb7453ac564c5b3ea88962fc1727a77d6169311f140a838470486af576",
@@ -288,7 +289,7 @@
       "files": {
         "E.cs": "2ae6ecb54a33a866524858653c16d3dbffa820da4a3fb00362e9fe47e53ff005",
         "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
         "GeneratedSearchModels.cs": "04be33c8e32ee5f7dff502b61271136a4f7d1493084cb6be34e6fab9eb880074",
         "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "1103c665a482eab98e46355b9e7e6c0f7aff526d17026cabdf1c5980d0508817",

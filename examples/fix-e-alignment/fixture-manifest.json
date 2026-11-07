@@ -2,12 +2,12 @@
   "schema": "teaql.generated-example-fixture/v1",
   "language": "dotnet",
   "modelSha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
-  "generatedManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
+  "generatedManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
   "previousGeneratedManifestSha256": "5d8645707521bceecc08f9c270ea3fb1c2e5a62e4d3699c94dd8107bca92d1fe",
   "previousProducerReceiptSha256": "f45b7da6c4a38abb84f90a0fd65d9279cd86b02d5b088f23833fc6b081100e58",
   "producerSource": {
-    "commit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
-    "gitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e"
+    "commit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
+    "gitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5"
   },
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
@@ -27,11 +27,11 @@
     "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e"
   },
   "generatorSourceContentsSha256": "984cadb159d0bda13d65ddffdc77c06de68278c2308bc1219579e18849f283e7",
-  "producerReportSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
+  "producerReportSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
   "qualificationReportSha256": "423a30c61fa2c04b6074ee15428d76b1aa0d8775a19aee9887cf44ab7906f5e7",
-  "generatorCommit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
-  "generatorGitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e",
-  "producerManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
-  "producerReceiptSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
-  "previousFixtureManifestSha256": "289f9b483111c378597d8b0dcaf8cf931f22e3fe38b7ab6b99f4efa6ec78da8f"
+  "generatorCommit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
+  "generatorGitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5",
+  "producerManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
+  "producerReceiptSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
+  "previousFixtureManifestSha256": "436d3828b69d797fce257b3b6d74d336d277b30c97a932a01d6f765cb462e9e6"
 }

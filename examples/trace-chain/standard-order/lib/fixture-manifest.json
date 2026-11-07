@@ -6,17 +6,17 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
   "producerSource": {
-    "commit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
-    "gitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e"
+    "commit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
+    "gitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5"
   },
-  "producerReceiptSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
-  "generatedManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
+  "producerReceiptSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
+  "generatedManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
   "files": {
     "E.cs": "bbd0d3fd38ce8f04ac3893ef8e376a8ab70d0b0a01e1d2039c3b265e7bc42ce6",
     "Requests/PlatformRequest.cs": "32ed52df3cfcece677889580e35ee4dfd18bc396003cdaa862d0f619cff4048f",
     "Requests/OrderStatusRequest.cs": "8c0f5648f559590f6719d6ca94da18c43dddca95d8b1c8f86ba3e39951f60564",
     "Requests/CustomerRequest.cs": "32afb8f1b445377816dcce646c402d02bf599e704aeeaeb42a09c0ea219fd956",
-    "Requests/CustomerOrderRequest.cs": "d9b259d8e68409a227ce437d4244eb73ed5051dd6c62acf50177235f53dc94b5",
+    "Requests/CustomerOrderRequest.cs": "096fb76bf0699e006147290b7baad6dc3d017e091e91e3729ec69f6243509976",
     "Requests/OrderItemRequest.cs": "a743280b912ad73d8b42fac40595236756060c1fba3c51d6fdba64b8db209338",
     "GeneratedSearchModels.cs": "9048fb8f3e24d4cad00ebff0d626589d6e57c066d1dfa75b97063b355b1191c0",
     "request-tree-order-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
@@ -29,9 +29,9 @@
     "teaql-i18n.json": "ee5dc28e916a8907555d5d5a4d0e3cf2fa37aad047af37abed0800582af18d96",
     "Q.cs": "7c9cdcea15557409e9e69b7957fd8dc43d15369dc63b8c3addc86f66b84fd530"
   },
-  "previousFixtureManifestSha256": "9bbf6000a316bbe2cf8abcc7ecff39bf95462b490253f88c49c047726c6022be",
-  "generatorCommit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
-  "generatorGitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e",
-  "producerReportSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
-  "producerManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935"
+  "previousFixtureManifestSha256": "2f06289f9e09ac40e091d4322503b3dbd915ff3e190c06ccf3e3f712dd2e563a",
+  "generatorCommit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
+  "generatorGitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5",
+  "producerReportSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
+  "producerManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203"
 }

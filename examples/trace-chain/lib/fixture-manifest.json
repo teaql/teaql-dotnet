@@ -6,11 +6,11 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
   "producerSource": {
-    "commit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
-    "gitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e"
+    "commit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
+    "gitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5"
   },
-  "producerReceiptSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
-  "generatedManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
+  "producerReceiptSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
+  "generatedManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
   "files": {
     "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
     "Requests/PlatformRequest.cs": "7eaf633bf8b146d6ef4bf6e08fe44eb3a88b8fa50bc2a817d192e33addd4558e",
@@ -31,9 +31,9 @@
     "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
     "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134"
   },
-  "previousFixtureManifestSha256": "06e3ebe2a31595ef20d9e5428a4210f5f7895882022aeb56a592f072ef55a673",
-  "generatorCommit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
-  "generatorGitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e",
-  "producerReportSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
-  "producerManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935"
+  "previousFixtureManifestSha256": "42eeaa3ef07dc91470ae4f17882964c015e7db67a6001c577ca26cf52be3d3fe",
+  "generatorCommit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
+  "generatorGitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5",
+  "producerReportSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
+  "producerManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203"
 }

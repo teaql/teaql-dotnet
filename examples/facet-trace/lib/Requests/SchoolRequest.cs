@@ -581,55 +581,55 @@ namespace Generated.Requests
 
                 public SchoolRequest WithEstablishedDateIs(DateTime val)
                 {
-                    _query.AndFilter(Expr.Eq("established_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq("established_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateIsNot(DateTime val)
                 {
-                    _query.AndFilter(Expr.Ne("established_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne("established_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.In("established_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("established_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateNotIn(params DateTime[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("established_date", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("established_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateGreaterThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gt("established_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt("established_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateGreaterThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Gte("established_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte("established_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateLessThan(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lt("established_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt("established_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateLessThanOrEqualTo(DateTime val)
                 {
-                    _query.AndFilter(Expr.Lte("established_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte("established_date", new Value.DateValue(val)));
                     return this;
                 }
 
                 public SchoolRequest WithEstablishedDateBetween(DateTime lower, DateTime upper)
                 {
-                    _query.AndFilter(Expr.Between("established_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between("established_date", new Value.DateValue(lower), new Value.DateValue(upper)));
                     return this;
                 }
 
