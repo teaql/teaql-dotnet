@@ -195,6 +195,27 @@ public class UserContext
         return this;
     }
 
+    /// <summary>Reserves identity before constructing a new entity. Allocation
+    /// errors and cancellation propagate without falling back to another allocator.</summary>
+    public async Task<ulong> NextIdAsync(string entity)
+    {
+        if (string.IsNullOrWhiteSpace(entity))
+            throw new ArgumentException("Entity name is required for ID allocation", nameof(entity));
+        var allocator = InternalIdAllocator;
+        if (allocator == null)
+        {
+            var service = RequireResource<IDataService>();
+            allocator = service is RuntimeDataService runtime
+                ? runtime.IdAllocator : service as IInternalIdAllocator;
+        }
+        if (allocator == null)
+            throw new NotSupportedException("Configured data service requires internal ID allocation support");
+        var identity = await allocator.NextIdAsync(entity).ConfigureAwait(false);
+        if (identity == 0)
+            throw new InvalidOperationException($"Internal ID allocator returned zero for {entity}");
+        return identity;
+    }
+
     /// <summary>
     /// Installs schema execution independently of the query/mutation data service.
     /// EnsureSchemaAsync remains the application entry point and also runs generated bootstrap.

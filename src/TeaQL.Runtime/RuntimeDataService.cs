@@ -31,6 +31,9 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public DataServiceCapabilities Capabilities => _provider.Capabilities;
 
+    // Keep the provider behind Context; application code does not unwrap it.
+    internal IInternalIdAllocator? IdAllocator => _provider as IInternalIdAllocator;
+
     /// <summary>Execute one authorized page snapshot. Generated libraries bind
     /// native operation metadata and hydrate rows; this runtime owns counting.</summary>
     public static Task<SmartList<Record>> FetchPageAsync(IDataService service, UserContext context, QueryRequest request) =>
