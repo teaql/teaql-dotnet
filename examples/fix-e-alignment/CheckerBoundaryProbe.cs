@@ -187,6 +187,9 @@ static class CheckerBoundaryProbe
                 var normalized = WireFields.Normalize(input, metadata, "/payload~1order"); state.Mapped++;
                 var value = (JsonElement)normalized.Values["contact_phone"]!;
                 var row = (await ParentAsync(context)); row.UpdateContactPhone(value.ValueKind == JsonValueKind.Null ? null! : value.GetString()!); state.Saves++;
+                // The factory has already reserved identity. From here measure
+                // Checker/Save effects, not that earlier allocation transaction.
+                transport.Reset();
                 try { await row.AuditAs("Save a normalized object-local JSON request").SaveAsync(context); }
                 catch (CheckException error) { throw new SubmittedViolation(error, normalized); }
                 return (row, normalized);
@@ -202,7 +205,8 @@ static class CheckerBoundaryProbe
                     .Single(v => v.RuleId == "required" && v.ModelPath == "contact_phone");
                 Require(violation.EntityType == "PurchaseOrder" && violation.SourceInstancePath == "/payload~1order/legacy~1phone~0", "Alias lost its exact submitted path");
                 var wires = Enum.GetValues<JsonFieldNamingProfile>().ToDictionary(Profile, p => violation.ToWire(p));
-                Emit("accepted-input-alias", new { wires, zeroProviderIO = true }, Profile(profile));
+                Emit("accepted-input-alias", new { wires, zeroProviderIO = true,
+                    measurementScope = "save-after-identity-reservation" }, Profile(profile));
             }
             foreach (var name in new[] { "unknown", "equal-forward", "equal-reverse", "unequal-forward", "unequal-reverse" })
             {

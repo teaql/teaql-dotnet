@@ -66,6 +66,7 @@ static class GraphFixLifecycleProbe
             parent.UpdateContactPhone("5550811").UpdateInternalNote(null!);
             if (valid) child.UpdateProductName(label + "-" + round);
             child.UpdateUnitPrice(10.00m); parent.OrderItemList.Add(child); parent.OrderItemList.Add(child);
+            Require(parent.Id > 0 && child.Id > 0, "factories must reserve positive identity before returning");
             return (parent, child);
         }
         async Task<PurchaseOrder> Reload(long id) => (await Q.PurchaseOrders().WithIdIs(id)
@@ -111,11 +112,12 @@ static class GraphFixLifecycleProbe
         foreach (var cancelled in new[] { false, true })
         {
             var graph = (await NewGraphAsync(cancelled ? "cancel-retry" : "provider-retry")); Begin();
+            var reserved = (Parent: graph.Parent.Id, Child: graph.Child.Id);
             transport.AfterChildInsert = cancelled ? () => throw new OperationCanceledException(new CancellationToken(true))
                 : () => throw new InjectedWriteFailure();
             var error = await Failed(graph.Parent); effects = transport.Counts(); transport.AfterChildInsert = null;
             Emit(cancelled ? "provider-cancellation" : "provider-write-failure", effects is { ParentWrites: 1, ChildWrites: 1, Begins: 1, Commits: 0, Rollbacks: 1 }
-                && graph.Parent.Id is null && graph.Child.Id is null && audit.Calls == 0
+                && graph.Parent.Id == reserved.Parent && graph.Child.Id == reserved.Child && audit.Calls == 0
                 && (cancelled ? error is OperationCanceledException
                     : error is SqlExecutorException { InnerException: InjectedWriteFailure }), effects, 2, error);
             var absent = await Q.OrderItems().WithProductNameIs((cancelled ? "cancel-retry" : "provider-retry") + "-" + round)
@@ -124,17 +126,23 @@ static class GraphFixLifecycleProbe
             Require(absent.Count == 0, "Failed child insert was not rolled back");
             Begin(); await graph.Parent.AuditAs("Retry the same failed object graph").SaveAsync(context); effects = transport.Counts();
             Emit(cancelled ? "same-graph-cancellation-retry" : "same-graph-provider-retry", effects is { ParentWrites: 1, ChildWrites: 1, Begins: 1, Commits: 1, Rollbacks: 0 }
-                && audit.Calls == 2 && policy.Calls == 1, effects, 2);
+                && audit.Calls == 2 && policy.Calls == 1
+                && graph.Parent.Id == reserved.Parent && graph.Child.Id == reserved.Child, effects, 2);
             await Check(graph.Parent, 10.01m, 1, 1);
         }
 
-        var invalid = (await NewGraphAsync("missing-input", false)); Begin(); var missing = await Failed(invalid.Parent); effects = transport.Counts();
+        var invalid = (await NewGraphAsync("missing-input", false));
+        var reservedInvalid = (Parent: invalid.Parent.Id, Child: invalid.Child.Id);
+        Begin(); var missing = await Failed(invalid.Parent); effects = transport.Counts();
         Emit("missing-child-input-before-io", effects.IsZero && missing is CheckException
-            && invalid.Parent.Id is null && invalid.Child.Id is null && audit.Calls == 0 && policy.Calls == 0, effects, 2, missing);
+            && invalid.Parent.Id == reservedInvalid.Parent && invalid.Child.Id == reservedInvalid.Child
+            && audit.Calls == 0 && policy.Calls == 0, effects, 2, missing);
         invalid.Child.UpdateProductName("repaired-input-" + round); Begin();
         await invalid.Parent.AuditAs("Repair and retry the same previously invalid graph").SaveAsync(context); effects = transport.Counts();
         Emit("same-graph-input-repair", effects is { ParentWrites: 1, ChildWrites: 1, Begins: 1, Commits: 1, Rollbacks: 0 }
-            && audit.Calls == 2 && policy.Calls == 1, effects, 2); await Check(invalid.Parent, 10.01m, 1, 1);
+            && audit.Calls == 2 && policy.Calls == 1
+            && invalid.Parent.Id == reservedInvalid.Parent && invalid.Child.Id == reservedInvalid.Child,
+            effects, 2); await Check(invalid.Parent, 10.01m, 1, 1);
 
         var root = (await Q.Tenants().WithIdIs(1).Limit(1).Comment("Load the root for a conflicting-parent graph")
             .Purpose("Reject mutation changes after one child has been checked").ExecuteForListAsync(context)).Single();
