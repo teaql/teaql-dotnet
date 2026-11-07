@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public TypePlatformRequest()
@@ -145,55 +145,55 @@ namespace Generated.Requests
                 }
 
 
-                public TypePlatformRequest WithIdIs(object val)
+                public TypePlatformRequest WithIdIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdIsNot(object val)
+                public TypePlatformRequest WithIdIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdIn(params object[] vals)
+                public TypePlatformRequest WithIdIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdNotIn(params object[] vals)
+                public TypePlatformRequest WithIdNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdGreaterThan(object val)
+                public TypePlatformRequest WithIdGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdGreaterThanOrEqualTo(object val)
+                public TypePlatformRequest WithIdGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdLessThan(object val)
+                public TypePlatformRequest WithIdLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdLessThanOrEqualTo(object val)
+                public TypePlatformRequest WithIdLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithIdBetween(object lower, object upper)
+                public TypePlatformRequest WithIdBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -222,49 +222,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public TypePlatformRequest WithNameIsNot(object val)
+                public TypePlatformRequest WithNameIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithNameIn(params object[] vals)
+                public TypePlatformRequest WithNameIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public TypePlatformRequest WithNameNotIn(params object[] vals)
+                public TypePlatformRequest WithNameNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public TypePlatformRequest WithNameGreaterThan(object val)
+                public TypePlatformRequest WithNameGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithNameGreaterThanOrEqualTo(object val)
+                public TypePlatformRequest WithNameGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithNameLessThan(object val)
+                public TypePlatformRequest WithNameLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithNameLessThanOrEqualTo(object val)
+                public TypePlatformRequest WithNameLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithNameBetween(object lower, object upper)
+                public TypePlatformRequest WithNameBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -317,55 +317,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionIs(object val)
+                public TypePlatformRequest WithVersionIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionIsNot(object val)
+                public TypePlatformRequest WithVersionIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionIn(params object[] vals)
+                public TypePlatformRequest WithVersionIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionNotIn(params object[] vals)
+                public TypePlatformRequest WithVersionNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionGreaterThan(object val)
+                public TypePlatformRequest WithVersionGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionGreaterThanOrEqualTo(object val)
+                public TypePlatformRequest WithVersionGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionLessThan(object val)
+                public TypePlatformRequest WithVersionLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionLessThanOrEqualTo(object val)
+                public TypePlatformRequest WithVersionLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TypePlatformRequest WithVersionBetween(object lower, object upper)
+                public TypePlatformRequest WithVersionBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -441,7 +441,8 @@ namespace Generated.Requests
 
                 public TypePlatformRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy("id");
+                    _query.ProjectExpr(retName, Expr.Column("id"));
                     return this;
                 }
                 public TypePlatformRequest GroupByName()
@@ -452,7 +453,8 @@ namespace Generated.Requests
 
                 public TypePlatformRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy("name");
+                    _query.ProjectExpr(retName, Expr.Column("name"));
                     return this;
                 }
                 public TypePlatformRequest GroupByVersion()
@@ -463,7 +465,8 @@ namespace Generated.Requests
 
                 public TypePlatformRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy("version");
+                    _query.ProjectExpr(retName, Expr.Column("version"));
                     return this;
                 }
                 public TypePlatformRequest SelectScalarTypeProbeList()
@@ -1659,10 +1662,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.TypePlatform NewEntity(UserContext context)
+        public async Task<Generated.Models.TypePlatform> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.TypePlatform();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("TypePlatform").ConfigureAwait(false));
+            var entity = context.InitializeEntity("TypePlatform", new Generated.Models.TypePlatform());
+            entity.TeaqlInitializeNewId(identity);
+            return entity;
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

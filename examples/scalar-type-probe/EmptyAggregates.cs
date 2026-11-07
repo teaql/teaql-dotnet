@@ -163,12 +163,12 @@ internal static class EmptyAggregates
         void Reset() { sink.Entries.Clear(); transport.Reads.Clear(); telemetry.Events.Clear(); telemetry.Statements.Clear(); }
         async Task<long> Parent(string name)
         {
-            var parent = Q.TypePlatforms().Comment("prepare aggregate bucket").Purpose("seed evaluated scalar model").NewEntity(context).UpdateName(name);
+            var parent = (await Q.TypePlatforms().Comment("prepare aggregate bucket").Purpose("seed evaluated scalar model").NewEntityAsync(context)).UpdateName(name);
             await parent.AuditAs("seed aggregate parent through generated mutation API").SaveAsync(context); return parent.Id!.Value;
         }
         async Task Child(long parent, int? value)
         {
-            var child = Q.ScalarTypeProbes().Comment("prepare aggregate contribution").Purpose("seed evaluated scalar model").NewEntity(context)
+            var child = (await Q.ScalarTypeProbes().Comment("prepare aggregate contribution").Purpose("seed evaluated scalar model").NewEntityAsync(context))
                 .UpdateTypePlatform(parent).UpdateRequiredString("EA236 contribution").UpdateRequiredBoolean(true).UpdateRequiredInteger(7)
                 .UpdateOptionalInteger(value).UpdateRequiredLong(8).UpdateRequiredDecimal(1m).UpdateRequiredFloat(1.25).UpdateRequiredDouble(2.5)
                 .UpdateRequiredDate(new DateTime(2026, 10, 20)).UpdateRequiredTime(new TimeSpan(12, 30, 0))

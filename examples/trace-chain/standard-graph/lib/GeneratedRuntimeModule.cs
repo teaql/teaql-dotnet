@@ -278,8 +278,7 @@ public static class GeneratedRuntimeModule
         var domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (domainRoot == null)
         {
-            var created = Q.Platforms().Comment("what: create generated Domain Root").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1);
+            var created = Generated.Models.Platform.TeaqlNewWithFixedId(1);
             created.UpdateName("Trace Chain Verification");
             try { domainRoot = await created.AuditAs("create generated Domain Root Platform").SaveAsync(context); }
             catch { domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: recover concurrent Domain Root bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (domainRoot == null) throw; }

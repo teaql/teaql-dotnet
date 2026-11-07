@@ -24,7 +24,7 @@ internal static class IntegralRoundtrip
                 .Comment("find retained exact integers").Purpose("repeat the generated example without cleanup").ExecuteForOneAsync(context);
             if (row is null)
             {
-                row = New(context, vector.Name).UpdateRequiredInteger(vector.Integer).UpdateRequiredLong(vector.Long);
+                row = (await NewAsync(context, vector.Name)).UpdateRequiredInteger(vector.Integer).UpdateRequiredLong(vector.Long);
                 await row.AuditAs("seed exact integer endpoints through generated mutation").SaveAsync(context);
             }
             row = await Load(context, row.Id!.Value);
@@ -38,7 +38,7 @@ internal static class IntegralRoundtrip
                 && provider.Snapshot() == calls, "typed JSON integer/null precision or unexpected I/O");
             retained.Add(row);
         }
-        var calibration = New(context, "integral-calibration-" + Guid.NewGuid().ToString("N"));
+        var calibration = (await NewAsync(context, "integral-calibration-" + Guid.NewGuid().ToString("N")));
         await calibration.AuditAs("calibrate generated create on every retained example round").SaveAsync(context);
         var calibrated = provider.Snapshot();
         Require(calibrated.Query > 0 && calibrated.Begin > 0 && calibrated.Mutate > 0 && calibrated.NextId > 0,
@@ -60,7 +60,7 @@ internal static class IntegralRoundtrip
             var (field, value) = bad[index];
             var fix = new ReplacingChecker(field, value);
             var candidateContext = module.And(new RuntimeModule().Checker("ScalarTypeProbe", fix)).IntoContext().WithDataService(provider);
-            var candidate = update ? await Load(context, retained[0].Id!.Value) : New(candidateContext, "invalid-integral-create");
+            var candidate = update ? await Load(context, retained[0].Id!.Value) : (await NewAsync(candidateContext, "invalid-integral-create"));
             if (update) candidate.UpdateRequiredString("pending-invalid-integral-update");
             var before = provider.Snapshot();
             try { await candidate.AuditAs("reject invalid customer integral Fix output").SaveAsync(candidateContext); throw new Exception("invalid integral Fix saved"); }
@@ -77,7 +77,7 @@ internal static class IntegralRoundtrip
             ("required_integer", (long)int.MaxValue + 1), ("required_integer", (long)int.MinValue - 1),
             ("optional_integer", (long)int.MaxValue + 1), ("optional_integer", (long)int.MinValue - 1) })
         {
-            var candidate = New(context, "invalid-integer-width");
+            var candidate = (await NewAsync(context, "invalid-integer-width"));
             if (field == "required_integer") candidate.UpdateRequiredInteger(value); else candidate.UpdateOptionalInteger(value);
             var before = provider.Snapshot();
             try { await candidate.AuditAs("reject out of range native Integer").SaveAsync(context); throw new Exception("native Integer overflow saved"); }
@@ -116,8 +116,8 @@ internal static class IntegralRoundtrip
         Console.WriteLine("DOTNET_INTEGRAL=" + JsonSerializer.Serialize(report));
     }
 
-    private static ScalarTypeProbe New(UserContext context, string name) => Q.ScalarTypeProbes()
-        .Comment("prepare complete generated integer fixture").Purpose("verify trusted model ranges").NewEntity(context)
+    private static async Task<ScalarTypeProbe> NewAsync(UserContext context, string name) => (await Q.ScalarTypeProbes()
+        .Comment("prepare complete generated integer fixture").Purpose("verify trusted model ranges").NewEntityAsync(context))
         .UpdateTypePlatform(1).UpdateRequiredString(name).UpdateRequiredBoolean(true).UpdateRequiredInteger(1).UpdateRequiredLong(1)
         .UpdateRequiredDecimal(1m).UpdateRequiredFloat(1.25).UpdateRequiredDouble(2.5)
         .UpdateRequiredDate(new DateTime(2026, 10, 20)).UpdateRequiredTime(new TimeSpan(12, 30, 0))

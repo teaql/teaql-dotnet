@@ -81,8 +81,8 @@ static class UnchangedViewsProbe
         }
         async Task<PurchaseOrder> Seed()
         {
-            var row = Q.PurchaseOrders().Comment("Prepare an unchanged-view fixture")
-                .Purpose("Verify no-op preservation using generated mutation APIs").NewEntity(context);
+            var row = (await Q.PurchaseOrders().Comment("Prepare an unchanged-view fixture")
+                .Purpose("Verify no-op preservation using generated mutation APIs").NewEntityAsync(context));
             row.UpdateContactPhone("5550800").UpdateInternalNote(null!);
             var before = Counts(); await row.AuditAs("Create an unchanged-view fixture").SaveAsync(context); RealWrite(before);
             return row;

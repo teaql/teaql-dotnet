@@ -26,8 +26,8 @@ internal static class EntityJsonExample
             .Comment("reload exact entity JSON values").Purpose("verify the generated SQLite JSON contract")
             .ExecuteForOneAsync(context) ?? throw new Exception("JSON fixture was not persisted");
 
-        var original = Q.ScalarTypeProbes().Comment("prepare exact entity JSON values")
-            .Purpose("verify the generated audited mutation contract").NewEntity(context)
+        var original = (await Q.ScalarTypeProbes().Comment("prepare exact entity JSON values")
+            .Purpose("verify the generated audited mutation contract").NewEntityAsync(context))
             .UpdateTypePlatform(1).UpdateRequiredString("entity-json-" + Guid.NewGuid().ToString("N"))
             .UpdateOptionalString("").UpdateLargeText("Unicode scalar fixture: 精确数值")
             .UpdateRequiredBoolean(false).UpdateOptionalBoolean(false)

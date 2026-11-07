@@ -50,17 +50,17 @@ static class PartialRootProbe
             return result;
         }
         Reset();
-        var other = Q.Tenants().Comment("Prepare another persisted domain root")
-            .Purpose("Test another real context rather than an invented ID").NewEntity(context);
+        var other = (await Q.Tenants().Comment("Prepare another persisted domain root")
+            .Purpose("Test another real context rather than an invented ID").NewEntityAsync(context));
         other.UpdateName("Independent partial root");
         await other.AuditAs("Create an independent root for partial-ancestor admission").SaveAsync(context);
         var otherId = other.Id ?? throw new InvalidOperationException("No persisted independent root ID");
         Require(otherId != active.Id && context.RequireActiveRoot("Tenant").Id == active.Id, "Creating another root changed the caller scope");
-        var order = Q.PurchaseOrders().Comment("Prepare the managed partial-ancestor fixture")
-            .Purpose("Verify unchanged ownership at the modified leaf").NewEntity(context);
+        var order = (await Q.PurchaseOrders().Comment("Prepare the managed partial-ancestor fixture")
+            .Purpose("Verify unchanged ownership at the modified leaf").NewEntityAsync(context));
         order.UpdateContactPhone("5550801"); order.UpdateInternalNote(null!); // Deliberate NULL for the optional modeled field.
-        var child = Q.OrderItems().Comment("Prepare the complete managed leaf")
-            .Purpose("Persist the leaf under its original active root").NewEntity(context);
+        var child = (await Q.OrderItems().Comment("Prepare the complete managed leaf")
+            .Purpose("Persist the leaf under its original active root").NewEntityAsync(context));
         child.UpdateProductName("Managed partial original"); child.UpdateUnitPrice(10.00m);
         order.OrderItemList.Add(child);
         await order.AuditAs("Create the owned graph for partial-root verification").SaveAsync(context);

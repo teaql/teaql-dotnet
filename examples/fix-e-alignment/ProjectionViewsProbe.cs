@@ -47,8 +47,8 @@ static class ProjectionViewsProbe
         Effects Counts() => new(transport.Queries, transport.Mutations, transport.Begins, transport.Commits, transport.Rollbacks, transport.IdStatements, policies, audit.Calls);
         async Task<PurchaseOrder> Seed()
         {
-            var row = Q.PurchaseOrders().Comment("Prepare an independent query-view fixture")
-                .Purpose("Verify projection boundaries and independent mutation ledgers").NewEntity(context);
+            var row = (await Q.PurchaseOrders().Comment("Prepare an independent query-view fixture")
+                .Purpose("Verify projection boundaries and independent mutation ledgers").NewEntityAsync(context));
             row.UpdateContactPhone("5550700"); row.UpdateInternalNote(null!);
             var before = Counts(); await row.AuditAs("Create the projection fixture through generated mutation").SaveAsync(context);
             var after = Counts();

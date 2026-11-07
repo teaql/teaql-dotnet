@@ -26,8 +26,8 @@ static class VersionProbe
         var cases = new List<object>();
         foreach (var lastValidUpdate in new[] { true, false })
         {
-            var item = Q.PurchaseOrders().Comment("Prepare a signed version boundary")
-                .Purpose("Verify checked generated mutation admission").NewEntity(context);
+            var item = (await Q.PurchaseOrders().Comment("Prepare a signed version boundary")
+                .Purpose("Verify checked generated mutation admission").NewEntityAsync(context));
             item.UpdateContactPhone(lastValidUpdate ? "5550950" : "5550951");
             item = await item.AuditAs("Create the version boundary calibration").SaveAsync(context);
             var id = item.Id ?? throw new InvalidOperationException("Missing boundary ID");

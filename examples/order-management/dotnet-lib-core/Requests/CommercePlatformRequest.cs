@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public CommercePlatformRequest()
@@ -159,55 +159,55 @@ namespace Generated.Requests
                 }
 
 
-                public CommercePlatformRequest WithIdIs(object val)
+                public CommercePlatformRequest WithIdIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdIsNot(object val)
+                public CommercePlatformRequest WithIdIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdIn(params object[] vals)
+                public CommercePlatformRequest WithIdIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdNotIn(params object[] vals)
+                public CommercePlatformRequest WithIdNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdGreaterThan(object val)
+                public CommercePlatformRequest WithIdGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdGreaterThanOrEqualTo(object val)
+                public CommercePlatformRequest WithIdGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdLessThan(object val)
+                public CommercePlatformRequest WithIdLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdLessThanOrEqualTo(object val)
+                public CommercePlatformRequest WithIdLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithIdBetween(object lower, object upper)
+                public CommercePlatformRequest WithIdBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -236,49 +236,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public CommercePlatformRequest WithNameIsNot(object val)
+                public CommercePlatformRequest WithNameIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithNameIn(params object[] vals)
+                public CommercePlatformRequest WithNameIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithNameNotIn(params object[] vals)
+                public CommercePlatformRequest WithNameNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithNameGreaterThan(object val)
+                public CommercePlatformRequest WithNameGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithNameGreaterThanOrEqualTo(object val)
+                public CommercePlatformRequest WithNameGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithNameLessThan(object val)
+                public CommercePlatformRequest WithNameLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithNameLessThanOrEqualTo(object val)
+                public CommercePlatformRequest WithNameLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithNameBetween(object lower, object upper)
+                public CommercePlatformRequest WithNameBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -331,55 +331,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeIs(object val)
+                public CommercePlatformRequest WithCreateTimeIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeIsNot(object val)
+                public CommercePlatformRequest WithCreateTimeIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeIn(params object[] vals)
+                public CommercePlatformRequest WithCreateTimeIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeNotIn(params object[] vals)
+                public CommercePlatformRequest WithCreateTimeNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeGreaterThan(object val)
+                public CommercePlatformRequest WithCreateTimeGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeGreaterThanOrEqualTo(object val)
+                public CommercePlatformRequest WithCreateTimeGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeLessThan(object val)
+                public CommercePlatformRequest WithCreateTimeLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeLessThanOrEqualTo(object val)
+                public CommercePlatformRequest WithCreateTimeLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithCreateTimeBetween(object lower, object upper)
+                public CommercePlatformRequest WithCreateTimeBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -397,55 +397,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeIs(object val)
+                public CommercePlatformRequest WithUpdateTimeIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeIsNot(object val)
+                public CommercePlatformRequest WithUpdateTimeIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeIn(params object[] vals)
+                public CommercePlatformRequest WithUpdateTimeIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeNotIn(params object[] vals)
+                public CommercePlatformRequest WithUpdateTimeNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeGreaterThan(object val)
+                public CommercePlatformRequest WithUpdateTimeGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
+                public CommercePlatformRequest WithUpdateTimeGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeLessThan(object val)
+                public CommercePlatformRequest WithUpdateTimeLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeLessThanOrEqualTo(object val)
+                public CommercePlatformRequest WithUpdateTimeLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithUpdateTimeBetween(object lower, object upper)
+                public CommercePlatformRequest WithUpdateTimeBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -463,55 +463,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionIs(object val)
+                public CommercePlatformRequest WithVersionIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionIsNot(object val)
+                public CommercePlatformRequest WithVersionIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionIn(params object[] vals)
+                public CommercePlatformRequest WithVersionIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionNotIn(params object[] vals)
+                public CommercePlatformRequest WithVersionNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionGreaterThan(object val)
+                public CommercePlatformRequest WithVersionGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionGreaterThanOrEqualTo(object val)
+                public CommercePlatformRequest WithVersionGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionLessThan(object val)
+                public CommercePlatformRequest WithVersionLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionLessThanOrEqualTo(object val)
+                public CommercePlatformRequest WithVersionLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public CommercePlatformRequest WithVersionBetween(object lower, object upper)
+                public CommercePlatformRequest WithVersionBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -611,7 +611,8 @@ namespace Generated.Requests
 
                 public CommercePlatformRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy("id");
+                    _query.ProjectExpr(retName, Expr.Column("id"));
                     return this;
                 }
                 public CommercePlatformRequest GroupByName()
@@ -622,7 +623,8 @@ namespace Generated.Requests
 
                 public CommercePlatformRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy("name");
+                    _query.ProjectExpr(retName, Expr.Column("name"));
                     return this;
                 }
                 public CommercePlatformRequest GroupByCreateTime()
@@ -633,7 +635,8 @@ namespace Generated.Requests
 
                 public CommercePlatformRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time"); 
+                    _query.GroupBy("create_time");
+                    _query.ProjectExpr(retName, Expr.Column("create_time"));
                     return this;
                 }
                 public CommercePlatformRequest GroupByUpdateTime()
@@ -644,7 +647,8 @@ namespace Generated.Requests
 
                 public CommercePlatformRequest GroupByUpdateTimeAs(string retName)
                 {
-                    _query.GroupBy("update_time"); 
+                    _query.GroupBy("update_time");
+                    _query.ProjectExpr(retName, Expr.Column("update_time"));
                     return this;
                 }
                 public CommercePlatformRequest GroupByVersion()
@@ -655,7 +659,8 @@ namespace Generated.Requests
 
                 public CommercePlatformRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy("version");
+                    _query.ProjectExpr(retName, Expr.Column("version"));
                     return this;
                 }
                 public CommercePlatformRequest SelectCustomerList()
@@ -1391,10 +1396,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.CommercePlatform NewEntity(UserContext context)
+        public async Task<Generated.Models.CommercePlatform> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.CommercePlatform();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("CommercePlatform").ConfigureAwait(false));
+            var entity = context.InitializeEntity("CommercePlatform", new Generated.Models.CommercePlatform());
+            entity.TeaqlInitializeNewId(identity);
+            return entity;
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

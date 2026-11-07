@@ -118,14 +118,25 @@ namespace Generated.Models
             return _fullyLoaded || _loadedFields.Contains(field);
         }
 
-        internal void TeaqlInitializeGeneratedBootstrapId(long value)
+        internal void TeaqlInitializeNewId(long value)
         {
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
             var oldKey = TeaqlEntityKey();
             Id = value;
             MarkLoaded("Id");
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
             _entityRoot.Set(TeaqlEntityKey(), "id", new Value.I64Value(value));
             _teaqlForceCreate = true;
+        }
+
+        // Trusted generated bootstrap owns the model-declared identity. It must
+        // not consume an unrelated allocator value and replace it with a seed ID.
+        internal static CustomerOrder TeaqlNewWithFixedId(long value)
+        {
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
+            var entity = new CustomerOrder();
+            entity.TeaqlInitializeNewId(value);
+            return entity;
         }
 
         public CustomerOrder MarkLoaded(params string[] fields)
@@ -299,6 +310,7 @@ namespace Generated.Models
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Prepare)) return;
             graph.DiscardRestoredFields("CustomerOrder", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = !Id.HasValue || _teaqlForceCreate;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
@@ -348,6 +360,7 @@ namespace Generated.Models
 
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Preflight)) return;
             if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
                 graph.PreflightPrepared(this);
             for (var index = 0; index < OrderItemList.Count; index++)
@@ -364,6 +377,7 @@ namespace Generated.Models
 
         internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Reserve)) return;
             var creating = !Id.HasValue || _teaqlForceCreate;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
             {
@@ -419,6 +433,7 @@ namespace Generated.Models
         internal async global::System.Threading.Tasks.Task<CustomerOrder> TeaqlSaveWithinGraphAsync(UserContext context,
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Write)) return this;
             var creating = !this.Id.HasValue || _teaqlForceCreate;
             if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
             {

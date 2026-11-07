@@ -6,85 +6,28 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
   "producerSource": {
-    "commit": "63eb1da8f2272682dd83f79fea504777c332d3c2",
-    "diff": "0f564063c1dc81ad4ef12af376c678893e9db48c277b0a4319e8e7c9ab887e6c",
-    "status": "8589a1b3a8a58d25baf4cce8388e1faa150fde153a341b3137ea801efd520a39",
-    "sourceContentsSha256": "8100032eb1a5c884307b3bb70dec223b84f667efe70a460e05eaff62917da20b",
-    "retainedModels": [
-      {
-        "id": "conformance",
-        "model": "examples/conformance/model.xml",
-        "target": "examples/conformance",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7"
-      },
-      {
-        "id": "trace-chain",
-        "model": "examples/trace-chain/model.xml",
-        "target": "examples/trace-chain/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "916a6851b84c8c9b3345c2330c597481270767dca02cd4194587f80a700698e0"
-      },
-      {
-        "id": "facet-trace",
-        "model": "examples/facet-trace/model.xml",
-        "target": "examples/facet-trace/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e"
-      },
-      {
-        "id": "school-management",
-        "model": "examples/school-management/models/school-model.xml",
-        "target": "examples/school-management",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4"
-      },
-      {
-        "id": "order-management",
-        "model": "examples/order-management/model.xml",
-        "target": "examples/order-management/dotnet-lib-core",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "8b11ee844c2be184e194d8116994fb5fe95299dd593bfed83ec06d71ada0411d"
-      },
-      {
-        "id": "standard-graph",
-        "model": "examples/trace-chain/standard-graph/model.xml",
-        "target": "examples/trace-chain/standard-graph/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "a788850d6cf55c1ffca665122d953b0a04edff0c22e8cd4a55d6996e2b289a1c"
-      },
-      {
-        "id": "standard-order",
-        "model": "examples/trace-chain/standard-order/model.xml",
-        "target": "examples/trace-chain/standard-order/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c"
-      }
-    ],
-    "exporterProbeSha256": "a91a2d427e7ab59515b71fb745777324a7d824df1a5fe30a4c5041f8e1e7dfd5"
+    "commit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
+    "gitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e"
   },
-  "producerReceiptSha256": "c6d2160def3215ad6fa699712066e5a6c334f147bc28a640bb052ecf8d846cc8",
-  "generatedManifestSha256": "fcabf2d22cd31ab6a2ad531aa61da4f411baaa3922bbb4c228877b3e1f0fd261",
+  "producerReceiptSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
+  "generatedManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
   "files": {
+    "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
+    "Requests/PlatformRequest.cs": "a5e573662e0fedae4a7adb3199e26a6e21ec8bfa83c8532798e558f6862a6ac7",
+    "Requests/SchoolTypeRequest.cs": "0379c0af7ee94b47a5646daba788eb71feaacdad5108c327e79f06e818d0d2d0",
+    "Requests/SchoolRequest.cs": "ad5b363571175f06f2726684c81a84b69dd48c0d4f461d9e30d6ce2f377eafdd",
     "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
     "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "Requests/PlatformRequest.cs": "0d0d300f8f2bcab4a45b5748ce36bf8776dde2a1f3c95baeb0ec23170e56f451",
-    "Requests/SchoolTypeRequest.cs": "750c2622e639b76760d6d1ae41a32fec4cbf9e6af9dd6cd5d68be3e53018401b",
-    "Requests/SchoolRequest.cs": "8f09b22551a2747021326cec26535355ce6a452a4c421be8b0e593aac8377cf0",
-    "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97",
-    "GeneratedRuntimeModule.cs": "e39b5d7639d997a7b20f8f2854eca60f741ceec874e939e0e187d6c6e6f627e2",
-    "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
+    "GeneratedRuntimeModule.cs": "edb727b9b6d4046b7dac1b841fc17e0947e315f8867a218e5cdb20784e5c1b0f",
+    "Models/Platform.cs": "be929f265fc6a435ea8df97c7b5911372a9e90855b39b8b5392b327679b619d4",
+    "Models/SchoolType.cs": "9b483f19488b078166723c4e725eaa793b30df19e8598ab188398bf2dee4890c",
+    "Models/School.cs": "e38701e4ef6761fc3da823c649a6e4f2d5d14c35829ea69c69d9828b4f9f1b1f",
     "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
-    "Models/Platform.cs": "990014a0cb974a45dd85aca136895087c330bcc7dd75e0985c73755d942daca2",
-    "Models/SchoolType.cs": "8e1afb6f6333951cf5c80481c379f4d6d80f8a7523de697f55c906fca2b6c4f5",
-    "Models/School.cs": "582e9be67c0531cef097f7b507683c44d116357392cecdfeb2aae4aa27a55fe0"
+    "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
   },
-  "previousFixtureManifestSha256": "29dffc7d198c0676c6583671d8f9c2c1b08e4a9fc65432f393b44d393acdfe05"
+  "previousFixtureManifestSha256": "7cd1ae133566e07bc19dfea7327eb0c6246dc19f1ccda0334ba6249aa0a1e965",
+  "generatorCommit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
+  "generatorGitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e",
+  "producerReportSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
+  "producerManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935"
 }

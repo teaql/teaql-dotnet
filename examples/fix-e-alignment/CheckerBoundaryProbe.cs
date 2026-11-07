@@ -56,12 +56,12 @@ static class CheckerBoundaryProbe
         Effects Counts() => new(transport.Statements, transport.Begins, transport.ParentInserts, transport.ChildInserts,
             state.CheckerCalls, state.Mapped, state.Saves, state.Policies, audit.Calls);
         void Reset() { transport.Reset(); state.ResetCounts(); audit.Calls = 0; }
-        PurchaseOrder Parent(UserContext ctx) => Q.PurchaseOrders().Comment("Prepare a bounded Checker fixture")
-            .Purpose("Verify generated graph admission before persistence").NewEntity(ctx);
+        PurchaseOrder Parent(UserContext ctx) => (await Q.PurchaseOrders().Comment("Prepare a bounded Checker fixture")
+            .Purpose("Verify generated graph admission before persistence").NewEntityAsync(ctx));
         OrderItem Child(UserContext ctx, string? name = "Boundary item")
         {
-            var row = Q.OrderItems().Comment("Prepare a real child constraint")
-                .Purpose("Keep business writes in generated mutation APIs").NewEntity(ctx);
+            var row = (await Q.OrderItems().Comment("Prepare a real child constraint")
+                .Purpose("Keep business writes in generated mutation APIs").NewEntityAsync(ctx));
             if (name != null) row.UpdateProductName(name);
             row.UpdateUnitPrice(10.00m); return row;
         }

@@ -6,91 +6,34 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
   "producerSource": {
-    "commit": "63eb1da8f2272682dd83f79fea504777c332d3c2",
-    "diff": "0f564063c1dc81ad4ef12af376c678893e9db48c277b0a4319e8e7c9ab887e6c",
-    "status": "8589a1b3a8a58d25baf4cce8388e1faa150fde153a341b3137ea801efd520a39",
-    "sourceContentsSha256": "8100032eb1a5c884307b3bb70dec223b84f667efe70a460e05eaff62917da20b",
-    "retainedModels": [
-      {
-        "id": "conformance",
-        "model": "examples/conformance/model.xml",
-        "target": "examples/conformance",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7"
-      },
-      {
-        "id": "trace-chain",
-        "model": "examples/trace-chain/model.xml",
-        "target": "examples/trace-chain/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "916a6851b84c8c9b3345c2330c597481270767dca02cd4194587f80a700698e0"
-      },
-      {
-        "id": "facet-trace",
-        "model": "examples/facet-trace/model.xml",
-        "target": "examples/facet-trace/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e"
-      },
-      {
-        "id": "school-management",
-        "model": "examples/school-management/models/school-model.xml",
-        "target": "examples/school-management",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4"
-      },
-      {
-        "id": "order-management",
-        "model": "examples/order-management/model.xml",
-        "target": "examples/order-management/dotnet-lib-core",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "8b11ee844c2be184e194d8116994fb5fe95299dd593bfed83ec06d71ada0411d"
-      },
-      {
-        "id": "standard-graph",
-        "model": "examples/trace-chain/standard-graph/model.xml",
-        "target": "examples/trace-chain/standard-graph/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "a788850d6cf55c1ffca665122d953b0a04edff0c22e8cd4a55d6996e2b289a1c"
-      },
-      {
-        "id": "standard-order",
-        "model": "examples/trace-chain/standard-order/model.xml",
-        "target": "examples/trace-chain/standard-order/lib",
-        "language": "dotnet",
-        "scope": "dotnet-lib-core",
-        "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c"
-      }
-    ],
-    "exporterProbeSha256": "a91a2d427e7ab59515b71fb745777324a7d824df1a5fe30a4c5041f8e1e7dfd5"
+    "commit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
+    "gitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e"
   },
-  "producerReceiptSha256": "c6d2160def3215ad6fa699712066e5a6c334f147bc28a640bb052ecf8d846cc8",
-  "generatedManifestSha256": "fcabf2d22cd31ab6a2ad531aa61da4f411baaa3922bbb4c228877b3e1f0fd261",
+  "producerReceiptSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
+  "generatedManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
   "files": {
+    "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
+    "Requests/PlatformRequest.cs": "7eaf633bf8b146d6ef4bf6e08fe44eb3a88b8fa50bc2a817d192e33addd4558e",
+    "Requests/CustomerOrderRequest.cs": "13ba4f029fa0ec12d792902c28cd4dba22bb348c502fdfe625d6f57e0e4b7366",
+    "Requests/OrderItemRequest.cs": "99a592c67ed1da4c6770dfcce60eba2093eb2acec14f5ce3fc06dfa8765d0d27",
+    "Requests/PaymentRequest.cs": "e99faa9cd82d40175deccef52a5c558470b89c08221f1ea13c1347939d9639c6",
+    "Requests/PaymentAttemptRequest.cs": "a6a216ce4e1611bccd4fb4413c6d6b21c8d114e033ed65e80967f4599d7d3949",
+    "Requests/ShipmentRequest.cs": "ae81e2a329384ce3477b2c5196ff36cff8df2443dd44fa571c537e78dd22dfd3",
     "GeneratedSearchModels.cs": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332",
     "trace-chain-service-lib.csproj": "fd7e02db480f6c2cfa832618d29bbd558fe9f37d2391a6bd13c7ff5c9842e625",
-    "Requests/PlatformRequest.cs": "6a25ce8510d825a60f53913e49f9e606eeaddaafb607003cfedcb1f7f8cef365",
-    "Requests/CustomerOrderRequest.cs": "ac9a643f59fdadd2503fb2dbe583387d6f85d845b617333f4ee9a1d85feefdf2",
-    "Requests/OrderItemRequest.cs": "51d2c72bde96fd79edff9be0096aa478692b3a554f611d40928ee24166039e4d",
-    "Requests/PaymentRequest.cs": "729d1a53c203e04f13ac656e6c9bea849086cb2816bb4bc50e2582cd6a5c7577",
-    "Requests/PaymentAttemptRequest.cs": "64aa9ff82432ddcfb10bae01add8ac04fbc5ba595ad5101b1eecfb3c6daa4e7a",
-    "Requests/ShipmentRequest.cs": "1b79fabc6f66f9d666efca0d668d9647c121b195f2309b730e9bc09ec8418755",
-    "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134",
-    "GeneratedRuntimeModule.cs": "4348d7732a57168fa045526993528fa24ef757dca9ce7f51811c15865d24f615",
-    "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
+    "GeneratedRuntimeModule.cs": "abef42c67955ad88f9d634274ccbbd0c144a09c38335784bf92589e310c73d46",
+    "Models/Platform.cs": "3a9bb4fdb444182cac838925abefef405f2916b1193ab4c358ec2e3beaaa2d7f",
+    "Models/CustomerOrder.cs": "162e19e790a592d4265c10421c4091acbdc716fda2d2ba2dbd4f75e94ef751b5",
+    "Models/OrderItem.cs": "f2babb9f0b5c77c59f4664383c8138ae2646b87cb34d3d0d88e81460baec390d",
+    "Models/Payment.cs": "2e18fc37d830e9db754acb0443d9a64ecda5eb6e5f3fadb8b5bb71395b521e07",
+    "Models/PaymentAttempt.cs": "1880ed5e8982c20ae91567e4251ce1dc3ed99bcb35ef4488b0f109dfee2009fd",
+    "Models/Shipment.cs": "51febea00f28849297b9b73e9497c7073ff11cbd32b40d43ecdabbcc455ab298",
     "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
-    "Models/Platform.cs": "6fcfbd7ba0547a09716dea77f0be112d095d15edad2b11f5c44a0e5519af9127",
-    "Models/CustomerOrder.cs": "c2dbcb56948fff714782315b94714d0fef27266fabf6a1b9b4375baa741790cc",
-    "Models/OrderItem.cs": "ea5f6703b04b17112ae356b8a723c7395453553fd31d7d8e24e749a907a63d3b",
-    "Models/Payment.cs": "d3dd3ce657d7434d9a7d78e461bc384313ce2207fd2398ee1e3537a1f514242d",
-    "Models/PaymentAttempt.cs": "c041b0fe617130069656cbe0581fe8ed3c175207c1ff75d4a06378c43ac2010e",
-    "Models/Shipment.cs": "df0f155b89b74ffdc1b028e98fa7414fa0a482060246a2e59ec5f2517fa028ce"
+    "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134"
   },
-  "previousFixtureManifestSha256": "304b4d8fdd3e5a711ff3ed017806689547312a71d6556949ee0092d62fdd2afd"
+  "previousFixtureManifestSha256": "06e3ebe2a31595ef20d9e5428a4210f5f7895882022aeb56a592f072ef55a673",
+  "generatorCommit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
+  "generatorGitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e",
+  "producerReportSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
+  "producerManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935"
 }

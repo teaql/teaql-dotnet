@@ -26,14 +26,14 @@ internal static class CanonicalNames
         var cases = new List<object>(); var parents = new List<TypePlatform>();
         foreach (var suffix in new[] { "original", "replacement" })
         {
-            var parent = Q.TypePlatforms().Comment("prepare canonical parent").Purpose("verify relation identity").NewEntity(context)
+            var parent = (await Q.TypePlatforms().Comment("prepare canonical parent").Purpose("verify relation identity").NewEntityAsync(context))
                 .UpdateName(marker + "-" + suffix);
             await parent.AuditAs("create canonical naming parent").SaveAsync(context); parents.Add(parent);
         }
         var rows = new List<ScalarTypeProbe>();
         foreach (var suffix in new[] { "first", "second" })
         {
-            var row = New(context, marker + "-" + suffix, parents[0].Id!.Value);
+            var row = (await NewAsync(context, marker + "-" + suffix, parents[0].Id!.Value));
             var pending = Pending(row);
             Require(pending.ContainsKey("required_string") && pending.ContainsKey("type_platform")
                 && !pending.ContainsKey("requiredString") && !pending.ContainsKey("type_platform_id"), "native updaters lost canonical keys");
@@ -68,7 +68,7 @@ internal static class CanonicalNames
         var rejected = new List<string>();
         foreach (var update in new[] { false, true }) foreach (var item in invalid)
         {
-            var candidate = update ? await Load(context, first.Id!.Value) : New(context, marker, parents[0].Id!.Value);
+            var candidate = update ? await Load(context, first.Id!.Value) : (await NewAsync(context, marker, parents[0].Id!.Value));
             foreach (var pair in item.Fields) candidate.TeaqlMutationLedger.Set(Key(candidate), pair.Key, pair.Value);
             var before = provider.Snapshot(); var beforeSql = sql.Calls;
             var hooks = (checker.Calls, policy.Plans.Count, audit.Events.Count);
@@ -83,7 +83,7 @@ internal static class CanonicalNames
         }
         foreach (var update in new[] { false, true })
         {
-            var candidate = update ? await Load(context, first.Id!.Value) : New(context, marker, parents[0].Id!.Value);
+            var candidate = update ? await Load(context, first.Id!.Value) : (await NewAsync(context, marker, parents[0].Id!.Value));
             candidate.UpdateRequiredString(null!); var before = provider.Snapshot(); var beforeSql = sql.Calls; var audits = audit.Events.Count;
             try { await candidate.AuditAs("reject canonical required value").SaveAsync(context); throw new Exception("missing required value saved"); }
             catch (CheckException error)
@@ -209,8 +209,8 @@ internal static class CanonicalNames
         Console.WriteLine("DOTNET_CANONICAL_NAME=" + reportJson);
     }
 
-    private static ScalarTypeProbe New(UserContext context, string name, long parent) => Q.ScalarTypeProbes()
-        .Comment("prepare canonical naming fixture").Purpose("verify generated mutation boundaries").NewEntity(context)
+    private static async Task<ScalarTypeProbe> NewAsync(UserContext context, string name, long parent) => (await Q.ScalarTypeProbes()
+        .Comment("prepare canonical naming fixture").Purpose("verify generated mutation boundaries").NewEntityAsync(context))
         .UpdateTypePlatform(parent).UpdateRequiredString(name).UpdateRequiredBoolean(true).UpdateRequiredInteger(1).UpdateRequiredLong(1)
         .UpdateRequiredDecimal(3.50m).UpdateRequiredFloat(1.25).UpdateRequiredDouble(2.5)
         .UpdateRequiredDate(new DateTime(2026, 10, 20)).UpdateRequiredTime(new TimeSpan(12, 30, 0))

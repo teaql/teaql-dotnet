@@ -88,14 +88,25 @@ namespace Generated.Models
             return _fullyLoaded || _loadedFields.Contains(field);
         }
 
-        internal void TeaqlInitializeGeneratedBootstrapId(long value)
+        internal void TeaqlInitializeNewId(long value)
         {
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
             var oldKey = TeaqlEntityKey();
             Id = value;
             MarkLoaded("Id");
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
             _entityRoot.Set(TeaqlEntityKey(), "id", new Value.I64Value(value));
             _teaqlForceCreate = true;
+        }
+
+        // Trusted generated bootstrap owns the model-declared identity. It must
+        // not consume an unrelated allocator value and replace it with a seed ID.
+        internal static TypePlatform TeaqlNewWithFixedId(long value)
+        {
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
+            var entity = new TypePlatform();
+            entity.TeaqlInitializeNewId(value);
+            return entity;
         }
 
         public TypePlatform MarkLoaded(params string[] fields)

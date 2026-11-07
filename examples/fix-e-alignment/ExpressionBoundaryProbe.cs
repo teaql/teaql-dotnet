@@ -30,19 +30,19 @@ static class ExpressionBoundaryProbe
             .WithAppAuditEventSink(audit)
             .WithMutationPolicyRegistry(new DelegatingMutationPolicyRegistry(_ => { policies++; return null; }));
         await context.EnsureSchemaAsync();
-        var parent = Q.PurchaseOrders().Comment("Create the generated E boundary parent")
-            .Purpose("Verify expression diagnostics on persisted rows").NewEntity(context);
+        var parent = (await Q.PurchaseOrders().Comment("Create the generated E boundary parent")
+            .Purpose("Verify expression diagnostics on persisted rows").NewEntityAsync(context));
         parent.UpdateContactPhone("PRIVATE_DOTNET_ROOT_123");
         for (var index = 0; index < 3; index++)
         {
-            var child = Q.OrderItems().Comment("Create an indexed E boundary child")
-                .Purpose("Exercise actual loaded list positions").NewEntity(context);
+            var child = (await Q.OrderItems().Comment("Create an indexed E boundary child")
+                .Purpose("Exercise actual loaded list positions").NewEntityAsync(context));
             child.UpdateProductName("Expression item " + index); child.UpdateUnitPrice(10.00m);
             parent.OrderItemList.Add(child);
         }
         await parent.AuditAs("Persist the generated E boundary graph").SaveAsync(context);
-        var empty = Q.PurchaseOrders().Comment("Create the loaded-empty E boundary parent")
-            .Purpose("Distinguish loaded empty from NotLoaded").NewEntity(context);
+        var empty = (await Q.PurchaseOrders().Comment("Create the loaded-empty E boundary parent")
+            .Purpose("Distinguish loaded empty from NotLoaded").NewEntityAsync(context));
         empty.UpdateContactPhone("PRIVATE_DOTNET_ROOT_EMPTY");
         await empty.AuditAs("Persist a parent without children").SaveAsync(context);
         var parentId = parent.Id ?? throw new InvalidOperationException("Missing persisted parent ID");

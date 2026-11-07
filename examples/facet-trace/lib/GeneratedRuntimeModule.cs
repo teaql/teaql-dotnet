@@ -239,8 +239,7 @@ public static class GeneratedRuntimeModule
         var domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (domainRoot == null)
         {
-            var created = Q.Platforms().Comment("what: create generated Domain Root").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1);
+            var created = Generated.Models.Platform.TeaqlNewWithFixedId(1);
             created.UpdateName("Campus Learning Platform");
             created.UpdateBaseUrl("https://campus.example.com");
             try { domainRoot = await created.AuditAs("create generated Domain Root Platform").SaveAsync(context); }
@@ -249,8 +248,7 @@ public static class GeneratedRuntimeModule
         var constantSchoolType1001 = await Q.SchoolTypes().WithIdIs(1001).Comment("what: locate generated constant").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (constantSchoolType1001 == null)
         {
-            var created = Q.SchoolTypes().Comment("what: create generated constant").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1001);
+            var created = Generated.Models.SchoolType.TeaqlNewWithFixedId(1001);
             created.UpdatePlatform(domainRoot.Id);
             created.UpdateName("Primary");
             created.UpdateCode("PRIMARY");
@@ -286,8 +284,7 @@ public static class GeneratedRuntimeModule
         var constantSchoolType1002 = await Q.SchoolTypes().WithIdIs(1002).Comment("what: locate generated constant").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (constantSchoolType1002 == null)
         {
-            var created = Q.SchoolTypes().Comment("what: create generated constant").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1002);
+            var created = Generated.Models.SchoolType.TeaqlNewWithFixedId(1002);
             created.UpdatePlatform(domainRoot.Id);
             created.UpdateName("Secondary");
             created.UpdateCode("SECONDARY");

@@ -28,12 +28,12 @@ static class CheckerMetadataProbe
             .WithDataService(new SqlDataServiceExecutor(new SqliteDialect(), transport, new ModuleSchemaProvider(runtimeModule)))
             .WithAppAuditEventSink(audit);
         var context = Context(module);
-        PurchaseOrder Parent(UserContext ctx) => Q.PurchaseOrders().Comment("Prepare synthetic Checker metadata")
-            .Purpose("Verify model checks precede all database work").NewEntity(ctx);
+        PurchaseOrder Parent(UserContext ctx) => (await Q.PurchaseOrders().Comment("Prepare synthetic Checker metadata")
+            .Purpose("Verify model checks precede all database work").NewEntityAsync(ctx));
         OrderItem Child(UserContext ctx, string? name, decimal price)
         {
-            var child = Q.OrderItems().Comment("Prepare a synthetic child constraint")
-                .Purpose("Verify indexed graph diagnostics").NewEntity(ctx);
+            var child = (await Q.OrderItems().Comment("Prepare a synthetic child constraint")
+                .Purpose("Verify indexed graph diagnostics").NewEntityAsync(ctx));
             if (name != null) child.UpdateProductName(name);
             child.UpdateUnitPrice(price);
             return child;

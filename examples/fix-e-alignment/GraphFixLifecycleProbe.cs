@@ -59,10 +59,10 @@ static class GraphFixLifecycleProbe
         }
         (PurchaseOrder Parent, OrderItem Child) NewGraph(string label, bool valid = true)
         {
-            var parent = Q.PurchaseOrders().Comment("Prepare a graph lifecycle parent")
-                .Purpose("Verify generated graph save boundaries").NewEntity(context);
-            var child = Q.OrderItems().Comment("Prepare a graph lifecycle child")
-                .Purpose("Verify duplicate references and customer Fix").NewEntity(context);
+            var parent = (await Q.PurchaseOrders().Comment("Prepare a graph lifecycle parent")
+                .Purpose("Verify generated graph save boundaries").NewEntityAsync(context));
+            var child = (await Q.OrderItems().Comment("Prepare a graph lifecycle child")
+                .Purpose("Verify duplicate references and customer Fix").NewEntityAsync(context));
             parent.UpdateContactPhone("5550811").UpdateInternalNote(null!);
             if (valid) child.UpdateProductName(label + "-" + round);
             child.UpdateUnitPrice(10.00m); parent.OrderItemList.Add(child); parent.OrderItemList.Add(child);

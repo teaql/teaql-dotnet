@@ -21,8 +21,8 @@ internal static class BaselineRestoration
             .WithBusinessClock(new FixedBusinessClock(DateTimeOffset.Parse("2032-03-01T12:30:00Z")));
         await context.EnsureSchemaAsync();
         var marker = "restore-" + Guid.NewGuid().ToString("N");
-        var created = Q.ScalarTypeProbes().Comment("prepare restoration fixture")
-            .Purpose("verify known persisted baseline").NewEntity(context)
+        var created = (await Q.ScalarTypeProbes().Comment("prepare restoration fixture")
+            .Purpose("verify known persisted baseline").NewEntityAsync(context))
             .UpdateTypePlatform(1).UpdateRequiredString(marker).UpdateRequiredBoolean(true)
             .UpdateRequiredInteger(37).UpdateRequiredLong(8).UpdateRequiredDecimal(37m)
             .UpdateRequiredFloat(1.25).UpdateRequiredDouble(0.0)

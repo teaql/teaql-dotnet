@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public ShipmentRequest()
@@ -172,55 +172,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ShipmentRequest WithIdIs(object val)
+                public ShipmentRequest WithIdIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithIdIsNot(object val)
+                public ShipmentRequest WithIdIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithIdIn(params object[] vals)
+                public ShipmentRequest WithIdIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public ShipmentRequest WithIdNotIn(params object[] vals)
+                public ShipmentRequest WithIdNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public ShipmentRequest WithIdGreaterThan(object val)
+                public ShipmentRequest WithIdGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithIdGreaterThanOrEqualTo(object val)
+                public ShipmentRequest WithIdGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithIdLessThan(object val)
+                public ShipmentRequest WithIdLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithIdLessThanOrEqualTo(object val)
+                public ShipmentRequest WithIdLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithIdBetween(object lower, object upper)
+                public ShipmentRequest WithIdBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -273,49 +273,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
-                public ShipmentRequest WithReferenceCodeIsNot(object val)
+                public ShipmentRequest WithReferenceCodeIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithReferenceCodeIn(params object[] vals)
+                public ShipmentRequest WithReferenceCodeIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("reference_code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public ShipmentRequest WithReferenceCodeNotIn(params object[] vals)
+                public ShipmentRequest WithReferenceCodeNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("reference_code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public ShipmentRequest WithReferenceCodeGreaterThan(object val)
+                public ShipmentRequest WithReferenceCodeGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithReferenceCodeGreaterThanOrEqualTo(object val)
+                public ShipmentRequest WithReferenceCodeGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithReferenceCodeLessThan(object val)
+                public ShipmentRequest WithReferenceCodeLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithReferenceCodeLessThanOrEqualTo(object val)
+                public ShipmentRequest WithReferenceCodeLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithReferenceCodeBetween(object lower, object upper)
+                public ShipmentRequest WithReferenceCodeBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("reference_code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -368,55 +368,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ShipmentRequest WithVersionIs(object val)
+                public ShipmentRequest WithVersionIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionIsNot(object val)
+                public ShipmentRequest WithVersionIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionIn(params object[] vals)
+                public ShipmentRequest WithVersionIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionNotIn(params object[] vals)
+                public ShipmentRequest WithVersionNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionGreaterThan(object val)
+                public ShipmentRequest WithVersionGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionGreaterThanOrEqualTo(object val)
+                public ShipmentRequest WithVersionGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionLessThan(object val)
+                public ShipmentRequest WithVersionLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionLessThanOrEqualTo(object val)
+                public ShipmentRequest WithVersionLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ShipmentRequest WithVersionBetween(object lower, object upper)
+                public ShipmentRequest WithVersionBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -493,7 +493,8 @@ namespace Generated.Requests
 
                 public ShipmentRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy("id");
+                    _query.ProjectExpr(retName, Expr.Column("id"));
                     return this;
                 }
                 public ShipmentRequest GroupByCustomerOrder()
@@ -504,7 +505,8 @@ namespace Generated.Requests
 
                 public ShipmentRequest GroupByCustomerOrderAs(string retName)
                 {
-                    _query.GroupBy("customer_order"); 
+                    _query.GroupBy("customer_order");
+                    _query.ProjectExpr(retName, Expr.Column("customer_order"));
                     return this;
                 }
                 public ShipmentRequest GroupByReferenceCode()
@@ -515,7 +517,8 @@ namespace Generated.Requests
 
                 public ShipmentRequest GroupByReferenceCodeAs(string retName)
                 {
-                    _query.GroupBy("reference_code"); 
+                    _query.GroupBy("reference_code");
+                    _query.ProjectExpr(retName, Expr.Column("reference_code"));
                     return this;
                 }
                 public ShipmentRequest GroupByVersion()
@@ -526,7 +529,8 @@ namespace Generated.Requests
 
                 public ShipmentRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy("version");
+                    _query.ProjectExpr(retName, Expr.Column("version"));
                     return this;
                 }
                 public ShipmentRequest FacetByCustomerOrderAs(
@@ -640,10 +644,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.Shipment NewEntity(UserContext context)
+        public async Task<Generated.Models.Shipment> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.Shipment();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("Shipment").ConfigureAwait(false));
+            var entity = context.InitializeEntity("Shipment", new Generated.Models.Shipment());
+            entity.TeaqlInitializeNewId(identity);
+            return entity;
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

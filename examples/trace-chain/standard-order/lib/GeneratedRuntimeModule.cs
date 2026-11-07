@@ -272,8 +272,7 @@ public static class GeneratedRuntimeModule
         var domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (domainRoot == null)
         {
-            var created = Q.Platforms().Comment("what: create generated Domain Root").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1);
+            var created = Generated.Models.Platform.TeaqlNewWithFixedId(1);
             created.UpdateName("Commerce Test Platform");
             try { domainRoot = await created.AuditAs("create generated Domain Root Platform").SaveAsync(context); }
             catch { domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: recover concurrent Domain Root bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (domainRoot == null) throw; }
@@ -281,8 +280,7 @@ public static class GeneratedRuntimeModule
         var constantOrderStatus1001 = await Q.OrderStatuses().WithIdIs(1001).Comment("what: locate generated constant").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (constantOrderStatus1001 == null)
         {
-            var created = Q.OrderStatuses().Comment("what: create generated constant").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1001);
+            var created = Generated.Models.OrderStatus.TeaqlNewWithFixedId(1001);
             created.UpdatePlatform(domainRoot.Id);
             created.UpdateName("New");
             created.UpdateCode("NEW");
@@ -324,8 +322,7 @@ public static class GeneratedRuntimeModule
         var constantOrderStatus1002 = await Q.OrderStatuses().WithIdIs(1002).Comment("what: locate generated constant").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (constantOrderStatus1002 == null)
         {
-            var created = Q.OrderStatuses().Comment("what: create generated constant").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1002);
+            var created = Generated.Models.OrderStatus.TeaqlNewWithFixedId(1002);
             created.UpdatePlatform(domainRoot.Id);
             created.UpdateName("Paid");
             created.UpdateCode("PAID");
@@ -367,8 +364,7 @@ public static class GeneratedRuntimeModule
         var constantOrderStatus1003 = await Q.OrderStatuses().WithIdIs(1003).Comment("what: locate generated constant").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
         if (constantOrderStatus1003 == null)
         {
-            var created = Q.OrderStatuses().Comment("what: create generated constant").Purpose("why: initialize runtime bootstrap").NewEntity(context);
-            created.TeaqlInitializeGeneratedBootstrapId(1003);
+            var created = Generated.Models.OrderStatus.TeaqlNewWithFixedId(1003);
             created.UpdatePlatform(domainRoot.Id);
             created.UpdateName("Cancelled");
             created.UpdateCode("CANCELLED");

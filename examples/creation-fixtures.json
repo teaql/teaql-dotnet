@@ -1,0 +1,303 @@
+{
+  "schema": "teaql.dotnet-creation-fixture-import/v1",
+  "generatorCommit": "1fc7f7a4cfd13b6d81da4687ea1c7b69096032d1",
+  "generatorGitTreeContentsSha256": "772afa213fcadd6fb32d7d2729f48030661ccac035fe1f4788a98045e392af2e",
+  "producerReportSha256": "d1d19b73e90ce7a57af427f8389d94bbf2a8a2a6b2558c080a2f42dfc699fa9c",
+  "producerManifestSha256": "b2cc3d2b98a90ac6e197893fe35ba83c30eb4befe908fa364844b3424bde0935",
+  "rawExport": "dotnet-creation-fixtures-v1",
+  "previousManifests": [
+    {
+      "file": "examples/conformance/fixture-manifest.json",
+      "sha256": "a79aef99d80512b0e02ec84aa82e596cd4b706d418abcc09c01a72a987a4cf65"
+    },
+    {
+      "file": "examples/trace-chain/lib/fixture-manifest.json",
+      "sha256": "06e3ebe2a31595ef20d9e5428a4210f5f7895882022aeb56a592f072ef55a673"
+    },
+    {
+      "file": "examples/facet-trace/lib/fixture-manifest.json",
+      "sha256": "7cd1ae133566e07bc19dfea7327eb0c6246dc19f1ccda0334ba6249aa0a1e965"
+    },
+    {
+      "file": "examples/school-management/fixture-manifest.json",
+      "sha256": "60f146f7f93ee81a19ff444e95759ce9fb47b6217279a5be204ad37f306c8a37"
+    },
+    {
+      "file": "examples/order-management/dotnet-lib-core/fixture-manifest.json",
+      "sha256": "3a9b3db7e95515d8a26b7aaa43f84be682d32d08ee7a8b7671ecb379d3375ec5"
+    },
+    {
+      "file": "examples/trace-chain/standard-graph/lib/fixture-manifest.json",
+      "sha256": "8e23b5cc4c6b945b94a6237bfca8fcd8a432e8f59ea24450424c3b49c90f30b7"
+    },
+    {
+      "file": "examples/trace-chain/standard-order/lib/fixture-manifest.json",
+      "sha256": "9bbf6000a316bbe2cf8abcc7ecff39bf95462b490253f88c49c047726c6022be"
+    },
+    {
+      "file": "examples/fix-e-alignment/fixture-manifest.json",
+      "sha256": "289f9b483111c378597d8b0dcaf8cf931f22e3fe38b7ab6b99f4efa6ec78da8f"
+    },
+    {
+      "file": "examples/scalar-type-probe/time-hydration-provenance.json",
+      "sha256": "374944b9b6fcb9943e5aa30ecb730fe318cf635043f7478d2ee6cc575da1a6ac"
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "conformance",
+      "model": "examples/conformance/model.xml",
+      "modelSha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7",
+      "target": "examples/conformance",
+      "files": {
+        "E.cs": "c5abf3e9959ef6903572930409db4ff066847c624307d65f517628a6b9dd76a5",
+        "Requests/PlatformRequest.cs": "79336ebd57278a8c13d22dc48bbd741de90435d941926ae3c53a3cb24477102a",
+        "Requests/WorkItemRequest.cs": "679215aae48d2a2cea4b03847d77ebd7fe81d7b27dbad857ab04fd67f943a35a",
+        "GeneratedSearchModels.cs": "3f4e30fe802c4cb71fa5c35333336ca4b4439db3c3e358ec9ae760f3c879c53f",
+        "runtime-example-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "884db2ebb2f72a06548f39cd61716262e653cb0a25e7ccb16f76c2d3191ba214",
+        "Models/Platform.cs": "1cb55d2e920fb10afb6860029ad9d3725b83ef692ec534eec316d2f08aca53c9",
+        "Models/WorkItem.cs": "231aa0c6b1d427d25a4a055f6ccfd58a3c1b2bbe3ab5f6c8b6b75272914f04b8",
+        "teaql-i18n.json": "fa0ea9576dccfb6ef4e940b00b53abb843ee492741e98da5001e6ea2ad79b2cb",
+        "Q.cs": "df7f8f1301551068b1d95ab39f8bd9a6a25aaaa3af54d4871097ea4e4117ed92"
+      }
+    },
+    {
+      "id": "trace-chain",
+      "model": "examples/trace-chain/model.xml",
+      "modelSha256": "916a6851b84c8c9b3345c2330c597481270767dca02cd4194587f80a700698e0",
+      "target": "examples/trace-chain/lib",
+      "files": {
+        "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
+        "Requests/PlatformRequest.cs": "7eaf633bf8b146d6ef4bf6e08fe44eb3a88b8fa50bc2a817d192e33addd4558e",
+        "Requests/CustomerOrderRequest.cs": "13ba4f029fa0ec12d792902c28cd4dba22bb348c502fdfe625d6f57e0e4b7366",
+        "Requests/OrderItemRequest.cs": "99a592c67ed1da4c6770dfcce60eba2093eb2acec14f5ce3fc06dfa8765d0d27",
+        "Requests/PaymentRequest.cs": "e99faa9cd82d40175deccef52a5c558470b89c08221f1ea13c1347939d9639c6",
+        "Requests/PaymentAttemptRequest.cs": "a6a216ce4e1611bccd4fb4413c6d6b21c8d114e033ed65e80967f4599d7d3949",
+        "Requests/ShipmentRequest.cs": "ae81e2a329384ce3477b2c5196ff36cff8df2443dd44fa571c537e78dd22dfd3",
+        "GeneratedSearchModels.cs": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332",
+        "trace-chain-service-lib.csproj": "fd7e02db480f6c2cfa832618d29bbd558fe9f37d2391a6bd13c7ff5c9842e625",
+        "GeneratedRuntimeModule.cs": "abef42c67955ad88f9d634274ccbbd0c144a09c38335784bf92589e310c73d46",
+        "Models/Platform.cs": "3a9bb4fdb444182cac838925abefef405f2916b1193ab4c358ec2e3beaaa2d7f",
+        "Models/CustomerOrder.cs": "162e19e790a592d4265c10421c4091acbdc716fda2d2ba2dbd4f75e94ef751b5",
+        "Models/OrderItem.cs": "f2babb9f0b5c77c59f4664383c8138ae2646b87cb34d3d0d88e81460baec390d",
+        "Models/Payment.cs": "2e18fc37d830e9db754acb0443d9a64ecda5eb6e5f3fadb8b5bb71395b521e07",
+        "Models/PaymentAttempt.cs": "1880ed5e8982c20ae91567e4251ce1dc3ed99bcb35ef4488b0f109dfee2009fd",
+        "Models/Shipment.cs": "51febea00f28849297b9b73e9497c7073ff11cbd32b40d43ecdabbcc455ab298",
+        "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
+        "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134"
+      }
+    },
+    {
+      "id": "facet-trace",
+      "model": "examples/facet-trace/model.xml",
+      "modelSha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e",
+      "target": "examples/facet-trace/lib",
+      "files": {
+        "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
+        "Requests/PlatformRequest.cs": "a5e573662e0fedae4a7adb3199e26a6e21ec8bfa83c8532798e558f6862a6ac7",
+        "Requests/SchoolTypeRequest.cs": "0379c0af7ee94b47a5646daba788eb71feaacdad5108c327e79f06e818d0d2d0",
+        "Requests/SchoolRequest.cs": "ad5b363571175f06f2726684c81a84b69dd48c0d4f461d9e30d6ce2f377eafdd",
+        "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
+        "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "edb727b9b6d4046b7dac1b841fc17e0947e315f8867a218e5cdb20784e5c1b0f",
+        "Models/Platform.cs": "be929f265fc6a435ea8df97c7b5911372a9e90855b39b8b5392b327679b619d4",
+        "Models/SchoolType.cs": "9b483f19488b078166723c4e725eaa793b30df19e8598ab188398bf2dee4890c",
+        "Models/School.cs": "e38701e4ef6761fc3da823c649a6e4f2d5d14c35829ea69c69d9828b4f9f1b1f",
+        "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
+        "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
+      }
+    },
+    {
+      "id": "school-management",
+      "model": "examples/school-management/models/school-model.xml",
+      "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
+      "target": "examples/school-management",
+      "files": {
+        "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
+        "Requests/PlatformRequest.cs": "a5e573662e0fedae4a7adb3199e26a6e21ec8bfa83c8532798e558f6862a6ac7",
+        "Requests/SchoolTypeRequest.cs": "0379c0af7ee94b47a5646daba788eb71feaacdad5108c327e79f06e818d0d2d0",
+        "Requests/SchoolRequest.cs": "ad5b363571175f06f2726684c81a84b69dd48c0d4f461d9e30d6ce2f377eafdd",
+        "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
+        "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "8fa82e014d85f09cb4a6187ea0a9ed5cebaa3ced5a4a238c13d7404d02c30edf",
+        "Models/Platform.cs": "be929f265fc6a435ea8df97c7b5911372a9e90855b39b8b5392b327679b619d4",
+        "Models/SchoolType.cs": "9b483f19488b078166723c4e725eaa793b30df19e8598ab188398bf2dee4890c",
+        "Models/School.cs": "e38701e4ef6761fc3da823c649a6e4f2d5d14c35829ea69c69d9828b4f9f1b1f",
+        "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
+        "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
+      }
+    },
+    {
+      "id": "order-management",
+      "model": "examples/order-management/model.xml",
+      "modelSha256": "8b11ee844c2be184e194d8116994fb5fe95299dd593bfed83ec06d71ada0411d",
+      "target": "examples/order-management/dotnet-lib-core",
+      "files": {
+        "E.cs": "a1663576e91a2b3333985a1e2c8daa9129049ceb1908f621e21e317bc18bcb7a",
+        "Requests/CommercePlatformRequest.cs": "683bfaf6af925aa479ef3b2cbdf928c99201dfc1556b2c19de028e7dcaf3f9ae",
+        "Requests/CustomerRequest.cs": "6579a3588b7b87db3b143b6ad5bba51a5830529fc97af0bebb8522e5ad5e1fb2",
+        "Requests/OrderStatusRequest.cs": "abfd2d5b464a8540224a5745bc38b1529b58420a0026560b7561a8f630fb0589",
+        "Requests/CustomerOrderRequest.cs": "03db50637eab9afc0f2f25c1e724dd3857c14898819f788d92f002b9c5209682",
+        "Requests/ProductRequest.cs": "556839bf15838d97b7ac9ea72cbdcb2876078bd0299f71c5533885f90741eaf7",
+        "Requests/OrderLineRequest.cs": "e8d1158d38e413b539c19c2341132807ef3e691b9b05f1ba71e68214d45ea2e3",
+        "Requests/OrderSearchPresetRequest.cs": "81b277da0fff3390da083acfca1e1c52a0bffd34dbbe3810397fd2f23e00037d",
+        "GeneratedSearchModels.cs": "35c79fed4eeaae2d087c9525711a811dd37621df56836850eabae3450d681687",
+        "order-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "2216ae97b7f6907a2a58c6e53a0e2c9b9c0e27882ed3d79def813296fb2d86b1",
+        "Models/CommercePlatform.cs": "83da36abb3300011045d50c09b68430991c626c9e82d511e0d48a37091c6bfa5",
+        "Models/Customer.cs": "6cbd81b068ce56e4a7167080945aca8604c7c7acab7b3d3d23cbf4de164ec1d8",
+        "Models/OrderStatus.cs": "b1cc361c5376c9892923817010d90edd8f5d97356872f50389a8e889c8802862",
+        "Models/CustomerOrder.cs": "a9b26dfd340ace2d328de481fe5e7dd429841c18d48a11c5946e2280dbf18933",
+        "Models/Product.cs": "e8fee52bb836b0511d9c1ea44fd4c98b4a7fd17cf819ee05d47ab5360abb440b",
+        "Models/OrderLine.cs": "a976139892efd49e0fb1545c2bc4d5c9266e658ee3bdae5472616fb7211e4376",
+        "Models/OrderSearchPreset.cs": "c749eb99e842b36d6d9f25a78fc2f1c560c05108a16e34a02f3260292c76a2c7",
+        "teaql-i18n.json": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135",
+        "Q.cs": "a8b1d8a5250a7d326bc4ba30f8a0e1e7f1c0278097b81d0c0b2321e33604a7c7"
+      }
+    },
+    {
+      "id": "standard-graph",
+      "model": "examples/trace-chain/standard-graph/model.xml",
+      "modelSha256": "a788850d6cf55c1ffca665122d953b0a04edff0c22e8cd4a55d6996e2b289a1c",
+      "target": "examples/trace-chain/standard-graph/lib",
+      "files": {
+        "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
+        "Requests/PlatformRequest.cs": "7eaf633bf8b146d6ef4bf6e08fe44eb3a88b8fa50bc2a817d192e33addd4558e",
+        "Requests/CustomerOrderRequest.cs": "13ba4f029fa0ec12d792902c28cd4dba22bb348c502fdfe625d6f57e0e4b7366",
+        "Requests/OrderItemRequest.cs": "99a592c67ed1da4c6770dfcce60eba2093eb2acec14f5ce3fc06dfa8765d0d27",
+        "Requests/PaymentRequest.cs": "e99faa9cd82d40175deccef52a5c558470b89c08221f1ea13c1347939d9639c6",
+        "Requests/PaymentAttemptRequest.cs": "a6a216ce4e1611bccd4fb4413c6d6b21c8d114e033ed65e80967f4599d7d3949",
+        "Requests/ShipmentRequest.cs": "ae81e2a329384ce3477b2c5196ff36cff8df2443dd44fa571c537e78dd22dfd3",
+        "GeneratedSearchModels.cs": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332",
+        "trace-chain-service-lib.csproj": "44eafffe5a1bb9aecc284417a993b45a4290b5b452fedcd0c728de07d14e36bd",
+        "GeneratedRuntimeModule.cs": "f5a243206400196e4132dbecf04f66fbee756cf5eba4488ae931fdb41ae2c0d6",
+        "Models/Platform.cs": "3a9bb4fdb444182cac838925abefef405f2916b1193ab4c358ec2e3beaaa2d7f",
+        "Models/CustomerOrder.cs": "162e19e790a592d4265c10421c4091acbdc716fda2d2ba2dbd4f75e94ef751b5",
+        "Models/OrderItem.cs": "f2babb9f0b5c77c59f4664383c8138ae2646b87cb34d3d0d88e81460baec390d",
+        "Models/Payment.cs": "2e18fc37d830e9db754acb0443d9a64ecda5eb6e5f3fadb8b5bb71395b521e07",
+        "Models/PaymentAttempt.cs": "1880ed5e8982c20ae91567e4251ce1dc3ed99bcb35ef4488b0f109dfee2009fd",
+        "Models/Shipment.cs": "51febea00f28849297b9b73e9497c7073ff11cbd32b40d43ecdabbcc455ab298",
+        "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
+        "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134"
+      }
+    },
+    {
+      "id": "standard-order",
+      "model": "examples/trace-chain/standard-order/model.xml",
+      "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c",
+      "target": "examples/trace-chain/standard-order/lib",
+      "files": {
+        "E.cs": "bbd0d3fd38ce8f04ac3893ef8e376a8ab70d0b0a01e1d2039c3b265e7bc42ce6",
+        "Requests/PlatformRequest.cs": "32ed52df3cfcece677889580e35ee4dfd18bc396003cdaa862d0f619cff4048f",
+        "Requests/OrderStatusRequest.cs": "8c0f5648f559590f6719d6ca94da18c43dddca95d8b1c8f86ba3e39951f60564",
+        "Requests/CustomerRequest.cs": "32afb8f1b445377816dcce646c402d02bf599e704aeeaeb42a09c0ea219fd956",
+        "Requests/CustomerOrderRequest.cs": "d9b259d8e68409a227ce437d4244eb73ed5051dd6c62acf50177235f53dc94b5",
+        "Requests/OrderItemRequest.cs": "a743280b912ad73d8b42fac40595236756060c1fba3c51d6fdba64b8db209338",
+        "GeneratedSearchModels.cs": "9048fb8f3e24d4cad00ebff0d626589d6e57c066d1dfa75b97063b355b1191c0",
+        "request-tree-order-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "9b1770295c9a937399352cf6edd72165959769e2a95ffa8e33495f12a6f4af63",
+        "Models/Platform.cs": "629730f893898cafb27d5c1d817f2410cc6930eca5f322cd4e24d06f81080f2b",
+        "Models/OrderStatus.cs": "0b4969167c3dbeb324aad76267be2c75616693625cd69066be6e51c5209e7fd7",
+        "Models/Customer.cs": "80111c32ff539fada49035bc7675015501a382fec716750cfc706f9c1730290d",
+        "Models/CustomerOrder.cs": "9a41ea56d67334220a855102123d368b02c595c9dcd9c9399e47931b3166c22d",
+        "Models/OrderItem.cs": "f6ca3aab9c0db1a2715746f132ed99dee196fa7d75ee169ff36512c88986dbf9",
+        "teaql-i18n.json": "ee5dc28e916a8907555d5d5a4d0e3cf2fa37aad047af37abed0800582af18d96",
+        "Q.cs": "7c9cdcea15557409e9e69b7957fd8dc43d15369dc63b8c3addc86f66b84fd530"
+      }
+    },
+    {
+      "id": "fix-e-alignment",
+      "model": "examples/fix-e-alignment/model.xml",
+      "modelSha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
+      "target": "examples/fix-e-alignment/generated",
+      "files": {
+        "E.cs": "8260775859cc9cd523543f8822a529a94f7c9841d6bcff72ebced453c41f9078",
+        "Requests/TenantRequest.cs": "141ff795e045bcb9db5776ce482a6d07263b1e4a06ea2386c17db44052f0fba5",
+        "Requests/PurchaseOrderRequest.cs": "1c001dd0db9ca374f7460ab86c219c5f9386621fd994cd8f1d1930e2e668b0c6",
+        "Requests/OrderItemRequest.cs": "017707bb9b08c52bee5b66b779f498ae165f516c624d3250c52cab8c6f754d9a",
+        "GeneratedSearchModels.cs": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c",
+        "checker-fix-advanced-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "f5b5518be0beb9099b899e77ac4fe56eda8570c9f82a2d8c9efce91d786de707",
+        "Models/Tenant.cs": "86a376f5a00b7fd51bdcc568a698e47c5cf96a774fb077312f66a59e85dd53c0",
+        "Models/PurchaseOrder.cs": "059a64deadef46f97b1ed2408311a62736c5b98580510da03e243a4a0a5efcb2",
+        "Models/OrderItem.cs": "653df0b9497a4771dde6868bddb7864331896e1113dfb4bc74166ac396652a6b",
+        "teaql-i18n.json": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014",
+        "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e"
+      }
+    },
+    {
+      "id": "scalar-type-probe",
+      "model": "examples/scalar-type-probe/model.xml",
+      "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
+      "target": "examples/scalar-type-probe/generated",
+      "files": {
+        "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
+        "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
+        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
+        "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "21a30d920579f0461cfd9e6f9aca5498410cb2cfc1a57c946130e701bcaf1bd0",
+        "Models/TypePlatform.cs": "bf134c8f138ffdf61cfc9dc21bb1d2908cd1ad2faef05dbea148477c22e9860d",
+        "Models/ScalarTypeProbe.cs": "474b1cf8ae628fda13c029a5f397cd113ca1fc267c52f7eda6da3b822cf40eeb",
+        "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
+        "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+      }
+    },
+    {
+      "id": "expression-camelcase",
+      "model": "examples/expression-profiles/generated/camelCase/model.xml",
+      "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
+      "target": "examples/expression-profiles/generated/camelCase",
+      "files": {
+        "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
+        "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
+        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
+        "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "21a30d920579f0461cfd9e6f9aca5498410cb2cfc1a57c946130e701bcaf1bd0",
+        "Models/TypePlatform.cs": "bf134c8f138ffdf61cfc9dc21bb1d2908cd1ad2faef05dbea148477c22e9860d",
+        "Models/ScalarTypeProbe.cs": "474b1cf8ae628fda13c029a5f397cd113ca1fc267c52f7eda6da3b822cf40eeb",
+        "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
+        "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+      }
+    },
+    {
+      "id": "expression-snake-case",
+      "model": "examples/expression-profiles/generated/snake_case/model.xml",
+      "modelSha256": "2dbbcfea6057a5dc7c7c356ea4d0dacec5d5165538f6a9c5903d4d3b64ee13c6",
+      "target": "examples/expression-profiles/generated/snake_case",
+      "files": {
+        "E.cs": "874b7102377dbf8e96a4e6e3f6a04499b763214e09ff7ff3a8c17978db0933ab",
+        "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
+        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
+        "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "aca1c7bb7453ac564c5b3ea88962fc1727a77d6169311f140a838470486af576",
+        "Models/TypePlatform.cs": "8911bf0dbc11bdc1b0796311144b9faddad4e0983cb9780a9f536b758a40a71b",
+        "Models/ScalarTypeProbe.cs": "1c65aac6b5c8e36a6fafd1f3492f3ca455d4b3d6ae2446c59eec6124fd5f26bb",
+        "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
+        "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+      }
+    },
+    {
+      "id": "expression-pascalcase",
+      "model": "examples/expression-profiles/generated/PascalCase/model.xml",
+      "modelSha256": "f836540a765f8c372bd7103a25a83ca316797253079ac63f8a1ef5ee4ded027d",
+      "target": "examples/expression-profiles/generated/PascalCase",
+      "files": {
+        "E.cs": "2ae6ecb54a33a866524858653c16d3dbffa820da4a3fb00362e9fe47e53ff005",
+        "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
+        "Requests/ScalarTypeProbeRequest.cs": "aa4e1067e39f88e70547a4223b8186693db4841f7c2e62dac5c34a572ea0f5d4",
+        "GeneratedSearchModels.cs": "04be33c8e32ee5f7dff502b61271136a4f7d1493084cb6be34e6fab9eb880074",
+        "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+        "GeneratedRuntimeModule.cs": "1103c665a482eab98e46355b9e7e6c0f7aff526d17026cabdf1c5980d0508817",
+        "Models/TypePlatform.cs": "1c625e5b7ae66fdc9fd0efc2503605e4cf97af21e78a707cf90d57964bcbcb19",
+        "Models/ScalarTypeProbe.cs": "4bb13c4ba2eb9f1d5bcf5834a905604eafb9845f623c5163a191b73969c41920",
+        "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
+        "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+      }
+    }
+  ],
+  "generatedImplementationHandEdited": false
+}

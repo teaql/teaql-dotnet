@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public SchoolTypeRequest()
@@ -209,55 +209,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdIs(object val)
+                public SchoolTypeRequest WithIdIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdIsNot(object val)
+                public SchoolTypeRequest WithIdIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdIn(params object[] vals)
+                public SchoolTypeRequest WithIdIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdNotIn(params object[] vals)
+                public SchoolTypeRequest WithIdNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdGreaterThan(object val)
+                public SchoolTypeRequest WithIdGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdGreaterThanOrEqualTo(object val)
+                public SchoolTypeRequest WithIdGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdLessThan(object val)
+                public SchoolTypeRequest WithIdLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdLessThanOrEqualTo(object val)
+                public SchoolTypeRequest WithIdLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithIdBetween(object lower, object upper)
+                public SchoolTypeRequest WithIdBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -286,49 +286,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public SchoolTypeRequest WithNameIsNot(object val)
+                public SchoolTypeRequest WithNameIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithNameIn(params object[] vals)
+                public SchoolTypeRequest WithNameIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithNameNotIn(params object[] vals)
+                public SchoolTypeRequest WithNameNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithNameGreaterThan(object val)
+                public SchoolTypeRequest WithNameGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithNameGreaterThanOrEqualTo(object val)
+                public SchoolTypeRequest WithNameGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithNameLessThan(object val)
+                public SchoolTypeRequest WithNameLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithNameLessThanOrEqualTo(object val)
+                public SchoolTypeRequest WithNameLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithNameBetween(object lower, object upper)
+                public SchoolTypeRequest WithNameBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -392,49 +392,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("code", TeaqlQueryValue(val)));
                     return this;
                 }
-                public SchoolTypeRequest WithCodeIsNot(object val)
+                public SchoolTypeRequest WithCodeIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithCodeIn(params object[] vals)
+                public SchoolTypeRequest WithCodeIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithCodeNotIn(params object[] vals)
+                public SchoolTypeRequest WithCodeNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithCodeGreaterThan(object val)
+                public SchoolTypeRequest WithCodeGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithCodeGreaterThanOrEqualTo(object val)
+                public SchoolTypeRequest WithCodeGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithCodeLessThan(object val)
+                public SchoolTypeRequest WithCodeLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithCodeLessThanOrEqualTo(object val)
+                public SchoolTypeRequest WithCodeLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithCodeBetween(object lower, object upper)
+                public SchoolTypeRequest WithCodeBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -487,55 +487,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderIs(object val)
+                public SchoolTypeRequest WithDisplayOrderIs(decimal val)
                 {
                     _query.AndFilter(Expr.Eq("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderIsNot(object val)
+                public SchoolTypeRequest WithDisplayOrderIsNot(decimal val)
                 {
                     _query.AndFilter(Expr.Ne("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderIn(params object[] vals)
+                public SchoolTypeRequest WithDisplayOrderIn(params decimal[] vals)
                 {
-                    _query.AndFilter(Expr.In("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("display_order", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderNotIn(params object[] vals)
+                public SchoolTypeRequest WithDisplayOrderNotIn(params decimal[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("display_order", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderGreaterThan(object val)
+                public SchoolTypeRequest WithDisplayOrderGreaterThan(decimal val)
                 {
                     _query.AndFilter(Expr.Gt("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderGreaterThanOrEqualTo(object val)
+                public SchoolTypeRequest WithDisplayOrderGreaterThanOrEqualTo(decimal val)
                 {
                     _query.AndFilter(Expr.Gte("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderLessThan(object val)
+                public SchoolTypeRequest WithDisplayOrderLessThan(decimal val)
                 {
                     _query.AndFilter(Expr.Lt("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderLessThanOrEqualTo(object val)
+                public SchoolTypeRequest WithDisplayOrderLessThanOrEqualTo(decimal val)
                 {
                     _query.AndFilter(Expr.Lte("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithDisplayOrderBetween(object lower, object upper)
+                public SchoolTypeRequest WithDisplayOrderBetween(decimal lower, decimal upper)
                 {
                     _query.AndFilter(Expr.Between("display_order", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -553,55 +553,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionIs(object val)
+                public SchoolTypeRequest WithVersionIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionIsNot(object val)
+                public SchoolTypeRequest WithVersionIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionIn(params object[] vals)
+                public SchoolTypeRequest WithVersionIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionNotIn(params object[] vals)
+                public SchoolTypeRequest WithVersionNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionGreaterThan(object val)
+                public SchoolTypeRequest WithVersionGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionGreaterThanOrEqualTo(object val)
+                public SchoolTypeRequest WithVersionGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionLessThan(object val)
+                public SchoolTypeRequest WithVersionLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionLessThanOrEqualTo(object val)
+                public SchoolTypeRequest WithVersionLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public SchoolTypeRequest WithVersionBetween(object lower, object upper)
+                public SchoolTypeRequest WithVersionBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -781,7 +781,8 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest GroupByPlatformAs(string retName)
                 {
-                    _query.GroupBy("platform"); 
+                    _query.GroupBy("platform");
+                    _query.ProjectExpr(retName, Expr.Column("platform"));
                     return this;
                 }
                 public SchoolTypeRequest GroupById()
@@ -792,7 +793,8 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy("id");
+                    _query.ProjectExpr(retName, Expr.Column("id"));
                     return this;
                 }
                 public SchoolTypeRequest GroupByName()
@@ -803,7 +805,8 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy("name");
+                    _query.ProjectExpr(retName, Expr.Column("name"));
                     return this;
                 }
                 public SchoolTypeRequest GroupByCode()
@@ -814,7 +817,8 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest GroupByCodeAs(string retName)
                 {
-                    _query.GroupBy("code"); 
+                    _query.GroupBy("code");
+                    _query.ProjectExpr(retName, Expr.Column("code"));
                     return this;
                 }
                 public SchoolTypeRequest GroupByDisplayOrder()
@@ -825,7 +829,8 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest GroupByDisplayOrderAs(string retName)
                 {
-                    _query.GroupBy("display_order"); 
+                    _query.GroupBy("display_order");
+                    _query.ProjectExpr(retName, Expr.Column("display_order"));
                     return this;
                 }
                 public SchoolTypeRequest GroupByVersion()
@@ -836,7 +841,8 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy("version");
+                    _query.ProjectExpr(retName, Expr.Column("version"));
                     return this;
                 }
                 public SchoolTypeRequest SelectSchoolList()
@@ -1107,10 +1113,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.SchoolType NewEntity(UserContext context)
+        public async Task<Generated.Models.SchoolType> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.SchoolType();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("SchoolType").ConfigureAwait(false));
+            var entity = context.InitializeEntity("SchoolType", new Generated.Models.SchoolType());
+            entity.TeaqlInitializeNewId(identity);
+            return entity;
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

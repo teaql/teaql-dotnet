@@ -39,8 +39,8 @@ var module = GeneratedRuntimeModule.Module;
 var service = new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
 var context = module.IntoContext().WithDataService(service).WithBusinessClock(new FixedBusinessClock(first));
 await context.EnsureSchemaAsync();
-var order = Q.PurchaseOrders().Comment("Prepare the synthetic clock fixture")
-    .Purpose("Verify generated audited saves and expression diagnostics").NewEntity(context);
+var order = (await Q.PurchaseOrders().Comment("Prepare the synthetic clock fixture")
+    .Purpose("Verify generated audited saves and expression diagnostics").NewEntityAsync(context));
 order.UpdateContactPhone("5550100");
 await order.AuditAs("Create the synthetic Fix order").SaveAsync(context);
 Require(E.PurchaseOrder(order).CreateTime().Eval() == first.UtcDateTime, "Create time did not consume injected T0");

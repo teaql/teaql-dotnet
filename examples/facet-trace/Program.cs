@@ -27,7 +27,7 @@ var existing = await Q.Schools().WithNameIs(Secret).Limit(10).Comment("check ret
     .Purpose("reuse one database without cleanup").ExecuteForListAsync(context);
 if (existing.Count == 0) {
     for (var i = 0; i < 2; i++) {
-        var school = Q.Schools().Comment("seed facet membership").Purpose("prepare generated fixture").NewEntity(context);
+        var school = (await Q.Schools().Comment("seed facet membership").Purpose("prepare generated fixture").NewEntityAsync(context));
         school.UpdatePlatformId(1).UpdateSchoolTypeToPrimary().UpdateName(Secret)
             .UpdateAddress("Facet Road").UpdateEstablishedDate(new DateTime(2001, 1, 1))
             .UpdateStudentCapacity(10).UpdateActive(true);

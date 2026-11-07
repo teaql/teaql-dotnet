@@ -11,10 +11,10 @@ static class OwnershipProbe
     {
         var before = await Q.PurchaseOrders().Limit(20).Comment("Inspect the initial ownership fixture")
             .Purpose("Verify independent roots never share pending mutations").ExecuteForListAsync(context);
-        var first = Q.PurchaseOrders().Comment("Prepare independent new owner A")
-            .Purpose("Verify Context does not own mutation ledgers").NewEntity(context);
-        var second = Q.PurchaseOrders().Comment("Prepare independent new owner B")
-            .Purpose("Verify Context does not own mutation ledgers").NewEntity(context);
+        var first = (await Q.PurchaseOrders().Comment("Prepare independent new owner A")
+            .Purpose("Verify Context does not own mutation ledgers").NewEntityAsync(context));
+        var second = (await Q.PurchaseOrders().Comment("Prepare independent new owner B")
+            .Purpose("Verify Context does not own mutation ledgers").NewEntityAsync(context));
         first.UpdateContactPhone("5550300"); second.UpdateContactPhone("5550400");
         var savedA = await first.AuditAs("Save only independent new owner A").SaveAsync(context);
         var initial = await Q.PurchaseOrders().Limit(20).Comment("Inspect A's save before saving B")

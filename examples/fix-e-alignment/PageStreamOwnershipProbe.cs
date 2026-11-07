@@ -11,8 +11,8 @@ static class PageStreamOwnershipProbe
     {
         var before = await Q.PurchaseOrders().Limit(20).Comment("Inspect the page ownership fixture")
             .Purpose("Establish the bounded exact total").ExecuteForListAsync(context);
-        var sentinel = Q.PurchaseOrders().Comment("Prepare a page-offset sentinel")
-            .Purpose("Exercise a genuine nonzero page offset").NewEntity(context);
+        var sentinel = (await Q.PurchaseOrders().Comment("Prepare a page-offset sentinel")
+            .Purpose("Exercise a genuine nonzero page offset").NewEntityAsync(context));
         sentinel.UpdateContactPhone("5550500");
         await sentinel.AuditAs("Save the synthetic page sentinel").SaveAsync(context);
         async Task Exercise(IEnumerable<Generated.Models.PurchaseOrder> rows, string label, string previous, string next, long version)

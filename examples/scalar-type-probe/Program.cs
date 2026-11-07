@@ -20,8 +20,8 @@ var roots = await Q.TypePlatforms().Limit(10).Comment("check scalar bootstrap")
     .Purpose("verify idempotent root seed").ExecuteForListAsync(context);
 Require(roots.Count == 1 && roots[0].Id == 1, "bootstrap must keep exactly one root");
 
-var invalid = Q.ScalarTypeProbes().Comment("prepare missing required values")
-    .Purpose("verify checker rejects before SQL").NewEntity(context);
+var invalid = (await Q.ScalarTypeProbes().Comment("prepare missing required values")
+    .Purpose("verify checker rejects before SQL").NewEntityAsync(context));
 var sqlBefore = diagnostics.Count;
 try
 {
@@ -44,7 +44,7 @@ if (fresh)
 {
     foreach (var (name, amount) in new[] { ("exact-high", precise), ("numeric-two", 2m), ("numeric-ten", 10m) })
     {
-        var entity = NewProbe(name, amount);
+        var entity = (await NewProbeAsync(name, amount));
         await entity.AuditAs("seed scalar fixture through generated mutation API").SaveAsync(context);
     }
 }
@@ -106,8 +106,8 @@ await IntegralRoundtrip.RunAsync(database + ".integer.sqlite");
 await CanonicalNames.RunAsync(database + ".names.sqlite");
 await BaselineRestoration.RunAsync(database + ".restore.sqlite");
 
-ScalarTypeProbe NewProbe(string name, decimal amount) => Q.ScalarTypeProbes()
-    .Comment("prepare one generated scalar fixture").Purpose("verify exact provider storage").NewEntity(context)
+async Task<ScalarTypeProbe> NewProbeAsync(string name, decimal amount) => (await Q.ScalarTypeProbes()
+    .Comment("prepare one generated scalar fixture").Purpose("verify exact provider storage").NewEntityAsync(context))
     .UpdateTypePlatform(1).UpdateRequiredString(name).UpdateRequiredBoolean(true)
     .UpdateRequiredInteger(7).UpdateRequiredLong(8).UpdateRequiredDecimal(amount)
     .UpdateRequiredFloat(1.25).UpdateRequiredDouble(2.5).UpdateRequiredDate(new DateTime(2026, 10, 20))

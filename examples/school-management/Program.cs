@@ -107,8 +107,8 @@ try
     Console.WriteLine($"PASS .NET generated bootstrap trace logging={logging} fresh={fresh} originalVersion={originalVersion}");
     if (bootstrapOnly) return;
 
-    var school = Q.Schools().Comment("create School Query conformance fixture")
-        .Purpose("execute the shared School example").NewEntity(context);
+    var school = (await Q.Schools().Comment("create School Query conformance fixture")
+        .Purpose("execute the shared School example").NewEntityAsync(context));
     school.UpdatePlatform(Platform.Refer(1));
     school.UpdateSchoolTypeToPrimary();
     school.UpdateName("Riverside Primary School");

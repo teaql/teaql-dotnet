@@ -35,11 +35,11 @@ static class PartialAncestorProbe
         Effects Counts() => new(transport.Statements, transport.Begins, transport.IdStatements, transport.Mutations, policies, audit.Calls);
         void Reset() { transport.Reset(); policies = 0; audit.Calls = 0; }
         Reset();
-        var parent = Q.PurchaseOrders().Comment("Prepare the partial-ancestor fixture")
-            .Purpose("Validate only modified business objects for graph saves").NewEntity(context);
+        var parent = (await Q.PurchaseOrders().Comment("Prepare the partial-ancestor fixture")
+            .Purpose("Validate only modified business objects for graph saves").NewEntityAsync(context));
         parent.UpdateContactPhone("5550600");
-        var child = Q.OrderItems().Comment("Prepare one complete leaf")
-            .Purpose("Use the generated relation and audited save").NewEntity(context);
+        var child = (await Q.OrderItems().Comment("Prepare one complete leaf")
+            .Purpose("Use the generated relation and audited save").NewEntityAsync(context));
         child.UpdateProductName("Partial graph original"); child.UpdateUnitPrice(10.00m);
         parent.OrderItemList.Add(child);
         await parent.AuditAs("Create the partial-ancestor graph").SaveAsync(context);

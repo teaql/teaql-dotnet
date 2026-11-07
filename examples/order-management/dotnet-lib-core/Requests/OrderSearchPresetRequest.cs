@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public OrderSearchPresetRequest()
@@ -207,55 +207,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdIs(object val)
+                public OrderSearchPresetRequest WithIdIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdIsNot(object val)
+                public OrderSearchPresetRequest WithIdIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdIn(params object[] vals)
+                public OrderSearchPresetRequest WithIdIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithIdNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdGreaterThan(object val)
+                public OrderSearchPresetRequest WithIdGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithIdGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdLessThan(object val)
+                public OrderSearchPresetRequest WithIdLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithIdLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithIdBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithIdBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -284,49 +284,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderSearchPresetRequest WithNameIsNot(object val)
+                public OrderSearchPresetRequest WithNameIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithNameIn(params object[] vals)
+                public OrderSearchPresetRequest WithNameIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithNameNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithNameNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithNameGreaterThan(object val)
+                public OrderSearchPresetRequest WithNameGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithNameGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithNameGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithNameLessThan(object val)
+                public OrderSearchPresetRequest WithNameLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithNameLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithNameLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithNameBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithNameBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -390,49 +390,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("filter_json", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderSearchPresetRequest WithFilterJsonIsNot(object val)
+                public OrderSearchPresetRequest WithFilterJsonIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("filter_json", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithFilterJsonIn(params object[] vals)
+                public OrderSearchPresetRequest WithFilterJsonIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("filter_json", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("filter_json", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithFilterJsonNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithFilterJsonNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("filter_json", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("filter_json", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithFilterJsonGreaterThan(object val)
+                public OrderSearchPresetRequest WithFilterJsonGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("filter_json", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithFilterJsonGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithFilterJsonGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("filter_json", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithFilterJsonLessThan(object val)
+                public OrderSearchPresetRequest WithFilterJsonLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("filter_json", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithFilterJsonLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithFilterJsonLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("filter_json", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithFilterJsonBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithFilterJsonBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("filter_json", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -496,49 +496,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("request_id", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderSearchPresetRequest WithRequestIdIsNot(object val)
+                public OrderSearchPresetRequest WithRequestIdIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("request_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithRequestIdIn(params object[] vals)
+                public OrderSearchPresetRequest WithRequestIdIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("request_id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("request_id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithRequestIdNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithRequestIdNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("request_id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("request_id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithRequestIdGreaterThan(object val)
+                public OrderSearchPresetRequest WithRequestIdGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("request_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithRequestIdGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithRequestIdGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("request_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithRequestIdLessThan(object val)
+                public OrderSearchPresetRequest WithRequestIdLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("request_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithRequestIdLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithRequestIdLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("request_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithRequestIdBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithRequestIdBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("request_id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -602,49 +602,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("owner_user_id", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderSearchPresetRequest WithOwnerUserIdIsNot(object val)
+                public OrderSearchPresetRequest WithOwnerUserIdIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("owner_user_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithOwnerUserIdIn(params object[] vals)
+                public OrderSearchPresetRequest WithOwnerUserIdIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("owner_user_id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("owner_user_id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithOwnerUserIdNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithOwnerUserIdNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("owner_user_id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("owner_user_id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithOwnerUserIdGreaterThan(object val)
+                public OrderSearchPresetRequest WithOwnerUserIdGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("owner_user_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithOwnerUserIdGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithOwnerUserIdGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("owner_user_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithOwnerUserIdLessThan(object val)
+                public OrderSearchPresetRequest WithOwnerUserIdLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("owner_user_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithOwnerUserIdLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithOwnerUserIdLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("owner_user_id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithOwnerUserIdBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithOwnerUserIdBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("owner_user_id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -721,55 +721,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeIs(object val)
+                public OrderSearchPresetRequest WithCreateTimeIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeIsNot(object val)
+                public OrderSearchPresetRequest WithCreateTimeIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeIn(params object[] vals)
+                public OrderSearchPresetRequest WithCreateTimeIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithCreateTimeNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeGreaterThan(object val)
+                public OrderSearchPresetRequest WithCreateTimeGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithCreateTimeGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeLessThan(object val)
+                public OrderSearchPresetRequest WithCreateTimeLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithCreateTimeLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithCreateTimeBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithCreateTimeBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -787,55 +787,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeIs(object val)
+                public OrderSearchPresetRequest WithUpdateTimeIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeIsNot(object val)
+                public OrderSearchPresetRequest WithUpdateTimeIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeIn(params object[] vals)
+                public OrderSearchPresetRequest WithUpdateTimeIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithUpdateTimeNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeGreaterThan(object val)
+                public OrderSearchPresetRequest WithUpdateTimeGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithUpdateTimeGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeLessThan(object val)
+                public OrderSearchPresetRequest WithUpdateTimeLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithUpdateTimeLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithUpdateTimeBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithUpdateTimeBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -853,55 +853,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionIs(object val)
+                public OrderSearchPresetRequest WithVersionIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionIsNot(object val)
+                public OrderSearchPresetRequest WithVersionIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionIn(params object[] vals)
+                public OrderSearchPresetRequest WithVersionIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionNotIn(params object[] vals)
+                public OrderSearchPresetRequest WithVersionNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionGreaterThan(object val)
+                public OrderSearchPresetRequest WithVersionGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionGreaterThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithVersionGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionLessThan(object val)
+                public OrderSearchPresetRequest WithVersionLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionLessThanOrEqualTo(object val)
+                public OrderSearchPresetRequest WithVersionLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderSearchPresetRequest WithVersionBetween(object lower, object upper)
+                public OrderSearchPresetRequest WithVersionBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1038,7 +1038,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy("id");
+                    _query.ProjectExpr(retName, Expr.Column("id"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByName()
@@ -1049,7 +1050,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy("name");
+                    _query.ProjectExpr(retName, Expr.Column("name"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByFilterJson()
@@ -1060,7 +1062,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByFilterJsonAs(string retName)
                 {
-                    _query.GroupBy("filter_json"); 
+                    _query.GroupBy("filter_json");
+                    _query.ProjectExpr(retName, Expr.Column("filter_json"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByRequestId()
@@ -1071,7 +1074,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByRequestIdAs(string retName)
                 {
-                    _query.GroupBy("request_id"); 
+                    _query.GroupBy("request_id");
+                    _query.ProjectExpr(retName, Expr.Column("request_id"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByOwnerUserId()
@@ -1082,7 +1086,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByOwnerUserIdAs(string retName)
                 {
-                    _query.GroupBy("owner_user_id"); 
+                    _query.GroupBy("owner_user_id");
+                    _query.ProjectExpr(retName, Expr.Column("owner_user_id"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByCommercePlatform()
@@ -1093,7 +1098,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByCommercePlatformAs(string retName)
                 {
-                    _query.GroupBy("commerce_platform"); 
+                    _query.GroupBy("commerce_platform");
+                    _query.ProjectExpr(retName, Expr.Column("commerce_platform"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByCreateTime()
@@ -1104,7 +1110,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time"); 
+                    _query.GroupBy("create_time");
+                    _query.ProjectExpr(retName, Expr.Column("create_time"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByUpdateTime()
@@ -1115,7 +1122,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByUpdateTimeAs(string retName)
                 {
-                    _query.GroupBy("update_time"); 
+                    _query.GroupBy("update_time");
+                    _query.ProjectExpr(retName, Expr.Column("update_time"));
                     return this;
                 }
                 public OrderSearchPresetRequest GroupByVersion()
@@ -1126,7 +1134,8 @@ namespace Generated.Requests
 
                 public OrderSearchPresetRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy("version");
+                    _query.ProjectExpr(retName, Expr.Column("version"));
                     return this;
                 }
                 public OrderSearchPresetRequest FacetByCommercePlatformAs(
@@ -1240,10 +1249,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.OrderSearchPreset NewEntity(UserContext context)
+        public async Task<Generated.Models.OrderSearchPreset> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.OrderSearchPreset();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("OrderSearchPreset").ConfigureAwait(false));
+            var entity = context.InitializeEntity("OrderSearchPreset", new Generated.Models.OrderSearchPreset());
+            entity.TeaqlInitializeNewId(identity);
+            return entity;
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

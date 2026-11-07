@@ -40,11 +40,11 @@ static class ConcurrentQueryProbe
         var ids = new Dictionary<string, long>(); var childIds = new Dictionary<string, long>();
         foreach (var label in new[] { "alpha", "beta" })
         {
-            var parent = Q.PurchaseOrders().Comment("Prepare the " + label + " query fixture")
-                .Purpose("Use generated audited graph mutation before concurrent reads").NewEntity(context);
+            var parent = (await Q.PurchaseOrders().Comment("Prepare the " + label + " query fixture")
+                .Purpose("Use generated audited graph mutation before concurrent reads").NewEntityAsync(context));
             parent.UpdateContactPhone(label == "alpha" ? "5550701" : "5550702"); parent.UpdateInternalNote(null!);
-            var child = Q.OrderItems().Comment("Prepare the " + label + " query leaf")
-                .Purpose("Read the persisted child identity through generated Q and E").NewEntity(context);
+            var child = (await Q.OrderItems().Comment("Prepare the " + label + " query leaf")
+                .Purpose("Read the persisted child identity through generated Q and E").NewEntityAsync(context));
             child.UpdateProductName(label + " child"); child.UpdateUnitPrice(1.00m); parent.OrderItemList.Add(child);
             await parent.AuditAs("Create the " + label + " concurrent-query graph").SaveAsync(context);
             ids[label] = parent.Id ?? throw new InvalidOperationException("Missing parent ID");

@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public PaymentAttemptRequest()
@@ -172,55 +172,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdIs(object val)
+                public PaymentAttemptRequest WithIdIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdIsNot(object val)
+                public PaymentAttemptRequest WithIdIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdIn(params object[] vals)
+                public PaymentAttemptRequest WithIdIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdNotIn(params object[] vals)
+                public PaymentAttemptRequest WithIdNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdGreaterThan(object val)
+                public PaymentAttemptRequest WithIdGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdGreaterThanOrEqualTo(object val)
+                public PaymentAttemptRequest WithIdGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdLessThan(object val)
+                public PaymentAttemptRequest WithIdLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdLessThanOrEqualTo(object val)
+                public PaymentAttemptRequest WithIdLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithIdBetween(object lower, object upper)
+                public PaymentAttemptRequest WithIdBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -273,49 +273,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
-                public PaymentAttemptRequest WithReferenceCodeIsNot(object val)
+                public PaymentAttemptRequest WithReferenceCodeIsNot(string val)
                 {
                     _query.AndFilter(Expr.Ne("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithReferenceCodeIn(params object[] vals)
+                public PaymentAttemptRequest WithReferenceCodeIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.In("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("reference_code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithReferenceCodeNotIn(params object[] vals)
+                public PaymentAttemptRequest WithReferenceCodeNotIn(params string[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("reference_code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithReferenceCodeGreaterThan(object val)
+                public PaymentAttemptRequest WithReferenceCodeGreaterThan(string val)
                 {
                     _query.AndFilter(Expr.Gt("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithReferenceCodeGreaterThanOrEqualTo(object val)
+                public PaymentAttemptRequest WithReferenceCodeGreaterThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Gte("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithReferenceCodeLessThan(object val)
+                public PaymentAttemptRequest WithReferenceCodeLessThan(string val)
                 {
                     _query.AndFilter(Expr.Lt("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithReferenceCodeLessThanOrEqualTo(object val)
+                public PaymentAttemptRequest WithReferenceCodeLessThanOrEqualTo(string val)
                 {
                     _query.AndFilter(Expr.Lte("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithReferenceCodeBetween(object lower, object upper)
+                public PaymentAttemptRequest WithReferenceCodeBetween(string lower, string upper)
                 {
                     _query.AndFilter(Expr.Between("reference_code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -368,55 +368,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionIs(object val)
+                public PaymentAttemptRequest WithVersionIs(long val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionIsNot(object val)
+                public PaymentAttemptRequest WithVersionIsNot(long val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionIn(params object[] vals)
+                public PaymentAttemptRequest WithVersionIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionNotIn(params object[] vals)
+                public PaymentAttemptRequest WithVersionNotIn(params long[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionGreaterThan(object val)
+                public PaymentAttemptRequest WithVersionGreaterThan(long val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionGreaterThanOrEqualTo(object val)
+                public PaymentAttemptRequest WithVersionGreaterThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionLessThan(object val)
+                public PaymentAttemptRequest WithVersionLessThan(long val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionLessThanOrEqualTo(object val)
+                public PaymentAttemptRequest WithVersionLessThanOrEqualTo(long val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentAttemptRequest WithVersionBetween(object lower, object upper)
+                public PaymentAttemptRequest WithVersionBetween(long lower, long upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -493,7 +493,8 @@ namespace Generated.Requests
 
                 public PaymentAttemptRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy("id");
+                    _query.ProjectExpr(retName, Expr.Column("id"));
                     return this;
                 }
                 public PaymentAttemptRequest GroupByPayment()
@@ -504,7 +505,8 @@ namespace Generated.Requests
 
                 public PaymentAttemptRequest GroupByPaymentAs(string retName)
                 {
-                    _query.GroupBy("payment"); 
+                    _query.GroupBy("payment");
+                    _query.ProjectExpr(retName, Expr.Column("payment"));
                     return this;
                 }
                 public PaymentAttemptRequest GroupByReferenceCode()
@@ -515,7 +517,8 @@ namespace Generated.Requests
 
                 public PaymentAttemptRequest GroupByReferenceCodeAs(string retName)
                 {
-                    _query.GroupBy("reference_code"); 
+                    _query.GroupBy("reference_code");
+                    _query.ProjectExpr(retName, Expr.Column("reference_code"));
                     return this;
                 }
                 public PaymentAttemptRequest GroupByVersion()
@@ -526,7 +529,8 @@ namespace Generated.Requests
 
                 public PaymentAttemptRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy("version");
+                    _query.ProjectExpr(retName, Expr.Column("version"));
                     return this;
                 }
                 public PaymentAttemptRequest FacetByPaymentAs(
@@ -640,10 +644,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.PaymentAttempt NewEntity(UserContext context)
+        public async Task<Generated.Models.PaymentAttempt> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.PaymentAttempt();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("PaymentAttempt").ConfigureAwait(false));
+            var entity = context.InitializeEntity("PaymentAttempt", new Generated.Models.PaymentAttempt());
+            entity.TeaqlInitializeNewId(identity);
+            return entity;
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
