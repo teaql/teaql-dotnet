@@ -693,11 +693,16 @@ public class UserContext
 
     /// <summary>Applies trusted local defaults while preserving the concrete generated type.</summary>
     public T InitializeEntity<T>(string entityName, T entity) where T : class
+        => InitializeEntity(entityName, entity, null);
+
+    /// <summary>Run generated postconditions after all initializers, before registration.</summary>
+    public T InitializeEntity<T>(string entityName, T entity, Action<T>? finalAdmission) where T : class
     {
         if (string.IsNullOrWhiteSpace(entityName)) throw new ArgumentException("Entity name is required", nameof(entityName));
         ArgumentNullException.ThrowIfNull(entity);
         ApplyEntityInitializers("*", entity);
         ApplyEntityInitializers(entityName, entity);
+        finalAdmission?.Invoke(entity);
         _managedEntities.Add(entity);
         return entity;
     }
