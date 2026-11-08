@@ -1,14 +1,29 @@
+using System.Text.Json.Serialization;
+
 namespace TeaQL.Core;
+
+public enum LoadedScalarSnapshotOrigin { Hydrated, CreationBaseline }
 
 /// <summary>Loaded scalar provenance, independent of mutation ownership and relations.</summary>
 public sealed class LoadedScalarSnapshot
 {
     private readonly Record _values;
     internal EntityKey? Owner { get; }
-    public LoadedScalarSnapshot(Record values) => _values = Copy(values);
-    public LoadedScalarSnapshot(EntityKey owner, Record values)
+    [JsonIgnore] public LoadedScalarSnapshotOrigin Origin { get; }
+    [JsonIgnore] public long? PersistedVersion => Origin == LoadedScalarSnapshotOrigin.Hydrated
+        && _values.TryGetValue("version", out var value) && value is Value.I64Value version
+        ? version.Value : null;
+    public LoadedScalarSnapshot(Record values) : this(values, LoadedScalarSnapshotOrigin.Hydrated) { }
+    public LoadedScalarSnapshot(Record values, LoadedScalarSnapshotOrigin origin)
+    {
+        Origin = origin;
+        _values = Copy(values);
+    }
+    public LoadedScalarSnapshot(EntityKey owner, Record values,
+        LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
     {
         Owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        Origin = origin;
         _values = Copy(values);
     }
     public Record CopyValues() => Copy(_values);

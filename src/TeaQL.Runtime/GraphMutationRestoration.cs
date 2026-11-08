@@ -15,7 +15,7 @@ public sealed partial class GraphMutationSession
             throw new InvalidOperationException("GRAPH_LEDGER_ENTITY_TYPE_MISMATCH");
         var pending = ledger.Change(key);
         CanonicalMutationFields.Validate(_context, entityType, pending, !ledger.IsNew(key) && !ledger.IsDeleted(key));
-        if (ledger.IsNew(key) || ledger.IsDeleted(key) || snapshot.Owner != key
+        if (ledger.IsNew(key) || ledger.IsDeleted(key) || snapshot.Origin != LoadedScalarSnapshotOrigin.Hydrated || snapshot.Owner != key
             || !snapshot.TryOriginal("id", out var originalId) || !LoadedScalarSnapshot.SameValue(originalId, key.Id)
             || !snapshot.TryOriginal("version", out var version) || version is not Value.I64Value originalVersion
             || ledger.OriginalVersion(key) != originalVersion.Value) return;
