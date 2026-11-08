@@ -42,7 +42,9 @@ var context = module.IntoContext().WithDataService(service);
 await context.EnsureSchemaAsync();
 Console.WriteLine("PASS EnsureSchemaAsync (explicit SQLite DDL from Runtime Module)");
 
-var invalid = new WorkItem().UpdatePlatform(1);
+Require(await ManagedConstructionChecks.Run() == 0, "Managed initialization checks failed");
+var invalid = (await Q.WorkItems().Comment("Prepare an invalid work item")
+    .Purpose("Verify required title rejection").NewEntityAsync(context)).UpdatePlatform(1);
 try
 {
     await invalid.AuditAs("Checker must reject a missing title").SaveAsync(context);
@@ -56,7 +58,8 @@ catch (CheckException error)
 }
 Console.WriteLine("PASS Checker (canonical title key, rejected before SQL)");
 
-var created = await new WorkItem()
+var created = await (await Q.WorkItems().Comment("Prepare the conformance work item")
+    .Purpose("Verify managed creation").NewEntityAsync(context))
     .UpdateTitle("Verify .NET runtime")
     .UpdatePlatform(1)
     .AuditAs("Create conformance work item")

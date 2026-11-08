@@ -1401,9 +1401,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("CommercePlatform").ConfigureAwait(false));
-            var entity = context.InitializeEntity("CommercePlatform", new Generated.Models.CommercePlatform());
-            entity.TeaqlInitializeNewId(identity);
-            return entity;
+            var entity = Generated.Models.CommercePlatform.TeaqlNewWithReservedId(identity);
+            return context.InitializeEntity("CommercePlatform", entity,
+                initialized => initialized.TeaqlValidateReservedIdentity(identity));
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

@@ -703,9 +703,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("Payment").ConfigureAwait(false));
-            var entity = context.InitializeEntity("Payment", new Generated.Models.Payment());
-            entity.TeaqlInitializeNewId(identity);
-            return entity;
+            var entity = Generated.Models.Payment.TeaqlNewWithReservedId(identity);
+            return context.InitializeEntity("Payment", entity,
+                initialized => initialized.TeaqlValidateReservedIdentity(identity));
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

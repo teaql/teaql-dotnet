@@ -3673,9 +3673,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("ScalarTypeProbe").ConfigureAwait(false));
-            var entity = context.InitializeEntity("ScalarTypeProbe", new Generated.Models.ScalarTypeProbe());
-            entity.TeaqlInitializeNewId(identity);
-            return entity;
+            var entity = Generated.Models.ScalarTypeProbe.TeaqlNewWithReservedId(identity);
+            return context.InitializeEntity("ScalarTypeProbe", entity,
+                initialized => initialized.TeaqlValidateReservedIdentity(identity));
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

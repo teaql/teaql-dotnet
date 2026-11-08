@@ -3,13 +3,13 @@
     "camelCase": {
       "files": {
         "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
-        "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-        "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
+        "Requests/TypePlatformRequest.cs": "2313541648c4f4ddfdfac8b7a2291d9e4030f5104ffa13d34086f00f04424c14",
+        "Requests/ScalarTypeProbeRequest.cs": "7ff5d3f597af80f39e8e7111534a7acec375ad8815aeee209237ef8ab0275c4a",
         "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
         "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "21a30d920579f0461cfd9e6f9aca5498410cb2cfc1a57c946130e701bcaf1bd0",
-        "Models/TypePlatform.cs": "bf134c8f138ffdf61cfc9dc21bb1d2908cd1ad2faef05dbea148477c22e9860d",
-        "Models/ScalarTypeProbe.cs": "474b1cf8ae628fda13c029a5f397cd113ca1fc267c52f7eda6da3b822cf40eeb",
+        "Models/TypePlatform.cs": "544b0fb2e0f0a129c857c2ee0d6949961d25239a8f3625d724ff597a4075b0db",
+        "Models/ScalarTypeProbe.cs": "4928453621d1ae5b676e4564a3f7d2e6bd704a4495646be9a9ecb9d37698f87b",
         "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
         "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
       },
@@ -136,13 +136,13 @@
     "snake_case": {
       "files": {
         "E.cs": "874b7102377dbf8e96a4e6e3f6a04499b763214e09ff7ff3a8c17978db0933ab",
-        "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-        "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
+        "Requests/TypePlatformRequest.cs": "2313541648c4f4ddfdfac8b7a2291d9e4030f5104ffa13d34086f00f04424c14",
+        "Requests/ScalarTypeProbeRequest.cs": "7ff5d3f597af80f39e8e7111534a7acec375ad8815aeee209237ef8ab0275c4a",
         "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
         "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "aca1c7bb7453ac564c5b3ea88962fc1727a77d6169311f140a838470486af576",
-        "Models/TypePlatform.cs": "8911bf0dbc11bdc1b0796311144b9faddad4e0983cb9780a9f536b758a40a71b",
-        "Models/ScalarTypeProbe.cs": "1c65aac6b5c8e36a6fafd1f3492f3ca455d4b3d6ae2446c59eec6124fd5f26bb",
+        "Models/TypePlatform.cs": "7e524fb5a9bf16f1ed70a865082c3f280eb8c59975d6e98ea5ee18f12c92a5f8",
+        "Models/ScalarTypeProbe.cs": "f438f4a1a5dcb79f8236fb182d51a0b659257c72a563cd8454dab4dc0e2dffbe",
         "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
         "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
       },
@@ -269,13 +269,13 @@
     "PascalCase": {
       "files": {
         "E.cs": "2ae6ecb54a33a866524858653c16d3dbffa820da4a3fb00362e9fe47e53ff005",
-        "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-        "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
+        "Requests/TypePlatformRequest.cs": "2313541648c4f4ddfdfac8b7a2291d9e4030f5104ffa13d34086f00f04424c14",
+        "Requests/ScalarTypeProbeRequest.cs": "7ff5d3f597af80f39e8e7111534a7acec375ad8815aeee209237ef8ab0275c4a",
         "GeneratedSearchModels.cs": "04be33c8e32ee5f7dff502b61271136a4f7d1493084cb6be34e6fab9eb880074",
         "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
         "GeneratedRuntimeModule.cs": "1103c665a482eab98e46355b9e7e6c0f7aff526d17026cabdf1c5980d0508817",
-        "Models/TypePlatform.cs": "1c625e5b7ae66fdc9fd0efc2503605e4cf97af21e78a707cf90d57964bcbcb19",
-        "Models/ScalarTypeProbe.cs": "4bb13c4ba2eb9f1d5bcf5834a905604eafb9845f623c5163a191b73969c41920",
+        "Models/TypePlatform.cs": "f3c023f56f3b2601845b3c51ed5126d481d2bb36b484881c2564ed1034884e56",
+        "Models/ScalarTypeProbe.cs": "b6c2281d43ca1734adb55f116e9091d45259e61260964ff239a02c5ae869984a",
         "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
         "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
       },

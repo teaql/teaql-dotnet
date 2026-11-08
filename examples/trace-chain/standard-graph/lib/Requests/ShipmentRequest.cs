@@ -649,9 +649,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("Shipment").ConfigureAwait(false));
-            var entity = context.InitializeEntity("Shipment", new Generated.Models.Shipment());
-            entity.TeaqlInitializeNewId(identity);
-            return entity;
+            var entity = Generated.Models.Shipment.TeaqlNewWithReservedId(identity);
+            return context.InitializeEntity("Shipment", entity,
+                initialized => initialized.TeaqlValidateReservedIdentity(identity));
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

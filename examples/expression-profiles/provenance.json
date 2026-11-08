@@ -1,12 +1,12 @@
 {
-  "generatorCommit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
-  "generatorGitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5",
-  "producerReportSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
-  "producerManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
-  "manifestSha256": "c9684ea614eec3b69f879aeff2cd3b859f2f29f1cadcb456f8ab260c37916c92",
+  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
+  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
+  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
+  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
+  "manifestSha256": "5d97c96a6ec92f8261f82387730b10dda6910fa976a17920b9145db3904a70df",
   "producer": {
-    "commit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
-    "gitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5"
+    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
+    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
   },
-  "previousManifestSha256": "47855821d1fe75901e16899f2bdd30a15d63c291b25e7c6af6fdb4ccf1bddb46"
+  "previousManifestSha256": "c9684ea614eec3b69f879aeff2cd3b859f2f29f1cadcb456f8ab260c37916c92"
 }

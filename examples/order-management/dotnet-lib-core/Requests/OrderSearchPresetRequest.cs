@@ -1254,9 +1254,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("OrderSearchPreset").ConfigureAwait(false));
-            var entity = context.InitializeEntity("OrderSearchPreset", new Generated.Models.OrderSearchPreset());
-            entity.TeaqlInitializeNewId(identity);
-            return entity;
+            var entity = Generated.Models.OrderSearchPreset.TeaqlNewWithReservedId(identity);
+            return context.InitializeEntity("OrderSearchPreset", entity,
+                initialized => initialized.TeaqlValidateReservedIdentity(identity));
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

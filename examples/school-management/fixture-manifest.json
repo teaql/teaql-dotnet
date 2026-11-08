@@ -6,28 +6,28 @@
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
   "producerSource": {
-    "commit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
-    "gitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5"
+    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
+    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
   },
-  "producerReceiptSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
-  "generatedManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
+  "producerReceiptSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
+  "generatedManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
   "files": {
     "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
-    "Requests/PlatformRequest.cs": "a5e573662e0fedae4a7adb3199e26a6e21ec8bfa83c8532798e558f6862a6ac7",
-    "Requests/SchoolTypeRequest.cs": "0379c0af7ee94b47a5646daba788eb71feaacdad5108c327e79f06e818d0d2d0",
-    "Requests/SchoolRequest.cs": "f96087f22f1561b635e0b15631fad4ac4ad145eb048817ddfa43406fb02e9168",
+    "Requests/PlatformRequest.cs": "21edae3feb1be558018545dad2c0a99d5ba94cf959933413334a649b3d8c5797",
+    "Requests/SchoolTypeRequest.cs": "78b4cad538deb71970dae0c068feb0949285a9e53d1826e6784a4b1a9c217dea",
+    "Requests/SchoolRequest.cs": "9e404d008524c1fb9c08cfdf893b4248ef0edd587f9cf38c65185ec8ed03ed64",
     "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
     "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
     "GeneratedRuntimeModule.cs": "8fa82e014d85f09cb4a6187ea0a9ed5cebaa3ced5a4a238c13d7404d02c30edf",
-    "Models/Platform.cs": "be929f265fc6a435ea8df97c7b5911372a9e90855b39b8b5392b327679b619d4",
-    "Models/SchoolType.cs": "9b483f19488b078166723c4e725eaa793b30df19e8598ab188398bf2dee4890c",
-    "Models/School.cs": "e38701e4ef6761fc3da823c649a6e4f2d5d14c35829ea69c69d9828b4f9f1b1f",
+    "Models/Platform.cs": "e3091fadceae37f315f8c06bd454f8f77a24c314b8001ab529da86dc6c92092a",
+    "Models/SchoolType.cs": "c5987f376e275b02f4d7ba1f4c241a98218b61763065c7d7baab84ebfaf33f27",
+    "Models/School.cs": "65a050216ccbdb9ceb31f95c4b8a27c57764af2654343e1e3a15529b4a83763d",
     "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
     "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
   },
-  "previousFixtureManifestSha256": "95075bd771a242feec103056c81093a21141538c624548c31c255514e3b1f823",
-  "generatorCommit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
-  "generatorGitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5",
-  "producerReportSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
-  "producerManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203"
+  "previousFixtureManifestSha256": "fc59b60915aea9ffe3d4bb1f1b937bfab9543674df7bdeed5c1b9b828c838d69",
+  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
+  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
+  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
+  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9"
 }

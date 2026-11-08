@@ -5,32 +5,32 @@
     "sourceContentsSha256": "8f2c5d91303e7210630558d7c911cb6438f42b3e8cf2d03e7cc73cc090a82d4d",
     "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "producerReportSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
-  "producerManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
+  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
+  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
   "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
   "files": {
     "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
-    "Requests/TypePlatformRequest.cs": "2799fbaa9e71548ae576cd975deb120eb47bcbe118445575210a112334a27f2e",
-    "Requests/ScalarTypeProbeRequest.cs": "74e81dfd6489fb386cedb5d5fdc87aeaa484f67d7cb000130f31e0a446c612ee",
+    "Requests/TypePlatformRequest.cs": "2313541648c4f4ddfdfac8b7a2291d9e4030f5104ffa13d34086f00f04424c14",
+    "Requests/ScalarTypeProbeRequest.cs": "7ff5d3f597af80f39e8e7111534a7acec375ad8815aeee209237ef8ab0275c4a",
     "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
     "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
     "GeneratedRuntimeModule.cs": "21a30d920579f0461cfd9e6f9aca5498410cb2cfc1a57c946130e701bcaf1bd0",
-    "Models/TypePlatform.cs": "bf134c8f138ffdf61cfc9dc21bb1d2908cd1ad2faef05dbea148477c22e9860d",
-    "Models/ScalarTypeProbe.cs": "474b1cf8ae628fda13c029a5f397cd113ca1fc267c52f7eda6da3b822cf40eeb",
+    "Models/TypePlatform.cs": "544b0fb2e0f0a129c857c2ee0d6949961d25239a8f3625d724ff597a4075b0db",
+    "Models/ScalarTypeProbe.cs": "4928453621d1ae5b676e4564a3f7d2e6bd704a4495646be9a9ecb9d37698f87b",
     "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
     "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
   },
   "generatedCSharpEditedByHand": false,
-  "generatorCommit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
-  "generatorGitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5",
+  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
+  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
   "producerSource": {
-    "commit": "b5e161a2ff64104a38e124e88910d5a21f3f421c",
-    "gitTreeContentsSha256": "230ef4a5608f10c743abcd1d7d0a5ed05a32449835e73617d225f483f7a946f5"
+    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
+    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
   },
-  "producerReceiptSha256": "061db7204dd046c910c7c475fa52320f023a0f0f692cf267e27e0e3aa59a01e9",
-  "generatedManifestSha256": "44fa768b4e24201cdffa3f0cf8e1c3e92c8ad0dabeff099cd4286ce14120c203",
+  "producerReceiptSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
+  "generatedManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
-  "previousFixtureManifestSha256": "32f40ab0e3d099274f3b57a1650957c26c0a65d60e4b052562343fe14333a27f"
+  "previousFixtureManifestSha256": "97c73aa5e1432acf90b653ba9712ea4f4c90cb95a0757d62622640d3b2fe523b"
 }

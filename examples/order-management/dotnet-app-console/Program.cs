@@ -20,25 +20,27 @@ await connection.OpenAsync();
 var module = GeneratedRuntimeModule.Module;
 var service = new SqlDataServiceExecutor(
     new SqliteDialect(), new SqliteTransport(connection), new ModuleSchemaProvider(module));
-var context = module.IntoContext().WithDataService(service);
+var context = module.IntoContext().WithDataService(service).WithBusinessClock(new QuickStartClock());
 await context.EnsureSchemaAsync();
 long platformId;
 if (firstRun)
 {
-    var now = new DateTime(2026, 8, 13, 9, 0, 0, DateTimeKind.Utc);
     var platform = await Q.CommercePlatforms().WithIdIs(1)
         .Comment("Load generated commerce root")
         .Purpose("Seed quick-start data")
         .ExecuteForOneAsync(context)
         ?? throw new InvalidOperationException("Generated root was not seeded");
     platformId = platform.Id!.Value;
-    var customer = new Customer { Name = "Acme Retail", Email = "masked-in-quick-start", CommercePlatform = platformId, CreateTime = now, UpdateTime = now };
+    var customer = (await Q.Customers().Comment("Prepare the quick-start customer")
+        .Purpose("Seed deterministic quick-start data").NewEntityAsync(context))
+        .UpdateName("Acme Retail").UpdateEmail("masked-in-quick-start")
+        .UpdateCommercePlatform(platformId);
     await customer.AuditAs("Create masked quick-start customer").SaveAsync(context);
-    var order = new CustomerOrder {
-        OrderNumber = "WEB-2026-001", OrderDate = new DateTime(2026, 8, 12), TotalAmount = 129.95m,
-        Status = 1001, Customer = customer.Id, CommercePlatform = platformId,
-        CreateTime = now, UpdateTime = now
-    };
+    var order = (await Q.CustomerOrders().Comment("Prepare the quick-start order")
+        .Purpose("Seed deterministic quick-start data").NewEntityAsync(context))
+        .UpdateOrderNumber("WEB-2026-001").UpdateOrderDate(new DateTime(2026, 8, 12))
+        .UpdateTotalAmount(129.95m).UpdateStatusToPending()
+        .UpdateCustomer(customer.Id!.Value).UpdateCommercePlatform(platformId);
     await order.AuditAs("Create deterministic quick-start order").SaveAsync(context);
     Console.WriteLine("[schema] ensured generated entity tables and columns while saving");
     Console.WriteLine("[seed] inserted deterministic platform, customer, and order");
@@ -68,11 +70,11 @@ foreach (var row in orders)
 
 if (firstRun)
 {
-    var preset = new OrderSearchPreset {
-        Name = "Pending web orders", FilterJson = "{\"order_number\":\"WEB-\"}",
-        RequestId = "quick-start-pending-orders", OwnerUserId = "quick-start-user",
-        CommercePlatform = platformId
-    };
+    var preset = (await Q.OrderSearchPresets().Comment("Prepare the quick-start preset")
+        .Purpose("Persist the operator's reusable search").NewEntityAsync(context))
+        .UpdateName("Pending web orders").UpdateFilterJson("{\"order_number\":\"WEB-\"}")
+        .UpdateRequestId("quick-start-pending-orders").UpdateOwnerUserId("quick-start-user")
+        .UpdateCommercePlatform(platformId);
     await preset.AuditAs("Save idempotent quick-start search preset").SaveAsync(context);
     Console.WriteLine($"[mutation] saved preset #{preset.Id}");
 }
@@ -91,4 +93,9 @@ Console.WriteLine("[audit] governed mutation path verified");
 sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider
 {
     public EntityDescriptor? GetEntity(string name) => module.Metadata.GetEntity(name);
+}
+
+sealed class QuickStartClock : IBusinessClock
+{
+    public DateTimeOffset Now => new(2026, 8, 13, 9, 0, 0, TimeSpan.Zero);
 }

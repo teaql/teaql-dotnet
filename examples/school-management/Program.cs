@@ -34,7 +34,11 @@ await RejectIntent(() => Q.Schools().Purpose("verify missing comment")
     .ExecuteForListAsync(rejectedContext), "REQUEST_COMMENT_REQUIRED", "comment", "query");
 await RejectIntent(() => Q.Schools().Comment("verify blank purpose").Purpose("\u2003")
     .ExecuteForOneAsync(rejectedContext), "QUERY_PURPOSE_REQUIRED", "purpose", "query");
-await RejectIntent(() => new School().SaveAsync(rejectedContext),
+var unaudited = await Q.Schools().Comment("Prepare the missing-audit negative fixture")
+    .Purpose("Verify intent rejection before provider lookup")
+    .NewEntityAsync(new UserContext().Install(GeneratedRuntimeModule.Module)
+        .WithInternalIdAllocator(new IntentProbeAllocator()));
+await RejectIntent(() => unaudited.SaveAsync(rejectedContext),
     "REQUEST_COMMENT_REQUIRED", "comment", "mutation");
 var callbackCount = 0;
 await RejectIntent(() => rejectedContext.ExecuteGraphSaveAsync("\u2003", graph => {
@@ -183,4 +187,10 @@ sealed class IntentPolicyProbe : IRequestPolicy
 {
     public int Calls { get; private set; }
     public SelectQuery Apply(SelectQuery query) { Calls++; return query; }
+}
+
+sealed class IntentProbeAllocator : IInternalIdAllocator
+{
+    public Task<ulong> NextIdAsync(string entity) => Task.FromResult(1UL);
+    public Task EnsureIdFloorAsync(string entity, ulong floor) => Task.CompletedTask;
 }

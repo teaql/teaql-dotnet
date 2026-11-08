@@ -1443,9 +1443,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("School").ConfigureAwait(false));
-            var entity = context.InitializeEntity("School", new Generated.Models.School());
-            entity.TeaqlInitializeNewId(identity);
-            return entity;
+            var entity = Generated.Models.School.TeaqlNewWithReservedId(identity);
+            return context.InitializeEntity("School", entity,
+                initialized => initialized.TeaqlValidateReservedIdentity(identity));
         }
 
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)

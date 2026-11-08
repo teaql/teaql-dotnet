@@ -62,10 +62,12 @@ namespace Generated.Models
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
+        private EntityCreationState _creationState;
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("SchoolType", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
+        internal bool TeaqlCreationIntent => _teaqlForceCreate || _entityRoot.IsNew(TeaqlEntityKey());
         internal void AttachRoot(EntityRoot root, bool hydration = false)
         {
             var key = TeaqlEntityKey();
@@ -89,7 +91,23 @@ namespace Generated.Models
             Value.DateValue v => v.Value,
             _ => Convert.ToDateTime(value.Raw)
         };
-        public SchoolType() { _entityRoot.MarkAsNew(TeaqlEntityKey()); }
+        // Hydration is private and cannot acquire insert intent from absent fields.
+        private SchoolType() { _creationState = EntityCreationState.Hydrated; }
+
+        internal static SchoolType TeaqlNewWithReservedId(long value)
+        {
+            EntityCreation.RequireReserved(EntityCreationState.Reserved, value);
+            var entity = new SchoolType();
+            entity._creationState = EntityCreationState.Reserved;
+            entity.TeaqlInitializeNewId(value);
+            return entity;
+        }
+
+        internal void TeaqlValidateReservedIdentity(long expected)
+        {
+            EntityCreation.RequireReserved(_creationState, Id);
+            if (Id != expected || !_entityRoot.IsNew(TeaqlEntityKey())) throw new EntityCreationException();
+        }
                 public long? Platform { get; set; }
                 public long? Id { get; set; }
                 public string? Name { get; set; }
@@ -109,25 +127,24 @@ namespace Generated.Models
             return _fullyLoaded || _loadedFields.Contains(field);
         }
 
-        internal void TeaqlInitializeNewId(long value)
+        private void TeaqlInitializeNewId(long value)
         {
-            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
+            EntityCreation.RequireReserved(_creationState, value);
             var oldKey = TeaqlEntityKey();
             Id = value;
             MarkLoaded("Id");
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
             _entityRoot.Set(TeaqlEntityKey(), "id", new Value.I64Value(value));
+            _entityRoot.MarkAsNew(TeaqlEntityKey());
             _teaqlForceCreate = true;
+            _loadedSnapshot = TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin.CreationBaseline);
         }
 
         // Trusted generated bootstrap owns the model-declared identity. It must
         // not consume an unrelated allocator value and replace it with a seed ID.
         internal static SchoolType TeaqlNewWithFixedId(long value)
         {
-            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
-            var entity = new SchoolType();
-            entity.TeaqlInitializeNewId(value);
-            return entity;
+            return TeaqlNewWithReservedId(value);
         }
 
         public SchoolType MarkLoaded(params string[] fields)
@@ -257,10 +274,11 @@ namespace Generated.Models
         public async global::System.Threading.Tasks.Task<SchoolType> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
+            TeaqlValidateCreationGraph(new HashSet<object>(ReferenceEqualityComparer.Instance));
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
                 graph.DeclareRootEntity("SchoolType");
-                if (!Id.HasValue || _teaqlForceCreate)
+                if (TeaqlCreationIntent)
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
@@ -268,18 +286,30 @@ namespace Generated.Models
                 await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
-                await TeaqlReserveGraphIdentitiesAsync(graph);
+                await TeaqlCaptureGraphStateAsync(graph);
                 TeaqlPreflightGraph(context, graph);
                 return await TeaqlSaveWithinGraphAsync(context, graph);
             });
+        }
+
+        internal void TeaqlValidateCreationGraph(HashSet<object> visited, bool relationWillChange = false)
+        {
+            if (!visited.Add(this)) return;
+            EntityCreation.RequireMutation(_creationState, Id, TeaqlCreationIntent,
+                TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()) || relationWillChange,
+                _loadedSnapshot);
+            foreach (var child in SchoolList)
+                child.TeaqlValidateCreationGraph(visited,
+                    (child.TeaqlCreationIntent || child.IsLoaded("SchoolType")) && child.SchoolType != Id);
         }
 
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Prepare)) return;
             graph.DiscardRestoredFields("SchoolType", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
-            var creating = !Id.HasValue || _teaqlForceCreate;
+            var creating = TeaqlCreationIntent;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            EntityCreation.RequireMutation(_creationState, Id, creating, changed, _loadedSnapshot);
             if (changed)
             {
             if (!creating && !_markedForDeletion)
@@ -311,7 +341,8 @@ namespace Generated.Models
             {
                 var child = SchoolList[index];
                 child.AttachRoot(_entityRoot);
-                if (child.SchoolType != (Id ?? _ledgerId)) child.UpdateSchoolTypeId(Id ?? _ledgerId);
+                if ((child.TeaqlCreationIntent || child.IsLoaded("SchoolType")) && child.SchoolType != Id)
+                    child.UpdateSchoolTypeId(Id);
                 try { child.TeaqlPrepareInputGraph(context, graph); }
                 catch (CheckException error)
                 {
@@ -325,7 +356,7 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Preflight)) return;
-            if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            if (TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
                 graph.PreflightPrepared(this);
             for (var index = 0; index < SchoolList.Count; index++)
             {
@@ -339,16 +370,17 @@ namespace Generated.Models
             }
         }
 
-        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
+        internal async global::System.Threading.Tasks.Task TeaqlCaptureGraphStateAsync(GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Reserve)) return;
-            var creating = !Id.HasValue || _teaqlForceCreate;
+            var creating = TeaqlCreationIntent;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
             {
             var teaqlOriginalKey = TeaqlEntityKey();
             var teaqlOriginalLedgerId = _ledgerId;
             var teaqlOriginalMarkedForDeletion = _markedForDeletion;
             var teaqlOriginalForceCreate = _teaqlForceCreate;
+            var teaqlOriginalCreationState = _creationState;
             var teaqlOriginalFullyLoaded = _fullyLoaded;
             var teaqlOriginalLoadedFields = new HashSet<string>(_loadedFields, StringComparer.OrdinalIgnoreCase);
             var teaqlOriginalPlatform = this.Platform;
@@ -369,6 +401,7 @@ namespace Generated.Models
                 _ledgerId = teaqlOriginalLedgerId;
                 _markedForDeletion = teaqlOriginalMarkedForDeletion;
                 _teaqlForceCreate = teaqlOriginalForceCreate;
+                _creationState = teaqlOriginalCreationState;
                 _fullyLoaded = teaqlOriginalFullyLoaded;
                 _loadedFields = teaqlOriginalLoadedFields;
                 _entityRoot.Rekey(currentKey, teaqlOriginalKey);
@@ -382,13 +415,11 @@ namespace Generated.Models
                 throw new InvalidOperationException("Cannot delete an entity without an id");
             if (creating)
             {
-                var allocationKey = TeaqlEntityKey();
-                Id = checked((long)await graph.ReservePreparedIdAsync(this));
-                _teaqlForceCreate = true;
-                _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
+                EntityCreation.RequireReserved(_creationState, Id);
+                graph.BindPreparedId(this, Id!.Value);
             }
             }
-            foreach (var child in SchoolList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
+            foreach (var child in SchoolList) await child.TeaqlCaptureGraphStateAsync(graph);
             await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
@@ -396,7 +427,7 @@ namespace Generated.Models
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Write)) return this;
-            var creating = !this.Id.HasValue || _teaqlForceCreate;
+            var creating = TeaqlCreationIntent;
             if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
             {
                 var cleanScope = graph.Scope("SchoolType",
@@ -421,6 +452,7 @@ namespace Generated.Models
             this.Version = saved.Version;
             _ledgerId = Id ?? _ledgerId;
             _teaqlForceCreate = false;
+            _creationState = EntityCreationState.Hydrated;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
             await TeaqlSaveChildrenAsync(context, graph, scope);
             return saved;
@@ -432,7 +464,8 @@ namespace Generated.Models
             {
                 var child = SchoolList[index];
                 child.AttachRoot(_entityRoot);
-                if (child.SchoolType != Id) child.UpdateSchoolTypeId(Id);
+                if ((child.TeaqlCreationIntent || child.IsLoaded("SchoolType")) && child.SchoolType != Id)
+                    child.UpdateSchoolTypeId(Id);
                 try { await child.TeaqlSaveWithinGraphAsync(context, graph, scope); }
                 catch (CheckException error)
                 {
@@ -452,7 +485,7 @@ namespace Generated.Models
             _ => throw new InvalidOperationException("Unsupported mutation command")
         }).WithLoadedSnapshot(_loadedSnapshot);
 
-        private LoadedScalarSnapshot TeaqlScalarSnapshot()
+        private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
                         if (IsLoaded("Platform")) record["platform"] = TeaqlValue(Platform);
@@ -461,7 +494,7 @@ namespace Generated.Models
                         if (IsLoaded("Code")) record["code"] = TeaqlValue(Code);
                         if (IsLoaded("DisplayOrder")) record["display_order"] = TeaqlValue(DisplayOrder);
                         if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
-            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
         public InsertCommand ToInsertCommand()
