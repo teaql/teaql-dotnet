@@ -68,7 +68,25 @@ public sealed partial class GraphMutationSession
         _prepared.Add(entity, new PreparedMutation(CopyRequest(captured)));
     }
 
-    /// <summary>Reserve all graph identities after admission, before final policy preflight.</summary>
+    /// <summary>Register an identity already reserved by the Context creation boundary.
+    /// This bridge has no allocator fallback and cannot reassign the entity key.</summary>
+    public void BindPreparedId(object entity, long reservedId)
+    {
+        EntityCreation.RequireReserved(EntityCreationState.Reserved, reservedId);
+        var prepared = Prepared(entity);
+        if (_transaction == null) throw new InvalidOperationException("GRAPH_PREPARATION_CANNOT_BIND_ID");
+        if (prepared.Input is not InsertMutationRequest insert)
+            throw new InvalidOperationException("GRAPH_ID_RESERVATION_REQUIRES_CREATE");
+        var expected = new EntityKey(insert.Command.Entity, reservedId);
+        if (prepared.Input.LedgerKey != expected
+            || !insert.Command.Values.TryGetValue("id", out var value) || value.TryI64() != reservedId
+            || prepared.Key != expected)
+            throw new InvalidOperationException("GRAPH_RESERVED_ID_MISMATCH");
+        _assignedIds[expected] = expected.Id;
+        prepared.IdReserved = true;
+    }
+
+    /// <summary>Low-level SPI reservation; generated managed factories use BindPreparedId instead.</summary>
     public async Task<ulong> ReservePreparedIdAsync(object entity)
     {
         var prepared = Prepared(entity);

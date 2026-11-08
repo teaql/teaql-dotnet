@@ -8,6 +8,29 @@ namespace TeaQL.Runtime.Tests;
 public class PreparedGraphMutationTests
 {
     [Fact]
+    public async Task BindsAnAlreadyReservedIdentityWithoutAllocatingOrReplacingIt()
+    {
+        var provider = new Provider(); var context = new UserContext().WithDataService(provider);
+        var owner = new object(); var request = Insert("Probe", 77);
+        request.Command.Values["id"] = new Value.I64Value(77);
+        await context.ExecuteGraphSaveAsync("bind the factory reservation", graph => {
+            graph.PrepareInput(owner, request); graph.SealPreparedGraph(); return Task.CompletedTask;
+        }, async graph => {
+            Assert.Throws<EntityCreationException>(() => graph.BindPreparedId(owner, 0));
+            Assert.Equal("GRAPH_RESERVED_ID_MISMATCH", Assert.Throws<InvalidOperationException>(() => graph.BindPreparedId(owner, 78)).Message);
+            graph.BindPreparedId(owner, 77); graph.BindPreparedId(owner, 77);
+            graph.PreflightPrepared(owner); await graph.MutatePreparedAsync(owner); return 1;
+        });
+        Assert.Equal(77, Assert.IsType<InsertMutationRequest>(Assert.Single(provider.Requests)).Command.Values["id"].TryI64());
+        Assert.Equal(0, provider.ReservedSpaces);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => context.ExecuteGraphSaveAsync<int>(
+            "missing reservation cannot fall back", graph => {
+                graph.PrepareInput(owner, Insert("Probe", 77)); graph.SealPreparedGraph(); return Task.CompletedTask;
+            }, graph => {graph.BindPreparedId(owner, 77); return Task.FromResult(0);}));
+        Assert.Single(provider.Requests); Assert.Equal(0, provider.ReservedSpaces);
+    }
+
+    [Fact]
     public async Task AChildOnlySaveKeepsTheDeclaredRootPolicyEntryPoint()
     {
         var provider = new Provider(); var policy = new Policy();
@@ -280,6 +303,7 @@ public class PreparedGraphMutationTests
         public Action? OnMutation;
         public List<MutationRequest> Requests {get;} = [];
         private readonly Dictionary<string, ulong> _ids = new();
+        public int ReservedSpaces => _ids.Count;
         public DataServiceCapabilities Capabilities => new() {Mutation = true, Transaction = true};
         public Task<QueryResult> QueryAsync(QueryRequest request) => throw new Exception("unexpected query");
         public Task<MutationResult> MutateAsync(MutationRequest request) {Requests.Add(request); OnMutation?.Invoke(); return Task.FromResult(new MutationResult {AffectedRows = 1});}
