@@ -64,8 +64,14 @@ static class GraphSaveReentrancyProbe
                 await operation.WaitAsync(Bound);
             }
             catch (Exception error) { failure = error; }
-            var code = failure is GraphCommittedException committed ? committed.InnerExceptions.Single().Message : failure?.Message;
+            var code = failure?.GetBaseException().Message;
             Require(code == "GRAPH_SAVE_REENTRANT", "Expected prompt nested root rejection, not a timeout or unrelated error");
+            Require(scenario switch
+            {
+                "after-write" => failure is SqlExecutorException { InnerException: InvalidOperationException },
+                "after-commit" => failure is GraphCommittedException { InnerExceptions.Count: 1 },
+                _ => failure is InvalidOperationException
+            }, "Unexpected exception wrapper at the execution boundary");
             Require((failure is GraphCommittedException) == (scenario == "after-commit"), "Wrong committed failure classification");
             var rejected = transport.Counts();
             Require(rejected == (scenario switch
