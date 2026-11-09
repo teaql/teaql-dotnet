@@ -118,7 +118,8 @@ internal static class CanonicalNames
         first = await Load(context, first.Id!.Value, true);
         Require(E.ScalarTypeProbe(first).TypePlatform().Name().Eval() == marker + "-replacement"
             && E.ScalarTypeProbe(first).OptionalString().Eval() is null, "loaded reference/null mismatch");
-        var sparse = await Q.ScalarTypeProbesWithMinimalFields().WithIdIs(first.Id.Value).SelectRequiredString().Limit(1)
+        var reloadedId = first.Id ?? throw new InvalidOperationException("Reloaded canonical fixture has no identity");
+        var sparse = await Q.ScalarTypeProbesWithMinimalFields().WithIdIs(reloadedId).SelectRequiredString().Limit(1)
             .Comment("read canonical sparse projection").Purpose("verify NotLoaded semantics").ExecuteForOneAsync(context)
             ?? throw new Exception("canonical sparse fixture missing");
         var noIo = provider.Snapshot(); var noSql = sql.Calls;
