@@ -4,7 +4,8 @@ const fs = require('node:fs'), path = require('node:path'), crypto = require('no
 const repo = path.resolve(__dirname, '..'), sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const roots = ['examples/conformance', 'examples/trace-chain/lib', 'examples/facet-trace/lib',
   'examples/school-management', 'examples/order-management/dotnet-lib-core',
-  'examples/trace-chain/standard-graph/lib', 'examples/trace-chain/standard-order/lib'];
+  'examples/trace-chain/standard-graph/lib', 'examples/trace-chain/standard-order/lib',
+  'examples/task_board/TaskBoardExample/Generated'];
 let files = 0;
 for (const relative of roots) {
   const root = path.join(repo, relative), manifest = JSON.parse(fs.readFileSync(path.join(root, 'fixture-manifest.json')));

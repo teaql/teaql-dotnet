@@ -1,164 +1,74 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Generated;
 using Microsoft.Data.Sqlite;
 using TeaQL.Core;
-using TeaQL.DataService;
 using TeaQL.Provider.Sqlite;
 using TeaQL.Runtime;
 using TeaQL.Sql;
-using Record = TeaQL.Core.Record;
 
-namespace TaskBoardExample;
-
-public class SchemaProviderWrapper : ISchemaProvider
+static void Require(bool condition, string message)
 {
-    private readonly IMetadataStore _store;
-    public SchemaProviderWrapper(IMetadataStore store) => _store = store;
-    public EntityDescriptor? GetEntity(string name) => _store.GetEntity(name);
+    if (!condition) throw new InvalidOperationException(message);
 }
 
-class Program
+var database = Environment.GetEnvironmentVariable("TEAQL_TASK_BOARD_DB") ?? ":memory:";
+await using var connection = new SqliteConnection($"Data Source={database}");
+await connection.OpenAsync();
+var module = GeneratedRuntimeModule.Module;
+var context = module.IntoContext().WithDataService(new SqlDataServiceExecutor(
+    new SqliteDialect(), new SqliteTransport(connection),
+    new MetadataSchemaProvider(module.Metadata.GetEntity)));
+
+await context.EnsureSchemaAsync();
+await context.EnsureSchemaAsync();
+
+var pending = (await Q.Tasks().Comment("prepare an authorized robot task")
+    .Purpose("demonstrate generated task mutations").NewEntityAsync(context))
+    .UpdateName("Inspect robot charging station").UpdatePlatform(1).UpdateStatusToPlanned();
+try
 {
-    static async Task Main(string[] args)
-    {
-        Console.WriteLine("Initializing TaskBoard Schema...");
-
-        var platform = EntityDescriptor.New("Platform")
-            .TableName("platform")
-            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
-            .Property(PropertyDescriptor.New("name", DataType.Text))
-            .Property(PropertyDescriptor.New("founded", DataType.I64)) 
-            .Property(PropertyDescriptor.New("user_email", DataType.Text))
-            .Property(PropertyDescriptor.New("version", DataType.I64).Version());
-
-        var taskStatus = EntityDescriptor.New("TaskStatus")
-            .TableName("task_status")
-            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
-            .Property(PropertyDescriptor.New("name", DataType.Text))
-            .Property(PropertyDescriptor.New("code", DataType.Text))
-            .Property(PropertyDescriptor.New("color", DataType.Text))
-            .Property(PropertyDescriptor.New("display_order", DataType.I64))
-            .Property(PropertyDescriptor.New("progress", DataType.I64))
-            .Property(PropertyDescriptor.New("platform", DataType.I64))
-            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
-            .Relation(RelationDescriptor.New("platform_ref", "Platform").LocalKey("platform"));
-
-        var task = EntityDescriptor.New("Task")
-            .TableName("task")
-            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
-            .Property(PropertyDescriptor.New("name", DataType.Text))
-            .Property(PropertyDescriptor.New("status", DataType.I64))
-            .Property(PropertyDescriptor.New("platform", DataType.I64))
-            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
-            .Relation(RelationDescriptor.New("status_ref", "TaskStatus").LocalKey("status"))
-            .Relation(RelationDescriptor.New("platform_ref", "Platform").LocalKey("platform"));
-
-        var taskExecutionLog = EntityDescriptor.New("TaskExecutionLog")
-            .TableName("task_execution_log")
-            .Property(PropertyDescriptor.New("id", DataType.I64).Id())
-            .Property(PropertyDescriptor.New("task", DataType.I64))
-            .Property(PropertyDescriptor.New("action", DataType.Text))
-            .Property(PropertyDescriptor.New("detail", DataType.Text))
-            .Property(PropertyDescriptor.New("version", DataType.I64).Version())
-            .Relation(RelationDescriptor.New("task_ref", "Task").LocalKey("task"));
-
-        var store = new InMemoryMetadataStore()
-            .WithEntity(platform)
-            .WithEntity(taskStatus)
-            .WithEntity(task)
-            .WithEntity(taskExecutionLog);
-
-        var userContext = new UserContext().WithMetadata(store);
-        var runtime = new TeaqlRuntime(userContext);
-
-        Console.WriteLine("Initializing SQLite Provider...");
-        using var connection = new SqliteConnection("Data Source=:memory:");
-        connection.Open();
-        var transport = new SqliteTransport(connection);
-        var dialect = new SqliteDialect();
-        var schemaProvider = new SchemaProviderWrapper(store);
-        var executor = new SqlDataServiceExecutor(dialect, transport, schemaProvider);
-
-        // Create tables manually for this in-memory SQLite demo
-        await transport.ExecuteSqlAsync(new CompiledQuery("CREATE TABLE platform (id INTEGER PRIMARY KEY, name TEXT, founded INTEGER, user_email TEXT, version INTEGER)", new List<Value>()));
-        await transport.ExecuteSqlAsync(new CompiledQuery("CREATE TABLE task_status (id INTEGER PRIMARY KEY, name TEXT, code TEXT, color TEXT, display_order INTEGER, progress INTEGER, platform INTEGER, version INTEGER)", new List<Value>()));
-        await transport.ExecuteSqlAsync(new CompiledQuery("CREATE TABLE task (id INTEGER PRIMARY KEY, name TEXT, status INTEGER, platform INTEGER, version INTEGER)", new List<Value>()));
-        await transport.ExecuteSqlAsync(new CompiledQuery("CREATE TABLE task_execution_log (id INTEGER PRIMARY KEY, task INTEGER, action TEXT, detail TEXT, version INTEGER)", new List<Value>()));
-
-        Console.WriteLine("Inserting Platform and TaskStatus...");
-        var pId = 1L;
-        var p = new Generated.Models.Platform {
-            Id = pId,
-            Name = "Robot System",
-            Founded = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            UserEmail = "admin@robots.com",
-            Version = 1
-        };
-        await executor.MutateAsync(new InsertMutationRequest(p.ToInsertCommand(), "initialize robot platform"));
-
-        var tsId = 1001L;
-        var ts = new Generated.Models.TaskStatus {
-            Id = tsId,
-            Name = "Planned",
-            Code = "PLANNED",
-            Color = "#94A3B8",
-            DisplayOrder = 10,
-            Progress = 0,
-            Platform = pId,
-            Version = 1
-        };
-        await executor.MutateAsync(new InsertMutationRequest(ts.ToInsertCommand(), "initialize planned task status"));
-
-        Console.WriteLine("Creating Task...");
-        var tId = 1L;
-        var t = new Generated.Models.Task {
-            Id = tId,
-            Name = "Initial Robot Task",
-            Status = tsId,
-            Platform = pId,
-            Version = 1
-        };
-        await executor.MutateAsync(new InsertMutationRequest(t.ToInsertCommand(), "create robot task"));
-
-        Console.WriteLine("Updating Task...");
-        var tUpdate = new Generated.Models.Task {
-            Id = tId,
-            Name = "Updated Robot Task",
-            Version = 2
-        };
-        await executor.MutateAsync(new UpdateMutationRequest(tUpdate.ToUpdateCommand(), "rename robot task"));
-
-        Console.WriteLine("Inserting TaskExecutionLog...");
-        var log = new Generated.Models.TaskExecutionLog {
-            Id = 1L,
-            Task = tId,
-            Action = "Update Name",
-            Detail = "Changed name to 'Updated Robot Task'",
-            Version = 1
-        };
-        await executor.MutateAsync(new InsertMutationRequest(log.ToInsertCommand(), "record robot task rename"));
-
-        Console.WriteLine("Querying Tasks...");
-        var taskQuery = new SelectQuery("Task");
-        var taskResults = await executor.QueryAsync(new QueryRequest(taskQuery,
-            new QueryIntent("load robot tasks", "display task board")));
-
-        foreach (var row in taskResults.Rows)
-        {
-            Console.WriteLine($"Task ID: {((Value.I64Value)row["id"]).Value}, Name: {((Value.TextValue)row["name"]).Value}");
-        }
-
-        Console.WriteLine("Querying TaskExecutionLogs...");
-        var logQuery = new SelectQuery("TaskExecutionLog");
-        var logResults = await executor.QueryAsync(new QueryRequest(logQuery,
-            new QueryIntent("load task execution history", "inspect robot task audit trail")));
-
-        foreach (var row in logResults.Rows)
-        {
-            Console.WriteLine($"Log ID: {((Value.I64Value)row["id"]).Value}, Action: {((Value.TextValue)row["action"]).Value}, Detail: {((Value.TextValue)row["detail"]).Value}");
-        }
-
-        Console.WriteLine("Example finished successfully!");
-    }
+    await pending.SaveAsync(context);
+    throw new InvalidOperationException("A write without an audit comment succeeded");
 }
+catch (RequestIntentException error) when (error.Code == "REQUEST_COMMENT_REQUIRED"
+    && error.RequestKind == "mutation") { }
+
+var saved = await pending.AuditAs("Create a planned robot task").SaveAsync(context);
+var taskId = saved.Id ?? throw new InvalidOperationException("Created task has no ID");
+Require(saved.Version == 1, "Create did not return version 1");
+
+var tasks = await Q.Tasks().WithIdIs(taskId).Limit(1)
+    .Comment("load the complete task before renaming it")
+    .Purpose("verify generated Q and E on the task board").ExecuteForListAsync(context);
+Require(tasks.Count == 1, "Task query did not return exactly one row");
+var loaded = tasks[0];
+Require(E.Task(loaded).Name().Eval() == "Inspect robot charging station", "Loaded name mismatch");
+Require(E.Task(loaded).StatusId().Eval() == 1001, "Planned constant relation mismatch");
+
+var updated = await loaded.UpdateName("Verified robot charging station")
+    .AuditAs("Rename the verified robot task").SaveAsync(context);
+Require(updated.Id == taskId && updated.Version == 2, "Update lost identity or optimistic version");
+
+var log = (await Q.TaskExecutionLogs().Comment("prepare a robot task execution record")
+    .Purpose("retain the explicit task history").NewEntityAsync(context))
+    .UpdateTask(taskId).UpdateAction("Rename task")
+    .UpdateDetail("Changed the task name after verification");
+var savedLog = await log.AuditAs("Record the verified task rename").SaveAsync(context);
+var logId = savedLog.Id ?? throw new InvalidOperationException("Created history record has no ID");
+
+var history = await Q.TaskExecutionLogs().WithIdIs(logId).Limit(1)
+    .Comment("load the new execution history record")
+    .Purpose("verify the task history survives audited save").ExecuteForListAsync(context);
+Require(history.Count == 1 && history[0].Task == taskId && history[0].Action == "Rename task",
+    "Saved history is not associated with its task");
+
+var reloaded = await Q.Tasks().WithIdIs(taskId).Limit(1)
+    .Comment("reload the renamed robot task")
+    .Purpose("verify persisted values with the generated E API").ExecuteForListAsync(context);
+Require(reloaded.Count == 1 && E.Task(reloaded[0]).Name().Eval() == "Verified robot charging station"
+    && E.Task(reloaded[0]).Version().Eval() == 2, "Persisted rename mismatch");
+Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new {
+    marker = "DOTNET_TASK_BOARD", passed = true, taskId, logId,
+    version = updated.Version, generatedQueries = true, generatedExpressions = true,
+    auditedSaves = true, repeatedBootstrap = true, missingAuditRejected = true
+}));
+Console.WriteLine("PASS .NET generated Task Board");

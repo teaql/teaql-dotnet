@@ -1,0 +1,28 @@
+{
+  "schema": "teaql.retained-example-fixture/v1",
+  "modelSource": "examples/task_board/model.xml",
+  "modelSha256": "4a1ec513cb362e4c25a5bc9479fe27a2034558633a9e5760245919af7c601856",
+  "evaluatedScope": "dotnet-lib-core",
+  "evaluationErrors": 0,
+  "producerSource": {
+    "commit": "9e616c438e22bef5ad9f57824dd9dcd302fcfd76"
+  },
+  "producerReceiptSha256": "bf3a265598d92e5398fc3e5250afb326fdde0825afe50ea2f9e33e2cadb55e11",
+  "generatedManifestSha256": "edc6e4fd76d260f4abe70316ab355b1917780609234adab4ff0b66d626d288bf",
+  "files": {
+    "E.cs": "2709673b9edef448ce134a160cf76cd129f84dbdac2e68c5c0f3df84d85985d8",
+    "Q.cs": "1266be8e87db79f7c5c64cf84761745bde5ec6bea2c4aee016c28ee70c3bb58e",
+    "Requests/PlatformRequest.cs": "c999ca5af89fdc93425b53cdf6b9ce11bd17ec2edc0ed5c7c385682f4bd2adfb",
+    "Requests/TaskStatusRequest.cs": "9782a7958426136a37f65c263ec26d1e6b1d8042bac6c03c66e71772457cda6d",
+    "Requests/TaskRequest.cs": "a60228a96578f03c4beb103e8fa5f645eed038469fcba5e1e6d2d8ed3ff64974",
+    "Requests/TaskExecutionLogRequest.cs": "83957b9883479edab941203fc7288a75ea3ca639b1254581d51350b9f14ccb8b",
+    "teaql-i18n.json": "79b420e04edf1c1e1b9f4d04ddfc0ec8a6e2a2458e6a337a8c046bacb64c3a8d",
+    "Models/Platform.cs": "defb85c1f632bd5f08d436c0cbf67b66aea18870c9f2d26388b1c4bd92e6d8b0",
+    "Models/TaskStatus.cs": "80712ab6a2cf2c347ae348ff70f14c72a29030970d05bb317d625d5d23bd3ad6",
+    "Models/Task.cs": "857f6dfd93aec990337fc5ce93449ded8ef94222858a58ef44e76cff2aabdfb8",
+    "Models/TaskExecutionLog.cs": "741604fd3cf7fe9095e17c9383ef7542dbc4509f544cdb84a2b5bcaf1e907dde",
+    "GeneratedSearchModels.cs": "d136d0b7174846ae524143ea964cb3767d9b6b538ca79b2619bfe6e2b8818241",
+    "robot-task-board-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+    "GeneratedRuntimeModule.cs": "0793188ca5b968ece0b50984e8841aeb9a5b3be8b6b66be2ed1a1725aa5444ec"
+  }
+}

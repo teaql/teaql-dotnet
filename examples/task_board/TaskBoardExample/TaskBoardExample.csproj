@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\TeaQL.Core\TeaQL.Core.csproj" />
-    <ProjectReference Include="..\..\..\src\TeaQL.Runtime\TeaQL.Runtime.csproj" />
-    <ProjectReference Include="..\..\..\src\TeaQL.Provider.Sqlite\TeaQL.Provider.Sqlite.csproj" />
+    <Compile Include="Program.cs" />
+    <ProjectReference Include="Generated/robot-task-board-service-lib.csproj"
+                      AdditionalProperties="TeaQLRuntimeSourceRoot=$(TeaQLRuntimeSourceRoot)" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -11,6 +11,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TeaQLRuntimeSourceRoot Condition="'$(TeaQLRuntimeSourceRoot)' == ''">$(MSBuildThisFileDirectory)../../..</TeaQLRuntimeSourceRoot>
+    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.3.1</TeaQLRuntimeVersion>
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
   </PropertyGroup>
 
 </Project>
