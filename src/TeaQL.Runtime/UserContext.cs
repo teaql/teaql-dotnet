@@ -32,6 +32,12 @@ public class UserContext
         = new Dictionary<string, IReadOnlyDictionary<string, string>>();
     private readonly MutationPolicyRuntimeState _mutationPolicy = new();
     private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
+    // An execution-flow marker distinguishes a nested root Save (which would
+    // wait on its own gate) from an independent caller that must still queue.
+    // Child flows retain the token, not a permanent flag: once the owner exits,
+    // those flows may start a new root Save normally.
+    private sealed class GraphSaveInvocation { internal volatile bool Active = true; }
+    private readonly AsyncLocal<GraphSaveInvocation?> _graphSaveInvocation = new();
     private GraphMutationSession? _activeGraphSave;
     private DateTimeOffset? _graphFixTime;
     private IBusinessClock _businessClock = SystemBusinessClock.Instance;
@@ -258,6 +264,7 @@ public class UserContext
     public async Task<T> ExecuteGraphSaveAsync<T>(string comment, Func<GraphMutationSession, Task<T>> work)
     {
         var intent = new MutationIntent(comment); // Must precede callbacks and transaction allocation.
+        EnsureGraphSaveCanEnter();
         return await RuntimeTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
             () => ExecuteGraphSaveCoreAsync(intent, null, work)).ConfigureAwait(false);
     }
@@ -269,14 +276,24 @@ public class UserContext
         ArgumentNullException.ThrowIfNull(prepare);
         ArgumentNullException.ThrowIfNull(work);
         var intent = new MutationIntent(comment);
+        EnsureGraphSaveCanEnter();
         return await RuntimeTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
             () => ExecuteGraphSaveCoreAsync(intent, prepare, work)).ConfigureAwait(false);
+    }
+
+    private void EnsureGraphSaveCanEnter()
+    {
+        if (_graphSaveInvocation.Value is { Active: true })
+            throw new InvalidOperationException("GRAPH_SAVE_REENTRANT");
     }
 
     private async Task<T> ExecuteGraphSaveCoreAsync<T>(MutationIntent intent,
         Func<GraphMutationSession, Task>? prepare, Func<GraphMutationSession, Task<T>> work)
     {
         await _graphSaveGate.WaitAsync().ConfigureAwait(false);
+        var previousInvocation = _graphSaveInvocation.Value;
+        var invocation = new GraphSaveInvocation();
+        _graphSaveInvocation.Value = invocation;
         ITransaction? transaction = null;
         GraphMutationSession? session = null;
         try
@@ -311,19 +328,26 @@ public class UserContext
         }
         finally
         {
-            // A read-only view of the active List is not an immutable receipt:
-            // a later standalone Fix must never append to an older result.
-            _lastFixEvidence = Array.AsReadOnly(_currentFixEvidence.ToArray());
-            _currentFixEvidence = new List<FixEvidence>();
-            session?.Close();
-            _activeGraphSave = null;
-            _mutationPolicy.EndGraph();
-            _graphFixTime = null;
-            // A custom provider's cleanup may fail after commit. Release the
-            // Context gate even then; the outer telemetry observation closes
-            // only after cleanup and sees the same error returned to callers.
-            try { transaction?.Dispose(); }
-            finally { _graphSaveGate.Release(); }
+            try
+            {
+                // A read-only view of the active List is not an immutable receipt:
+                // a later standalone Fix must never append to an older result.
+                _lastFixEvidence = Array.AsReadOnly(_currentFixEvidence.ToArray());
+                _currentFixEvidence = new List<FixEvidence>();
+                session?.Close();
+                _activeGraphSave = null;
+                _mutationPolicy.EndGraph();
+                _graphFixTime = null;
+                // The execution-flow marker remains active through provider
+                // cleanup, which must not re-enter this still-owned gate.
+                transaction?.Dispose();
+            }
+            finally
+            {
+                invocation.Active = false;
+                _graphSaveInvocation.Value = previousInvocation;
+                _graphSaveGate.Release();
+            }
         }
     }
 

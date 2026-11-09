@@ -42,6 +42,61 @@ public class GraphSaveReentrancyTests
     }
 
     [Fact]
+    public async Task ActiveInheritedChildFlowRejectsBeforeOpeningAnotherTransaction()
+    {
+        var provider = new Provider();
+        var context = new UserContext().WithDataService(provider);
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            context.ExecuteGraphSaveAsync("outer owner with active child", async graph =>
+                await Task.Run(() => context.ExecuteGraphSaveAsync("nested child root", _ => Task.FromResult(2))))
+                .WaitAsync(Bound));
+        Assert.Equal("GRAPH_SAVE_REENTRANT", error.Message);
+        Assert.Equal(1, provider.Begins);
+        Assert.Equal(0, provider.Commits);
+        Assert.Equal(1, provider.Rollbacks);
+    }
+
+    [Fact]
+    public async Task CaughtReentryDoesNotPoisonTheOwningGraphOrItsNextSave()
+    {
+        var provider = new Provider();
+        var context = new UserContext().WithDataService(provider);
+        Assert.Equal(1, await context.ExecuteGraphSaveAsync("catch nested rejection", async graph =>
+        {
+            var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                context.ExecuteGraphSaveAsync("invalid nested root", _ => Task.FromResult(2)));
+            Assert.Equal("GRAPH_SAVE_REENTRANT", error.Message);
+            return 1;
+        }).WaitAsync(Bound));
+        Assert.Equal(3, await context.ExecuteGraphSaveAsync("next independent root", _ => Task.FromResult(3)).WaitAsync(Bound));
+        Assert.Equal(2, provider.Begins);
+        Assert.Equal(2, provider.Commits);
+        Assert.Equal(0, provider.Rollbacks);
+    }
+
+    [Fact]
+    public async Task PostCommitReentryRejectsWithoutRollingBackCommittedWork()
+    {
+        var provider = new Provider();
+        var context = new UserContext().WithDataService(provider);
+        var error = await Assert.ThrowsAsync<GraphCommittedException>(() =>
+            context.ExecuteGraphSaveAsync("committed owner", graph =>
+            {
+                graph.AfterCommit(() => context.ExecuteGraphSaveAsync("invalid postcommit root", _ => Task.FromResult(2))
+                    .GetAwaiter().GetResult());
+                return Task.FromResult(1);
+            }).WaitAsync(Bound));
+        Assert.Equal("GRAPH_SAVE_REENTRANT", Assert.Single(error.InnerExceptions).Message);
+        Assert.Equal(1, provider.Begins);
+        Assert.Equal(1, provider.Commits);
+        Assert.Equal(0, provider.Rollbacks);
+        Assert.Equal(3, await context.ExecuteGraphSaveAsync("next root after postcommit rejection", _ => Task.FromResult(3)).WaitAsync(Bound));
+        Assert.Equal(2, provider.Begins);
+        Assert.Equal(2, provider.Commits);
+        Assert.Equal(0, provider.Rollbacks);
+    }
+
+    [Fact]
     public async Task IndependentConcurrentFlowStillQueuesAndCommitsSeparately()
     {
         var provider = new Provider();
