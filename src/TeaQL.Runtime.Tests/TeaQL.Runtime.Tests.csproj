@@ -38,4 +38,10 @@
                       LogicalName="business-id-permutation-v1.csv" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\test-vectors\masking-v1.tsv"
+          Link="test-vectors/masking-v1.tsv"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

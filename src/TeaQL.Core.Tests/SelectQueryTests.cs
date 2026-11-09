@@ -84,8 +84,9 @@ public class SelectQueryTests
         Assert.Equal("SELECT * FROM users", query.RawSqlText);
         Assert.Single(query.RawSqlSearchCriteriaItems);
         Assert.Equal(2, query.RelationLoads.Count);
-        Assert.Equal((ulong)40, query.Slice!.Limit.Value);
-        Assert.Equal((ulong)30, query.Slice.Offset);
+        var slice = Assert.IsType<Slice>(query.Slice);
+        Assert.Equal((ulong?)40, slice.Limit);
+        Assert.Equal((ulong)30, slice.Offset);
         Assert.Equal(500, query.StreamConfig!.ChunkSize);
     }
 }
