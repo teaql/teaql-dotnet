@@ -105,6 +105,7 @@ await EntityJsonExample.RunAsync(database + ".json.sqlite");
 await IntegralRoundtrip.RunAsync(database + ".integer.sqlite");
 await CanonicalNames.RunAsync(database + ".names.sqlite");
 await BaselineRestoration.RunAsync(database + ".restore.sqlite");
+await Tombstones.RunAsync(database + ".tombstone.sqlite");
 
 async Task<ScalarTypeProbe> NewProbeAsync(string name, decimal amount) => (await Q.ScalarTypeProbes()
     .Comment("prepare one generated scalar fixture").Purpose("verify exact provider storage").NewEntityAsync(context))

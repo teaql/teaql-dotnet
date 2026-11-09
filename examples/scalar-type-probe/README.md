@@ -175,3 +175,16 @@ database access is involved in property capture or serialization.
 `TEAQL_EMPTY_DB` is refused by the script. Build outputs are removed on exit;
 reports, raw observations and SQLite data remain available for inspection.
 Installed-package qualification is a separate gate.
+
+## Authoritative deletion readback
+
+The default `verify.sh` also runs six tombstone scenarios twice on a separate,
+unreset SQLite database. Generated Q/E and audited Save verify ordinary deletion,
+trigger-modified values (including null and typed dates), failure before physical
+commit and same-object retry, and zero-callback repeated deletion rejection.
+The audit observer rejects delivery before physical commit. Explicit provider
+commit/rollback and recovery/physical-delete controls are labelled separately;
+they do not claim caller-owned transactions around generated graph Save.
+SQL only installs a controlled trigger or reads the independent storage oracle.
+The generated library is unchanged. Build scratch is removed on exit; compact
+logs and synthetic databases remain available for inspection.

@@ -14,6 +14,7 @@
     <Compile Include="IntegralRoundtrip.cs" />
     <Compile Include="CanonicalNames.cs" />
     <Compile Include="BaselineRestoration.cs" />
+    <Compile Include="Tombstones.cs" />
     <Compile Include="generated/**/*.cs" Exclude="generated/**/bin/**;generated/**/obj/**" />
     <Using Include="TeaQL.Core" />
     <Using Include="TeaQL.DataService" />

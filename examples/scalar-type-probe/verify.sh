@@ -37,12 +37,13 @@ if [[ "$executable" != "$build_root/"* || ! -f "$executable" ]]; then
   exit 1
 fi
 for round in 1 2; do
-  TEAQL_SCALAR_DB="$database" DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER=1 \
+  TEAQL_SCALAR_DB="$database" TEAQL_TOMBSTONE_ROUND="$round" DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER=1 \
     dotnet "$executable" | tee "$evidence/round-$round.log"
   fresh=True; version=2
   if [[ "$round" == 2 ]]; then fresh=False; version=3; fi
   rg -Fq "PASS .NET generated scalar Decimal fresh=$fresh rows=3 version=$version" "$evidence/round-$round.log"
   rg -Fq 'PASS .NET known-baseline restoration cases=11' "$evidence/round-$round.log"
+  rg -Fq 'PASS .NET generated authoritative tombstone and provider transaction controls cases=6' "$evidence/round-$round.log"
   sha256sum -c generated.sha256
 done
 echo "PASS .NET scalar example twice without cleanup; evidence: $evidence"
