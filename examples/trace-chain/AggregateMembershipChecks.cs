@@ -102,7 +102,7 @@ static class AggregateMembershipChecks
             var safe = sink.Sql;
             var commands = capture.Commands.Count;
             var audits = sink.Audit.Count;
-            string Detail(CustomerOrder parent)
+            string? Detail(CustomerOrder parent)
             {
                 try { return E.CustomerOrder(parent).Description().Eval(); }
                 catch (TeaQLNotLoadedException) { return "NotLoaded"; } // Test observation, never a business fallback.

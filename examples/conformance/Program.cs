@@ -72,7 +72,7 @@ var queried = await Q.WorkItems().WithIdIs(createdId)
     .Comment("Load the complete work item before mutation")
     .Purpose("Verify typed Q API and update semantics")
     .ExecuteForOneAsync(context) ?? throw new InvalidOperationException("Created work item was not found");
-Require(queried is not null && queried.Title == "Verify .NET runtime", "Q API result mismatch");
+Require(queried.Title == "Verify .NET runtime", "Q API result mismatch");
 Console.WriteLine("PASS Q API (typed SmartList<WorkItem>)");
 
 var related = await Q.WorkItems().WithIdIs(createdId)
