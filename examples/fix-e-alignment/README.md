@@ -19,6 +19,18 @@ and a real provider failure rolls back before retrying the same original graph.
 Only live parent/child rows and committed audits may persist. Pending descendants
 under a cancelled new node require explicit resolution, not implicit cascading.
 
+`GraphSaveReentrancyProbe.cs` calls the actual generated audited Save from four
+already-owned execution stages: preparation, transaction work, a callback after
+a real SQLite INSERT, and a post-commit callback. A nested root Save must reject
+with `GRAPH_SAVE_REENTRANT`, not wait for its own gate or join implicitly. The
+after-write case rolls back its actual INSERT; the post-commit case retains its
+committed classification and never rolls back. Each rejected object's original
+ID, version and input survive and the same object then saves successfully with
+one committed audit. Two rounds share an unreset SQLite store. Native controls
+also prove independent concurrent calls still queue, different contexts remain
+independent and an inherited child flow may save after its owner has completed.
+This does not add a caller-owned outer-transaction API.
+
 `ProjectionViewsProbe.cs` adds three generated-query combinations twice on a
 separate unreset store: a later full query cannot widen a sparse view; two full
 views retain independent pending mutations and reject a stale second save; and

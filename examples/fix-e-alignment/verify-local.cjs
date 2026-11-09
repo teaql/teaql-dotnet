@@ -35,6 +35,7 @@ try {
   report.graphFixLifecycleApplicationSha256 = sha(fs.readFileSync(path.join(example, 'GraphFixLifecycleProbe.cs')));
   report.concurrentQueryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ConcurrentQueryProbe.cs')));
   report.cancelledNewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CancelledNewProbe.cs')));
+  report.graphReentryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'GraphSaveReentrancyProbe.cs')));
   const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
   fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
   for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
@@ -108,6 +109,16 @@ try {
     const summary = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_CANCELLED_NEW_RESULT='))
       .map(line => JSON.parse(line.slice('DOTNET_CANCELLED_NEW_RESULT='.length)));
     assert.deepEqual(summary, [{round, passed: true, cases: 6, passedCases: 6}]);
+    const reentry = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_GRAPH_REENTRY='))
+      .map(line => JSON.parse(line.slice('DOTNET_GRAPH_REENTRY='.length)));
+    assert.deepEqual(reentry.map(row => row.scenario), ['prepare', 'work', 'after-write', 'after-commit']);
+    assert(reentry.every(row => row.passed && row.round === round && row.code === 'GRAPH_SAVE_REENTRANT'
+      && row.retry && row.version === 1 && row.auditCount === 1));
+    assert.deepEqual(reentry.map(row => row.rejected), [
+      {Begins: 0, Commits: 0, Rollbacks: 0, Inserts: 0},
+      {Begins: 1, Commits: 0, Rollbacks: 1, Inserts: 0},
+      {Begins: 1, Commits: 0, Rollbacks: 1, Inserts: 1},
+      {Begins: 1, Commits: 1, Rollbacks: 0, Inserts: 0}]);
   }
   report.databaseSha256 = sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite'))); report.passed = true;
   report.expressionBoundaryDatabase = {file: 'fixture.sqlite.expression-boundaries.sqlite',
@@ -128,6 +139,8 @@ try {
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.concurrent-query.sqlite')))};
   report.cancelledNewDatabase = {file: 'fixture.sqlite.cancelled-new.sqlite',
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.cancelled-new.sqlite')))};
+  report.graphReentryDatabase = {file: 'fixture.sqlite.graph-reentry.sqlite',
+    sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.graph-reentry.sqlite')))};
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
 } catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {

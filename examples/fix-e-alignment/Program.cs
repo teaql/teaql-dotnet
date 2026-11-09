@@ -107,6 +107,9 @@ Require(await CancelledNewProbe.Verify((Environment.GetEnvironmentVariable("TEAQ
     ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".cancelled-new.sqlite",
     int.Parse(Environment.GetEnvironmentVariable("TEAQL_FIX_E_ROUND") ?? "1")),
     "Cancelled new graph verification failed");
+await GraphSaveReentrancyProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
+    ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".graph-reentry.sqlite",
+    int.Parse(Environment.GetEnvironmentVariable("TEAQL_FIX_E_ROUND") ?? "1"));
 Console.WriteLine("FIX_E_EXAMPLE=" + JsonSerializer.Serialize(new {
     language = "dotnet", passed = true, normalGeneratedSave = true, createTimePreserved = true,
     updateTimeAdvanced = true, declaredContextRootInjected = true,
