@@ -103,6 +103,10 @@ await GraphFixLifecycleProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_F
     ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".graph-fix-lifecycle.sqlite");
 await ConcurrentQueryProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
     ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".concurrent-query.sqlite");
+Require(await CancelledNewProbe.Verify((Environment.GetEnvironmentVariable("TEAQL_FIX_E_DB")
+    ?? throw new InvalidOperationException("A retained SQLite database is required")) + ".cancelled-new.sqlite",
+    int.Parse(Environment.GetEnvironmentVariable("TEAQL_FIX_E_ROUND") ?? "1")),
+    "Cancelled new graph verification failed");
 Console.WriteLine("FIX_E_EXAMPLE=" + JsonSerializer.Serialize(new {
     language = "dotnet", passed = true, normalGeneratedSave = true, createTimePreserved = true,
     updateTimeAdvanced = true, declaredContextRootInjected = true,

@@ -12,6 +12,13 @@ partial unchanged ancestors with a complete modified child. The same database
 is used for two rounds. Compact logs and SQLite files are retained; disposable
 consumer builds are removed.
 
+`CancelledNewProbe.cs` covers six additional cases per round: a cancelled new
+root rejects before clock/provider work; complete, incomplete and already-composed
+cancelled children are omitted; an invalid live sibling still reaches Checker;
+and a real provider failure rolls back before retrying the same original graph.
+Only live parent/child rows and committed audits may persist. Pending descendants
+under a cancelled new node require explicit resolution, not implicit cascading.
+
 `ProjectionViewsProbe.cs` adds three generated-query combinations twice on a
 separate unreset store: a later full query cannot widen a sparse view; two full
 views retain independent pending mutations and reject a stale second save; and

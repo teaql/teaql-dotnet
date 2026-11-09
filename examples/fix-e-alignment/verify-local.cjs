@@ -34,6 +34,7 @@ try {
   report.checkerBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CheckerBoundaryProbe.cs')));
   report.graphFixLifecycleApplicationSha256 = sha(fs.readFileSync(path.join(example, 'GraphFixLifecycleProbe.cs')));
   report.concurrentQueryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ConcurrentQueryProbe.cs')));
+  report.cancelledNewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CancelledNewProbe.cs')));
   const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
   fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
   for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
@@ -61,6 +62,7 @@ try {
   }
   report.binarySha256 = sha(fs.readFileSync(executable)); report.localProjectDependencies = true;
   for (const round of [1, 2]) {
+    env.TEAQL_FIX_E_ROUND = String(round);
     const log = await run(['dotnet', executable], 'round-' + round + '.log');
     for (const marker of ['FIX_E_EXAMPLE=', 'CORE_LOAD_EXAMPLE=', 'CORE_MUTATION_OWNERSHIP=', 'CORE_MUTATION_PAGING=', 'DOTNET_VERSION_BOUNDARIES=', 'DOTNET_CHECKER_METADATA=', 'DOTNET_CHECKER_BOUNDARY_RESULT=', 'CORE_DOTNET_E_BOUNDARY_RESULT=', 'CORE_DOTNET_PARTIAL_ANCESTORS_RESULT=', 'CORE_DOTNET_PARTIAL_ROOT_RESULT=']) {
       const values = log.split(/\r?\n/).filter(line => line.startsWith(marker)).map(line => JSON.parse(line.slice(marker.length)));
@@ -98,6 +100,14 @@ try {
     assert(concurrency[0].observation.bothLive && concurrency[0].observation.sameContext && concurrency[0].observation.distinctRoots);
     assert.equal(concurrency[0].observation.physicalQueries, 6); assert.equal(concurrency[0].observation.providerRootCalls, 3);
     assert.deepEqual(fingerprint(), m);
+    const cancelled = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_CANCELLED_NEW='))
+      .map(line => JSON.parse(line.slice('DOTNET_CANCELLED_NEW='.length)));
+    assert.deepEqual(cancelled.map(row => row.scenario), ['root', 'complete-child', 'incomplete-child',
+      'already-composed-child', 'invalid-live-sibling', 'rollback-retry']);
+    assert(cancelled.every(row => row.passed && row.round === round));
+    const summary = log.split(/\r?\n/).filter(line => line.startsWith('DOTNET_CANCELLED_NEW_RESULT='))
+      .map(line => JSON.parse(line.slice('DOTNET_CANCELLED_NEW_RESULT='.length)));
+    assert.deepEqual(summary, [{round, passed: true, cases: 6, passedCases: 6}]);
   }
   report.databaseSha256 = sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite'))); report.passed = true;
   report.expressionBoundaryDatabase = {file: 'fixture.sqlite.expression-boundaries.sqlite',
@@ -116,6 +126,8 @@ try {
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.graph-fix-lifecycle.sqlite')))};
   report.concurrentQueryDatabase = {file: 'fixture.sqlite.concurrent-query.sqlite',
     sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.concurrent-query.sqlite')))};
+  report.cancelledNewDatabase = {file: 'fixture.sqlite.cancelled-new.sqlite',
+    sha256: sha(fs.readFileSync(path.join(evidence, 'fixture.sqlite.cancelled-new.sqlite')))};
   console.log('PASS .NET retained Fix/E/loading/ownership example twice on one database');
 } catch (error) { console.error(error.stack); process.exitCode ||= 1; }
 finally {
