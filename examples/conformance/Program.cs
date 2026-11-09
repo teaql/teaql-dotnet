@@ -65,16 +65,17 @@ var created = await (await Q.WorkItems().Comment("Prepare the conformance work i
     .AuditAs("Create conformance work item")
     .SaveAsync(context);
 Require(created.Id.HasValue && created.Version == 1, "Create did not return ID/version");
+var createdId = created.Id ?? throw new InvalidOperationException("Created work item has no identity");
 Console.WriteLine($"PASS Create (id={created.Id}, version={created.Version})");
 
-var queried = await Q.WorkItems().WithIdIs(created.Id.Value)
+var queried = await Q.WorkItems().WithIdIs(createdId)
     .Comment("Load the complete work item before mutation")
     .Purpose("Verify typed Q API and update semantics")
-    .ExecuteForOneAsync(context);
+    .ExecuteForOneAsync(context) ?? throw new InvalidOperationException("Created work item was not found");
 Require(queried is not null && queried.Title == "Verify .NET runtime", "Q API result mismatch");
 Console.WriteLine("PASS Q API (typed SmartList<WorkItem>)");
 
-var related = await Q.WorkItems().WithIdIs(created.Id.Value)
+var related = await Q.WorkItems().WithIdIs(createdId)
     .SelectPlatformWith(Q.PlatformsWithMinimalFields().SelectName())
     .Comment("what: load work item with platform")
     .Purpose("why: prove generated relation trace inheritance")
@@ -85,7 +86,7 @@ Console.WriteLine("PASS relation query (typed Platform and inherited trace inten
 
 Require(E.WorkItem(queried).Title().Eval() == "Verify .NET runtime", "E loaded scalar mismatch");
 Require(E.WorkItem(queried).Description().OrIfNull("N/A") == "N/A", "E null fallback mismatch");
-var minimal = await Q.WorkItemsWithMinimalFields().WithIdIs(created.Id.Value)
+var minimal = await Q.WorkItemsWithMinimalFields().WithIdIs(createdId)
     .Comment("Load only mandatory identity fields")
     .Purpose("Verify E not-loaded semantics")
     .ExecuteForOneAsync(context);
@@ -97,14 +98,14 @@ try
 catch (TeaQLNotLoadedException) { }
 Console.WriteLine("PASS E API (loaded, null fallback, and not-loaded are distinct)");
 
-var oldVersion = queried.Version.Value;
+var oldVersion = queried.Version ?? throw new InvalidOperationException("Loaded work item has no optimistic version");
 var updated = await queried.UpdateTitle("Verified .NET runtime")
     .AuditAs("Update conformance work item").SaveAsync(context);
 Require(updated.Version == oldVersion + 1, "Update did not increment version");
 Console.WriteLine($"PASS Update (version {oldVersion} -> {updated.Version})");
 
 await updated.MarkForDeletion().AuditAs("Delete conformance work item").SaveAsync(context);
-var remaining = await Q.WorkItems().WithIdIs(created.Id.Value)
+var remaining = await Q.WorkItems().WithIdIs(createdId)
     .Comment("Verify soft-deleted work item is excluded")
     .Purpose("Verify delete semantics")
     .ExecuteForListAsync(context);
