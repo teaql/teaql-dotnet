@@ -2,36 +2,39 @@
   "schema": "teaql.generated-example-fixture/v1",
   "language": "dotnet",
   "modelSha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
-  "generatedManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
-  "previousGeneratedManifestSha256": "5d8645707521bceecc08f9c270ea3fb1c2e5a62e4d3699c94dd8107bca92d1fe",
-  "previousProducerReceiptSha256": "f45b7da6c4a38abb84f90a0fd65d9279cd86b02d5b088f23833fc6b081100e58",
-  "producerSource": {
-    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
-  },
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
-  "evaluationWarnings": 4,
+  "generatorCommit": "cb35754e14d03882880765aa35f59bbf537f2a8a",
+  "generatorSourceContentsSha256": "fc91ca0b754f8e9b2c7bf5deb403724da43b642b87983d554e19fa1d9106eb3a",
+  "producerSource": {
+    "commit": "cb35754e14d03882880765aa35f59bbf537f2a8a",
+    "sourceContentsSha256": "fc91ca0b754f8e9b2c7bf5deb403724da43b642b87983d554e19fa1d9106eb3a"
+  },
+  "producerReceiptSchema": "teaql.dotnet-cancelled-fixture-producer/v1",
+  "producerReceiptSha256": "17a98d3193256579a351e90f26d745b912b617c0d35f40a24ff8862963d4a53c",
+  "generatedManifestSha256": "840bdcf5727f47d80c07849aa8a7543d795fea75803748065563a3a05d7d6b35",
+  "previousFixtureManifestSha256": "484d1e97515737bc4f3d86a5c8a12f30fe40bd07d19a4566f842ec089081aed2",
+  "regeneration": {
+    "repository": "teaql/teaql-conformance",
+    "receipt": "evidence/2026-10-25-core-p0-p1/dotnet-cancelled-new-candidate-v3/producer.json",
+    "changedFiles": [
+      "Models/OrderItem.cs",
+      "Models/PurchaseOrder.cs",
+      "Models/Tenant.cs"
+    ]
+  },
   "files": {
     "E.cs": "8260775859cc9cd523543f8822a529a94f7c9841d6bcff72ebced453c41f9078",
-    "Requests/TenantRequest.cs": "599b1ce3fde8258d0390bd426245261aad7dff54be0dcdc6fc45e8c6e2e48da0",
-    "Requests/PurchaseOrderRequest.cs": "f42e5399387b7c33db0cca62c16f23e3339e4c5dfcd24f0eff2db1627b5893ae",
-    "Requests/OrderItemRequest.cs": "35d41699f868a3a27f91b8f5f306b6c2c7a020f068407c3a48ddd285126d4941",
-    "GeneratedSearchModels.cs": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c",
-    "checker-fix-advanced-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
     "GeneratedRuntimeModule.cs": "f5b5518be0beb9099b899e77ac4fe56eda8570c9f82a2d8c9efce91d786de707",
-    "Models/Tenant.cs": "5d44bdb5f4d2fdc324585359e5a52c665507bd48f648bf0ee27a703fd10c6a47",
-    "Models/PurchaseOrder.cs": "562ee2f87e5bb0464c24b6d5df8f1732efcfca67aff68528c5aad6695ac469eb",
-    "Models/OrderItem.cs": "f9bde027e7e46f314e42d6807c159e937f10658e8007de1c1457b4309e6b47fd",
-    "teaql-i18n.json": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014",
-    "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e"
-  },
-  "generatorSourceContentsSha256": "984cadb159d0bda13d65ddffdc77c06de68278c2308bc1219579e18849f283e7",
-  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "qualificationReportSha256": "423a30c61fa2c04b6074ee15428d76b1aa0d8775a19aee9887cf44ab7906f5e7",
-  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
-  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
-  "producerReceiptSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "previousFixtureManifestSha256": "e1be452b90022b6a91fec4b6db0ebb36b77b2bc029252662e97e3fce765cd264"
+    "GeneratedSearchModels.cs": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c",
+    "Models/OrderItem.cs": "2d9a21074440107209fc0a55b59f51526edbdde2888c42047d517a9743f23206",
+    "Models/PurchaseOrder.cs": "9974f6477bc8897043d0d4a6fe3b5143f112da8f056056b49a278694858f0277",
+    "Models/Tenant.cs": "9325dc101b224a8c138a0c1ad36b5c7d132a92219f576e585ef7f524ef6cf0f8",
+    "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e",
+    "Requests/OrderItemRequest.cs": "35d41699f868a3a27f91b8f5f306b6c2c7a020f068407c3a48ddd285126d4941",
+    "Requests/PurchaseOrderRequest.cs": "f42e5399387b7c33db0cca62c16f23e3339e4c5dfcd24f0eff2db1627b5893ae",
+    "Requests/TenantRequest.cs": "599b1ce3fde8258d0390bd426245261aad7dff54be0dcdc6fc45e8c6e2e48da0",
+    "checker-fix-advanced-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+    "teaql-i18n.json": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014"
+  }
 }

@@ -77,8 +77,26 @@ namespace Generated.Models
         private EntityKey TeaqlEntityKey() => new EntityKey("OrderItem", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
         internal bool TeaqlCreationIntent => _teaqlForceCreate || _entityRoot.IsNew(TeaqlEntityKey());
+        internal bool TeaqlHasPendingGraph(HashSet<object> visited)
+        {
+            if (!visited.Add(this)) return false;
+            if (TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey())) return true;
+            return false;
+        }
+        internal bool TeaqlIsCancelledNew()
+        {
+            if (!_markedForDeletion || !TeaqlCreationIntent) return false;
+            var key = TeaqlEntityKey();
+            EntityCreation.RequireMutation(_creationState, Id, true, true, _loadedSnapshot);
+            if (!_entityRoot.IsNew(key) || !_entityRoot.IsDeleted(key)
+                || !_loadedSnapshot.CopyValues().TryGetValue("id", out var reservedId) || reservedId.TryI64() != Id)
+                throw new EntityCreationException();
+            var visited = new HashSet<object>(ReferenceEqualityComparer.Instance) { this };
+            return true;
+        }
         internal void AttachRoot(EntityRoot root, bool hydration = false)
         {
+            if (!hydration && TeaqlIsCancelledNew()) return;
             var key = TeaqlEntityKey();
             if (!ReferenceEquals(root, _entityRoot) && (hydration || _entityRoot.HasPending(key)))
             {
@@ -302,6 +320,8 @@ namespace Generated.Models
         public async global::System.Threading.Tasks.Task<OrderItem> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
+            if (TeaqlIsCancelledNew())
+                throw new InvalidOperationException("Cannot save a cancelled new root");
             TeaqlValidateCreationGraph(new HashSet<object>(ReferenceEqualityComparer.Instance));
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
@@ -323,6 +343,7 @@ namespace Generated.Models
         internal void TeaqlValidateCreationGraph(HashSet<object> visited, bool relationWillChange = false)
         {
             if (!visited.Add(this)) return;
+            if (TeaqlIsCancelledNew()) return;
             EntityCreation.RequireMutation(_creationState, Id, TeaqlCreationIntent,
                 TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()) || relationWillChange,
                 _loadedSnapshot);
@@ -331,6 +352,7 @@ namespace Generated.Models
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Prepare)) return;
+            if (TeaqlIsCancelledNew()) return;
             graph.DiscardRestoredFields("OrderItem", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = TeaqlCreationIntent;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
@@ -371,6 +393,7 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Preflight)) return;
+            if (TeaqlIsCancelledNew()) return;
             if (TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
                 graph.PreflightPrepared(this);
         }
@@ -378,6 +401,7 @@ namespace Generated.Models
         internal async global::System.Threading.Tasks.Task TeaqlCaptureGraphStateAsync(GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Reserve)) return;
+            if (TeaqlIsCancelledNew()) return;
             var creating = TeaqlCreationIntent;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
             {
@@ -435,6 +459,7 @@ namespace Generated.Models
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Write)) return this;
+            if (TeaqlIsCancelledNew()) return this;
             var creating = TeaqlCreationIntent;
             if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
             {
