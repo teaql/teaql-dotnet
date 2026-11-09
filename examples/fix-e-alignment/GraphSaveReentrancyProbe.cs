@@ -1,6 +1,7 @@
 using Generated;
 using Microsoft.Data.Sqlite;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using TeaQL.Core;
 using TeaQL.DataService;
 using TeaQL.Provider.Sqlite;
@@ -113,7 +114,7 @@ static class GraphSaveReentrancyProbe
         public async Task<ISqlTransaction> BeginSqlAsync() { begins++; return new Transaction(await inner.BeginSqlAsync(), this); }
         async Task Observe(CompiledQuery query)
         {
-            if (!query.Sql.TrimStart().StartsWith("INSERT INTO \"purchase_order_data\"", StringComparison.OrdinalIgnoreCase)) return;
+            if (!Regex.IsMatch(query.Sql.Replace("\"", ""), @"^\s*INSERT INTO\s+purchase_order_data\b", RegexOptions.IgnoreCase)) return;
             inserts++;
             if (AfterInsert is { } callback) await callback();
         }
