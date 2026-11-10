@@ -132,6 +132,37 @@ public class QueryPageRequestTreeTests
         Assert.All(roots, root => Assert.Equal(2, spans.Count(span => span.OperationName == "teaql.provider" && span.ParentSpanId == root.SpanId)));
     }
 
+    [Fact]
+    public async Task CountAlongsideScalarAggregateCountsMatchingEntitiesSeparately()
+    {
+        var request = CountedRequest();
+        request.Query.Sum("amount", "sum");
+        var service = new PageService();
+        var result = await RuntimeDataService.FetchPageAsync(service, new UserContext(), request);
+        Assert.Equal(3, result.TotalCount);
+        Assert.Equal(AggregateFunction.Count, Assert.Single(service.Requests[0].Query.AggregateItems).Function);
+        Assert.Equal(AggregateFunction.Sum, Assert.Single(service.Requests[1].Query.AggregateItems).Function);
+        Assert.Equal(2, request.Query.AggregateItems.Count);
+    }
+
+    [Fact]
+    public async Task ExactCountRejectsFractionNegativeOverflowAndMissingValue()
+    {
+        foreach (var value in new Value[] {
+            new Value.DecimalValue(1.5m), new Value.I64Value(-1),
+            new Value.DecimalValue(decimal.MaxValue), new Value.U64Value(ulong.MaxValue), new Value.NullValue()
+        }) {
+            var service = new PageService { CountValue = value };
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                RuntimeDataService.FetchPageAsync(service, new UserContext(), CountedRequest()));
+            Assert.Single(service.Requests);
+        }
+        foreach (var value in new Value[] { new Value.DecimalValue(0m), new Value.DecimalValue(3m) }) {
+            var page = await RuntimeDataService.FetchPageAsync(new PageService { CountValue = value }, new UserContext(), CountedRequest());
+            Assert.Equal((long)value.TryDecimal()!, page.TotalCount);
+        }
+    }
+
     private static QueryRequest CountedRequest()
     {
         var query = new SelectQuery("CustomerOrder").Comment("load orders").Purpose("render orders").Limit(1).Offset(1);
@@ -144,6 +175,7 @@ public class QueryPageRequestTreeTests
         public DataServiceCapabilities Capabilities { get; } = new() { Query = true };
         public List<QueryRequest> Requests { get; } = new();
         public bool Fail { get; init; }
+        public Value CountValue { get; init; } = new Value.I64Value(3);
         public Func<QueryRequest, Task>? BeforeQuery { get; set; }
         public async Task<QueryResult> QueryAsync(QueryRequest request)
         {
@@ -151,7 +183,7 @@ public class QueryPageRequestTreeTests
             if (BeforeQuery != null) await BeforeQuery(request);
             if (Fail) throw new InvalidOperationException("count failed");
             var row = new TeaQL.Core.Record();
-            if (request.Query.AggregateItems.Count > 0) row["totalOrders"] = new Value.I64Value(3);
+            if (request.Query.AggregateItems.Count > 0) row["totalOrders"] = CountValue;
             else row["id"] = new Value.I64Value(2);
             return new QueryResult { Rows = new() { row } };
         }

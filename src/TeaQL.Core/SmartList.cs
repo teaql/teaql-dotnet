@@ -54,6 +54,7 @@ public class SmartList<T> : List<T>
 
     public SmartList<T> WithTotalCount(long totalCount)
     {
+        if (totalCount < 0) throw new ArgumentOutOfRangeException(nameof(totalCount));
         TotalCount = totalCount;
         return this;
     }
@@ -138,11 +139,22 @@ public class SmartList<T> : List<T>
         return new SmartList<U>(this.Select(mapper))
         {
             TotalCount = TotalCount,
-            Aggregations = Aggregations,
-            Summary = Summary,
-            Facets = Facets,
+            Aggregations = CopyRecord(Aggregations),
+            Summary = CopyRecord(Summary),
+            Facets = CopyFacets(Facets),
             IsLoaded = IsLoaded
         };
+    }
+
+    public SmartList<T> Filter(Func<T, bool> predicate) => new(this.Where(predicate)) { IsLoaded = IsLoaded };
+
+    public SmartList<U> FlatMap<U>(Func<T, IEnumerable<U>> mapper) => new(this.SelectMany(mapper)) { IsLoaded = IsLoaded };
+
+    public bool TryGet(int index, out T? value)
+    {
+        if (index >= 0 && index < Count) { value = this[index]; return true; }
+        value = default;
+        return false;
     }
 
     public List<U> ToList<U>(Func<T, U> mapper)
@@ -207,14 +219,7 @@ public class SmartList<T> : List<T>
 
     public SmartList<Record> IntoRecords()
     {
-        return new SmartList<Record>(this.Select(item => ((IEntity)item!).IntoRecord()))
-        {
-            TotalCount = TotalCount,
-            Aggregations = Aggregations,
-            Summary = Summary,
-            Facets = Facets,
-            IsLoaded = IsLoaded
-        };
+        return Map(item => ((IEntity)item!).IntoRecord());
     }
 
     public List<Value> Ids()
@@ -228,6 +233,7 @@ public class SmartList<T> : List<T>
         foreach (var item in this)
         {
             var idValue = ((IIdentifiableEntity)item!).IdValue();
+            if (idValue is Value.NullValue or Value.TypedNullValue) continue;
             map[IdKey(idValue)] = item;
         }
         return map;
@@ -237,6 +243,24 @@ public class SmartList<T> : List<T>
     {
         return this.Select(item => ((IVersionedEntity)item!).Version()).ToList();
     }
+
+    private static Record CopyRecord(Record source)
+    {
+        var result = new Record(source.ToDictionary(pair => pair.Key, pair => CopyValue(pair.Value)));
+        foreach (var pair in CopyFacets(source.QueryFacets)) result.QueryFacets.Add(pair.Key, pair.Value);
+        return result;
+    }
+
+    private static Value CopyValue(Value value) => value switch
+    {
+        Value.ObjectValue item => new Value.ObjectValue(CopyRecord(item.Value)),
+        Value.ListValue item => new Value.ListValue(item.Values.Select(CopyValue).ToList()),
+        Value.JsonValue item => new Value.JsonValue(item.Value?.DeepClone()),
+        _ => value
+    };
+
+    private static Dictionary<string, SmartList<Record>> CopyFacets(Dictionary<string, SmartList<Record>> source) =>
+        source.ToDictionary(pair => pair.Key, pair => pair.Value.Map(CopyRecord));
 
     private static string IdKey(Value value)
     {

@@ -17,5 +17,12 @@ public class DynamicPropertySnapshotTests
         Assert.True(snapshot.Contains("emptySum")); Assert.IsType<Value.NullValue>(snapshot.Get("emptySum"));
         var first = Assert.IsType<Value.ObjectValue>(snapshot.Get("nested")); first.Value["value"] = new Value.I64Value(99);
         Assert.Equal(5L,Assert.IsType<Value.ObjectValue>(snapshot.Get("nested")).Value["value"].TryI64());
+        var json = snapshot.ToJson();
+        Assert.True(json.ContainsKey("emptySum")); Assert.Null(json["emptySum"]);
+        Assert.False(json.ContainsKey("id"));
+        json["nested"]!["value"] = 123;
+        json["itemCount"] = 123;
+        Assert.Equal(5L,snapshot.ToJson()["nested"]!["value"]!.GetValue<long>());
+        Assert.Equal(5L,snapshot.Get("itemCount")!.TryI64());
     }
 }
