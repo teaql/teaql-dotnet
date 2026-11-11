@@ -53,9 +53,14 @@ resolver.Phase = "B"; context.WithBusinessClock(new FixedBusinessClock(now.AddDa
 Reset();
 for (var attempt = 0; attempt < 2; attempt++) await loaded.AuditAs("Do not turn changed Context into an update").SaveAsync(context);
 Zero("clean entity"); Require(resolver.Calls == 0 && loaded.Version == version, "no-op changed Context");
-loaded.UpdateName("updated-" + suffix); Reset();
+wrapper.NormalizeTo = loaded.Name!;
+loaded.UpdateName("NORMALIZE"); Reset();
+await loaded.AuditAs("Normalize the last business edit back to its persisted value").SaveAsync(context);
+Zero("normalized business edit"); Require(loaded.Version == version && loaded.Name == wrapper.NormalizeTo, "normalized native values/version");
+Require(E.Entry(loaded).TouchedAt().Eval() == now.UtcDateTime && loaded.LastIp == "ip-A", "normalized Context values");
+loaded.UpdateName("updated-" + suffix); Reset(); var clocksBeforeUpdate = resolver.NowCalls;
 await loaded.AuditAs("Apply Context only alongside a real business edit").SaveAsync(context);
-Require(audit.Calls == 1 && resolver.NowCalls == 3, "one update and once-only Fix");
+Require(audit.Calls == 1 && resolver.NowCalls == clocksBeforeUpdate + 1, "one update and once-only Fix");
 loaded = await Load(loaded.Id!.Value);
 Require(loaded.Version == version + 1 && E.Entry(loaded).TouchedAt().Eval() == now.AddDays(1).UtcDateTime, "real update version/clock");
 Require(E.Entry(loaded).BornAt().Eval() == now.UtcDateTime && loaded.SourceIp == "ip-A" && loaded.OpenedBy == "actor-A", "preserve create-only Context");
@@ -89,6 +94,23 @@ parent = (await Q.Catalogs().WithIdIs(parent.Id!.Value).SelectEntryListWith(Q.En
 first = parent.EntryList[0]; second = parent.EntryList[1];
 var parentVersion = parent.Version; var secondVersion = second.Version;
 var firstOriginal = first.Name; var secondOriginal = second.Name;
+wrapper.NormalizeTo = firstOriginal!;
+first.UpdateName("NORMALIZE"); Reset();
+await parent.AuditAs("Normalize one child without dirtying its clean relatives").SaveAsync(context);
+Zero("normalized child-only graph");
+Require(first.Name == firstOriginal && first.Version == 1 && parent.Version == parentVersion, "normalized graph native state");
+first.UpdateName("NORMALIZE"); second.UpdateName("real-sibling-" + suffix); Reset();
+await parent.AuditAs("Normalize one child while saving an independently changed sibling").SaveAsync(context);
+Require(audit.Calls == 1 && first.Name == firstOriginal && first.Version == 1 && parent.Version == parentVersion,
+    "mixed graph must not write the normalized child");
+secondVersion = second.Version; secondOriginal = second.Name;
+first.UpdateName("NORMALIZE"); second.UpdateName(new string('x', 300)); Reset();
+var normalizedGraphError = await Reject(async () => await parent.AuditAs("Reject a later child after an earlier normalized edit").SaveAsync(context));
+Require(normalizedGraphError.Violations.Any(v => v.InstancePath == "/entryList/1/name"), "normalized mixed graph location");
+Zero("normalized child before invalid sibling");
+first.UpdateName(firstOriginal!); second.UpdateName(secondOriginal!); Reset();
+await parent.AuditAs("Restore the rejected mixed graph without stale automatic changes").SaveAsync(context);
+Zero("restored normalized graph");
 first.UpdateName("changed-" + suffix); second.UpdateName(new string('x', 300)); resolver.Phase = "D"; Reset();
 var graphError = await Reject(async () => await parent.AuditAs("Reject the second child before writing either child").SaveAsync(context));
 Require(graphError.Violations.Any(v => v.InstancePath == "/entryList/1/name"), "indexed graph ObjectLocation"); Zero("invalid graph");
@@ -110,6 +132,7 @@ Console.WriteLine("DOTNET_CONTEXT_FIX_SQLITE=" + JsonSerializer.Serialize(new {p
 
 sealed class Checker(IEntityChecker generated) : IEntityChecker
 {
+    public string NormalizeTo = "";
     public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now) {
         if (request is InsertMutationRequest) {
             ContextFix.Apply(context, request, now, "source_ip", "ip");
@@ -117,7 +140,10 @@ sealed class Checker(IEntityChecker generated) : IEntityChecker
         }
         ContextFix.Apply(context, request, now, "last_ip", "ip");
         ContextFix.Apply(context, request, now, "changed_by", "actor");
-        return generated.CheckAndFix(context, request, now);
+        var results = generated.CheckAndFix(context, request, now);
+        if (request is UpdateMutationRequest update && update.Command.Values.TryGetValue("name", out var name)
+            && name == new Value.TextValue("NORMALIZE")) update.Command.Values["name"] = new Value.TextValue(NormalizeTo);
+        return results;
     }
 }
 sealed class Resolver : IContextFixResolver

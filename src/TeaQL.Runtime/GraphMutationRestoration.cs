@@ -6,6 +6,9 @@ public sealed partial class GraphMutationSession
 {
     /// <summary>Generated bridge: admit raw keys, then cancel only proven persisted baseline edits.</summary>
     public void DiscardRestoredFields(string entityType, EntityRoot ledger, EntityKey key,
+        LoadedScalarSnapshot snapshot) => DiscardRestoredFieldsCore(entityType, ledger, key, snapshot);
+
+    private Record DiscardRestoredFieldsCore(string entityType, EntityRoot ledger, EntityKey key,
         LoadedScalarSnapshot snapshot)
     {
         RequireActive();
@@ -18,13 +21,14 @@ public sealed partial class GraphMutationSession
         if (ledger.IsNew(key) || ledger.IsDeleted(key) || snapshot.Origin != LoadedScalarSnapshotOrigin.Hydrated || snapshot.Owner != key
             || !snapshot.TryOriginal("id", out var originalId) || !LoadedScalarSnapshot.SameValue(originalId, key.Id)
             || !snapshot.TryOriginal("version", out var version) || version is not Value.I64Value originalVersion
-            || ledger.OriginalVersion(key) != originalVersion.Value) return;
+            || ledger.OriginalVersion(key) != originalVersion.Value) return new();
         var metadata = _context.Metadata?.GetEntity(entityType);
-        if (metadata == null) return;
+        if (metadata == null) return new();
         var restored = pending.Where(item => item.Key is not "id" and not "version"
             && metadata.PropertyByName(item.Key) is { IsId: false, IsVersion: false }
             && snapshot.TryOriginal(item.Key, out var original)
             && LoadedScalarSnapshot.SameValue(item.Value, original)).ToDictionary(item => item.Key, item => item.Value);
         ledger.DiscardFields(key, restored);
+        return new Record(restored);
     }
 }

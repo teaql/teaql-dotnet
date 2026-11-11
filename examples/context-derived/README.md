@@ -14,11 +14,16 @@ the built `.deps.json`, and runs the same binary twice on one SQLite database.
 It reaps its command groups and removes compiler output, retaining compact logs,
 receipt and the database. Shared NuGet caches and services are never removed.
 `TEAQL_CONTEXT_FIX_EVIDENCE_DIR` can select a new absolute evidence directory.
+Set `TEAQL_CONTEXT_FIX_UNIT_TESTS=1` to run all solution test projects in the
+same owned compiler workspace before building and executing the consumer.
 
 The example proves:
 
 - Changing the Business Clock, IP or actor alone causes no provider call, version
   bump or audit. Restoring a failed business edit remains a no-op.
+- When business Fix normalizes the last edit to its known persisted value,
+  automatic Context values are withdrawn without repeating Fix. The native
+  entity and ledger agree, including mixed graphs with a genuinely dirty sibling.
 - Create defaults and update defaults use the captured Business Clock; create
   fields are preserved on update. Generated `uniStr` runs once, not per phase.
 - Provider errors have a safe field location without raw exception causes.

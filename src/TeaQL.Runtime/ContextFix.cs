@@ -39,7 +39,7 @@ public static class ContextFix
         internal readonly PropertyDescriptor[] Fields;
         internal readonly bool Allowed;
         private readonly Frame? _parent;
-        private readonly Record? _values;
+        private readonly Record? _baseline;
         private readonly Record _before;
         internal bool Closed;
         private bool _completed;
@@ -47,27 +47,46 @@ public static class ContextFix
         internal Frame(UserContext context, MutationRequest request)
         {
             Context = context; Request = request; Fields = ContextFix.Fields(context, request);
-            _values = Values(request); _parent = Active.Value;
-            _before = _values == null ? new() : new LoadedScalarSnapshot(new Record(_values
+            var values = Values(request); _parent = Active.Value;
+            _before = values == null ? new() : new LoadedScalarSnapshot(new Record(values
                 .Where(item => Fields.Any(field => field.Name == item.Key)).ToDictionary(item => item.Key, item => item.Value))).CopyValues();
-            var old = (request as UpdateMutationRequest)?.Command.OldValues;
-            Allowed = request is InsertMutationRequest || request is UpdateMutationRequest && _values != null
-                && _values.Any(item => item.Key is not "id" and not "version" && !item.Key.StartsWith('_')
-                    && !Fields.Any(field => field.Name == item.Key)
-                    && (old == null || !old.TryGetValue(item.Key, out var original)
-                        || !LoadedScalarSnapshot.SameValue(item.Value, original)));
+            var old = (Request as UpdateMutationRequest)?.Command.OldValues;
+            if (old == null && Request.LoadedSnapshot is { Origin: LoadedScalarSnapshotOrigin.Hydrated } snapshot
+                && Request.LedgerKey is { } key && snapshot.Owner == key
+                && snapshot.TryOriginal("id", out var id) && LoadedScalarSnapshot.SameValue(id, key.Id)
+                && snapshot.TryOriginal("version", out var version) && version is Value.I64Value originalVersion
+                && Request.LedgerRoot?.OriginalVersion(key) == originalVersion.Value)
+                old = snapshot.CopyValues();
+            _baseline = old == null ? null : new LoadedScalarSnapshot(old).CopyValues();
+            Allowed = HasBusinessChange();
             Active.Value = this;
+        }
+        private bool HasBusinessChange()
+        {
+            return Request is InsertMutationRequest || Request is UpdateMutationRequest && Values(Request) is { } values
+                && values.Any(item => item.Key is not "id" and not "version" && !item.Key.StartsWith('_')
+                    && !Fields.Any(field => field.Name == item.Key)
+                    && (_baseline == null || !_baseline.TryGetValue(item.Key, out var original)
+                        || !LoadedScalarSnapshot.SameValue(item.Value, original)));
+        }
+        internal void NormalizeFinalIntent()
+        {
+            if (Request is UpdateMutationRequest && !HasBusinessChange()) Restore();
+        }
+        private void Restore()
+        {
+            if (Values(Request) is not { } values) return;
+            foreach (var field in Fields) {
+                if (_before.TryGetValue(field.Name, out var value)) values[field.Name] = LoadedScalarSnapshot.CopyValue(value);
+                else values.Remove(field.Name);
+            }
         }
         internal void Complete() => _completed = true;
         public void Dispose()
         {
             if (Closed) return;
             try {
-                if (!_completed && _values != null)
-                    foreach (var field in Fields) {
-                        if (_before.TryGetValue(field.Name, out var value)) _values[field.Name] = LoadedScalarSnapshot.CopyValue(value);
-                        else _values.Remove(field.Name);
-                    }
+                if (!_completed) Restore();
             }
             finally { Closed = true; Active.Value = _parent; }
         }

@@ -231,7 +231,7 @@ namespace Generated.Models
                 var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
                 if (originalVersion.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment));
+            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment), TeaqlRestoreFixedValues);
             }
             for (var index = 0; index < EntryList.Count; index++)
             {
@@ -373,6 +373,16 @@ namespace Generated.Models
                         if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
                         if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
+        }
+
+        // Repair native scalar values cancelled against an owner/version-qualified baseline.
+        // Do not change identity, loading state, or relations through serialization.
+        private void TeaqlRestoreFixedValues(Record record)
+        {
+                    if (record.TryGetValue("name", out var nameValue))
+                        this.Name = nameValue.Raw == null ? null : Convert.ToString(nameValue.Raw);
+
+
         }
 
         public InsertCommand ToInsertCommand()

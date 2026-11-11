@@ -347,7 +347,7 @@ namespace Generated.Models
                 var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
                 if (originalVersion.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment));
+            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment), TeaqlRestoreFixedValues);
             }
         }
 
@@ -484,6 +484,40 @@ namespace Generated.Models
                         if (IsLoaded("GuardedToken")) record["guarded_token"] = TeaqlValue(GuardedToken);
                         if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
+        }
+
+        // Repair native scalar values cancelled against an owner/version-qualified baseline.
+        // Do not change identity, loading state, or relations through serialization.
+        private void TeaqlRestoreFixedValues(Record record)
+        {
+                    if (record.TryGetValue("catalog", out var catalogValue))
+                        this.Catalog = catalogValue.Raw == null ? null : Convert.ToInt64(catalogValue.Raw);
+
+                    if (record.TryGetValue("name", out var nameValue))
+                        this.Name = nameValue.Raw == null ? null : Convert.ToString(nameValue.Raw);
+
+                    if (record.TryGetValue("born_at", out var bornAtValue))
+                        this.BornAt = bornAtValue.Raw == null ? null : TeaqlDateTime(bornAtValue);
+
+                    if (record.TryGetValue("touched_at", out var touchedAtValue))
+                        this.TouchedAt = touchedAtValue.Raw == null ? null : TeaqlDateTime(touchedAtValue);
+
+                    if (record.TryGetValue("source_ip", out var sourceIpValue))
+                        this.SourceIp = sourceIpValue.Raw == null ? null : Convert.ToString(sourceIpValue.Raw);
+
+                    if (record.TryGetValue("last_ip", out var lastIpValue))
+                        this.LastIp = lastIpValue.Raw == null ? null : Convert.ToString(lastIpValue.Raw);
+
+                    if (record.TryGetValue("opened_by", out var openedByValue))
+                        this.OpenedBy = openedByValue.Raw == null ? null : Convert.ToString(openedByValue.Raw);
+
+                    if (record.TryGetValue("changed_by", out var changedByValue))
+                        this.ChangedBy = changedByValue.Raw == null ? null : Convert.ToString(changedByValue.Raw);
+
+                    if (record.TryGetValue("guarded_token", out var guardedTokenValue))
+                        this.GuardedToken = guardedTokenValue.Raw == null ? null : Convert.ToString(guardedTokenValue.Raw);
+
+
         }
 
         public InsertCommand ToInsertCommand()

@@ -57,6 +57,11 @@ async function main() {
       const bytes=fs.readFileSync(file); report.commands.push({command,exitCode:result.status,signal:result.signal,logSha256:sha(bytes)});
       assert.equal(result.status,0,bytes.toString().slice(-8000)); return bytes.toString();
     }
+    if (process.env.TEAQL_CONTEXT_FIX_UNIT_TESTS === '1') {
+      await run(['dotnet','test',path.join(repo,'TeaQL.sln'),'--disable-build-servers','-m:2','--verbosity','minimal',
+        ...properties], 'unit-tests.log',600000);
+      report.completeSolutionTests=true;
+    }
     await run(['dotnet','build',project,'--disable-build-servers','-m:2','--verbosity','minimal',...properties],'build.log',300000);
     const binary=(await run(['dotnet','msbuild',project,'-nologo','-getProperty:TargetPath',...properties],'target-path.log')).trim();
     assert(binary.startsWith(artifacts+path.sep)&&fs.existsSync(binary));

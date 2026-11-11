@@ -6,9 +6,16 @@ namespace TeaQL.Runtime.Tests;
 
 public class ContextFixTests
 {
+    [Fact]
+    public void ExistingCompiledGeneratedBridgesRetainTheirMethodSignatures()
+    {
+        Assert.NotNull(typeof(GraphMutationSession).GetMethod("PrepareInput", [typeof(object), typeof(MutationRequest)]));
+        Assert.Equal(typeof(void), typeof(GraphMutationSession).GetMethod("DiscardRestoredFields")!.ReturnType);
+    }
     private static readonly DateTimeOffset Now = DateTimeOffset.Parse("2032-02-29T10:15:30Z");
     private static RuntimeModule Module() => new RuntimeModule().Entity(EntityDescriptor.New("Probe")
         .Property(PropertyDescriptor.New("name", DataType.Text))
+        .Property(PropertyDescriptor.New("note", DataType.Text))
         .Property(PropertyDescriptor.New("born_at", DataType.Timestamp).OnCreateFromContext("now"))
         .Property(PropertyDescriptor.New("touched_at", DataType.Timestamp).OnCreateFromContext("now").OnUpdateFromContext("now"))
         .Property(PropertyDescriptor.New("source_ip", DataType.Text).OnCreateFromContext("ip").OnUpdateFromContext("ip")))
@@ -17,6 +24,25 @@ public class ContextFixTests
     private static UpdateMutationRequest Update(Record values, Record? old = null) => new(new UpdateCommand("Probe", new Value.I64Value(1)) {
         Values = values, OldValues = old, ExpectedVersionValue = 7
     }, "check frozen mutation intent");
+
+    [Theory]
+    [InlineData("NORMALIZE", true)]
+    [InlineData("REPAIR_OTHER", false)]
+    [InlineData("UNKNOWN_BASELINE", false)]
+    [InlineData("MUTATE_BASELINE", false)]
+    public void FinalBusinessIntentNotAnEarlierDirtyFlagControlsContextRetention(string mode, bool noOp)
+    {
+        var ctx = Context();
+        ctx.InsertResource<IContextFixResolver>(new Resolver((_, input) => input.Function == "now"
+            ? new Value.TimestampValue(input.Now.ToUnixTimeMilliseconds()) : new Value.TextValue("prepared IP")));
+        var values = new Record { ["name"] = new Value.TextValue(mode) };
+        ctx.CheckAndFix(Update(values, mode == "UNKNOWN_BASELINE" ? null : new Record {
+            ["name"] = new Value.TextValue(mode == "MUTATE_BASELINE" ? "different" : "same") }));
+        Assert.Equal(new Value.TextValue("same"), values["name"]);
+        Assert.Equal(!noOp, values.ContainsKey("touched_at"));
+        Assert.Equal(!noOp, values.ContainsKey("source_ip"));
+        if (mode == "REPAIR_OTHER") Assert.Equal(new Value.TextValue("business repair"), values["note"]);
+    }
 
     [Theory]
     [InlineData("empty")]
@@ -118,6 +144,12 @@ public class ContextFixTests
             if (request is InsertMutationRequest) ContextFix.Apply(ctx, request, now, "born_at", "now");
             ContextFix.Apply(ctx, request, now, "touched_at", "now");
             ContextFix.Apply(ctx, request, now, "source_ip", "ip");
+            if (request is UpdateMutationRequest update && update.Command.Values.TryGetValue("name", out var name)
+                && name is Value.TextValue text && text.Value is "NORMALIZE" or "REPAIR_OTHER" or "UNKNOWN_BASELINE" or "MUTATE_BASELINE") {
+                update.Command.Values["name"] = new Value.TextValue("same");
+                if (text.Value == "MUTATE_BASELINE") update.Command.OldValues!["name"] = new Value.TextValue("same");
+                if (text.Value == "REPAIR_OTHER") update.Command.Values["note"] = new Value.TextValue("business repair");
+            }
             if (!reject) return [];
             ((UpdateMutationRequest)request).Command.Values["name"] = new Value.TextValue("custom repair");
             return [new CheckResult {RuleId = "required", Location = ObjectLocation.Property("name")}];

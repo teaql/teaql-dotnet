@@ -681,6 +681,7 @@ public class UserContext
         diagnosticSecrets.AddRange(CheckerPrivacy.RequestSecrets(this, request));
         CheckerPrivacy.Translate(violations, I18nCatalog, Locale, this, diagnosticSecrets, entity);
         if (violations.Count != 0) throw new CheckException(violations);
+        contextFix.NormalizeFinalIntent();
         MutationFixLedger.WriteBack(request, beforeFix);
         contextFix.Complete();
     }

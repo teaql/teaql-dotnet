@@ -45,7 +45,9 @@ public sealed partial class GraphMutationSession
     }
 
     /// <summary>Validate/fix input before opening a transaction; retain a private snapshot.</summary>
-    public void PrepareInput(object entity, MutationRequest request)
+    public void PrepareInput(object entity, MutationRequest request) => PrepareInput(entity, request, null);
+
+    public void PrepareInput(object entity, MutationRequest request, Action<Record>? restoreFixedValues)
     {
         RequireActive(); ArgumentNullException.ThrowIfNull(entity);
         if (_transaction != null || _preparedGraphSealed) throw new InvalidOperationException("GRAPH_INPUT_PREPARATION_CLOSED");
@@ -68,6 +70,14 @@ public sealed partial class GraphMutationSession
         _intentValues.AddRange(RuntimeDataService.LoadedPrivateValues(captured, _context).Select(LoadedScalarSnapshot.CopyValue));
         _context.CheckAndFix(captured);
         _intentValues.AddRange(RuntimeDataService.PrivateMutationValues(captured, _context).Select(LoadedScalarSnapshot.CopyValue));
+        if (captured is UpdateMutationRequest normalizedUpdate && captured.LoadedSnapshot is { } snapshot
+            && restoreFixedValues != null)
+        {
+            var restored = DiscardRestoredFieldsCore(entityType, captured.LedgerRoot!, captured.LedgerKey!, snapshot);
+            restoreFixedValues(restored);
+            if (!captured.LedgerRoot!.HasPending(captured.LedgerKey!)) return;
+            normalizedUpdate.Command.Values = captured.LedgerRoot.Change(captured.LedgerKey!);
+        }
         _prepared.Add(entity, new PreparedMutation(CopyRequest(captured)));
     }
 
