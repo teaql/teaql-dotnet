@@ -15,6 +15,10 @@ public record PropertyDescriptor(
     public string ColumnNameString { get; init; } = string.IsNullOrEmpty(ColumnNameValue) ? Name : ColumnNameValue;
     public bool IsInt32 { get; init; }
     public string? ImmutableAfterCreateRuleId { get; init; }
+    public string? CreateFunction { get; init; }
+    public string? UpdateFunction { get; init; }
+    public PropertyDescriptor OnCreateFromContext(string function) => this with { CreateFunction = function };
+    public PropertyDescriptor OnUpdateFromContext(string function) => this with { UpdateFunction = function };
 
     public static PropertyDescriptor New(string name, DataType dataType)
     {

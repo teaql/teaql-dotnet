@@ -133,6 +133,18 @@ public class RuntimeModule
         return this;
     }
 
+    /// <summary>Generated model declaration; not an input-payload eligibility flag.</summary>
+    public RuntimeModule ContextField(string entity, string field, string? create = null, string? update = null)
+    {
+        var descriptor = Metadata.GetEntity(entity) ?? throw new ArgumentException("Context field requires a modeled entity");
+        var index = descriptor.Properties.FindIndex(property => property.Name == field);
+        if (index < 0 || descriptor.Properties[index].IsId || descriptor.Properties[index].IsVersion
+            || string.IsNullOrWhiteSpace(create) && string.IsNullOrWhiteSpace(update))
+            throw new ArgumentException("Context field requires a canonical modeled non-identity field and function");
+        descriptor.Properties[index] = descriptor.Properties[index] with { CreateFunction = create, UpdateFunction = update };
+        return this;
+    }
+
     public RuntimeModule And(RuntimeModule other)
     {
         ArgumentNullException.ThrowIfNull(other);

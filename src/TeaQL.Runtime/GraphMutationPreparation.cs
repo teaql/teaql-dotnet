@@ -61,6 +61,9 @@ public sealed partial class GraphMutationSession
             throw new InvalidOperationException("GRAPH_LEDGER_ENTITY_TYPE_MISMATCH");
         var captured = Request(CopyRequest(request));
         _context.ValidateGraphMutation(captured, this);
+        var contextFields = ContextFix.Fields(_context, captured).Select(field => field.Name).ToArray();
+        if (contextFields.Length != 0)
+            AfterRollback(captured.LedgerRoot!.CaptureFields(captured.LedgerKey!, contextFields));
         _intentValues.AddRange(RuntimeDataService.PrivateMutationValues(captured, _context).Select(LoadedScalarSnapshot.CopyValue));
         _intentValues.AddRange(RuntimeDataService.LoadedPrivateValues(captured, _context).Select(LoadedScalarSnapshot.CopyValue));
         _context.CheckAndFix(captured);

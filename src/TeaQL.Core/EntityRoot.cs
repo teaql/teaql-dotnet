@@ -56,6 +56,26 @@ public sealed class EntityRoot
         lock (_gate) return _changes.TryGetValue(key, out var values) ? new Record(values) : new Record();
     }
 
+    // Undo only automatic Context fields; never restore a complete stale ledger
+    // over caller intent, lifecycle, optimistic versions or trace history.
+    internal Action CaptureFields(EntityKey key, IReadOnlyCollection<string> fields)
+    {
+        Record saved;
+        lock (_gate) saved = new LoadedScalarSnapshot(new Record(Change(key)
+            .Where(item => fields.Contains(item.Key)).ToDictionary(item => item.Key, item => item.Value))).CopyValues();
+        return () => {
+            lock (_gate)
+            {
+                if (_changes.TryGetValue(key, out var values))
+                {
+                    foreach (var field in fields) values.TryRemove(field, out _);
+                    if (values.IsEmpty) _changes.TryRemove(key, out _);
+                }
+                foreach (var (field, value) in saved) Set(key, field, LoadedScalarSnapshot.CopyValue(value));
+            }
+        };
+    }
+
     // Runtime normalization discards only validated restored fields. Identity,
     // optimistic version, lifecycle and lineage remain owned by this ledger.
     internal void DiscardFields(EntityKey key, IReadOnlyDictionary<string, Value> restored)

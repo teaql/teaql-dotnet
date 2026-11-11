@@ -132,6 +132,12 @@ approval emits a warning; it is not automatic rejection. Marking for deletion
 stages a change—the audited Save performs it. Atomicity is provider/route scoped,
 not a distributed transaction across unrelated databases.
 
+Context-derived defaults supplement real business mutations: a changed clock,
+client IP or actor alone must not cause an update. Create uses its own defaults;
+updates preserve create-only fields. Failed validation discards automatic values
+without discarding caller intent. See the runnable [Context Fix example](examples/context-derived)
+for typed Q/E, per-entity graph rollback and precise error locations.
+
 Signed optimistic versions use checked transitions shared by Core, Runtime and
 SQL: update requires `1 <= v < long.MaxValue`; soft delete accepts every positive
 version and computes `-v-1`; recovery requires a negative version with a
