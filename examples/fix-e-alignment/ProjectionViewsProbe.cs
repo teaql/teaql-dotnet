@@ -89,7 +89,8 @@ static class ProjectionViewsProbe
         await left.AuditAs("Save only the first independent view").SaveAsync(context);
         var stored = await Full(two.Id.Value);
         Require(E.PurchaseOrder(stored).ContactPhone().Eval() == "5550701" && E.PurchaseOrder(stored).InternalNote().Eval() is null
-            && E.PurchaseOrder(stored).Version().Eval() == 2, "Saving one view persisted another view's pending field");
+            && E.PurchaseOrder(stored).Version().Eval() == 2 && E.PurchaseOrder(stored).UpdateTime().Eval() == second.UtcDateTime,
+            "Saving one view persisted another view's pending field or lost its Business Clock assignment");
         Require(E.PurchaseOrder(other).Version().Eval() == 1 && Ledger(other).OriginalVersion(Key(other)) == 1
             && Ledger(other).Change(Key(other))["internal_note"] == new Value.TextValue("pending-other-view"), "Successful save changed another view's intent or version");
         var beforeReject = Counts(); Exception? failure = null;
@@ -109,8 +110,8 @@ static class ProjectionViewsProbe
         Console.WriteLine("DOTNET_PENDING_VIEW_OBSERVATION=" + JsonSerializer.Serialize(new { round,
             keys = pending.Keys.OrderBy(k => k).ToArray(), values = pending.ToDictionary(p => p.Key,
                 p => new { type = p.Value.GetType().Name, value = p.Value.ToJsonValue() }) }));
-        Require(derived.SequenceEqual(new[] { "update_time" }) && pending["update_time"] == new Value.TimestampValue(second.ToUnixTimeMilliseconds()),
-            "Only the exact managed BusinessClock Fix may be added to pending intent");
+        Require(derived.Length == 0 && E.PurchaseOrder(other).UpdateTime().Eval() == first.UtcDateTime,
+            "A rejected save must discard staged Context fields and preserve only caller intent");
         Case("same-identity-independent-mutation-ledgers", two, new { separateViews = true, otherPendingEditRetained = true,
             noCrossViewWrite = true, staleException = failure!.GetType().FullName, storedVersion = 2, otherVersion = 1,
             derivedFixFields = derived, rejectionRolledBack = true, commitAuditsOnRejection = 0 });

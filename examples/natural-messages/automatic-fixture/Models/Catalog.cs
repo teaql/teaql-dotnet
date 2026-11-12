@@ -47,12 +47,37 @@ namespace Generated.Models
         private static long _teaqlTemporaryId;
         private EntityRoot _entityRoot = new EntityRoot();
         private LoadedScalarSnapshot _loadedSnapshot = new LoadedScalarSnapshot(new Record());
+        private EntityCreationState _creationState;
         private long _ledgerId = -Interlocked.Increment(ref _teaqlTemporaryId);
         private bool _teaqlForceCreate;
         private EntityKey TeaqlEntityKey() => new EntityKey("Catalog", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
+        internal bool TeaqlCreationIntent => _teaqlForceCreate || _entityRoot.IsNew(TeaqlEntityKey());
+        internal bool TeaqlHasPendingGraph(HashSet<object> visited)
+        {
+            if (!visited.Add(this)) return false;
+            if (TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey())) return true;
+            foreach (var child in EntryList)
+                if (child.TeaqlHasPendingGraph(visited)) return true;
+            return false;
+        }
+        internal bool TeaqlIsCancelledNew()
+        {
+            if (!_markedForDeletion || !TeaqlCreationIntent) return false;
+            var key = TeaqlEntityKey();
+            EntityCreation.RequireMutation(_creationState, Id, true, true, _loadedSnapshot);
+            if (!_entityRoot.IsNew(key) || !_entityRoot.IsDeleted(key)
+                || !_loadedSnapshot.CopyValues().TryGetValue("id", out var reservedId) || reservedId.TryI64() != Id)
+                throw new EntityCreationException();
+            var visited = new HashSet<object>(ReferenceEqualityComparer.Instance) { this };
+            foreach (var child in EntryList)
+                if (child.TeaqlHasPendingGraph(visited))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_deletion_state", EntityType = "Catalog", Location = ObjectLocation.Property("id"), Message = "Cancelled new entity has pending descendants; explicit resolution is required" } });
+            return true;
+        }
         internal void AttachRoot(EntityRoot root, bool hydration = false)
         {
+            if (!hydration && TeaqlIsCancelledNew()) return;
             var key = TeaqlEntityKey();
             if (!ReferenceEquals(root, _entityRoot) && (hydration || _entityRoot.HasPending(key)))
             {
@@ -74,7 +99,20 @@ namespace Generated.Models
             Value.DateValue v => v.Value,
             _ => Convert.ToDateTime(value.Raw)
         };
-        public Catalog() { _entityRoot.MarkAsNew(TeaqlEntityKey()); }
+        private Catalog() { _creationState = EntityCreationState.Hydrated; }
+        internal static Catalog TeaqlNewWithReservedId(long value)
+        {
+            EntityCreation.RequireReserved(EntityCreationState.Reserved, value);
+            var entity = new Catalog();
+            entity._creationState = EntityCreationState.Reserved;
+            entity.TeaqlInitializeNewId(value);
+            return entity;
+        }
+        internal void TeaqlValidateReservedIdentity(long expected)
+        {
+            EntityCreation.RequireReserved(_creationState, Id);
+            if (Id != expected || !_entityRoot.IsNew(TeaqlEntityKey())) throw new EntityCreationException();
+        }
                 public long? Id { get; set; }
                 public string? Name { get; set; }
                 public long? Version { get; set; }
@@ -91,13 +129,26 @@ namespace Generated.Models
         }
 
         internal void TeaqlInitializeGeneratedBootstrapId(long value)
+            => TeaqlInitializeNewId(value);
+
+        internal void TeaqlInitializeNewId(long value)
         {
+            EntityCreation.RequireReserved(_creationState, value);
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
             var oldKey = TeaqlEntityKey();
             Id = value;
             MarkLoaded("Id");
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
             _entityRoot.Set(TeaqlEntityKey(), "id", new Value.I64Value(value));
+            _entityRoot.MarkAsNew(TeaqlEntityKey());
             _teaqlForceCreate = true;
+            _loadedSnapshot = TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin.CreationBaseline);
+        }
+
+        // Fixed model seeds do not consume an unrelated allocator value.
+        internal static Catalog TeaqlNewWithFixedId(long value)
+        {
+            return TeaqlNewWithReservedId(value);
         }
 
         public Catalog MarkLoaded(params string[] fields)
@@ -190,6 +241,8 @@ namespace Generated.Models
         public async global::System.Threading.Tasks.Task<Catalog> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
+            if (TeaqlIsCancelledNew()) throw new InvalidOperationException("Cannot save a cancelled new root");
+            TeaqlValidateCreationGraph(new HashSet<object>(ReferenceEqualityComparer.Instance));
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
                 graph.DeclareRootEntity("Catalog");
@@ -207,11 +260,26 @@ namespace Generated.Models
             });
         }
 
+        internal void TeaqlValidateCreationGraph(HashSet<object> visited, bool relationWillChange = false)
+        {
+            if (!visited.Add(this)) return;
+            if (TeaqlIsCancelledNew()) return;
+            EntityCreation.RequireMutation(_creationState, Id, TeaqlCreationIntent,
+                TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()) || relationWillChange,
+                _loadedSnapshot);
+            foreach (var child in EntryList)
+                child.TeaqlValidateCreationGraph(visited,
+                    (child.TeaqlCreationIntent || child.IsLoaded("Catalog")) && child.Catalog != Id);
+        }
+
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Prepare)) return;
+            if (TeaqlIsCancelledNew()) return;
             graph.DiscardRestoredFields("Catalog", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
-            var creating = !Id.HasValue || _teaqlForceCreate;
+            var creating = TeaqlCreationIntent;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
+            EntityCreation.RequireMutation(_creationState, Id, creating, changed, _loadedSnapshot);
             if (changed)
             {
             if (!creating && !_markedForDeletion)
@@ -236,8 +304,13 @@ namespace Generated.Models
             for (var index = 0; index < EntryList.Count; index++)
             {
                 var child = EntryList[index];
+                if (child.TeaqlIsCancelledNew())
+                {
+                    child.TeaqlPrepareInputGraph(context, graph);
+                    continue;
+                }
                 child.AttachRoot(_entityRoot);
-                if (child.Catalog != (Id ?? _ledgerId)) child.UpdateCatalogId(Id ?? _ledgerId);
+                if ((child.TeaqlCreationIntent || child.IsLoaded("Catalog")) && child.Catalog != Id) child.UpdateCatalogId(Id);
                 try { child.TeaqlPrepareInputGraph(context, graph); }
                 catch (CheckException error)
                 {
@@ -250,6 +323,8 @@ namespace Generated.Models
 
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Preflight)) return;
+            if (TeaqlIsCancelledNew()) return;
             if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
                 graph.PreflightPrepared(this);
             for (var index = 0; index < EntryList.Count; index++)
@@ -266,13 +341,16 @@ namespace Generated.Models
 
         internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
-            var creating = !Id.HasValue || _teaqlForceCreate;
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Reserve)) return;
+            if (TeaqlIsCancelledNew()) return;
+            var creating = TeaqlCreationIntent;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
             {
             var teaqlOriginalKey = TeaqlEntityKey();
             var teaqlOriginalLedgerId = _ledgerId;
             var teaqlOriginalMarkedForDeletion = _markedForDeletion;
             var teaqlOriginalForceCreate = _teaqlForceCreate;
+            var teaqlOriginalCreationState = _creationState;
             var teaqlOriginalFullyLoaded = _fullyLoaded;
             var teaqlOriginalLoadedFields = new HashSet<string>(_loadedFields, StringComparer.OrdinalIgnoreCase);
             var teaqlOriginalId = this.Id;
@@ -287,6 +365,7 @@ namespace Generated.Models
                 _ledgerId = teaqlOriginalLedgerId;
                 _markedForDeletion = teaqlOriginalMarkedForDeletion;
                 _teaqlForceCreate = teaqlOriginalForceCreate;
+                _creationState = teaqlOriginalCreationState;
                 _fullyLoaded = teaqlOriginalFullyLoaded;
                 _loadedFields = teaqlOriginalLoadedFields;
                 _entityRoot.Rekey(currentKey, teaqlOriginalKey);
@@ -300,10 +379,8 @@ namespace Generated.Models
                 throw new InvalidOperationException("Cannot delete an entity without an id");
             if (creating)
             {
-                var allocationKey = TeaqlEntityKey();
-                Id = checked((long)await graph.ReservePreparedIdAsync(this));
-                _teaqlForceCreate = true;
-                _entityRoot.Rekey(allocationKey, TeaqlEntityKey());
+                EntityCreation.RequireReserved(_creationState, Id);
+                graph.BindPreparedId(this, Id!.Value);
             }
             }
             foreach (var child in EntryList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
@@ -313,7 +390,9 @@ namespace Generated.Models
         internal async global::System.Threading.Tasks.Task<Catalog> TeaqlSaveWithinGraphAsync(UserContext context,
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
-            var creating = !this.Id.HasValue || _teaqlForceCreate;
+            if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Write)) return this;
+            if (TeaqlIsCancelledNew()) return this;
+            var creating = TeaqlCreationIntent;
             if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
             {
                 var cleanScope = graph.Scope("Catalog",
@@ -335,6 +414,7 @@ namespace Generated.Models
             this.Version = saved.Version;
             _ledgerId = Id ?? _ledgerId;
             _teaqlForceCreate = false;
+            _creationState = EntityCreationState.Hydrated;
             _entityRoot.Rekey(oldKey, TeaqlEntityKey());
             await TeaqlSaveChildrenAsync(context, graph, scope);
             return saved;
@@ -345,8 +425,9 @@ namespace Generated.Models
             for (var index = 0; index < EntryList.Count; index++)
             {
                 var child = EntryList[index];
+                if (child.TeaqlIsCancelledNew()) continue;
                 child.AttachRoot(_entityRoot);
-                if (child.Catalog != Id) child.UpdateCatalogId(Id);
+                if ((child.TeaqlCreationIntent || child.IsLoaded("Catalog")) && child.Catalog != Id) child.UpdateCatalogId(Id);
                 try { await child.TeaqlSaveWithinGraphAsync(context, graph, scope); }
                 catch (CheckException error)
                 {
@@ -366,13 +447,13 @@ namespace Generated.Models
             _ => throw new InvalidOperationException("Unsupported mutation command")
         }).WithLoadedSnapshot(_loadedSnapshot);
 
-        private LoadedScalarSnapshot TeaqlScalarSnapshot()
+        private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
                         if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
                         if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
                         if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
-            return new LoadedScalarSnapshot(TeaqlEntityKey(), record);
+            return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
         // Repair native scalar values cancelled against an owner/version-qualified baseline.

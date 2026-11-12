@@ -23,6 +23,8 @@ generated project selects repository-local runtime projects through the supporte
 patched. The verifier records the complete source tree, not only runtime files.
 
 An unchanged parent contains two children selected in descending ID order.
+Each child is created through `await request.NewEntityAsync(context)`; its ID
+is positive before Save while its version still indicates it is unpersisted.
 One sibling has a valid pending edit while the second has an invalid name.
 Four rejection cases exercise Required in English and Chinese, the model's
 100-unit string limit, and a safe customer presentation renderer. Required uses

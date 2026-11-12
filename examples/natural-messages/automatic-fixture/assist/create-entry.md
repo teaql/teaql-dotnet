@@ -15,10 +15,10 @@ public static class EntryCreateService
 {
     public static async Task<Entry> CreateAsync(UserContext context)
     {
-        var entity = Q.Entries()
+        var entity = await Q.Entries()
             .Comment("initialize an authorized entry")
             .Purpose("create entry")
-            .NewEntity(context);
+            .NewEntityAsync(context);
 
         // entity.UpdateCatalog(relatedId); // validated relation id
         // entity.UpdateName(value); // allow-listed business input
@@ -31,7 +31,7 @@ public static class EntryCreateService
 }
 ```
 
-`Purpose(...)` enters the executable stage and `NewEntity` accepts exactly one
+`Purpose(...)` enters the executable stage and `NewEntityAsync` accepts exactly one
 context argument, `UserContext`. Add a negative test proving an empty audit
 reason cannot write. Output C# that uses the exact generated updater names.
 

@@ -46,6 +46,15 @@ static class CheckerMetadataProbe
         var id = calibrated.Id ?? throw new InvalidOperationException("Calibration did not allocate an ID");
         var calibrationStatements = transport.Statements;
         var cases = new List<object>(); var missing = new List<string>();
+        var childMessages = new Dictionary<string, string> {
+            ["required-child"] = "The product name of the 2nd order item is required.",
+            ["length-child"] = "The product name of the 2nd order item must not exceed 80 UTF-16 code units; its current length is 81.",
+            ["minimum-child"] = "The unit price of the 2nd order item must be at least 0.01.",
+            ["exact-below-minimum"] = "The unit price of the 2nd order item must be at least 0.01.",
+            ["maximum-child"] = "The unit price of the 2nd order item must not exceed 1000000.",
+            ["exact-above-maximum"] = "The unit price of the 2nd order item must not exceed 1000000.",
+            ["custom-specialized-child"] = "The product name of the 2nd order item must not exceed 80 UTF-16 code units; its current length is 26."
+        };
 
         async Task Reject(string name, UserContext ctx, PurchaseOrder owner, string rule,
             string modelPath, string entityType, object? expected = null, bool specialized = false)
@@ -68,8 +77,8 @@ static class CheckerMetadataProbe
             if (violation.EntityType != entityType) missing.Add(name + ":entityType");
             if (expected != null && Convert.ToDecimal(violation.SystemValue, CultureInfo.InvariantCulture)
                 != Convert.ToDecimal(expected, CultureInfo.InvariantCulture)) missing.Add(name + ":expectedConstraint");
-            if (modelPath.Contains('[') && !violation.Message!.Contains(violation.NativePath, StringComparison.Ordinal))
-                missing.Add(name + ":humanIndexedPath");
+            if (modelPath.Contains('[') && violation.Message != childMessages[name])
+                missing.Add(name + ":naturalIndexedMessage");
             if (specialized && violation.SourceInstancePath != "/orderItems/1/product~1name~0alias")
                 missing.Add(name + ":sourceAlias");
             var wires = new List<object>();

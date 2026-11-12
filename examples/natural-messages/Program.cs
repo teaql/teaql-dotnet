@@ -30,8 +30,9 @@ var roots = await Q.Catalogs().Limit(1)
 Require(roots.Count == 1 && roots[0].Id != null, "The generated root must be provisioned");
 var rootId = roots[0].Id!.Value;
 foreach (var name in new[] { "first", "second" }) {
-    var entry = Q.Entries().Comment("Prepare an entry").Purpose("Build the bounded validation graph")
-        .NewEntity(context).UpdateCatalog(rootId).UpdateName(name);
+    var entry = (await Q.Entries().Comment("Prepare an entry").Purpose("Build the bounded validation graph")
+        .NewEntityAsync(context)).UpdateCatalog(rootId).UpdateName(name);
+    Require(entry.Id > 0 && entry.Version is null, "Creation reserves identity before Save without claiming persistence");
     await entry.AuditAs("Create an entry with the generated audited mutation API").SaveAsync(context);
 }
 async Task<Catalog> Load() => (await Q.Catalogs().WithIdIs(rootId)

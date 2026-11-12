@@ -44,17 +44,14 @@ internal sealed class PurchaseOrderChecker : IEntityChecker
 
 
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("PurchaseOrder", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("PurchaseOrder", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("PurchaseOrder", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -99,17 +96,14 @@ internal sealed class OrderItemChecker : IEntityChecker
 
 
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("OrderItem", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("OrderItem", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("OrderItem", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -234,7 +228,7 @@ public static class GeneratedRuntimeModule
         ["OrderItem"] = new Dictionary<string, string> {
             ["tenant"] = "Tenant"
         }
-    }).WireEntity(WireFields.CreateMetadata("Tenant", ["id", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("PurchaseOrder", ["id", "tenant", "contact_phone", "internal_note", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["tenant"] = ["tenant"], ["contact_phone"] = ["contact_phone"], ["internal_note"] = ["internal_note"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "purchase_order", "tenant", "product_name", "unit_price", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["purchase_order"] = ["purchase_order"], ["tenant"] = ["tenant"], ["product_name"] = ["product_name"], ["unit_price"] = ["unit_price"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }).ContextField("PurchaseOrder", "create_time", create: "now").ContextField("PurchaseOrder", "update_time", create: "now", update: "now").ContextField("OrderItem", "create_time", create: "now").ContextField("OrderItem", "update_time", create: "now", update: "now").WireEntity(WireFields.CreateMetadata("Tenant", ["id", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("PurchaseOrder", ["id", "tenant", "contact_phone", "internal_note", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["tenant"] = ["tenant"], ["contact_phone"] = ["contact_phone"], ["internal_note"] = ["internal_note"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderItem", ["id", "purchase_order", "tenant", "product_name", "unit_price", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["purchase_order"] = ["purchase_order"], ["tenant"] = ["tenant"], ["product_name"] = ["product_name"], ["unit_price"] = ["unit_price"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).CheckerPresentation(CheckerPresentationModel.FromJson("{\"schema\":\"teaql.checker-model/v1\",\"revision\":\"sha256:cbc03c71084d5ff17fe312ca583e790e692d2ecb065fe3a55ec2398eb9189248\",\"entities\":{\"OrderItem\":{\"labels\":{\"en\":\"order item\"},\"fields\":[{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"product_name\",\"labels\":{\"en\":\"product name\"},\"aliases\":[\"ProductName\",\"productName\"]},{\"name\":\"purchase_order\",\"targetType\":\"PurchaseOrder\",\"labels\":{\"en\":\"purchase order\"},\"aliases\":[\"PurchaseOrder\",\"purchaseOrder\"]},{\"name\":\"tenant\",\"targetType\":\"Tenant\",\"labels\":{\"en\":\"tenant\"},\"aliases\":[\"Tenant\"]},{\"name\":\"unit_price\",\"labels\":{\"en\":\"unit price\"},\"aliases\":[\"UnitPrice\",\"unitPrice\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"PurchaseOrder\":{\"labels\":{\"en\":\"purchase order\"},\"fields\":[{\"name\":\"contact_phone\",\"labels\":{\"en\":\"contact phone\"},\"aliases\":[\"ContactPhone\",\"contactPhone\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"internal_note\",\"labels\":{\"en\":\"internal note\"},\"aliases\":[\"InternalNote\",\"internalNote\"]},{\"name\":\"order_item_list\",\"targetType\":\"OrderItem\",\"labels\":{\"en\":\"order item\"},\"aliases\":[\"OrderItemList\",\"orderItemList\"]},{\"name\":\"tenant\",\"targetType\":\"Tenant\",\"labels\":{\"en\":\"tenant\"},\"aliases\":[\"Tenant\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"Tenant\":{\"labels\":{\"en\":\"tenant\"},\"fields\":[{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"order_item_list\",\"targetType\":\"OrderItem\",\"labels\":{\"en\":\"order item\"},\"aliases\":[\"OrderItemList\",\"orderItemList\"]},{\"name\":\"purchase_order_list\",\"targetType\":\"PurchaseOrder\",\"labels\":{\"en\":\"purchase order\"},\"aliases\":[\"PurchaseOrderList\",\"purchaseOrderList\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]}}}")).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

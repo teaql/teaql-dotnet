@@ -839,12 +839,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.Entry NewEntity(UserContext context)
+        public async Task<Generated.Models.Entry> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.Entry();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("Entry").ConfigureAwait(false));
+            return context.InitializeEntity("Entry", Generated.Models.Entry.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

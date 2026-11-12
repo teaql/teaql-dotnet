@@ -627,12 +627,14 @@ namespace Generated.Requests
             return this;
         }
 
-        public Generated.Models.Catalog NewEntity(UserContext context)
+        public async Task<Generated.Models.Catalog> NewEntityAsync(UserContext context)
         {
             _ensureIntent();
-            return new Generated.Models.Catalog();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("Catalog").ConfigureAwait(false));
+            return context.InitializeEntity("Catalog", Generated.Models.Catalog.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

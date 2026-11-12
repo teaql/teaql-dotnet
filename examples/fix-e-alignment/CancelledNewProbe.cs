@@ -38,7 +38,7 @@ static class CancelledNewProbe
                 var parent = await Q.PurchaseOrders().Comment("Prepare the cancellation owner")
                     .Purpose("Verify abandoned creation never becomes a stored Delete").NewEntityAsync(context);
                 parent.UpdateContactPhone("5550188");
-                async Task<OrderItem> Child(bool complete)
+                async Task<OrderItem> ChildAsync(bool complete)
                 {
                     var value = await Q.OrderItems().Comment("Prepare a cancellation child")
                         .Purpose("Separate abandoned and live creation intent").NewEntityAsync(context);
@@ -49,11 +49,11 @@ static class CancelledNewProbe
                 if (name == "root") parent.MarkForDeletion();
                 else
                 {
-                    cancelled = await Child(name != "incomplete-child");
+                    cancelled = await ChildAsync(name != "incomplete-child");
                     if (name == "already-composed-child") parent.OrderItemList.Add(cancelled);
                     cancelled.MarkForDeletion();
                     if (name != "already-composed-child") parent.OrderItemList.Add(cancelled);
-                    parent.OrderItemList.Add(await Child(name != "invalid-live-sibling"));
+                    parent.OrderItemList.Add(await ChildAsync(name != "invalid-live-sibling"));
                 }
                 var parentId = parent.Id; var childId = cancelled?.Id; var cancelledVersion = cancelled?.Version;
                 row["parentId"] = parentId; row["cancelledId"] = childId;
