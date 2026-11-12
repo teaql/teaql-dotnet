@@ -1,0 +1,13 @@
+{
+  "schema": "teaql.generated-example-provenance/v1",
+  "generatorCommit": "bdd82ba26450c48d10a9ab1462973c45b2d29844",
+  "upstreamTest": "com.skynet.codegenerator.DotnetNaturalMessagesGenerationTest",
+  "fixtureOutputProperty": "teaql.dotnet.natural.fixture.output",
+  "scope": "dotnet-lib-core",
+  "runtimeDependency": "local repository source",
+  "modelSha256": "9e9b4e1336ee9c91135fb97718ec593d499a3efef408a7e563245f5dc14f3a20",
+  "generationReceipt": "teaql-conformance/evidence/2026-11-12-natural-checker-dotnet-automatic-generation-qualified/receipt.json",
+  "generationReceiptSha256": "5b9cebdb4a186df7230afcb1339a4047349afbaca0155208043b6a4954eb7344",
+  "implementationHandEdited": false,
+  "publicPublication": false
+}
