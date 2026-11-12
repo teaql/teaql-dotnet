@@ -16,10 +16,12 @@ public sealed partial class GraphMutationSession
     private bool _active = true;
     public MutationIntent Intent { get; }
     internal bool IsPreparing => _active && _transaction == null;
+    internal CheckerMessageConfiguration CheckerConfiguration { get; }
+    internal string? CheckerOrigin { get; private set; }
 
     internal GraphMutationSession(UserContext context, MutationIntent intent)
     {
-        _context = context; Intent = intent;
+        _context = context; Intent = intent; CheckerConfiguration = context.CaptureCheckerMessages();
     }
 
     internal void AttachTransaction(ITransaction transaction)
@@ -121,6 +123,7 @@ public sealed partial class GraphMutationSession
 
     internal void Close()
     {
+        CheckerOrigin = null;
         _active = false;
         ClearPreparedMutations();
     }

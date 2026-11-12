@@ -42,6 +42,7 @@ public sealed partial class GraphMutationSession
         if (_transaction != null || _prepared.Count != 0)
             throw new InvalidOperationException("GRAPH_ROOT_MUST_PRECEDE_PREPARATION");
         _context.DeclareGraphMutationRoot(entityType);
+        CheckerOrigin ??= entityType;
     }
 
     /// <summary>Validate/fix input before opening a transaction; retain a private snapshot.</summary>

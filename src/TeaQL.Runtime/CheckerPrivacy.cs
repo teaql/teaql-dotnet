@@ -21,14 +21,18 @@ internal static class CheckerPrivacy
 
     internal static IReadOnlyList<CheckResult> Translate(IReadOnlyList<CheckResult> results,
         I18nCatalog catalog, TeaQLLocale locale, UserContext? context = null, IEnumerable<string>? additional = null,
-        string? requestEntityType = null)
+        string? requestEntityType = null, CheckerMessageConfiguration? natural = null, CheckerValidationOrigin? origin = null)
     {
         var secrets = new HashSet<string>(additional ?? [], StringComparer.Ordinal);
+        var automatic = results.Select(CheckerMessages.Automatic).ToArray();
         var prepared = results.Select(result => Prepare(result, context, secrets, requestEntityType)).ToArray();
-        foreach (var result in prepared)
+        var seen = new HashSet<CheckerMessageWarning>();
+        for (var index = 0; index < prepared.Length; index++)
         {
+            var result = prepared[index];
             result.Message = Scrub(result.Message, secrets);
-            catalog.TranslatePrepared(result, locale, secrets);
+            if (natural != null) CheckerMessages.Render(natural, result, secrets, automatic[index], seen, origin);
+            else catalog.TranslatePrepared(result, locale, secrets);
         }
         return results;
     }
@@ -73,7 +77,7 @@ internal static class CheckerPrivacy
             || HasModeledMask(context, policy.ValueDescriptor, input.Value) || HasModeledMask(context, owner.ValueDescriptor, input.Value);
         var hide = credential || masked && !LogPrivacy.PlaintextEnabled();
         var same = previous?.Fingerprint != null && previous.Fingerprint == Fingerprint(input.Value);
-        int? length = same ? previous!.OriginalLength : InputLength(input.Value);
+        int? length = (same ? previous!.OriginalLength : InputLength(input.Value)) ?? result.ObservedLength;
         if (hide) Strings(input.Value, secrets);
         if (expected.Credential || credential && expected.Value is not null && !IsNumericOrBoolean(expected.Value))
         { Strings(expected.Value, secrets); expected = new Inspected(expected.Value == null ? null : Redacted, false); }

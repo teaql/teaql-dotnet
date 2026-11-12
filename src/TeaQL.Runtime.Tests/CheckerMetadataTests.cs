@@ -52,6 +52,7 @@ public sealed class CheckerMetadataTests
     public async Task LocalizationCannotRewriteAnEarlierFailureOrACustomerCachedResult()
     {
         var original = Violation(null);
+        original.Message = null; // Automatic wording can vary; explicit customer literals remain authoritative.
         var context = new UserContext().Install(new RuntimeModule()
             .Checker("PurchaseOrder", new CachedChecker(original))).WithDataService(new Provider());
         var english = await Reject(context.SetLocaleCode("en"), "PurchaseOrder");
@@ -60,9 +61,11 @@ public sealed class CheckerMetadataTests
 
         Assert.Equal(message, english.Message);
         Assert.NotEqual(english.Message, chinese.Message);
-        Assert.Equal("customer-owned diagnostic", original.Message);
+        Assert.Null(original.Message);
         Assert.Null(original.EntityType);
-        Assert.Contains("OrderItemList[2].ProductName", english.Message);
+        Assert.Contains("product name", english.Message);
+        Assert.Contains("the 3rd order item list", english.Message);
+        Assert.Equal("OrderItemList[2].ProductName", english.NativePath);
     }
 
     [Theory]

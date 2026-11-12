@@ -10,6 +10,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
   </ItemGroup>
   <ItemGroup><EmbeddedResource Include="builtin-messages-v1.json" /></ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="natural-messages-v1.json" LogicalName="TeaQL.Runtime.natural-messages-v1.json" />
+    <EmbeddedResource Include="checker-presentation-v1.json" LogicalName="TeaQL.Runtime.checker-presentation-v1.json" />
+  </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

@@ -86,8 +86,27 @@ public class UserContext
     public UserContext SetLocaleCode(string code) { var locale = TeaQLLocales.Parse(code); Locale = locale; return this; }
     public UserContext SetLanguageCode(string code) => SetLocaleCode(code);
     public UserContext InstallI18nCatalog(I18nCatalog catalog) { I18nCatalog = catalog ?? throw new ArgumentNullException(nameof(catalog)); return this; }
-    public IReadOnlyList<CheckResult> TranslateCheckResults(IReadOnlyList<CheckResult> results) =>
-        CheckerPrivacy.Translate(results, I18nCatalog, Locale, this);
+    private CheckerPresentationModel _checkerMessageModel = CheckerPresentationModel.Empty;
+    private CheckerMessageCatalog _checkerMessageCatalog = CheckerMessageCatalog.Builtin;
+    private CheckerMessageRenderer _checkerMessageRenderer = CheckerMessages.Standard;
+    private Action<CheckerMessageWarning> _checkerMessageWarning = CheckerMessages.DefaultWarning;
+    public UserContext InstallCheckerPresentationModel(CheckerPresentationModel model) { _checkerMessageModel = model ?? throw new ArgumentNullException(nameof(model)); return this; }
+    public UserContext InstallCheckerMessageCatalog(string source) { var catalog = CheckerMessageCatalog.FromJson(source); _checkerMessageCatalog = catalog; return this; }
+    public UserContext InstallCheckerMessageRenderer(CheckerMessageRenderer renderer) { _checkerMessageRenderer = renderer ?? throw new ArgumentNullException(nameof(renderer)); return this; }
+    public UserContext InstallCheckerMessageWarning(Action<CheckerMessageWarning> warning) { _checkerMessageWarning = warning ?? throw new ArgumentNullException(nameof(warning)); return this; }
+    internal CheckerMessageConfiguration CaptureCheckerMessages() => new(_checkerMessageModel, _checkerMessageCatalog, I18nCatalog, Locale, _checkerMessageRenderer, _checkerMessageWarning);
+    public IReadOnlyList<CheckResult> TranslateCheckResults(IReadOnlyList<CheckResult> results)
+    {
+        var config = _activeGraphSave?.CheckerConfiguration ?? CaptureCheckerMessages();
+        return CheckerPrivacy.Translate(results, config.Legacy, config.Locale, this, natural: config,
+            origin: _activeGraphSave?.CheckerOrigin is { } origin ? new(config.Model, origin) : null);
+    }
+    public IReadOnlyList<CheckResult> TranslateCheckResultsFrom(string origin, IReadOnlyList<CheckResult> results)
+    {
+        var config = CaptureCheckerMessages(); var owned = results.Select(result => result.Copy()).ToArray();
+        foreach (var result in owned) CheckerMessages.Bind(result, config.Model, origin);
+        return CheckerPrivacy.Translate(owned, config.Legacy, config.Locale, this, natural: config);
+    }
 
     public UserContext()
     {
@@ -317,8 +336,15 @@ public class UserContext
                 session.ValidatePreparedGraphBeforeCommit();
                 if (transaction != null) await transaction.CommitAsync().ConfigureAwait(false);
             }
-            catch
+            catch (Exception failure)
             {
+                if (failure is CheckException check)
+                {
+                    var config = session.CheckerConfiguration;
+                    var errors = check.Violations.Select(error => error.Copy()).ToArray();
+                    CheckerPrivacy.Translate(errors, config.Legacy, config.Locale, this, natural: config, origin: new(config.Model, session.CheckerOrigin));
+                    check.RefreshPresentation(errors);
+                }
                 try { if (transaction != null) await transaction.RollbackAsync().ConfigureAwait(false); }
                 finally { session.Restore(); }
                 throw;
@@ -625,6 +651,7 @@ public class UserContext
 
     private void CheckAndFixCore(MutationRequest request, bool invokeChecker = true)
     {
+        var checkerMessages = _activeGraphSave?.CheckerConfiguration ?? CaptureCheckerMessages();
         MutationVersionAdmission.Validate(this, request);
         if (request is BatchMutationRequest batch)
         {
@@ -677,9 +704,18 @@ public class UserContext
                         Message = "Expected a finite Float/Double value" });
         violations.AddRange(IntegralScalarAdmission.Check(descriptor, request, deferredReferences));
         for (var index = 0; index < violations.Count; index++)
+        {
             violations[index] = violations[index].ForDeclaringEntity(entity);
+            CheckerMessages.Bind(violations[index], checkerMessages.Model, entity);
+            // Generated Checkers can intentionally omit inputValue. Retain the
+            // actual measured length, not the rejected string, in that case.
+            if (violations[index].InputValue == null && CheckerMessages.Rule(violations[index].RuleId) is "checker.minLength" or "checker.maxLength"
+                && violations[index].Location.Segments is [ObjectLocationSegment.Property field]
+                && values != null && values.TryGetValue(field.Name, out var value) && value.Raw is string text)
+                violations[index].ObservedLength = text.Length;
+        }
         diagnosticSecrets.AddRange(CheckerPrivacy.RequestSecrets(this, request));
-        CheckerPrivacy.Translate(violations, I18nCatalog, Locale, this, diagnosticSecrets, entity);
+        CheckerPrivacy.Translate(violations, checkerMessages.Legacy, checkerMessages.Locale, this, diagnosticSecrets, entity, checkerMessages);
         if (violations.Count != 0) throw new CheckException(violations);
         contextFix.NormalizeFinalIntent();
         MutationFixLedger.WriteBack(request, beforeFix);

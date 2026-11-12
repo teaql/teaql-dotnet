@@ -68,7 +68,7 @@ public sealed class CheckerPrivacyTests : IDisposable
         var value = Violation("ordinary", "name", expected: 4);
         Context().TranslateCheckResults([value]); Assert.Equal("ordinary", value.InputValue);
         Assert.IsType<int>(value.SystemValue); Assert.Equal(4, value.SystemValue);
-        Assert.Contains("Name", value.Message);
+        Assert.Contains("name", value.Message); Assert.Equal("Name", value.NativePath);
     }
 
     [Fact]
@@ -77,7 +77,8 @@ public sealed class CheckerPrivacyTests : IDisposable
         var value = Violation("1", "password", expected: 128);
         new UserContext().TranslateCheckResults([value]);
         Assert.Equal(128, value.SystemValue); Assert.Contains("128", value.Message);
-        Assert.Contains("Password", value.Message); Assert.EndsWith(" is 1", value.Message);
+        Assert.Contains("password", value.Message); Assert.Contains("its current length is 1.", value.Message);
+        Assert.Equal("Password", value.NativePath);
         Assert.Equal("[REDACTED]", value.InputValue);
     }
 
@@ -123,7 +124,7 @@ public sealed class CheckerPrivacyTests : IDisposable
         var second = await Reject(context.SetLocaleCode("zh-CN"));
         Safe(first, Secret); Safe(second, Secret); Assert.Equal(message, first.Message);
         Assert.NotEqual(first.Message, second.Message); Assert.Equal(Secret, cached.InputValue);
-        Assert.Equal("customer-owned diagnostic", cached.Message); Assert.Equal(0, provider.Mutations);
+        Assert.Null(cached.Message); Assert.Equal(0, provider.Mutations);
     }
 
     [Fact]
@@ -237,7 +238,7 @@ public sealed class CheckerPrivacyTests : IDisposable
             return await Reject(context);
         }));
         foreach (var value in errors) Safe(value, Secret);
-        Assert.Equal(Secret, original.InputValue); Assert.Equal("customer-owned diagnostic", original.Message);
+        Assert.Equal(Secret, original.InputValue); Assert.Null(original.Message);
     }
 
     [Fact]
@@ -354,7 +355,7 @@ public sealed class CheckerPrivacyTests : IDisposable
     private static UserContext Context() => new UserContext().WithMetadata(new InMemoryMetadataStore().WithEntity(Descriptor()));
     private static CheckResult Violation(object? input, string field = "contact_phone", object? expected = null) => new() {
         RuleId = "max_length", EntityType = "Customer", Location = ObjectLocation.Property(field),
-        InputValue = input, SystemValue = expected ?? 4, Message = "customer-owned diagnostic"
+        InputValue = input, SystemValue = expected ?? 4
     };
     private static void Safe(CheckResult value, params string[] secrets)
     {

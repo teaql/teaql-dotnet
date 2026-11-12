@@ -14,6 +14,9 @@ public class RuntimeModule
     internal Dictionary<string, IReadOnlyDictionary<string, string>> ContextRootFields { get; } = new();
     internal Func<UserContext, Task>? GeneratedBootstrapCallback { get; private set; }
     public Dictionary<string, WireEntityMetadata> WireMetadata { get; } = new();
+    internal CheckerPresentationModel CheckerMessagesModel { get; private set; } = CheckerPresentationModel.Empty;
+    public RuntimeModule CheckerPresentation(CheckerPresentationModel model)
+    { CheckerMessagesModel = model ?? throw new ArgumentNullException(nameof(model)); return this; }
 
     public RuntimeModule() { }
 
@@ -148,7 +151,8 @@ public class RuntimeModule
     public RuntimeModule And(RuntimeModule other)
     {
         ArgumentNullException.ThrowIfNull(other);
-        var combined = new RuntimeModule();
+        var presentation = CheckerMessagesModel.Merge(other.CheckerMessagesModel);
+        var combined = new RuntimeModule().CheckerPresentation(presentation);
         foreach (var descriptor in Metadata.GetAllEntities()) combined.Entity(descriptor);
         foreach (var descriptor in other.Metadata.GetAllEntities()) combined.Entity(descriptor);
         foreach (var metadata in WireMetadata.Values) combined.WireEntity(metadata);
@@ -171,6 +175,7 @@ public class RuntimeModule
 
     public void ApplyTo(UserContext context)
     {
+        if (!ReferenceEquals(CheckerMessagesModel, CheckerPresentationModel.Empty)) context.InstallCheckerPresentationModel(CheckerMessagesModel);
         context.Metadata = Metadata;
         context.EntityRegistry = EntityRegistry;
         context.InstallCheckers(Checkers);

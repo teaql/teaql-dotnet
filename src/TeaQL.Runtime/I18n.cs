@@ -18,7 +18,8 @@ public static class TeaQLLocales
 
 public sealed class CheckResult
 {
-    public required string RuleId {get;init;} public required ObjectLocation Location {get;init;}
+    private ObjectLocation _location = ObjectLocation.Root();
+    public required string RuleId {get;init;} public required ObjectLocation Location {get => _location;init => _location=value;}
     public string ModelPath => Location.ModelPath;
     public string NativePath => Location.NativePath;
     public string InstancePath => Location.InstancePath;
@@ -30,8 +31,13 @@ public sealed class CheckResult
     public object? SystemValue {get => _systemValue; init => _systemValue = value;}
     public string? Message {get;set;}
     internal CheckerPresentation? Presentation {get;set;}
+    internal CheckerNaturalBinding? NaturalPresentation {get;set;}
+    internal int? ObservedLength {get;set;}
     internal void SetPresentedValues(object? input, object? system) { _inputValue = input; _systemValue = system; }
     internal CheckResult Copy() => (CheckResult)MemberwiseClone();
+    /// <summary>Preserve safe diagnostics and measurements while adding graph ancestry.</summary>
+    public CheckResult PrefixedBy(ObjectLocation prefix)
+    { var copy = Copy(); copy._location = Location.PrefixedBy(prefix); return copy; }
     public WireCheckResult ToWire(JsonFieldNamingProfile profile=JsonFieldNamingProfile.CamelCase)
     {
         var safe = CheckerPrivacy.ForWire(this);
@@ -58,10 +64,11 @@ public sealed record WireCheckResult(
     [property: JsonPropertyName("systemValue")] object? SystemValue,
     [property: JsonPropertyName("message")] string? Message);
 
-public sealed class CheckException(IReadOnlyList<CheckResult> violations)
-    : Exception("Check failed: " + string.Join("; ", violations.Select(x => x.Message ?? $"{x.RuleId}:{x.Location}")))
+public sealed class CheckException(IReadOnlyList<CheckResult> violations) : Exception("Check failed")
 {
-    public IReadOnlyList<CheckResult> Violations { get; } = violations;
+    public IReadOnlyList<CheckResult> Violations { get; private set; } = Array.AsReadOnly(violations.ToArray());
+    public override string Message => "Check failed: " + string.Join("; ", Violations.Select(x => x.Message ?? $"{x.RuleId}:{x.Location}"));
+    internal void RefreshPresentation(IReadOnlyList<CheckResult> values) => Violations = Array.AsReadOnly(values.ToArray());
 }
 
 public sealed class I18nCatalog
@@ -74,6 +81,7 @@ public sealed class I18nCatalog
     public static I18nCatalog Builtin=>BuiltinValue.Value;
     public static I18nCatalog FromJson(Stream stream,I18nCatalog? fallback=null){using var doc=JsonDocument.Parse(stream);if(doc.RootElement.GetProperty("schema").GetString()!="teaql.i18n/v1")throw new ArgumentException("Unsupported i18n schema");var locales=new Dictionary<string,LocaleData>();foreach(var locale in doc.RootElement.GetProperty("locales").EnumerateObject()){var code=TeaQLLocales.Parse(locale.Name).Code();var messages=locale.Value.GetProperty("messages").EnumerateObject().ToDictionary(x=>x.Name,x=>x.Value.GetString()!);var vocabulary=locale.Value.GetProperty("vocabulary").EnumerateObject().ToDictionary(x=>x.Name,x=>x.Value.GetString()!);locales[code]=new(messages,vocabulary);}return new(locales,fallback);}
     private string? Find(string code,string key)=>_locales.TryGetValue(code,out var locale)&&locale.Messages.TryGetValue(key,out var value)?value:null;
+    internal string? ApplicationMessage(TeaQLLocale locale, string key) => _builtin ? null : Find(locale.Code(), key);
     public string Message(TeaQLLocale locale,string key)=>Find(locale.Code(),key)??_fallback?.Find(locale.Code(),key)??Find("en",key)??_fallback?.Find("en",key)??key;
     public CheckResult Translate(CheckResult result, TeaQLLocale locale)
     {
