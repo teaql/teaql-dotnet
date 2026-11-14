@@ -394,8 +394,8 @@ public record SelectQuery
         if (Slice?.Limit is ulong requested && requested > ceiling)
             throw new InvalidOperationException($"QUERY_HARD_LIMIT_EXCEEDED: requested limit {requested} exceeds hard limit {ceiling}");
         Slice = Slice == null ? new Slice(ceiling, 0) : Slice with { Limit = Slice.Limit ?? ceiling };
-        foreach (var relation in RelationLoads) relation.Query?.ApplyListLimit(DefaultHardLimit);
-        foreach (var child in ChildEnhancements) child.ApplyListLimit(DefaultHardLimit);
+        // Bound this result only. Nested populations must remain complete;
+        // their explicitly configured business pages are preserved unchanged.
     }
 
     public SelectQuery Offset(ulong offset)

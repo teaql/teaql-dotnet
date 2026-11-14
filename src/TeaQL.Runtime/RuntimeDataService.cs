@@ -147,7 +147,8 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     private async Task<QueryResult> ExecuteQueryAsync(QueryRequest request)
     {
-        var source = request.Query.CloneForExecution().PrepareForList();
+        var source = request.Query.CloneForExecution();
+        if (request.Scope.Parent == null) source.PrepareForList();
         if (source.IdSetPagination == null)
         {
             _context.ObserveIdSet("ID_SET_DISABLED");
