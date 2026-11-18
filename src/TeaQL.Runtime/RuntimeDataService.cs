@@ -37,7 +37,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     /// <summary>Execute one authorized page snapshot. Generated libraries bind
     /// native operation metadata and hydrate rows; this runtime owns counting.</summary>
     public static Task<SmartList<Record>> FetchPageAsync(IDataService service, UserContext context, QueryRequest request) =>
-        context.RuntimeTelemetry.ObserveAsync(
+        context.OperationTelemetry.ObserveAsync(
             RuntimeOperation.Create("query", $"{request.Query.Entity}.list",
                 new Dictionary<string, object> { ["teaql.entity.type"] = request.Query.Entity }),
             () => FetchCountedListCoreAsync(service, context, request),
@@ -97,7 +97,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public IAsyncEnumerable<StreamChunk> QueryStreamAsync(QueryRequest request, int chunkSize,
         System.Threading.CancellationToken cancellationToken = default)
-        => RuntimeStream.Chunks(_context.RuntimeTelemetry, request.WithQuery(request.Query),
+        => RuntimeStream.Chunks(_context.OperationTelemetry, request.WithQuery(request.Query),
             (captured, token) => QueryStreamCoreAsync(captured, chunkSize, token), cancellationToken);
 
     private IAsyncEnumerable<StreamChunk> QueryStreamCoreAsync(QueryRequest request, int chunkSize,
@@ -121,7 +121,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         if (service is not IStreamQueryExecutor streaming)
             throw new NotSupportedException("The configured data service does not provide a local streaming cursor");
         var captured = request.WithQuery(request.Query);
-        return RuntimeStream.Entities(context.RuntimeTelemetry, captured, materialize,
+        return RuntimeStream.Entities(context.OperationTelemetry, captured, materialize,
             (execution, token) => service is RuntimeDataService runtime && ReferenceEquals(runtime._context, context)
                 ? runtime.QueryStreamCoreAsync(execution, chunkSize, token) : streaming.QueryStreamAsync(execution, chunkSize, token),
             cancellationToken);
@@ -129,7 +129,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public Task<QueryResult> QueryAsync(QueryRequest request)
     {
-        return _context.RuntimeTelemetry.ObserveAsync(
+        return _context.OperationTelemetry.ObserveAsync(
             RuntimeOperation.Create("query", $"{request.Query.Entity}.list",
                 new Dictionary<string, object> { ["teaql.entity.type"] = request.Query.Entity }),
             () => ExecuteOwnedQueryAsync(request),
@@ -141,7 +141,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     private Task<QueryResult> ExecuteOwnedQueryAsync(QueryRequest request)
     {
-        request.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry);
+        request.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.OperationTelemetry);
         return ExecuteQueryAsync(request);
     }
 
@@ -248,7 +248,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     private QueryRequest CopyRequest(QueryRequest source, SelectQuery query)
     {
         var copy = source.WithQuery(query);
-        copy.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.RuntimeTelemetry);
+        copy.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.OperationTelemetry);
         return copy;
     }
 
@@ -285,7 +285,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         if (prepared != null) _graph!.ValidatePreparedMutationForWrite(prepared);
         MutationVersionAdmission.Validate(_context, request);
         var entity = EntityName(request);
-        var result = await _context.RuntimeTelemetry.ObserveAsync(
+        var result = await _context.OperationTelemetry.ObserveAsync(
             RuntimeOperation.Create("mutation", $"{entity}.mutate",
                 new Dictionary<string, object>
                 {
@@ -324,6 +324,15 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     private void CollectMutationAudits(MutationRequest request, MutationResult result, List<Func<Task>> deliveries)
     {
+        try { CollectMutationAuditCore(request, result, deliveries); }
+        catch when (_context.GetResource<IAppAuditEventSink>() is null)
+        {
+            RuntimeLogger.Failure(_context.Logger.LogName, "log_projection_failed");
+        }
+    }
+
+    private void CollectMutationAuditCore(MutationRequest request, MutationResult result, List<Func<Task>> deliveries)
+    {
         if (request is BatchMutationRequest && result.BatchItems is { } items)
         {
             // These are the actual execution requests, with captured root intent
@@ -333,7 +342,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
                 CollectMutationAudits(item.Request, item.Result, deliveries);
             return;
         }
-        if (result.AffectedRows == 0 || _context.GetResource<IAppAuditEventSink>() == null) return;
+        if (result.AffectedRows == 0) return;
         var entity = EntityName(request); var mutationKind = MutationKind(request);
         var changedFields = ChangedFields(request).OrderBy(field => field, StringComparer.Ordinal).ToArray();
         var safeEvent = new Dictionary<string, object?>
@@ -454,7 +463,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
     {
         request.DiagnosticObserver = _context.RecordExecutionMetadata;
         request.StatementObserver = _context.RuntimeTelemetry is IRuntimeSqlTelemetry telemetry ? telemetry.StartStatement : null;
-        var result = await _context.RuntimeTelemetry.ObserveAsync(
+        var result = await _context.OperationTelemetry.ObserveAsync(
             RuntimeOperation.Create("provider", "data-service.query",
                 new Dictionary<string, object>
                 {
@@ -480,7 +489,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         request.InternalIdAllocator = _context.InternalIdAllocator;
         try
         {
-        var result = await _context.RuntimeTelemetry.ObserveAsync(
+        var result = await _context.OperationTelemetry.ObserveAsync(
             RuntimeOperation.Create("provider", "data-service.mutate",
                 new Dictionary<string, object>
                 {
