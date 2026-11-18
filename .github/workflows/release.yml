@@ -1,63 +1,71 @@
-name: Publish .NET packages
+name: Promote qualified dotnet packages
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Existing immutable signed release tag to publish
+        description: Existing signed tag whose exact packages passed internal qualification
         required: true
         type: string
-  push:
-    tags:
-      - "dotnet-v*"
+      qualification_sha256:
+        description: SHA-256 of logging-qualification.json retained with the release evidence
+        required: true
+        type: string
+
+concurrency:
+  group: dotnet-public-promotion
+  cancel-in-progress: false
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          fetch-depth: 0
+      - name: Verify signed source and qualified package bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          QUALIFICATION_SHA256: ${{ inputs.qualification_sha256 }}
+        shell: bash
+        run: |
+          export GNUPGHOME="$RUNNER_TEMP/teaql-release-signatures"
+          mkdir -m 700 "$GNUPGHOME"
+          gpg --batch --import .github/release-signing-key.asc
+          python3 scripts/verify-qualified-release.py \
+            --tag "$RELEASE_TAG" --manifest-sha256 "$QUALIFICATION_SHA256" \
+            --language dotnet --repository "$GITHUB_REPOSITORY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qualified-dotnet-packages
+          path: qualified-packages/
+          if-no-files-found: error
+
   publish:
+    needs: verify
     runs-on: ubuntu-latest
     environment: nuget
     permissions:
       contents: read
       id-token: write
-    env:
-      TEAQL_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
-          ref: ${{ inputs.release_tag || github.ref }}
+          name: qualified-dotnet-packages
+          path: qualified-packages/
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-      - name: Install test inventory tools
-        run: sudo apt-get update && sudo apt-get install -y ripgrep
-      - name: Verify tag matches package version
-        shell: bash
-        run: |
-          [[ "$TEAQL_RELEASE_TAG" =~ ^dotnet-v[0-9]+\.[0-9]+\.[0-9]+$ ]]
-          expected="${TEAQL_RELEASE_TAG#dotnet-v}"
-          actual="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props)"
-          test "$expected" = "$actual"
-      - name: Verify every source test project (including Core)
-        run: bash scripts/verify-trace-chain-source-tests.sh artifacts/test-results -c Release -p:UseSharedCompilation=false
-      - name: Pack public projects
-        shell: bash
-        run: |
-          projects=(
-            TeaQL.Core TeaQL.DataService TeaQL.Sql TeaQL.Runtime
-            TeaQL.Provider.Sqlite TeaQL.Provider.PostgreSql TeaQL.Provider.MySql
-            TeaQL.Provider.SqlServer TeaQL.CacheIntegration.Redis
-            TeaQL.WebIntegration.AspNetCore TeaQL.TfpEndpoint TeaQL.Telemetry.OpenTelemetry
-          )
-          for project in "${projects[@]}"; do
-            dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore \
-              -p:UseSharedCompilation=false -o artifacts
-          done
       - uses: NuGet/login@v1
         id: login
         with:
           user: ${{ vars.NUGET_USER }}
-      - name: Publish packages
+      - name: Publish the verified packages
         run: >-
-          dotnet nuget push "artifacts/*.nupkg"
+          dotnet nuget push "qualified-packages/*.nupkg"
           --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
-          --skip-duplicate
