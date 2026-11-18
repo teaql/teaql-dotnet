@@ -159,6 +159,7 @@ internal static class LogPrivacy
         {
             Backend = source.Backend, Operation = source.Operation,
             ExecutionOutcome = source.ExecutionOutcome,
+            SqlCorrelation = source.SqlCorrelation,
             StartedAt = source.StartedAt, EndedAt = source.EndedAt,
             ResultCount = source.ResultCount, AffectedRows = source.AffectedRows,
             BackendRequestId = Scrub(source.BackendRequestId),

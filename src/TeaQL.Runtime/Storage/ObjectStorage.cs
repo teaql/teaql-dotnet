@@ -33,7 +33,7 @@ internal sealed class StorageReceipt
     private readonly IRuntimeTelemetryScope _scope;
     private int _ended;
     public StorageReceipt(UserContext context, string operation, string comment)
-    { _context = context; _operation = operation; _comment = comment; _scope = context.RuntimeTelemetry.StartSafely(RuntimeOperation.Create("object_storage", operation)); }
+    { _context = context; _operation = operation; _comment = comment; _scope = context.OperationTelemetry.StartSafely(RuntimeOperation.Create("object_storage", operation)); }
     public void Finish(string outcome)
     {
         if (Interlocked.Exchange(ref _ended, 1) != 0) return;

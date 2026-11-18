@@ -66,8 +66,10 @@ public class UserContext
     public string? Timezone { get; set; } = "UTC";
     
     public IServiceProvider? ServiceProvider { get; set; }
-    public IRuntimeTelemetry RuntimeTelemetry { get; private set; } = TelemetryStartup.Default();
-    public IDiagnosticSqlLogSink? DiagnosticSqlLogSink { get; private set; } = new TextDiagnosticSqlLogSink();
+    public IRuntimeTelemetry RuntimeTelemetry { get; private set; }
+    public RuntimeLogger Logger { get; }
+    public IRuntimeTelemetry OperationTelemetry => new LocalLogTelemetry(RuntimeTelemetry, Logger);
+    public IDiagnosticSqlLogSink? DiagnosticSqlLogSink { get; private set; }
     public ISensitiveDiagnosticSqlLogSink? SensitiveDiagnosticSqlLogSink { get; private set; }
     public bool QuerySqlLogEnabled { get; private set; } = true;
     public bool MutationSqlLogEnabled { get; private set; } = true;
@@ -108,8 +110,13 @@ public class UserContext
         return CheckerPrivacy.Translate(owned, config.Legacy, config.Locale, this, natural: config);
     }
 
-    public UserContext()
+    public UserContext() : this(RuntimeLogger.Default()) { }
+
+    public UserContext(RuntimeLogger logger)
     {
+        Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        DiagnosticSqlLogSink = new RuntimeDiagnosticSqlLogSink(logger);
+        RuntimeTelemetry = TelemetryStartup.Default();
         var pid = Environment.ProcessId;
         var threadId = Environment.CurrentManagedThreadId;
         var user = Environment.UserName;
@@ -284,7 +291,7 @@ public class UserContext
     {
         var intent = new MutationIntent(comment); // Must precede callbacks and transaction allocation.
         EnsureGraphSaveCanEnter();
-        return await RuntimeTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
+        return await OperationTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
             () => ExecuteGraphSaveCoreAsync(intent, null, work)).ConfigureAwait(false);
     }
 
@@ -296,7 +303,7 @@ public class UserContext
         ArgumentNullException.ThrowIfNull(work);
         var intent = new MutationIntent(comment);
         EnsureGraphSaveCanEnter();
-        return await RuntimeTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
+        return await OperationTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
             () => ExecuteGraphSaveCoreAsync(intent, prepare, work)).ConfigureAwait(false);
     }
 
@@ -588,7 +595,7 @@ public class UserContext
 
     public Task PublishAppAuditEventAsync(string entityType, string mutationKind,
         int changedFieldCount, IReadOnlyDictionary<string, object?> safeEvent,
-        CancellationToken cancellationToken = default) => RuntimeTelemetry.ObserveAsync(
+        CancellationToken cancellationToken = default) => OperationTelemetry.ObserveAsync(
             RuntimeOperation.Create("audit", $"{entityType}.audit",
                 new Dictionary<string, object>
                 {
@@ -598,8 +605,12 @@ public class UserContext
                 }),
             async () =>
             {
-                await RequireResource<IAppAuditEventSink>()
-                    .RecordAsync(safeEvent, cancellationToken).ConfigureAwait(false);
+                if (GetResource<IAppAuditEventSink>() is { } sink)
+                    await sink.RecordAsync(safeEvent, cancellationToken).ConfigureAwait(false);
+                Logger.Write("INFO", "audit.event", "TeaQL audit event", new Dictionary<string, object?>
+                {
+                    ["category"] = "AUDIT", ["outcome"] = "success", ["audit"] = safeEvent
+                });
                 return true;
             });
 
@@ -852,7 +863,7 @@ public class UserContext
     // ==========================================
     public void PutToLocalCache(string key, object value, int? timeToLiveInSeconds = null)
     {
-        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.put",
+        var scope = OperationTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.put",
             new Dictionary<string, object> { ["teaql.cache.operation"] = "put" }));
         try
         {
@@ -868,7 +879,7 @@ public class UserContext
     }
     public T? GetFromLocalCache<T>(string key)
     {
-        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.get",
+        var scope = OperationTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.get",
             new Dictionary<string, object> { ["teaql.cache.operation"] = "get" }));
         if (!LocalCache.TryGetValue(key, out var entry))
         {
@@ -888,7 +899,7 @@ public class UserContext
     }
     public void RemoveFromLocalCache(string key)
     {
-        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.remove",
+        var scope = OperationTelemetry.StartSafely(RuntimeOperation.Create("cache", "local.remove",
             new Dictionary<string, object> { ["teaql.cache.operation"] = "remove" }));
         try
         {
@@ -903,7 +914,7 @@ public class UserContext
     // ==========================================
     public void PutToRemoteCache(string key, object value, int? timeToLiveInSeconds = null)
     {
-        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.put",
+        var scope = OperationTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.put",
             new Dictionary<string, object> { ["teaql.cache.operation"] = "put" }));
         try
         {
@@ -914,7 +925,7 @@ public class UserContext
     }
     public T? GetFromRemoteCache<T>(string key)
     {
-        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.get",
+        var scope = OperationTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.get",
             new Dictionary<string, object> { ["teaql.cache.operation"] = "get" }));
         try
         {
@@ -928,7 +939,7 @@ public class UserContext
     }
     public void RemoveFromRemoteCache(string key)
     {
-        var scope = RuntimeTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.remove",
+        var scope = OperationTelemetry.StartSafely(RuntimeOperation.Create("cache", "remote.remove",
             new Dictionary<string, object> { ["teaql.cache.operation"] = "remove" }));
         try
         {
