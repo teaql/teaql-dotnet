@@ -137,8 +137,8 @@ try
         ("number range", Q.Schools().WithStudentCapacityBetween(700, 900), 1),
         ("strict comparison", Q.Schools().WithStudentCapacityGreaterThan(799).WithStudentCapacityLessThan(801), 1),
         ("date range", Q.Schools().WithEstablishedDateBetween(
-            new DateOnly(1995, 1, 1),
-            new DateOnly(1995, 12, 31)), 1),
+            new Value.DateValue(new DateTime(1995, 1, 1)),
+            new Value.DateValue(new DateTime(1995, 12, 31))), 1),
         ("known", Q.Schools().WithAddressIsKnown(), 1),
         ("unknown", Q.Schools().WithAddressIsUnknown(), 0),
         ("boolean true", Q.Schools().WhichAreActive(), 1),
