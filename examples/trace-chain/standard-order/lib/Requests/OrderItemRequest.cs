@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public OrderItemRequest()
@@ -186,55 +186,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderItemRequest WithIdIs(long val)
+                public OrderItemRequest WithIdIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithIdIsNot(long val)
+                public OrderItemRequest WithIdIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithIdIn(params long[] vals)
+                public OrderItemRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithIdNotIn(params long[] vals)
+                public OrderItemRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithIdGreaterThan(long val)
+                public OrderItemRequest WithIdGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithIdGreaterThanOrEqualTo(long val)
+                public OrderItemRequest WithIdGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithIdLessThan(long val)
+                public OrderItemRequest WithIdLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithIdLessThanOrEqualTo(long val)
+                public OrderItemRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithIdBetween(long lower, long upper)
+                public OrderItemRequest WithIdBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -287,49 +287,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("product_name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderItemRequest WithProductNameIsNot(string val)
+                public OrderItemRequest WithProductNameIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("product_name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithProductNameIn(params string[] vals)
+                public OrderItemRequest WithProductNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("product_name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("product_name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithProductNameNotIn(params string[] vals)
+                public OrderItemRequest WithProductNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("product_name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("product_name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithProductNameGreaterThan(string val)
+                public OrderItemRequest WithProductNameGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("product_name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithProductNameGreaterThanOrEqualTo(string val)
+                public OrderItemRequest WithProductNameGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("product_name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithProductNameLessThan(string val)
+                public OrderItemRequest WithProductNameLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("product_name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithProductNameLessThanOrEqualTo(string val)
+                public OrderItemRequest WithProductNameLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("product_name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithProductNameBetween(string lower, string upper)
+                public OrderItemRequest WithProductNameBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("product_name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -382,55 +382,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityIs(long val)
+                public OrderItemRequest WithQuantityIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("quantity", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityIsNot(long val)
+                public OrderItemRequest WithQuantityIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("quantity", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityIn(params long[] vals)
+                public OrderItemRequest WithQuantityIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("quantity", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("quantity", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityNotIn(params long[] vals)
+                public OrderItemRequest WithQuantityNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("quantity", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("quantity", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityGreaterThan(long val)
+                public OrderItemRequest WithQuantityGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("quantity", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityGreaterThanOrEqualTo(long val)
+                public OrderItemRequest WithQuantityGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("quantity", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityLessThan(long val)
+                public OrderItemRequest WithQuantityLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("quantity", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityLessThanOrEqualTo(long val)
+                public OrderItemRequest WithQuantityLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("quantity", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithQuantityBetween(long lower, long upper)
+                public OrderItemRequest WithQuantityBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("quantity", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -448,55 +448,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceIs(decimal val)
+                public OrderItemRequest WithUnitPriceIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("unit_price", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceIsNot(decimal val)
+                public OrderItemRequest WithUnitPriceIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("unit_price", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceIn(params decimal[] vals)
+                public OrderItemRequest WithUnitPriceIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("unit_price", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("unit_price", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceNotIn(params decimal[] vals)
+                public OrderItemRequest WithUnitPriceNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("unit_price", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("unit_price", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceGreaterThan(decimal val)
+                public OrderItemRequest WithUnitPriceGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("unit_price", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceGreaterThanOrEqualTo(decimal val)
+                public OrderItemRequest WithUnitPriceGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("unit_price", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceLessThan(decimal val)
+                public OrderItemRequest WithUnitPriceLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("unit_price", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceLessThanOrEqualTo(decimal val)
+                public OrderItemRequest WithUnitPriceLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("unit_price", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithUnitPriceBetween(decimal lower, decimal upper)
+                public OrderItemRequest WithUnitPriceBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("unit_price", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -514,55 +514,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderItemRequest WithVersionIs(long val)
+                public OrderItemRequest WithVersionIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionIsNot(long val)
+                public OrderItemRequest WithVersionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionIn(params long[] vals)
+                public OrderItemRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionNotIn(params long[] vals)
+                public OrderItemRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionGreaterThan(long val)
+                public OrderItemRequest WithVersionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionGreaterThanOrEqualTo(long val)
+                public OrderItemRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionLessThan(long val)
+                public OrderItemRequest WithVersionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionLessThanOrEqualTo(long val)
+                public OrderItemRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderItemRequest WithVersionBetween(long lower, long upper)
+                public OrderItemRequest WithVersionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -823,8 +823,7 @@ namespace Generated.Requests
 
                 public OrderItemRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy("id"); 
                     return this;
                 }
                 public OrderItemRequest GroupByCustomerOrder()
@@ -835,8 +834,7 @@ namespace Generated.Requests
 
                 public OrderItemRequest GroupByCustomerOrderAs(string retName)
                 {
-                    _query.GroupBy("customer_order");
-                    _query.ProjectExpr(retName, Expr.Column("customer_order"));
+                    _query.GroupBy("customer_order"); 
                     return this;
                 }
                 public OrderItemRequest GroupByProductName()
@@ -847,8 +845,7 @@ namespace Generated.Requests
 
                 public OrderItemRequest GroupByProductNameAs(string retName)
                 {
-                    _query.GroupBy("product_name");
-                    _query.ProjectExpr(retName, Expr.Column("product_name"));
+                    _query.GroupBy("product_name"); 
                     return this;
                 }
                 public OrderItemRequest GroupByQuantity()
@@ -859,8 +856,7 @@ namespace Generated.Requests
 
                 public OrderItemRequest GroupByQuantityAs(string retName)
                 {
-                    _query.GroupBy("quantity");
-                    _query.ProjectExpr(retName, Expr.Column("quantity"));
+                    _query.GroupBy("quantity"); 
                     return this;
                 }
                 public OrderItemRequest GroupByUnitPrice()
@@ -871,8 +867,7 @@ namespace Generated.Requests
 
                 public OrderItemRequest GroupByUnitPriceAs(string retName)
                 {
-                    _query.GroupBy("unit_price");
-                    _query.ProjectExpr(retName, Expr.Column("unit_price"));
+                    _query.GroupBy("unit_price"); 
                     return this;
                 }
                 public OrderItemRequest GroupByVersion()
@@ -883,8 +878,7 @@ namespace Generated.Requests
 
                 public OrderItemRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy("version"); 
                     return this;
                 }
                 public OrderItemRequest FacetByCustomerOrderAs(
@@ -910,29 +904,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.OrderItem?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.OrderItem.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.OrderItem>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.OrderItem>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.OrderItem>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.OrderItem>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -954,6 +953,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.OrderItem.FromRecord(row, new EntityRoot()), request.Query),
@@ -1003,11 +1004,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("OrderItem").ConfigureAwait(false));
-            var entity = Generated.Models.OrderItem.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("OrderItem", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("OrderItem", Generated.Models.OrderItem.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

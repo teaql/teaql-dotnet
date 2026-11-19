@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public OrderStatusRequest()
@@ -193,55 +193,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderStatusRequest WithIdIs(long val)
+                public OrderStatusRequest WithIdIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdIsNot(long val)
+                public OrderStatusRequest WithIdIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdIn(params long[] vals)
+                public OrderStatusRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdNotIn(params long[] vals)
+                public OrderStatusRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdGreaterThan(long val)
+                public OrderStatusRequest WithIdGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdGreaterThanOrEqualTo(long val)
+                public OrderStatusRequest WithIdGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdLessThan(long val)
+                public OrderStatusRequest WithIdLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdLessThanOrEqualTo(long val)
+                public OrderStatusRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithIdBetween(long lower, long upper)
+                public OrderStatusRequest WithIdBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -270,49 +270,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderStatusRequest WithNameIsNot(string val)
+                public OrderStatusRequest WithNameIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithNameIn(params string[] vals)
+                public OrderStatusRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithNameNotIn(params string[] vals)
+                public OrderStatusRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithNameGreaterThan(string val)
+                public OrderStatusRequest WithNameGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithNameGreaterThanOrEqualTo(string val)
+                public OrderStatusRequest WithNameGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithNameLessThan(string val)
+                public OrderStatusRequest WithNameLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithNameLessThanOrEqualTo(string val)
+                public OrderStatusRequest WithNameLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithNameBetween(string lower, string upper)
+                public OrderStatusRequest WithNameBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -376,49 +376,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("code", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderStatusRequest WithCodeIsNot(string val)
+                public OrderStatusRequest WithCodeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithCodeIn(params string[] vals)
+                public OrderStatusRequest WithCodeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("code", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithCodeNotIn(params string[] vals)
+                public OrderStatusRequest WithCodeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("code", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithCodeGreaterThan(string val)
+                public OrderStatusRequest WithCodeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithCodeGreaterThanOrEqualTo(string val)
+                public OrderStatusRequest WithCodeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithCodeLessThan(string val)
+                public OrderStatusRequest WithCodeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithCodeLessThanOrEqualTo(string val)
+                public OrderStatusRequest WithCodeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithCodeBetween(string lower, string upper)
+                public OrderStatusRequest WithCodeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -482,49 +482,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("color", TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderStatusRequest WithColorIsNot(string val)
+                public OrderStatusRequest WithColorIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("color", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithColorIn(params string[] vals)
+                public OrderStatusRequest WithColorIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("color", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("color", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithColorNotIn(params string[] vals)
+                public OrderStatusRequest WithColorNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("color", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("color", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithColorGreaterThan(string val)
+                public OrderStatusRequest WithColorGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("color", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithColorGreaterThanOrEqualTo(string val)
+                public OrderStatusRequest WithColorGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("color", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithColorLessThan(string val)
+                public OrderStatusRequest WithColorLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("color", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithColorLessThanOrEqualTo(string val)
+                public OrderStatusRequest WithColorLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("color", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithColorBetween(string lower, string upper)
+                public OrderStatusRequest WithColorBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("color", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -577,55 +577,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderIs(decimal val)
+                public OrderStatusRequest WithDisplayOrderIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderIsNot(decimal val)
+                public OrderStatusRequest WithDisplayOrderIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderIn(params decimal[] vals)
+                public OrderStatusRequest WithDisplayOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("display_order", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("display_order", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderNotIn(params decimal[] vals)
+                public OrderStatusRequest WithDisplayOrderNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("display_order", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("display_order", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderGreaterThan(decimal val)
+                public OrderStatusRequest WithDisplayOrderGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderGreaterThanOrEqualTo(decimal val)
+                public OrderStatusRequest WithDisplayOrderGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderLessThan(decimal val)
+                public OrderStatusRequest WithDisplayOrderLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderLessThanOrEqualTo(decimal val)
+                public OrderStatusRequest WithDisplayOrderLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("display_order", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithDisplayOrderBetween(decimal lower, decimal upper)
+                public OrderStatusRequest WithDisplayOrderBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("display_order", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -667,55 +667,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionIs(long val)
+                public OrderStatusRequest WithVersionIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionIsNot(long val)
+                public OrderStatusRequest WithVersionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionIn(params long[] vals)
+                public OrderStatusRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionNotIn(params long[] vals)
+                public OrderStatusRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionGreaterThan(long val)
+                public OrderStatusRequest WithVersionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionGreaterThanOrEqualTo(long val)
+                public OrderStatusRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionLessThan(long val)
+                public OrderStatusRequest WithVersionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionLessThanOrEqualTo(long val)
+                public OrderStatusRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderStatusRequest WithVersionBetween(long lower, long upper)
+                public OrderStatusRequest WithVersionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -908,8 +908,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy("id"); 
                     return this;
                 }
                 public OrderStatusRequest GroupByName()
@@ -920,8 +919,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name");
-                    _query.ProjectExpr(retName, Expr.Column("name"));
+                    _query.GroupBy("name"); 
                     return this;
                 }
                 public OrderStatusRequest GroupByCode()
@@ -932,8 +930,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest GroupByCodeAs(string retName)
                 {
-                    _query.GroupBy("code");
-                    _query.ProjectExpr(retName, Expr.Column("code"));
+                    _query.GroupBy("code"); 
                     return this;
                 }
                 public OrderStatusRequest GroupByColor()
@@ -944,8 +941,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest GroupByColorAs(string retName)
                 {
-                    _query.GroupBy("color");
-                    _query.ProjectExpr(retName, Expr.Column("color"));
+                    _query.GroupBy("color"); 
                     return this;
                 }
                 public OrderStatusRequest GroupByDisplayOrder()
@@ -956,8 +952,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest GroupByDisplayOrderAs(string retName)
                 {
-                    _query.GroupBy("display_order");
-                    _query.ProjectExpr(retName, Expr.Column("display_order"));
+                    _query.GroupBy("display_order"); 
                     return this;
                 }
                 public OrderStatusRequest GroupByCommercePlatform()
@@ -968,8 +963,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest GroupByCommercePlatformAs(string retName)
                 {
-                    _query.GroupBy("commerce_platform");
-                    _query.ProjectExpr(retName, Expr.Column("commerce_platform"));
+                    _query.GroupBy("commerce_platform"); 
                     return this;
                 }
                 public OrderStatusRequest GroupByVersion()
@@ -980,8 +974,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy("version"); 
                     return this;
                 }
                 public OrderStatusRequest SelectCustomerOrderList()
@@ -1164,29 +1157,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.OrderStatus?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.OrderStatus.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.OrderStatus>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.OrderStatus>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.OrderStatus>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.OrderStatus>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -1208,6 +1206,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.OrderStatus.FromRecord(row, new EntityRoot()), request.Query),
@@ -1257,11 +1257,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("OrderStatus").ConfigureAwait(false));
-            var entity = Generated.Models.OrderStatus.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("OrderStatus", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("OrderStatus", Generated.Models.OrderStatus.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

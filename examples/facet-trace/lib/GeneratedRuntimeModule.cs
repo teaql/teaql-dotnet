@@ -12,17 +12,14 @@ internal sealed class PlatformChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Platform", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Platform", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Platform", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -76,17 +73,14 @@ internal sealed class SchoolChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("School", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("School", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("School", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -219,7 +213,7 @@ public static class GeneratedRuntimeModule
             "student_capacity",
 
         }
-    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "base_url", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["base_url"] = ["base_url"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("SchoolType", ["platform", "id", "name", "code", "display_order", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("School", ["id", "platform", "school_type", "name", "address", "established_date", "student_capacity", "active", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["school_type"] = ["school_type"], ["name"] = ["name"], ["address"] = ["address"], ["established_date"] = ["established_date"], ["student_capacity"] = ["student_capacity"], ["active"] = ["active"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }).ContextField("Platform", "create_time", create: "now").ContextField("Platform", "update_time", create: "now", update: "now").ContextField("School", "create_time", create: "now").ContextField("School", "update_time", create: "now", update: "now").WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "base_url", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["base_url"] = ["base_url"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("SchoolType", ["platform", "id", "name", "code", "display_order", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["platform"] = ["platform"], ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["display_order"] = ["display_order"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("School", ["id", "platform", "school_type", "name", "address", "established_date", "student_capacity", "active", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["platform"] = ["platform"], ["school_type"] = ["school_type"], ["name"] = ["name"], ["address"] = ["address"], ["established_date"] = ["established_date"], ["student_capacity"] = ["student_capacity"], ["active"] = ["active"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).CheckerPresentation(CheckerPresentationModel.FromJson("{\"schema\":\"teaql.checker-model/v1\",\"revision\":\"sha256:71ba9da7267282a87034f786438f6f60442609b86ca42c3ef288e51c43107ce1\",\"entities\":{\"Platform\":{\"labels\":{\"en\":\"Platform\"},\"fields\":[{\"name\":\"base_url\",\"labels\":{\"en\":\"base url\"},\"aliases\":[\"BaseUrl\",\"baseUrl\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"school_list\",\"targetType\":\"School\",\"labels\":{\"en\":\"School\"},\"aliases\":[\"SchoolList\",\"schoolList\"]},{\"name\":\"school_type_list\",\"targetType\":\"SchoolType\",\"labels\":{\"en\":\"School Type\"},\"aliases\":[\"SchoolTypeList\",\"schoolTypeList\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"School\":{\"labels\":{\"en\":\"School\"},\"fields\":[{\"name\":\"active\",\"labels\":{\"en\":\"active\"},\"aliases\":[\"Active\"]},{\"name\":\"address\",\"labels\":{\"en\":\"address\"},\"aliases\":[\"Address\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"established_date\",\"labels\":{\"en\":\"established date\"},\"aliases\":[\"EstablishedDate\",\"establishedDate\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"platform\",\"targetType\":\"Platform\",\"labels\":{\"en\":\"Platform\"},\"aliases\":[\"Platform\"]},{\"name\":\"school_type\",\"targetType\":\"SchoolType\",\"labels\":{\"en\":\"School Type\"},\"aliases\":[\"SchoolType\",\"schoolType\"]},{\"name\":\"student_capacity\",\"labels\":{\"en\":\"student capacity\"},\"aliases\":[\"StudentCapacity\",\"studentCapacity\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"SchoolType\":{\"labels\":{\"en\":\"School Type\"},\"fields\":[{\"name\":\"code\",\"labels\":{\"en\":\"code\"},\"aliases\":[\"Code\"]},{\"name\":\"display_order\",\"labels\":{\"en\":\"display order\"},\"aliases\":[\"DisplayOrder\",\"displayOrder\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"platform\",\"targetType\":\"Platform\",\"labels\":{\"en\":\"Platform\"},\"aliases\":[\"Platform\"]},{\"name\":\"school_list\",\"targetType\":\"School\",\"labels\":{\"en\":\"School\"},\"aliases\":[\"SchoolList\",\"schoolList\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]}}}")).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

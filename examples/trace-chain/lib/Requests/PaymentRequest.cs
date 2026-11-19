@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public PaymentRequest()
@@ -172,55 +172,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public PaymentRequest WithIdIs(long val)
+                public PaymentRequest WithIdIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithIdIsNot(long val)
+                public PaymentRequest WithIdIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithIdIn(params long[] vals)
+                public PaymentRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PaymentRequest WithIdNotIn(params long[] vals)
+                public PaymentRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PaymentRequest WithIdGreaterThan(long val)
+                public PaymentRequest WithIdGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithIdGreaterThanOrEqualTo(long val)
+                public PaymentRequest WithIdGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithIdLessThan(long val)
+                public PaymentRequest WithIdLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithIdLessThanOrEqualTo(long val)
+                public PaymentRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithIdBetween(long lower, long upper)
+                public PaymentRequest WithIdBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -273,49 +273,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
-                public PaymentRequest WithReferenceCodeIsNot(string val)
+                public PaymentRequest WithReferenceCodeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithReferenceCodeIn(params string[] vals)
+                public PaymentRequest WithReferenceCodeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("reference_code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PaymentRequest WithReferenceCodeNotIn(params string[] vals)
+                public PaymentRequest WithReferenceCodeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("reference_code", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PaymentRequest WithReferenceCodeGreaterThan(string val)
+                public PaymentRequest WithReferenceCodeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithReferenceCodeGreaterThanOrEqualTo(string val)
+                public PaymentRequest WithReferenceCodeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithReferenceCodeLessThan(string val)
+                public PaymentRequest WithReferenceCodeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithReferenceCodeLessThanOrEqualTo(string val)
+                public PaymentRequest WithReferenceCodeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("reference_code", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithReferenceCodeBetween(string lower, string upper)
+                public PaymentRequest WithReferenceCodeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("reference_code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -368,55 +368,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public PaymentRequest WithVersionIs(long val)
+                public PaymentRequest WithVersionIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithVersionIsNot(long val)
+                public PaymentRequest WithVersionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithVersionIn(params long[] vals)
+                public PaymentRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PaymentRequest WithVersionNotIn(params long[] vals)
+                public PaymentRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PaymentRequest WithVersionGreaterThan(long val)
+                public PaymentRequest WithVersionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithVersionGreaterThanOrEqualTo(long val)
+                public PaymentRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithVersionLessThan(long val)
+                public PaymentRequest WithVersionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithVersionLessThanOrEqualTo(long val)
+                public PaymentRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PaymentRequest WithVersionBetween(long lower, long upper)
+                public PaymentRequest WithVersionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -493,8 +493,7 @@ namespace Generated.Requests
 
                 public PaymentRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy("id"); 
                     return this;
                 }
                 public PaymentRequest GroupByCustomerOrder()
@@ -505,8 +504,7 @@ namespace Generated.Requests
 
                 public PaymentRequest GroupByCustomerOrderAs(string retName)
                 {
-                    _query.GroupBy("customer_order");
-                    _query.ProjectExpr(retName, Expr.Column("customer_order"));
+                    _query.GroupBy("customer_order"); 
                     return this;
                 }
                 public PaymentRequest GroupByReferenceCode()
@@ -517,8 +515,7 @@ namespace Generated.Requests
 
                 public PaymentRequest GroupByReferenceCodeAs(string retName)
                 {
-                    _query.GroupBy("reference_code");
-                    _query.ProjectExpr(retName, Expr.Column("reference_code"));
+                    _query.GroupBy("reference_code"); 
                     return this;
                 }
                 public PaymentRequest GroupByVersion()
@@ -529,8 +526,7 @@ namespace Generated.Requests
 
                 public PaymentRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy("version"); 
                     return this;
                 }
                 public PaymentRequest SelectPaymentAttemptList()
@@ -610,29 +606,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.Payment?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.Payment.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.Payment>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.Payment>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.Payment>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.Payment>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -654,6 +655,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.Payment.FromRecord(row, new EntityRoot()), request.Query),
@@ -703,11 +706,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("Payment").ConfigureAwait(false));
-            var entity = Generated.Models.Payment.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("Payment", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("Payment", Generated.Models.Payment.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

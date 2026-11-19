@@ -1,31 +1,38 @@
 {
-  "schema": "teaql.retained-example-fixture/v1",
-  "modelSource": "examples/conformance/model.xml",
-  "modelSha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7",
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
-  "producerSource": {
-    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
-  },
-  "producerReceiptSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "generatedManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
   "files": {
     "E.cs": "c5abf3e9959ef6903572930409db4ff066847c624307d65f517628a6b9dd76a5",
-    "Requests/PlatformRequest.cs": "1e8f4e51d99db4a770e14a30742350df0227ea3bde8eb4b859f51345b1140baf",
-    "Requests/WorkItemRequest.cs": "d1608cfeb16432f2fb6a918cc4a87a431dd601435e1028fa8abbc4b77c506528",
+    "GeneratedRuntimeModule.cs": "714e1c2b0bea2fbf9e9e60b7599d5f5d5446e0513010c82b892e97be7f756d7b",
     "GeneratedSearchModels.cs": "3f4e30fe802c4cb71fa5c35333336ca4b4439db3c3e358ec9ae760f3c879c53f",
+    "Models/Platform.cs": "9c864e492c6f514bca4b4887cea902204e3e7973d96180bbe04f3cffb925343e",
+    "Models/WorkItem.cs": "4e147e480169bfe93128812d7671d75b056daf881154bdc6633e257eedf22eb8",
+    "Q.cs": "df7f8f1301551068b1d95ab39f8bd9a6a25aaaa3af54d4871097ea4e4117ed92",
+    "Requests/PlatformRequest.cs": "4c4af30975dc64645e8ed2bf031dd2aa7176eae3e8229c62529f5074fb9312b2",
+    "Requests/WorkItemRequest.cs": "c47a51c4646200f5103824ced8737d331cdb42df774f33137a6e3cedd35234dd",
     "runtime-example-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "GeneratedRuntimeModule.cs": "884db2ebb2f72a06548f39cd61716262e653cb0a25e7ccb16f76c2d3191ba214",
-    "Models/Platform.cs": "84f14005da94eaa07eb9550595f14ab602eab8d01730cc1e606414c2a620bbe3",
-    "Models/WorkItem.cs": "eaa45bd7a73cc3a3ace6274b663360c0db26d2352642bf86c6a13c0f453274bb",
     "teaql-i18n.json": "fa0ea9576dccfb6ef4e940b00b53abb843ee492741e98da5001e6ea2ad79b2cb",
-    "Q.cs": "df7f8f1301551068b1d95ab39f8bd9a6a25aaaa3af54d4871097ea4e4117ed92"
+    "teaql/checker-model.json": "4824e2986933569c4d827ca44cae7e3a028012aec1e7dbacd245fff5fd5ffe1b",
+    "teaql/model-provenance.json": "6710ca9864c596bf2413ab1eee0ba59b94cc73b57e7fec6ad4a13f482a3cdfea"
   },
-  "previousFixtureManifestSha256": "a43508ea32d506ad413a629d54ffc8d5c8afaa879fa83de871ff3b884bd3249a",
-  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
-  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9"
+  "generatedManifestSha256": "0dc800657e2d8d88154caae16a2ed9abe62a8577848c9ed7f1c5bb8bf1f3f4cd",
+  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/conformance/model/receipt.json",
+  "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+  "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+  "generatorRelease": "v4.2.0",
+  "modelSha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7",
+  "modelSource": "examples/conformance/model.xml",
+  "previousFixtureManifestSha256": "2347eccfe93f49192abff63d8854ac4751570c6d91202cb05314ca49c82acebc",
+  "previousOrigin": {
+    "commit": "7889bfc5dacd86206c17f26749fefe0d01d92671",
+    "path": "examples/conformance/fixture-manifest.json"
+  },
+  "producerReceiptSha256": "45c3c815155d8779d444fd7f150122b0691d0ee490724c87b8f5c0adb95bdde1",
+  "producerSource": {
+    "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+    "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+    "release": "v4.2.0"
+  },
+  "schema": "teaql.retained-example-fixture/v1"
 }

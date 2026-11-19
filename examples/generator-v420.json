@@ -1,0 +1,1232 @@
+{
+  "generator": {
+    "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+    "releaseURL": "https://github.com/teaql/teaql-code-gen/releases/tag/v4.2.0",
+    "sourceCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+    "tag": "v4.2.0"
+  },
+  "installationReceiptSHA256": "ddf103df0daa060962986e92d230cc201fcc78293198a4c5b107cdbe09346680",
+  "libraries": [
+    {
+      "archiveSHA256": "e687f0a63aa37cd8f752279d40fa185672135db23763a25356e19cc2481dd9ad",
+      "destination": "examples/conformance",
+      "generatedFiles": {
+        "examples/conformance/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "c5abf3e9959ef6903572930409db4ff066847c624307d65f517628a6b9dd76a5"
+        },
+        "examples/conformance/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "714e1c2b0bea2fbf9e9e60b7599d5f5d5446e0513010c82b892e97be7f756d7b"
+        },
+        "examples/conformance/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "3f4e30fe802c4cb71fa5c35333336ca4b4439db3c3e358ec9ae760f3c879c53f"
+        },
+        "examples/conformance/Models/Platform.cs": {
+          "emittedPath": "Models/Platform.cs",
+          "sha256": "9c864e492c6f514bca4b4887cea902204e3e7973d96180bbe04f3cffb925343e"
+        },
+        "examples/conformance/Models/WorkItem.cs": {
+          "emittedPath": "Models/WorkItem.cs",
+          "sha256": "4e147e480169bfe93128812d7671d75b056daf881154bdc6633e257eedf22eb8"
+        },
+        "examples/conformance/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "df7f8f1301551068b1d95ab39f8bd9a6a25aaaa3af54d4871097ea4e4117ed92"
+        },
+        "examples/conformance/Requests/PlatformRequest.cs": {
+          "emittedPath": "Requests/PlatformRequest.cs",
+          "sha256": "4c4af30975dc64645e8ed2bf031dd2aa7176eae3e8229c62529f5074fb9312b2"
+        },
+        "examples/conformance/Requests/WorkItemRequest.cs": {
+          "emittedPath": "Requests/WorkItemRequest.cs",
+          "sha256": "c47a51c4646200f5103824ced8737d331cdb42df774f33137a6e3cedd35234dd"
+        },
+        "examples/conformance/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "fa0ea9576dccfb6ef4e940b00b53abb843ee492741e98da5001e6ea2ad79b2cb"
+        },
+        "examples/conformance/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "4824e2986933569c4d827ca44cae7e3a028012aec1e7dbacd245fff5fd5ffe1b"
+        },
+        "examples/conformance/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "6710ca9864c596bf2413ab1eee0ba59b94cc73b57e7fec6ad4a13f482a3cdfea"
+        }
+      },
+      "model": "examples/conformance/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "0dc800657e2d8d88154caae16a2ed9abe62a8577848c9ed7f1c5bb8bf1f3f4cd",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/conformance/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7",
+        "producerReceiptSha256": "45c3c815155d8779d444fd7f150122b0691d0ee490724c87b8f5c0adb95bdde1",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/conformance/runtime-example-conformance-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "3b49a67ea8ee390779a8eb126d3b05f1bcb34b76a64a9b57027ff2faa9a61e93",
+      "destination": "examples/expression-profiles/generated/PascalCase",
+      "generatedFiles": {
+        "examples/expression-profiles/generated/PascalCase/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "2ae6ecb54a33a866524858653c16d3dbffa820da4a3fb00362e9fe47e53ff005"
+        },
+        "examples/expression-profiles/generated/PascalCase/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "5e780358b3923f550074a426d89fb36134b14d5833dd04bfb523ade06803e8a5"
+        },
+        "examples/expression-profiles/generated/PascalCase/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "04be33c8e32ee5f7dff502b61271136a4f7d1493084cb6be34e6fab9eb880074"
+        },
+        "examples/expression-profiles/generated/PascalCase/Models/ScalarTypeProbe.cs": {
+          "emittedPath": "Models/ScalarTypeProbe.cs",
+          "sha256": "e207142f995fe4fe1dd75a3f4e7ad63c2540cfe05907ea41414f6cad86ddc68d"
+        },
+        "examples/expression-profiles/generated/PascalCase/Models/TypePlatform.cs": {
+          "emittedPath": "Models/TypePlatform.cs",
+          "sha256": "2a8999b59d1881c9c2addf3e6ba8f7b6454609e6b31c8b5f49fb17ec9e5b3684"
+        },
+        "examples/expression-profiles/generated/PascalCase/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+        },
+        "examples/expression-profiles/generated/PascalCase/Requests/ScalarTypeProbeRequest.cs": {
+          "emittedPath": "Requests/ScalarTypeProbeRequest.cs",
+          "sha256": "a33d06d16e4c1930a06852516a24e661a5dd9efa07cc04020761dd10dd2d15f5"
+        },
+        "examples/expression-profiles/generated/PascalCase/Requests/TypePlatformRequest.cs": {
+          "emittedPath": "Requests/TypePlatformRequest.cs",
+          "sha256": "696bacd9ce39936d9819d163174bd1640d3230d8da148bd971eb5f292f702e04"
+        },
+        "examples/expression-profiles/generated/PascalCase/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163"
+        },
+        "examples/expression-profiles/generated/PascalCase/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "ce4ae61861d89991e89b2762d48bb448ad04ad18853c9c5d5ea4e0c7ac093bab"
+        },
+        "examples/expression-profiles/generated/PascalCase/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "ae427ef988d132abf6690f6dd0988e045249b7897a9ab1e3adee5c6ff789157b"
+        }
+      },
+      "model": "examples/expression-profiles/generated/PascalCase/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "c60867ab9578d4f12a2b889f0292ecbc00d031c69ea7246ec02410fd679e18f3",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/expression-profiles/generated/PascalCase/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "f836540a765f8c372bd7103a25a83ca316797253079ac63f8a1ef5ee4ded027d",
+        "producerReceiptSha256": "b1c0743c1a9bd86b007fc6576e722f2198d175aeedf2f127d69c858c73beec1d",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/expression-profiles/generated/PascalCase/scalar-type-conformance-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "a650ed251965fe0e05c9a94b2d0e975e797ffc581a8a8b6a2a4621913ef1b764",
+      "destination": "examples/expression-profiles/generated/camelCase",
+      "generatedFiles": {
+        "examples/expression-profiles/generated/camelCase/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94"
+        },
+        "examples/expression-profiles/generated/camelCase/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "d0afa82208cf185d0a9127011499a213032a95a48afe57ba90c017cc73b69fd1"
+        },
+        "examples/expression-profiles/generated/camelCase/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2"
+        },
+        "examples/expression-profiles/generated/camelCase/Models/ScalarTypeProbe.cs": {
+          "emittedPath": "Models/ScalarTypeProbe.cs",
+          "sha256": "e81fa105a203d9635666c1048855d0faae121b7a1819d86974444126551c684e"
+        },
+        "examples/expression-profiles/generated/camelCase/Models/TypePlatform.cs": {
+          "emittedPath": "Models/TypePlatform.cs",
+          "sha256": "718ae63d666414e3d4d45e9795dceff090c5e628d9b1962958f1b97c776097fb"
+        },
+        "examples/expression-profiles/generated/camelCase/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+        },
+        "examples/expression-profiles/generated/camelCase/Requests/ScalarTypeProbeRequest.cs": {
+          "emittedPath": "Requests/ScalarTypeProbeRequest.cs",
+          "sha256": "a33d06d16e4c1930a06852516a24e661a5dd9efa07cc04020761dd10dd2d15f5"
+        },
+        "examples/expression-profiles/generated/camelCase/Requests/TypePlatformRequest.cs": {
+          "emittedPath": "Requests/TypePlatformRequest.cs",
+          "sha256": "696bacd9ce39936d9819d163174bd1640d3230d8da148bd971eb5f292f702e04"
+        },
+        "examples/expression-profiles/generated/camelCase/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163"
+        },
+        "examples/expression-profiles/generated/camelCase/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "ce4ae61861d89991e89b2762d48bb448ad04ad18853c9c5d5ea4e0c7ac093bab"
+        },
+        "examples/expression-profiles/generated/camelCase/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "84e6e6a9d56404f3923357514c795575e617b670ac6ea413306a4203b80ff14e"
+        }
+      },
+      "model": "examples/expression-profiles/generated/camelCase/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "d4a280109425e47f92eb60f271ceafb967b9c2f85abee39db03fe71b52fb6378",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/expression-profiles/generated/camelCase/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
+        "producerReceiptSha256": "3fc7efec12c8a89ef45233b207964cade81f0290a8537492e4aabd5e81224438",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/expression-profiles/generated/camelCase/scalar-type-conformance-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "2d293b70ddead99aaa3bf28e7a05d75ed7eed6f84702158d21b0922fdecee932",
+      "destination": "examples/expression-profiles/generated/snake_case",
+      "generatedFiles": {
+        "examples/expression-profiles/generated/snake_case/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "874b7102377dbf8e96a4e6e3f6a04499b763214e09ff7ff3a8c17978db0933ab"
+        },
+        "examples/expression-profiles/generated/snake_case/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "e9a63c9ed0fa42073aea110ccc54e4519318374bfda0e872f259ba4226827b18"
+        },
+        "examples/expression-profiles/generated/snake_case/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2"
+        },
+        "examples/expression-profiles/generated/snake_case/Models/ScalarTypeProbe.cs": {
+          "emittedPath": "Models/ScalarTypeProbe.cs",
+          "sha256": "48595d50203a8a4deb2a10f49b814ac2c0ae418a366f430fb61dc3153c41f16d"
+        },
+        "examples/expression-profiles/generated/snake_case/Models/TypePlatform.cs": {
+          "emittedPath": "Models/TypePlatform.cs",
+          "sha256": "5421d16f9dbd6bec72756ab56d7c1c70f9770eafea4f5f92fc6ba90c1d7cbae6"
+        },
+        "examples/expression-profiles/generated/snake_case/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+        },
+        "examples/expression-profiles/generated/snake_case/Requests/ScalarTypeProbeRequest.cs": {
+          "emittedPath": "Requests/ScalarTypeProbeRequest.cs",
+          "sha256": "a33d06d16e4c1930a06852516a24e661a5dd9efa07cc04020761dd10dd2d15f5"
+        },
+        "examples/expression-profiles/generated/snake_case/Requests/TypePlatformRequest.cs": {
+          "emittedPath": "Requests/TypePlatformRequest.cs",
+          "sha256": "696bacd9ce39936d9819d163174bd1640d3230d8da148bd971eb5f292f702e04"
+        },
+        "examples/expression-profiles/generated/snake_case/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163"
+        },
+        "examples/expression-profiles/generated/snake_case/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "ce4ae61861d89991e89b2762d48bb448ad04ad18853c9c5d5ea4e0c7ac093bab"
+        },
+        "examples/expression-profiles/generated/snake_case/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "aae97b2ed5d87ede29d03b620225b0cd242b8e088d6ec9fc8cdf7629ff200a98"
+        }
+      },
+      "model": "examples/expression-profiles/generated/snake_case/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "3af7a4a96a28ced3f51d7df662b97f00dbcb49e62dd4fd8a27f6c702626e542d",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/expression-profiles/generated/snake_case/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "2dbbcfea6057a5dc7c7c356ea4d0dacec5d5165538f6a9c5903d4d3b64ee13c6",
+        "producerReceiptSha256": "91395a5f563b7f46bd1d1c01e463e85f82580ade1d07986bd621915a9515e104",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/expression-profiles/generated/snake_case/scalar-type-conformance-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "97c489a0c5af04c18c49c92452e06fb7a332a0b4eb12c189fb9f4a92345dbd6b",
+      "destination": "examples/facet-trace/lib",
+      "generatedFiles": {
+        "examples/facet-trace/lib/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788"
+        },
+        "examples/facet-trace/lib/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "d7a27a000e44725f7a4789a586ec54a4f721b4c38ccf5cbf25aa1e201b882d92"
+        },
+        "examples/facet-trace/lib/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b"
+        },
+        "examples/facet-trace/lib/Models/Platform.cs": {
+          "emittedPath": "Models/Platform.cs",
+          "sha256": "573f2005da8ef3141798bdcd4d7d8458fa6afaaaeb6697614db9314b7f8555fb"
+        },
+        "examples/facet-trace/lib/Models/School.cs": {
+          "emittedPath": "Models/School.cs",
+          "sha256": "a73200863f93caeb778b160cf44b949445934c34eaf2d1b33c955ff777324fed"
+        },
+        "examples/facet-trace/lib/Models/SchoolType.cs": {
+          "emittedPath": "Models/SchoolType.cs",
+          "sha256": "3b6e11348d1fb957b95c81832624de2a41b5338188dd0bf2f0e08fc0f3f03a8b"
+        },
+        "examples/facet-trace/lib/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
+        },
+        "examples/facet-trace/lib/Requests/PlatformRequest.cs": {
+          "emittedPath": "Requests/PlatformRequest.cs",
+          "sha256": "8be18eb89c10c961275d8bec7ac9b71b5fa552e4cc6e515677a02d016549975a"
+        },
+        "examples/facet-trace/lib/Requests/SchoolRequest.cs": {
+          "emittedPath": "Requests/SchoolRequest.cs",
+          "sha256": "4879d4784a630975dc3c3a87845725f43474e02b0ece73b70b3c4ee27116a869"
+        },
+        "examples/facet-trace/lib/Requests/SchoolTypeRequest.cs": {
+          "emittedPath": "Requests/SchoolTypeRequest.cs",
+          "sha256": "7251586aeec9a2449953040c087e5c77d86b39add656cfab60e2b0bcb847a74a"
+        },
+        "examples/facet-trace/lib/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d"
+        },
+        "examples/facet-trace/lib/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71"
+        },
+        "examples/facet-trace/lib/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "9b96c818b9b6a05b5298a98e97a8d6bf48596f85e508d43c8c584ba034317fb6"
+        }
+      },
+      "model": "examples/facet-trace/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "68b798abc00471ffa0e25b5b8fc4f9edcd7b3c0619a48cdc8e50957e117b2cc0",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/facet-trace/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e",
+        "producerReceiptSha256": "d72c886ffe28082508a5b03b1ce5453f7e02a1057a65181157c44802033a9fe5",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/facet-trace/lib/school-management-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "62794012d7ff11998dd17b9bdcddae10291a74fc9ae1049ee76f6e25ae66e754",
+      "destination": "examples/fix-e-alignment/generated",
+      "generatedFiles": {
+        "examples/fix-e-alignment/generated/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "8260775859cc9cd523543f8822a529a94f7c9841d6bcff72ebced453c41f9078"
+        },
+        "examples/fix-e-alignment/generated/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "e3a4b66a0dc85a1c331c5f5fa317ae0394ec6eccafa7e6ce039316f1d1687794"
+        },
+        "examples/fix-e-alignment/generated/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c"
+        },
+        "examples/fix-e-alignment/generated/Models/OrderItem.cs": {
+          "emittedPath": "Models/OrderItem.cs",
+          "sha256": "0ef9ade01b2efd847134992a0f5545e9f539c261c7ab599eb1f9a7928d1c0de3"
+        },
+        "examples/fix-e-alignment/generated/Models/PurchaseOrder.cs": {
+          "emittedPath": "Models/PurchaseOrder.cs",
+          "sha256": "0b7402fb76c54ea13c34bef75468983ddae18e6cda25faeb07844496cbf0a2d2"
+        },
+        "examples/fix-e-alignment/generated/Models/Tenant.cs": {
+          "emittedPath": "Models/Tenant.cs",
+          "sha256": "35e0697de689704c23618bcd12a70bea1659c29a9dda661b68c6b85a220e8b09"
+        },
+        "examples/fix-e-alignment/generated/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e"
+        },
+        "examples/fix-e-alignment/generated/Requests/OrderItemRequest.cs": {
+          "emittedPath": "Requests/OrderItemRequest.cs",
+          "sha256": "f56254cac828eed3565f717f3d0fcdfe5399dff8217667f6c1ff66080c226f0a"
+        },
+        "examples/fix-e-alignment/generated/Requests/PurchaseOrderRequest.cs": {
+          "emittedPath": "Requests/PurchaseOrderRequest.cs",
+          "sha256": "062d4d0a09cbce7535ea8f6c82363d997fdfe146caf9ec358dac84bc73bde01d"
+        },
+        "examples/fix-e-alignment/generated/Requests/TenantRequest.cs": {
+          "emittedPath": "Requests/TenantRequest.cs",
+          "sha256": "7c398015bfd14299351036105c136a8e0705efbc9f7810a840d675bd6d6a0101"
+        },
+        "examples/fix-e-alignment/generated/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014"
+        },
+        "examples/fix-e-alignment/generated/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "92144f0d6092e143784685a82a9dd67c1672665bbe50fa6ca57b9ad441325b45"
+        },
+        "examples/fix-e-alignment/generated/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "79aa8ed9ea90394fb39f6a20a880522c85bbe02559877679c8637653bff3547a"
+        }
+      },
+      "model": "examples/fix-e-alignment/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 4,
+        "generatedManifestSha256": "c98b358b6449efa821dcea89d725112d5590f67d28e497f6297e83a479fd18df",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/fix-e-alignment/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
+        "producerReceiptSha256": "55da603c805199271779c9181ec241ef817c5a11c00eb547d024f0177ec5cc4a",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/fix-e-alignment/generated/checker-fix-advanced-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "d5daf2a070dd86a185fba00f08f6496568862c8b64d4cb2a1fe73bb60058947c"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "882304128094e0e726713a7c8b22a379909708744aa5c69c8afd64762c3c57d8",
+      "destination": "examples/natural-messages/automatic-fixture",
+      "generatedFiles": {
+        "examples/natural-messages/automatic-fixture/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "29ae7bb7d1ffd2eeef5a98d966194c9874d5b287056c314c9db28805115bb5c3"
+        },
+        "examples/natural-messages/automatic-fixture/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "0103cc56de1538aa2e2c57fb4990cfce6a0519a49a80bd10c1ad18058e3661af"
+        },
+        "examples/natural-messages/automatic-fixture/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "4af57adc7c35cfbf42a817b2283dc4245b8fce23369dc00bda90db381199b43b"
+        },
+        "examples/natural-messages/automatic-fixture/Models/Catalog.cs": {
+          "emittedPath": "Models/Catalog.cs",
+          "sha256": "188a5d6b0a7195a81654a68c4ee4dcc24e150b22ca6e32cb56735fb498d628c0"
+        },
+        "examples/natural-messages/automatic-fixture/Models/Entry.cs": {
+          "emittedPath": "Models/Entry.cs",
+          "sha256": "9a13021bc8ee205b3cf167f3be08e1875a0a3ad631c2b23fb57e2a0d37aa95b9"
+        },
+        "examples/natural-messages/automatic-fixture/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "c5ed8382ab2236c771413964ee54f9013fd122d72adf6b3be0b69e4e79ac9c2e"
+        },
+        "examples/natural-messages/automatic-fixture/Requests/CatalogRequest.cs": {
+          "emittedPath": "Requests/CatalogRequest.cs",
+          "sha256": "b2a4f33bed2faa9c0ee992f8905e6a6515051de9a8032b6b70c672fbe71ee8cf"
+        },
+        "examples/natural-messages/automatic-fixture/Requests/EntryRequest.cs": {
+          "emittedPath": "Requests/EntryRequest.cs",
+          "sha256": "534aed23957266987b7655ccfef1909531e998e213328ac05e4b761828ed2ea2"
+        },
+        "examples/natural-messages/automatic-fixture/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "8bbd8285869941b68b39a8c9ebe58965619fe00f8f5f0a34f9e4366a5b438ce5"
+        },
+        "examples/natural-messages/automatic-fixture/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "dbac03cd54b294e3e60a62752aeb170ad1ad722a7dfb8feb639c569ff3e73b1a"
+        },
+        "examples/natural-messages/automatic-fixture/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "713092d98415609d6c111ab9d9cc57cdcf5961842078197bb8f88573e4987e39"
+        }
+      },
+      "model": "examples/natural-messages/automatic-fixture/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 2,
+        "generatedManifestSha256": "7cba8d995dec339d4b27c7538d8ae36e58439bbb49808f3367b9356e3cbd8ec7",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/natural-messages/automatic-fixture/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
+        "producerReceiptSha256": "1e7743625ff0bf1b612230bbfa8f7c3e01e89a1ffb184899d72c88bf0b8383bb",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/natural-messages/automatic-fixture/checker-natural-message-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "d5daf2a070dd86a185fba00f08f6496568862c8b64d4cb2a1fe73bb60058947c"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "22e844f2d63878fe8a00974eb43a99129d89be2b40a58aadae27b143fcde8772",
+      "destination": "examples/order-management/dotnet-lib-core",
+      "generatedFiles": {
+        "examples/order-management/dotnet-lib-core/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "a1663576e91a2b3333985a1e2c8daa9129049ceb1908f621e21e317bc18bcb7a"
+        },
+        "examples/order-management/dotnet-lib-core/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "7d2e24a55a5a3833d91b0a2788d2fd8c6efa3489b3f369413f4ee36f6a06364d"
+        },
+        "examples/order-management/dotnet-lib-core/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "35c79fed4eeaae2d087c9525711a811dd37621df56836850eabae3450d681687"
+        },
+        "examples/order-management/dotnet-lib-core/Models/CommercePlatform.cs": {
+          "emittedPath": "Models/CommercePlatform.cs",
+          "sha256": "28e5bc33eceba0ed9c95ce2fbe73ad4e7d6e2dbbaa1b8305acca4444ae079a37"
+        },
+        "examples/order-management/dotnet-lib-core/Models/Customer.cs": {
+          "emittedPath": "Models/Customer.cs",
+          "sha256": "d8d53edc1118569a368b7e5d6a95bad86529f3405b37898d9453b7fef61b3f08"
+        },
+        "examples/order-management/dotnet-lib-core/Models/CustomerOrder.cs": {
+          "emittedPath": "Models/CustomerOrder.cs",
+          "sha256": "9e0dc1737a14be0f6e80c5a970237c3c6542e9c2bd71cb1a885ecb9fa6a9db37"
+        },
+        "examples/order-management/dotnet-lib-core/Models/OrderLine.cs": {
+          "emittedPath": "Models/OrderLine.cs",
+          "sha256": "3b11e17ac6148697760d34ceb0b4e79f7645aed077da54032f97b744fdbd918f"
+        },
+        "examples/order-management/dotnet-lib-core/Models/OrderSearchPreset.cs": {
+          "emittedPath": "Models/OrderSearchPreset.cs",
+          "sha256": "02084036e4eaf75dbced4ffac6184a47b9c82aa8796582ef24cef4d5dd489a59"
+        },
+        "examples/order-management/dotnet-lib-core/Models/OrderStatus.cs": {
+          "emittedPath": "Models/OrderStatus.cs",
+          "sha256": "9860e003707e68329dd015752bdf6f7230d0251009a29c8c04c20275890034ce"
+        },
+        "examples/order-management/dotnet-lib-core/Models/Product.cs": {
+          "emittedPath": "Models/Product.cs",
+          "sha256": "6b483664b188a439b6193c9504afe0b7486c417a82ddda92dc7ded69c3498727"
+        },
+        "examples/order-management/dotnet-lib-core/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "a8b1d8a5250a7d326bc4ba30f8a0e1e7f1c0278097b81d0c0b2321e33604a7c7"
+        },
+        "examples/order-management/dotnet-lib-core/Requests/CommercePlatformRequest.cs": {
+          "emittedPath": "Requests/CommercePlatformRequest.cs",
+          "sha256": "7a1349b2df15f2d44000f4759e66e619ed831c5bb8c1a7908161e0e5cab38114"
+        },
+        "examples/order-management/dotnet-lib-core/Requests/CustomerOrderRequest.cs": {
+          "emittedPath": "Requests/CustomerOrderRequest.cs",
+          "sha256": "bbdee4e22087b1a1cd14352b384300e96c7dbc4b7fb73e213c02a9fdc5f53d54"
+        },
+        "examples/order-management/dotnet-lib-core/Requests/CustomerRequest.cs": {
+          "emittedPath": "Requests/CustomerRequest.cs",
+          "sha256": "0be76fd20a6ef588ec55fe07bba8728300e43f2992467a8617d779427a9654cc"
+        },
+        "examples/order-management/dotnet-lib-core/Requests/OrderLineRequest.cs": {
+          "emittedPath": "Requests/OrderLineRequest.cs",
+          "sha256": "dc539816ff3a1ad305683b3d3112c77c012e67067b79f7a0cacd78deaccc0454"
+        },
+        "examples/order-management/dotnet-lib-core/Requests/OrderSearchPresetRequest.cs": {
+          "emittedPath": "Requests/OrderSearchPresetRequest.cs",
+          "sha256": "a4514a8b3bc244d015cfbef5520c5c287040b69c2dfe5f7f86b46bcdd9edec62"
+        },
+        "examples/order-management/dotnet-lib-core/Requests/OrderStatusRequest.cs": {
+          "emittedPath": "Requests/OrderStatusRequest.cs",
+          "sha256": "aad69cf75fb9973e607da06f565f24df73401ebf94d9e1a44c9c2345d3d8dde3"
+        },
+        "examples/order-management/dotnet-lib-core/Requests/ProductRequest.cs": {
+          "emittedPath": "Requests/ProductRequest.cs",
+          "sha256": "769290df0c4de9d73c6aaf48ef4e325a0bfa8e969c97102e4e5650001454dd63"
+        },
+        "examples/order-management/dotnet-lib-core/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135"
+        },
+        "examples/order-management/dotnet-lib-core/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "82f1556c56fd3ed10f2e947da68d0defb73215bf2192ccd213cc9c7e8eae9b95"
+        },
+        "examples/order-management/dotnet-lib-core/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "31405751e4401502c2c62606fbef4bf7319675863392872f90e3903a2d0f51a1"
+        }
+      },
+      "model": "examples/order-management/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 8,
+        "generatedManifestSha256": "7f05186e25090042fe2302753e5806c5e5e18f7f3cdeadbdf663604cede879ca",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/order-management/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "8b11ee844c2be184e194d8116994fb5fe95299dd593bfed83ec06d71ada0411d",
+        "producerReceiptSha256": "b8a1cf164cc00fe22377ef2a33c63b3b6fda01f851da5ede90d082db09c9449e",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/order-management/dotnet-lib-core/order-management-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "a650ed251965fe0e05c9a94b2d0e975e797ffc581a8a8b6a2a4621913ef1b764",
+      "destination": "examples/scalar-type-probe/generated",
+      "generatedFiles": {
+        "examples/scalar-type-probe/generated/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94"
+        },
+        "examples/scalar-type-probe/generated/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "d0afa82208cf185d0a9127011499a213032a95a48afe57ba90c017cc73b69fd1"
+        },
+        "examples/scalar-type-probe/generated/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2"
+        },
+        "examples/scalar-type-probe/generated/Models/ScalarTypeProbe.cs": {
+          "emittedPath": "Models/ScalarTypeProbe.cs",
+          "sha256": "e81fa105a203d9635666c1048855d0faae121b7a1819d86974444126551c684e"
+        },
+        "examples/scalar-type-probe/generated/Models/TypePlatform.cs": {
+          "emittedPath": "Models/TypePlatform.cs",
+          "sha256": "718ae63d666414e3d4d45e9795dceff090c5e628d9b1962958f1b97c776097fb"
+        },
+        "examples/scalar-type-probe/generated/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
+        },
+        "examples/scalar-type-probe/generated/Requests/ScalarTypeProbeRequest.cs": {
+          "emittedPath": "Requests/ScalarTypeProbeRequest.cs",
+          "sha256": "a33d06d16e4c1930a06852516a24e661a5dd9efa07cc04020761dd10dd2d15f5"
+        },
+        "examples/scalar-type-probe/generated/Requests/TypePlatformRequest.cs": {
+          "emittedPath": "Requests/TypePlatformRequest.cs",
+          "sha256": "696bacd9ce39936d9819d163174bd1640d3230d8da148bd971eb5f292f702e04"
+        },
+        "examples/scalar-type-probe/generated/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163"
+        },
+        "examples/scalar-type-probe/generated/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "ce4ae61861d89991e89b2762d48bb448ad04ad18853c9c5d5ea4e0c7ac093bab"
+        },
+        "examples/scalar-type-probe/generated/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "84e6e6a9d56404f3923357514c795575e617b670ac6ea413306a4203b80ff14e"
+        }
+      },
+      "model": "examples/scalar-type-probe/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "d4a280109425e47f92eb60f271ceafb967b9c2f85abee39db03fe71b52fb6378",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/scalar-type-probe/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
+        "producerReceiptSha256": "ccb776408256776a29883cdfae44d3141b8489f7cb876e6ea686a6cdc14b372c",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/scalar-type-probe/generated/scalar-type-conformance-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "612247a01e69972e26efd0b18ef39f1211bac24ad17075d123e3ec79aa9bb335",
+      "destination": "examples/school-management",
+      "generatedFiles": {
+        "examples/school-management/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788"
+        },
+        "examples/school-management/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "5331337c0dcd075e4db592f5cbae009fbf194ef5bf2701ac37ff3219c84fd674"
+        },
+        "examples/school-management/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b"
+        },
+        "examples/school-management/Models/Platform.cs": {
+          "emittedPath": "Models/Platform.cs",
+          "sha256": "573f2005da8ef3141798bdcd4d7d8458fa6afaaaeb6697614db9314b7f8555fb"
+        },
+        "examples/school-management/Models/School.cs": {
+          "emittedPath": "Models/School.cs",
+          "sha256": "a73200863f93caeb778b160cf44b949445934c34eaf2d1b33c955ff777324fed"
+        },
+        "examples/school-management/Models/SchoolType.cs": {
+          "emittedPath": "Models/SchoolType.cs",
+          "sha256": "3b6e11348d1fb957b95c81832624de2a41b5338188dd0bf2f0e08fc0f3f03a8b"
+        },
+        "examples/school-management/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
+        },
+        "examples/school-management/Requests/PlatformRequest.cs": {
+          "emittedPath": "Requests/PlatformRequest.cs",
+          "sha256": "8be18eb89c10c961275d8bec7ac9b71b5fa552e4cc6e515677a02d016549975a"
+        },
+        "examples/school-management/Requests/SchoolRequest.cs": {
+          "emittedPath": "Requests/SchoolRequest.cs",
+          "sha256": "4879d4784a630975dc3c3a87845725f43474e02b0ece73b70b3c4ee27116a869"
+        },
+        "examples/school-management/Requests/SchoolTypeRequest.cs": {
+          "emittedPath": "Requests/SchoolTypeRequest.cs",
+          "sha256": "7251586aeec9a2449953040c087e5c77d86b39add656cfab60e2b0bcb847a74a"
+        },
+        "examples/school-management/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d"
+        },
+        "examples/school-management/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71"
+        },
+        "examples/school-management/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "e71643a0e395daf060883f2fb6752d0c6645884dffabd2934e2cabb6c90f0f92"
+        }
+      },
+      "model": "examples/school-management/models/school-model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "fbc9a52dd67b099fc913af7365cf50e970e3c6e7141640ea36669d333e6df32c",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/school-management/models/school-model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
+        "producerReceiptSha256": "9cc42bebfeebe75f562138cd690abd08cd1611393d01023c464b146f5fcadbd8",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/school-management/school-management-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "18a5f17ae5ae77884a563fd4b1c8721cfebbbf21045e3d80db4b5ee9618563f9",
+      "destination": "examples/task_board/TaskBoardExample/Generated",
+      "generatedFiles": {
+        "examples/task_board/TaskBoardExample/Generated/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "2709673b9edef448ce134a160cf76cd129f84dbdac2e68c5c0f3df84d85985d8"
+        },
+        "examples/task_board/TaskBoardExample/Generated/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "492901be63417aefe347089ee185f586b91c08bebda320d6a0e925e786d24a49"
+        },
+        "examples/task_board/TaskBoardExample/Generated/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "d136d0b7174846ae524143ea964cb3767d9b6b538ca79b2619bfe6e2b8818241"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Models/Platform.cs": {
+          "emittedPath": "Models/Platform.cs",
+          "sha256": "de0d83b620356ccdf3d67d4b0afa747f47faff207d4635a1806eb95b9b987fd9"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Models/Task.cs": {
+          "emittedPath": "Models/Task.cs",
+          "sha256": "4ceb76f550c52ac080033516ca2559c1c35c92fc463144808cd586f11fa59c87"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Models/TaskExecutionLog.cs": {
+          "emittedPath": "Models/TaskExecutionLog.cs",
+          "sha256": "e6e3af082b7d1a53060920655bd5d661c2119e48cb54a09439cddf397d3e1748"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Models/TaskStatus.cs": {
+          "emittedPath": "Models/TaskStatus.cs",
+          "sha256": "5d3398b7c6c600dacb03ab1278fdd4556e72d06b8df31190dd592e097efc7b94"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "1266be8e87db79f7c5c64cf84761745bde5ec6bea2c4aee016c28ee70c3bb58e"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Requests/PlatformRequest.cs": {
+          "emittedPath": "Requests/PlatformRequest.cs",
+          "sha256": "82ba57069d69357ccfcf08bfcccdfb1a85d8092dfc3201662837133b2f90b8ab"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Requests/TaskExecutionLogRequest.cs": {
+          "emittedPath": "Requests/TaskExecutionLogRequest.cs",
+          "sha256": "90cf19f704ed239b10578cf5371193dc8e574182088612ca4f25048668c14dc0"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Requests/TaskRequest.cs": {
+          "emittedPath": "Requests/TaskRequest.cs",
+          "sha256": "99868470efd721a0353f875e00534d82e69b784c7a9ba63d5de4f500f8f0d21b"
+        },
+        "examples/task_board/TaskBoardExample/Generated/Requests/TaskStatusRequest.cs": {
+          "emittedPath": "Requests/TaskStatusRequest.cs",
+          "sha256": "24113f1ceaadc995fc2efd9056aafef7eabfe731104906b9c821c90ff22d4e9d"
+        },
+        "examples/task_board/TaskBoardExample/Generated/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "79b420e04edf1c1e1b9f4d04ddfc0ec8a6e2a2458e6a337a8c046bacb64c3a8d"
+        },
+        "examples/task_board/TaskBoardExample/Generated/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "b49897830ad712d77109345903474626ce0ff55dce27a2d51f9fc5b9075e3ae4"
+        },
+        "examples/task_board/TaskBoardExample/Generated/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "2d0adf0f07afb650662520436bb0d16b542dd7731f9dfbcec3bb37f7ada173ac"
+        }
+      },
+      "model": "examples/task_board/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 6,
+        "generatedManifestSha256": "bb2a458b4cfd9dd0a6d59ab6ba3156f25c460237bc9c7b7a586ce668ffa9ae83",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/task_board/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "4a1ec513cb362e4c25a5bc9479fe27a2034558633a9e5760245919af7c601856",
+        "producerReceiptSha256": "98ed800b6baa0aa285a71146f9fecf0d4adabfcc2e49333df2d2b7c3df251039",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/task_board/TaskBoardExample/Generated/robot-task-board-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "8f7576fef2e7ba1f2c095b46bea4c33e6c132c3a65da7ecc4b07e1df838b9018",
+      "destination": "examples/trace-chain/lib",
+      "generatedFiles": {
+        "examples/trace-chain/lib/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889"
+        },
+        "examples/trace-chain/lib/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "c2316f54425b7e9ce53e521f5a9da1fe5f690b3ed40d68f8b52cf351652c54a7"
+        },
+        "examples/trace-chain/lib/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332"
+        },
+        "examples/trace-chain/lib/Models/CustomerOrder.cs": {
+          "emittedPath": "Models/CustomerOrder.cs",
+          "sha256": "b30071061f61635acc56e949759fd42010e5f012b68368fd3968b5e8e995b2fd"
+        },
+        "examples/trace-chain/lib/Models/OrderItem.cs": {
+          "emittedPath": "Models/OrderItem.cs",
+          "sha256": "d9775458e1c203fba6925015689b34727797aad4412fca05c3764517770bc701"
+        },
+        "examples/trace-chain/lib/Models/Payment.cs": {
+          "emittedPath": "Models/Payment.cs",
+          "sha256": "09f8297cfc6cd5c47e61cac23f64d9a9e4088a8b6eb2513cd50edb0c6197da08"
+        },
+        "examples/trace-chain/lib/Models/PaymentAttempt.cs": {
+          "emittedPath": "Models/PaymentAttempt.cs",
+          "sha256": "8f48a462fd35b8729c3ec0e52b8134bd7796fe4f0308dec1b625a81d7c21e357"
+        },
+        "examples/trace-chain/lib/Models/Platform.cs": {
+          "emittedPath": "Models/Platform.cs",
+          "sha256": "2f0a12b1156e294da943712abccddc63631a05f962aad6b94aa1f9856e118a42"
+        },
+        "examples/trace-chain/lib/Models/Shipment.cs": {
+          "emittedPath": "Models/Shipment.cs",
+          "sha256": "3f5e06cb9cf78c9127deaf2196a5988d8d027a9bbc7ab779283f41cf25818ec6"
+        },
+        "examples/trace-chain/lib/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134"
+        },
+        "examples/trace-chain/lib/Requests/CustomerOrderRequest.cs": {
+          "emittedPath": "Requests/CustomerOrderRequest.cs",
+          "sha256": "46321b4f721eaff7304b337ae837c2c8669ccc6c9a1ae6476d8325321ae3199b"
+        },
+        "examples/trace-chain/lib/Requests/OrderItemRequest.cs": {
+          "emittedPath": "Requests/OrderItemRequest.cs",
+          "sha256": "605b23cfd88cacb3405c683bfe61e423df21d092fecd7b6ee7e0daa9cd33a987"
+        },
+        "examples/trace-chain/lib/Requests/PaymentAttemptRequest.cs": {
+          "emittedPath": "Requests/PaymentAttemptRequest.cs",
+          "sha256": "6edc29614072837402c56f2c2b4e1286b41277a1b795e78f3b2585344d228993"
+        },
+        "examples/trace-chain/lib/Requests/PaymentRequest.cs": {
+          "emittedPath": "Requests/PaymentRequest.cs",
+          "sha256": "c4f700a6dc00d13f11264b02cfffaeae82412f7d9addcb566426b0f8d1b0398b"
+        },
+        "examples/trace-chain/lib/Requests/PlatformRequest.cs": {
+          "emittedPath": "Requests/PlatformRequest.cs",
+          "sha256": "7f099d81c57528bad993c22b719ffa5d7b81019e2ea7e320d257afb777963b98"
+        },
+        "examples/trace-chain/lib/Requests/ShipmentRequest.cs": {
+          "emittedPath": "Requests/ShipmentRequest.cs",
+          "sha256": "1acab6fb80b6941fdf4bcdeae3a62d1b63ba7e5d54460fed4a072cab48681145"
+        },
+        "examples/trace-chain/lib/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3"
+        },
+        "examples/trace-chain/lib/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "4e3a105f6a25a68a4565f8bb5addf7bb560cc2d53f113c300689986959ad8ec0"
+        },
+        "examples/trace-chain/lib/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "5267c6d37e108c1392e71d2bd7b15264e00ae97a989d98c4391d87c80c3843d4"
+        }
+      },
+      "model": "examples/trace-chain/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "c7e9e94de1b50ef1e6f76c57a435c9a40b2e03adc819a19ee383e1a8c1987095",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/trace-chain/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "c9743d776718c7b27c97792f75f492fdc99bf427e4bd0c24bf3492de6520c9a2",
+        "producerReceiptSha256": "9a8778b8d3567215d2d10e2a88042faf745f843bef7c847b5e439a55f99ef5e1",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/trace-chain/lib/trace-chain-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "fd7e02db480f6c2cfa832618d29bbd558fe9f37d2391a6bd13c7ff5c9842e625"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "6b016c87e26cae6006919cdeb5a43a0f34245820a891a6c1d0b52a04aae82051",
+      "destination": "examples/trace-chain/standard-graph/lib",
+      "generatedFiles": {
+        "examples/trace-chain/standard-graph/lib/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889"
+        },
+        "examples/trace-chain/standard-graph/lib/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "ec13382cb4d1f1caa231b879cfeaf29fc82769056a30cea35578ac25102ab826"
+        },
+        "examples/trace-chain/standard-graph/lib/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332"
+        },
+        "examples/trace-chain/standard-graph/lib/Models/CustomerOrder.cs": {
+          "emittedPath": "Models/CustomerOrder.cs",
+          "sha256": "b30071061f61635acc56e949759fd42010e5f012b68368fd3968b5e8e995b2fd"
+        },
+        "examples/trace-chain/standard-graph/lib/Models/OrderItem.cs": {
+          "emittedPath": "Models/OrderItem.cs",
+          "sha256": "d9775458e1c203fba6925015689b34727797aad4412fca05c3764517770bc701"
+        },
+        "examples/trace-chain/standard-graph/lib/Models/Payment.cs": {
+          "emittedPath": "Models/Payment.cs",
+          "sha256": "09f8297cfc6cd5c47e61cac23f64d9a9e4088a8b6eb2513cd50edb0c6197da08"
+        },
+        "examples/trace-chain/standard-graph/lib/Models/PaymentAttempt.cs": {
+          "emittedPath": "Models/PaymentAttempt.cs",
+          "sha256": "8f48a462fd35b8729c3ec0e52b8134bd7796fe4f0308dec1b625a81d7c21e357"
+        },
+        "examples/trace-chain/standard-graph/lib/Models/Platform.cs": {
+          "emittedPath": "Models/Platform.cs",
+          "sha256": "2f0a12b1156e294da943712abccddc63631a05f962aad6b94aa1f9856e118a42"
+        },
+        "examples/trace-chain/standard-graph/lib/Models/Shipment.cs": {
+          "emittedPath": "Models/Shipment.cs",
+          "sha256": "3f5e06cb9cf78c9127deaf2196a5988d8d027a9bbc7ab779283f41cf25818ec6"
+        },
+        "examples/trace-chain/standard-graph/lib/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134"
+        },
+        "examples/trace-chain/standard-graph/lib/Requests/CustomerOrderRequest.cs": {
+          "emittedPath": "Requests/CustomerOrderRequest.cs",
+          "sha256": "46321b4f721eaff7304b337ae837c2c8669ccc6c9a1ae6476d8325321ae3199b"
+        },
+        "examples/trace-chain/standard-graph/lib/Requests/OrderItemRequest.cs": {
+          "emittedPath": "Requests/OrderItemRequest.cs",
+          "sha256": "605b23cfd88cacb3405c683bfe61e423df21d092fecd7b6ee7e0daa9cd33a987"
+        },
+        "examples/trace-chain/standard-graph/lib/Requests/PaymentAttemptRequest.cs": {
+          "emittedPath": "Requests/PaymentAttemptRequest.cs",
+          "sha256": "6edc29614072837402c56f2c2b4e1286b41277a1b795e78f3b2585344d228993"
+        },
+        "examples/trace-chain/standard-graph/lib/Requests/PaymentRequest.cs": {
+          "emittedPath": "Requests/PaymentRequest.cs",
+          "sha256": "c4f700a6dc00d13f11264b02cfffaeae82412f7d9addcb566426b0f8d1b0398b"
+        },
+        "examples/trace-chain/standard-graph/lib/Requests/PlatformRequest.cs": {
+          "emittedPath": "Requests/PlatformRequest.cs",
+          "sha256": "7f099d81c57528bad993c22b719ffa5d7b81019e2ea7e320d257afb777963b98"
+        },
+        "examples/trace-chain/standard-graph/lib/Requests/ShipmentRequest.cs": {
+          "emittedPath": "Requests/ShipmentRequest.cs",
+          "sha256": "1acab6fb80b6941fdf4bcdeae3a62d1b63ba7e5d54460fed4a072cab48681145"
+        },
+        "examples/trace-chain/standard-graph/lib/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3"
+        },
+        "examples/trace-chain/standard-graph/lib/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "4e3a105f6a25a68a4565f8bb5addf7bb560cc2d53f113c300689986959ad8ec0"
+        },
+        "examples/trace-chain/standard-graph/lib/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "e26bea20b45d4a67f70f20ee228295eeaaeabbc897ac9c623060c247a490fe00"
+        }
+      },
+      "model": "examples/trace-chain/standard-graph/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "282dce8cc79bf6683dc6201cd2fcd9aaee65c59a308ed11e1e8ef9376990eb8b",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/trace-chain/standard-graph/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "242882959e9b196aa7461abc40cc743455a77798ed49fcd0f3c6b4acb2bf1ed9",
+        "producerReceiptSha256": "0c6ea50974c57cdf50d0b2d48d9c4c4a5dd8894fe40b4d6ce30715c5bed98fc5",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/trace-chain/standard-graph/lib/trace-chain-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "44eafffe5a1bb9aecc284417a993b45a4290b5b452fedcd0c728de07d14e36bd"
+        }
+      }
+    },
+    {
+      "archiveSHA256": "e2b58c57f72a215e226f5fc55b18819c6c65a4cfff2d2e4f17e5ed0086d14106",
+      "destination": "examples/trace-chain/standard-order/lib",
+      "generatedFiles": {
+        "examples/trace-chain/standard-order/lib/E.cs": {
+          "emittedPath": "E.cs",
+          "sha256": "bbd0d3fd38ce8f04ac3893ef8e376a8ab70d0b0a01e1d2039c3b265e7bc42ce6"
+        },
+        "examples/trace-chain/standard-order/lib/GeneratedRuntimeModule.cs": {
+          "emittedPath": "GeneratedRuntimeModule.cs",
+          "sha256": "a5db3e8295241e56829251ae379195a657967f79dae90b2700aa125d014ee1ad"
+        },
+        "examples/trace-chain/standard-order/lib/GeneratedSearchModels.cs": {
+          "emittedPath": "GeneratedSearchModels.cs",
+          "sha256": "9048fb8f3e24d4cad00ebff0d626589d6e57c066d1dfa75b97063b355b1191c0"
+        },
+        "examples/trace-chain/standard-order/lib/Models/Customer.cs": {
+          "emittedPath": "Models/Customer.cs",
+          "sha256": "1d568822f91fe9b55481a9491ab5c5605bd7804e1a2a2405bf20b7b8c90cb08d"
+        },
+        "examples/trace-chain/standard-order/lib/Models/CustomerOrder.cs": {
+          "emittedPath": "Models/CustomerOrder.cs",
+          "sha256": "fe78370ebfcca82b7bba2be2dc0a8507410fa84c9e6413fe86f3c556ae8acfdb"
+        },
+        "examples/trace-chain/standard-order/lib/Models/OrderItem.cs": {
+          "emittedPath": "Models/OrderItem.cs",
+          "sha256": "2d222d75a5029fddee2c6127603a16591ff38a3c024f4bf8f3b0f69bb954cda4"
+        },
+        "examples/trace-chain/standard-order/lib/Models/OrderStatus.cs": {
+          "emittedPath": "Models/OrderStatus.cs",
+          "sha256": "bc63c495568ccd30f07744173811917aaa59329dffafadee2b511e2fe10a178b"
+        },
+        "examples/trace-chain/standard-order/lib/Models/Platform.cs": {
+          "emittedPath": "Models/Platform.cs",
+          "sha256": "c5021a61ef61312f1f5dda5fe544069e060749e4248f1e1997db4700caee5765"
+        },
+        "examples/trace-chain/standard-order/lib/Q.cs": {
+          "emittedPath": "Q.cs",
+          "sha256": "7c9cdcea15557409e9e69b7957fd8dc43d15369dc63b8c3addc86f66b84fd530"
+        },
+        "examples/trace-chain/standard-order/lib/Requests/CustomerOrderRequest.cs": {
+          "emittedPath": "Requests/CustomerOrderRequest.cs",
+          "sha256": "d89633c120c6bec8d4d3107d0a63cbd78f194133d141805f8545a51fc81b98b0"
+        },
+        "examples/trace-chain/standard-order/lib/Requests/CustomerRequest.cs": {
+          "emittedPath": "Requests/CustomerRequest.cs",
+          "sha256": "482689245a14a23cae8cb6d729bf3a34725f5edd4ddf3057d51425a4b1a83c22"
+        },
+        "examples/trace-chain/standard-order/lib/Requests/OrderItemRequest.cs": {
+          "emittedPath": "Requests/OrderItemRequest.cs",
+          "sha256": "24e7feae715fa0b54a95d70fe1a9df53b684479b3cc424d85986454cbdfadb60"
+        },
+        "examples/trace-chain/standard-order/lib/Requests/OrderStatusRequest.cs": {
+          "emittedPath": "Requests/OrderStatusRequest.cs",
+          "sha256": "c02d5d1b6042d8a037b964fa0467944c0869f7f874bbf8435b581c623142a94e"
+        },
+        "examples/trace-chain/standard-order/lib/Requests/PlatformRequest.cs": {
+          "emittedPath": "Requests/PlatformRequest.cs",
+          "sha256": "0adf0368f992e93ff2c0c0bd5e6a97b3d4a766a9c5e7eae17861bead6c3ab4fe"
+        },
+        "examples/trace-chain/standard-order/lib/teaql-i18n.json": {
+          "emittedPath": "teaql-i18n.json",
+          "sha256": "ee5dc28e916a8907555d5d5a4d0e3cf2fa37aad047af37abed0800582af18d96"
+        },
+        "examples/trace-chain/standard-order/lib/teaql/checker-model.json": {
+          "emittedPath": "teaql/checker-model.json",
+          "sha256": "11e9102d94684fd30e13941514301d2cf6f20522c275cfa36eece9842ff1014e"
+        },
+        "examples/trace-chain/standard-order/lib/teaql/model-provenance.json": {
+          "emittedPath": "teaql/model-provenance.json",
+          "sha256": "72a2c1fc2a5d5c6a4469f6ca98b4499bd68ec497737b5d19f65f68bc8a7d25d9"
+        }
+      },
+      "model": "examples/trace-chain/standard-order/model.xml",
+      "origin": {
+        "evaluatedScope": "dotnet-lib-core",
+        "evaluationErrors": 0,
+        "evaluationWarnings": 0,
+        "generatedManifestSha256": "6fa0b21a4163d4af5bfb409f7a5dedbf7ef758d95368a0604491ad09ad90d723",
+        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/trace-chain/standard-order/model/receipt.json",
+        "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+        "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+        "generatorRelease": "v4.2.0",
+        "modelSha256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c",
+        "producerReceiptSha256": "9ab9aabe21724ec467887f42bd047f00eb71b788fc3badbdfa76b814c242b581",
+        "producerSource": {
+          "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+          "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+          "release": "v4.2.0"
+        }
+      },
+      "preservedApplicationFiles": {
+        "examples/trace-chain/standard-order/lib/request-tree-order-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
+          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
+        }
+      }
+    }
+  ],
+  "runtimeBaseCommit": "7889bfc5dacd86206c17f26749fefe0d01d92671",
+  "schema": "teaql.runtime-current-generated-examples/v1",
+  "sourceCodeHandEdited": false
+}

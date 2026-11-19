@@ -1,12 +1,12 @@
 {
-  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
-  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
-  "manifestSha256": "5d97c96a6ec92f8261f82387730b10dda6910fa976a17920b9145db3904a70df",
-  "producer": {
-    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
+  "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+  "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+  "generatorRelease": "v4.2.0",
+  "manifestSha256": "24a0dcd16935950b3a72d5237efd780eb56fc4248c917d9882be06b3f2ecd2df",
+  "previousManifestSha256": "c9684ea614eec3b69f879aeff2cd3b859f2f29f1cadcb456f8ab260c37916c92",
+  "previousOrigin": {
+    "commit": "7889bfc5dacd86206c17f26749fefe0d01d92671",
+    "path": "examples/expression-profiles/provenance.json"
   },
-  "previousManifestSha256": "c9684ea614eec3b69f879aeff2cd3b859f2f29f1cadcb456f8ab260c37916c92"
+  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9"
 }

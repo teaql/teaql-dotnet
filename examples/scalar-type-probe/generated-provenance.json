@@ -1,36 +1,43 @@
 {
-  "schema": "teaql.scalar-fixture-producer/v1",
-  "producer": {
-    "commit": "4966aacd94e9b254c4823bfe3da905a2d2f65138",
-    "sourceContentsSha256": "8f2c5d91303e7210630558d7c911cb6438f42b3e8cf2d03e7cc73cc090a82d4d",
-    "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  },
-  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
-  "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
-  "files": {
-    "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
-    "Requests/TypePlatformRequest.cs": "2313541648c4f4ddfdfac8b7a2291d9e4030f5104ffa13d34086f00f04424c14",
-    "Requests/ScalarTypeProbeRequest.cs": "7ff5d3f597af80f39e8e7111534a7acec375ad8815aeee209237ef8ab0275c4a",
-    "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
-    "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "GeneratedRuntimeModule.cs": "21a30d920579f0461cfd9e6f9aca5498410cb2cfc1a57c946130e701bcaf1bd0",
-    "Models/TypePlatform.cs": "544b0fb2e0f0a129c857c2ee0d6949961d25239a8f3625d724ff597a4075b0db",
-    "Models/ScalarTypeProbe.cs": "4928453621d1ae5b676e4564a3f7d2e6bd704a4495646be9a9ecb9d37698f87b",
-    "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
-    "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28"
-  },
-  "generatedCSharpEditedByHand": false,
-  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
-  "producerSource": {
-    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
-  },
-  "producerReceiptSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "generatedManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
-  "previousFixtureManifestSha256": "97c73aa5e1432acf90b653ba9712ea4f4c90cb95a0757d62622640d3b2fe523b"
+  "files": {
+    "E.cs": "2882982a8aab1b3b65d5bfe0d828cf2cfcc89ac0a27324a0105cab981f896b94",
+    "GeneratedRuntimeModule.cs": "d0afa82208cf185d0a9127011499a213032a95a48afe57ba90c017cc73b69fd1",
+    "GeneratedSearchModels.cs": "a301c99dfd10cb30ace0a4a2c383d79fa3bbdb13223f2f665fa39aae8390ddb2",
+    "Models/ScalarTypeProbe.cs": "e81fa105a203d9635666c1048855d0faae121b7a1819d86974444126551c684e",
+    "Models/TypePlatform.cs": "718ae63d666414e3d4d45e9795dceff090c5e628d9b1962958f1b97c776097fb",
+    "Q.cs": "5389eead249d582ad18e7a558f6765b3390d1f152485e5e8383e9fa24f42bf28",
+    "Requests/ScalarTypeProbeRequest.cs": "a33d06d16e4c1930a06852516a24e661a5dd9efa07cc04020761dd10dd2d15f5",
+    "Requests/TypePlatformRequest.cs": "696bacd9ce39936d9819d163174bd1640d3230d8da148bd971eb5f292f702e04",
+    "scalar-type-conformance-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+    "teaql-i18n.json": "a2b6c40ece22b6c1c4b0231036e6859c294494c3ed6db8d24d57f08448457163",
+    "teaql/checker-model.json": "ce4ae61861d89991e89b2762d48bb448ad04ad18853c9c5d5ea4e0c7ac093bab",
+    "teaql/model-provenance.json": "84e6e6a9d56404f3923357514c795575e617b670ac6ea413306a4203b80ff14e"
+  },
+  "generatedCSharpEditedByHand": false,
+  "generatedManifestSha256": "d4a280109425e47f92eb60f271ceafb967b9c2f85abee39db03fe71b52fb6378",
+  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/scalar-type-probe/model/receipt.json",
+  "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+  "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+  "generatorRelease": "v4.2.0",
+  "modelSha256": "8d3017392ffd00abbc06be2555ced27ac6360e2d05fabc4299e27a5ef8f1c762",
+  "previousFixtureManifestSha256": "0ddaadf2899c1ea99316317abdce560eb9f9733d831753176405fc44d34a4c5b",
+  "previousOrigin": {
+    "commit": "7889bfc5dacd86206c17f26749fefe0d01d92671",
+    "path": "examples/scalar-type-probe/generated-provenance.json"
+  },
+  "producer": {
+    "commit": "4966aacd94e9b254c4823bfe3da905a2d2f65138",
+    "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sourceContentsSha256": "8f2c5d91303e7210630558d7c911cb6438f42b3e8cf2d03e7cc73cc090a82d4d"
+  },
+  "producerReceiptSha256": "ccb776408256776a29883cdfae44d3141b8489f7cb876e6ea686a6cdc14b372c",
+  "producerSource": {
+    "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
+    "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
+    "release": "v4.2.0"
+  },
+  "schema": "teaql.scalar-fixture-producer/v1"
 }

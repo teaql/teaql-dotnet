@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public PlatformRequest()
@@ -166,55 +166,55 @@ namespace Generated.Requests
                 }
 
 
-                public PlatformRequest WithIdIs(long val)
+                public PlatformRequest WithIdIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithIdIsNot(long val)
+                public PlatformRequest WithIdIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithIdIn(params long[] vals)
+                public PlatformRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithIdNotIn(params long[] vals)
+                public PlatformRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithIdGreaterThan(long val)
+                public PlatformRequest WithIdGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithIdGreaterThanOrEqualTo(long val)
+                public PlatformRequest WithIdGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithIdLessThan(long val)
+                public PlatformRequest WithIdLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithIdLessThanOrEqualTo(long val)
+                public PlatformRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithIdBetween(long lower, long upper)
+                public PlatformRequest WithIdBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -243,49 +243,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public PlatformRequest WithNameIsNot(string val)
+                public PlatformRequest WithNameIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithNameIn(params string[] vals)
+                public PlatformRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithNameNotIn(params string[] vals)
+                public PlatformRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithNameGreaterThan(string val)
+                public PlatformRequest WithNameGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithNameGreaterThanOrEqualTo(string val)
+                public PlatformRequest WithNameGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithNameLessThan(string val)
+                public PlatformRequest WithNameLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithNameLessThanOrEqualTo(string val)
+                public PlatformRequest WithNameLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithNameBetween(string lower, string upper)
+                public PlatformRequest WithNameBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -349,49 +349,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("base_url", TeaqlQueryValue(val)));
                     return this;
                 }
-                public PlatformRequest WithBaseUrlIsNot(string val)
+                public PlatformRequest WithBaseUrlIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("base_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithBaseUrlIn(params string[] vals)
+                public PlatformRequest WithBaseUrlIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("base_url", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("base_url", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithBaseUrlNotIn(params string[] vals)
+                public PlatformRequest WithBaseUrlNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("base_url", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("base_url", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithBaseUrlGreaterThan(string val)
+                public PlatformRequest WithBaseUrlGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("base_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithBaseUrlGreaterThanOrEqualTo(string val)
+                public PlatformRequest WithBaseUrlGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("base_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithBaseUrlLessThan(string val)
+                public PlatformRequest WithBaseUrlLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("base_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithBaseUrlLessThanOrEqualTo(string val)
+                public PlatformRequest WithBaseUrlLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("base_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithBaseUrlBetween(string lower, string upper)
+                public PlatformRequest WithBaseUrlBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("base_url", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -444,55 +444,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeIs(long val)
+                public PlatformRequest WithCreateTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeIsNot(long val)
+                public PlatformRequest WithCreateTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeIn(params long[] vals)
+                public PlatformRequest WithCreateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeNotIn(params long[] vals)
+                public PlatformRequest WithCreateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeGreaterThan(long val)
+                public PlatformRequest WithCreateTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeGreaterThanOrEqualTo(long val)
+                public PlatformRequest WithCreateTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeLessThan(long val)
+                public PlatformRequest WithCreateTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeLessThanOrEqualTo(long val)
+                public PlatformRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithCreateTimeBetween(long lower, long upper)
+                public PlatformRequest WithCreateTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -510,55 +510,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeIs(long val)
+                public PlatformRequest WithUpdateTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeIsNot(long val)
+                public PlatformRequest WithUpdateTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeIn(params long[] vals)
+                public PlatformRequest WithUpdateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeNotIn(params long[] vals)
+                public PlatformRequest WithUpdateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeGreaterThan(long val)
+                public PlatformRequest WithUpdateTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeGreaterThanOrEqualTo(long val)
+                public PlatformRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeLessThan(long val)
+                public PlatformRequest WithUpdateTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeLessThanOrEqualTo(long val)
+                public PlatformRequest WithUpdateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithUpdateTimeBetween(long lower, long upper)
+                public PlatformRequest WithUpdateTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -576,55 +576,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public PlatformRequest WithVersionIs(long val)
+                public PlatformRequest WithVersionIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithVersionIsNot(long val)
+                public PlatformRequest WithVersionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithVersionIn(params long[] vals)
+                public PlatformRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithVersionNotIn(params long[] vals)
+                public PlatformRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public PlatformRequest WithVersionGreaterThan(long val)
+                public PlatformRequest WithVersionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithVersionGreaterThanOrEqualTo(long val)
+                public PlatformRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithVersionLessThan(long val)
+                public PlatformRequest WithVersionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithVersionLessThanOrEqualTo(long val)
+                public PlatformRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public PlatformRequest WithVersionBetween(long lower, long upper)
+                public PlatformRequest WithVersionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -736,8 +736,7 @@ namespace Generated.Requests
 
                 public PlatformRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy("id"); 
                     return this;
                 }
                 public PlatformRequest GroupByName()
@@ -748,8 +747,7 @@ namespace Generated.Requests
 
                 public PlatformRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name");
-                    _query.ProjectExpr(retName, Expr.Column("name"));
+                    _query.GroupBy("name"); 
                     return this;
                 }
                 public PlatformRequest GroupByBaseUrl()
@@ -760,8 +758,7 @@ namespace Generated.Requests
 
                 public PlatformRequest GroupByBaseUrlAs(string retName)
                 {
-                    _query.GroupBy("base_url");
-                    _query.ProjectExpr(retName, Expr.Column("base_url"));
+                    _query.GroupBy("base_url"); 
                     return this;
                 }
                 public PlatformRequest GroupByCreateTime()
@@ -772,8 +769,7 @@ namespace Generated.Requests
 
                 public PlatformRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time");
-                    _query.ProjectExpr(retName, Expr.Column("create_time"));
+                    _query.GroupBy("create_time"); 
                     return this;
                 }
                 public PlatformRequest GroupByUpdateTime()
@@ -784,8 +780,7 @@ namespace Generated.Requests
 
                 public PlatformRequest GroupByUpdateTimeAs(string retName)
                 {
-                    _query.GroupBy("update_time");
-                    _query.ProjectExpr(retName, Expr.Column("update_time"));
+                    _query.GroupBy("update_time"); 
                     return this;
                 }
                 public PlatformRequest GroupByVersion()
@@ -796,8 +791,7 @@ namespace Generated.Requests
 
                 public PlatformRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy("version"); 
                     return this;
                 }
                 public PlatformRequest SelectSchoolTypeList()
@@ -1126,29 +1120,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.Platform?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.Platform.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.Platform>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.Platform>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.Platform>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.Platform>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -1170,6 +1169,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.Platform.FromRecord(row, new EntityRoot()), request.Query),
@@ -1219,11 +1220,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("Platform").ConfigureAwait(false));
-            var entity = Generated.Models.Platform.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("Platform", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("Platform", Generated.Models.Platform.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

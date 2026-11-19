@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public TaskExecutionLogRequest()
@@ -179,55 +179,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdIs(long val)
+                public TaskExecutionLogRequest WithIdIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdIsNot(long val)
+                public TaskExecutionLogRequest WithIdIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdIn(params long[] vals)
+                public TaskExecutionLogRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdNotIn(params long[] vals)
+                public TaskExecutionLogRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdGreaterThan(long val)
+                public TaskExecutionLogRequest WithIdGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdGreaterThanOrEqualTo(long val)
+                public TaskExecutionLogRequest WithIdGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdLessThan(long val)
+                public TaskExecutionLogRequest WithIdLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdLessThanOrEqualTo(long val)
+                public TaskExecutionLogRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithIdBetween(long lower, long upper)
+                public TaskExecutionLogRequest WithIdBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -280,49 +280,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("action", TeaqlQueryValue(val)));
                     return this;
                 }
-                public TaskExecutionLogRequest WithActionIsNot(string val)
+                public TaskExecutionLogRequest WithActionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("action", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithActionIn(params string[] vals)
+                public TaskExecutionLogRequest WithActionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("action", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("action", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithActionNotIn(params string[] vals)
+                public TaskExecutionLogRequest WithActionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("action", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("action", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithActionGreaterThan(string val)
+                public TaskExecutionLogRequest WithActionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("action", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithActionGreaterThanOrEqualTo(string val)
+                public TaskExecutionLogRequest WithActionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("action", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithActionLessThan(string val)
+                public TaskExecutionLogRequest WithActionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("action", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithActionLessThanOrEqualTo(string val)
+                public TaskExecutionLogRequest WithActionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("action", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithActionBetween(string lower, string upper)
+                public TaskExecutionLogRequest WithActionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("action", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -386,49 +386,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("detail", TeaqlQueryValue(val)));
                     return this;
                 }
-                public TaskExecutionLogRequest WithDetailIsNot(string val)
+                public TaskExecutionLogRequest WithDetailIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("detail", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithDetailIn(params string[] vals)
+                public TaskExecutionLogRequest WithDetailIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("detail", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("detail", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithDetailNotIn(params string[] vals)
+                public TaskExecutionLogRequest WithDetailNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("detail", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("detail", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithDetailGreaterThan(string val)
+                public TaskExecutionLogRequest WithDetailGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("detail", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithDetailGreaterThanOrEqualTo(string val)
+                public TaskExecutionLogRequest WithDetailGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("detail", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithDetailLessThan(string val)
+                public TaskExecutionLogRequest WithDetailLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("detail", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithDetailLessThanOrEqualTo(string val)
+                public TaskExecutionLogRequest WithDetailLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("detail", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithDetailBetween(string lower, string upper)
+                public TaskExecutionLogRequest WithDetailBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("detail", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -481,55 +481,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionIs(long val)
+                public TaskExecutionLogRequest WithVersionIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionIsNot(long val)
+                public TaskExecutionLogRequest WithVersionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionIn(params long[] vals)
+                public TaskExecutionLogRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionNotIn(params long[] vals)
+                public TaskExecutionLogRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionGreaterThan(long val)
+                public TaskExecutionLogRequest WithVersionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionGreaterThanOrEqualTo(long val)
+                public TaskExecutionLogRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionLessThan(long val)
+                public TaskExecutionLogRequest WithVersionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionLessThanOrEqualTo(long val)
+                public TaskExecutionLogRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public TaskExecutionLogRequest WithVersionBetween(long lower, long upper)
+                public TaskExecutionLogRequest WithVersionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -618,8 +618,7 @@ namespace Generated.Requests
 
                 public TaskExecutionLogRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy("id"); 
                     return this;
                 }
                 public TaskExecutionLogRequest GroupByTask()
@@ -630,8 +629,7 @@ namespace Generated.Requests
 
                 public TaskExecutionLogRequest GroupByTaskAs(string retName)
                 {
-                    _query.GroupBy("task");
-                    _query.ProjectExpr(retName, Expr.Column("task"));
+                    _query.GroupBy("task"); 
                     return this;
                 }
                 public TaskExecutionLogRequest GroupByAction()
@@ -642,8 +640,7 @@ namespace Generated.Requests
 
                 public TaskExecutionLogRequest GroupByActionAs(string retName)
                 {
-                    _query.GroupBy("action");
-                    _query.ProjectExpr(retName, Expr.Column("action"));
+                    _query.GroupBy("action"); 
                     return this;
                 }
                 public TaskExecutionLogRequest GroupByDetail()
@@ -654,8 +651,7 @@ namespace Generated.Requests
 
                 public TaskExecutionLogRequest GroupByDetailAs(string retName)
                 {
-                    _query.GroupBy("detail");
-                    _query.ProjectExpr(retName, Expr.Column("detail"));
+                    _query.GroupBy("detail"); 
                     return this;
                 }
                 public TaskExecutionLogRequest GroupByVersion()
@@ -666,8 +662,7 @@ namespace Generated.Requests
 
                 public TaskExecutionLogRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy("version"); 
                     return this;
                 }
                 public TaskExecutionLogRequest FacetByTaskAs(
@@ -693,29 +688,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.TaskExecutionLog?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.TaskExecutionLog.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.TaskExecutionLog>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.TaskExecutionLog>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.TaskExecutionLog>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.TaskExecutionLog>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -737,6 +737,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.TaskExecutionLog.FromRecord(row, new EntityRoot()), request.Query),
@@ -786,11 +788,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("TaskExecutionLog").ConfigureAwait(false));
-            var entity = Generated.Models.TaskExecutionLog.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("TaskExecutionLog", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("TaskExecutionLog", Generated.Models.TaskExecutionLog.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

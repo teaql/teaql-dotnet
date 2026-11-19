@@ -12,17 +12,14 @@ internal sealed class CommercePlatformChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("CommercePlatform", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("CommercePlatform", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("CommercePlatform", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -48,17 +45,14 @@ internal sealed class CustomerChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Customer", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Customer", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Customer", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -114,17 +108,14 @@ internal sealed class CustomerOrderChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("CustomerOrder", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("CustomerOrder", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("CustomerOrder", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -160,17 +151,14 @@ internal sealed class ProductChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Product", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Product", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("Product", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -203,8 +191,7 @@ internal sealed class OrderLineChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("OrderLine", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
 
@@ -239,17 +226,14 @@ internal sealed class OrderSearchPresetChecker : IEntityChecker
         var updating = request is UpdateMutationRequest;
         var results = new List<CheckResult>();
         if (creating && (!values.TryGetValue("create_time", out var createCreateTime) || createCreateTime is Value.NullValue)) {
-            values["create_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("OrderSearchPreset", "create_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "create_time", "now", [], "create_time");
         }
 
         if (creating && (!values.TryGetValue("update_time", out var createUpdateTime) || createUpdateTime is Value.NullValue)) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("OrderSearchPreset", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
         if (updating) {
-            values["update_time"] = new Value.TimestampValue(now.ToUnixTimeMilliseconds());
-            context.RecordFixEvidence(new FixEvidence("OrderSearchPreset", "update_time", FixEvidenceSource.Clock, "graphClock"));
+            ContextFix.Apply(context, request, now, "update_time", "now", [], "update_time");
         }
 
 
@@ -502,7 +486,7 @@ public static class GeneratedRuntimeModule
         },
        ["OrderSearchPreset"] = new List<string> {
         }
-    }).WireEntity(WireFields.CreateMetadata("CommercePlatform", ["id", "name", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Customer", ["id", "name", "email", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["email"] = ["email"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderStatus", ["id", "name", "code", "color", "display_order", "commerce_platform", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["color"] = ["color"], ["display_order"] = ["display_order"], ["commerce_platform"] = ["commerce_platform"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("CustomerOrder", ["id", "order_number", "order_date", "total_amount", "status", "customer", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["order_number"] = ["order_number"], ["order_date"] = ["order_date"], ["total_amount"] = ["total_amount"], ["status"] = ["status"], ["customer"] = ["customer"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Product", ["id", "name", "sku", "image_url", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["sku"] = ["sku"], ["image_url"] = ["image_url"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderLine", ["id", "customer_order", "product", "product_name", "sku", "quantity", "commerce_platform", "create_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["product"] = ["product"], ["product_name"] = ["product_name"], ["sku"] = ["sku"], ["quantity"] = ["quantity"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderSearchPreset", ["id", "name", "filter_json", "request_id", "owner_user_id", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["filter_json"] = ["filter_json"], ["request_id"] = ["request_id"], ["owner_user_id"] = ["owner_user_id"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+    }).ContextField("CommercePlatform", "create_time", create: "now").ContextField("CommercePlatform", "update_time", create: "now", update: "now").ContextField("Customer", "create_time", create: "now").ContextField("Customer", "update_time", create: "now", update: "now").ContextField("CustomerOrder", "create_time", create: "now").ContextField("CustomerOrder", "update_time", create: "now", update: "now").ContextField("Product", "create_time", create: "now").ContextField("Product", "update_time", create: "now", update: "now").ContextField("OrderLine", "create_time", create: "now").ContextField("OrderSearchPreset", "create_time", create: "now").ContextField("OrderSearchPreset", "update_time", create: "now", update: "now").WireEntity(WireFields.CreateMetadata("CommercePlatform", ["id", "name", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Customer", ["id", "name", "email", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["email"] = ["email"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderStatus", ["id", "name", "code", "color", "display_order", "commerce_platform", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["code"] = ["code"], ["color"] = ["color"], ["display_order"] = ["display_order"], ["commerce_platform"] = ["commerce_platform"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("CustomerOrder", ["id", "order_number", "order_date", "total_amount", "status", "customer", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["order_number"] = ["order_number"], ["order_date"] = ["order_date"], ["total_amount"] = ["total_amount"], ["status"] = ["status"], ["customer"] = ["customer"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("Product", ["id", "name", "sku", "image_url", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["sku"] = ["sku"], ["image_url"] = ["image_url"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderLine", ["id", "customer_order", "product", "product_name", "sku", "quantity", "commerce_platform", "create_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["customer_order"] = ["customer_order"], ["product"] = ["product"], ["product_name"] = ["product_name"], ["sku"] = ["sku"], ["quantity"] = ["quantity"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("OrderSearchPreset", ["id", "name", "filter_json", "request_id", "owner_user_id", "commerce_platform", "create_time", "update_time", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["filter_json"] = ["filter_json"], ["request_id"] = ["request_id"], ["owner_user_id"] = ["owner_user_id"], ["commerce_platform"] = ["commerce_platform"], ["create_time"] = ["create_time"], ["update_time"] = ["update_time"], ["version"] = ["version"] })).CheckerPresentation(CheckerPresentationModel.FromJson("{\"schema\":\"teaql.checker-model/v1\",\"revision\":\"sha256:feb0a6c97f37d35282317bf77fbd60ffde5a4dc18d6f6a371fd40d2c37d6c975\",\"entities\":{\"CommercePlatform\":{\"labels\":{\"en\":\"commerce platform\"},\"fields\":[{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"customer_list\",\"targetType\":\"Customer\",\"labels\":{\"en\":\"customer\"},\"aliases\":[\"CustomerList\",\"customerList\"]},{\"name\":\"customer_order_list\",\"targetType\":\"CustomerOrder\",\"labels\":{\"en\":\"customer order\"},\"aliases\":[\"CustomerOrderList\",\"customerOrderList\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"order_line_list\",\"targetType\":\"OrderLine\",\"labels\":{\"en\":\"order line\"},\"aliases\":[\"OrderLineList\",\"orderLineList\"]},{\"name\":\"order_search_preset_list\",\"targetType\":\"OrderSearchPreset\",\"labels\":{\"en\":\"order search preset\"},\"aliases\":[\"OrderSearchPresetList\",\"orderSearchPresetList\"]},{\"name\":\"order_status_list\",\"targetType\":\"OrderStatus\",\"labels\":{\"en\":\"order status\"},\"aliases\":[\"OrderStatusList\",\"orderStatusList\"]},{\"name\":\"product_list\",\"targetType\":\"Product\",\"labels\":{\"en\":\"product\"},\"aliases\":[\"ProductList\",\"productList\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"Customer\":{\"labels\":{\"en\":\"customer\"},\"fields\":[{\"name\":\"commerce_platform\",\"targetType\":\"CommercePlatform\",\"labels\":{\"en\":\"commerce platform\"},\"aliases\":[\"CommercePlatform\",\"commercePlatform\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"customer_order_list\",\"targetType\":\"CustomerOrder\",\"labels\":{\"en\":\"customer order\"},\"aliases\":[\"CustomerOrderList\",\"customerOrderList\"]},{\"name\":\"email\",\"labels\":{\"en\":\"email\"},\"aliases\":[\"Email\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"CustomerOrder\":{\"labels\":{\"en\":\"customer order\"},\"fields\":[{\"name\":\"commerce_platform\",\"targetType\":\"CommercePlatform\",\"labels\":{\"en\":\"commerce platform\"},\"aliases\":[\"CommercePlatform\",\"commercePlatform\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"customer\",\"targetType\":\"Customer\",\"labels\":{\"en\":\"customer\"},\"aliases\":[\"Customer\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"order_date\",\"labels\":{\"en\":\"order date\"},\"aliases\":[\"OrderDate\",\"orderDate\"]},{\"name\":\"order_line_list\",\"targetType\":\"OrderLine\",\"labels\":{\"en\":\"order line\"},\"aliases\":[\"OrderLineList\",\"orderLineList\"]},{\"name\":\"order_number\",\"labels\":{\"en\":\"order number\"},\"aliases\":[\"OrderNumber\",\"orderNumber\"]},{\"name\":\"status\",\"targetType\":\"OrderStatus\",\"labels\":{\"en\":\"status\"},\"aliases\":[\"Status\"]},{\"name\":\"total_amount\",\"labels\":{\"en\":\"total amount\"},\"aliases\":[\"TotalAmount\",\"totalAmount\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"OrderLine\":{\"labels\":{\"en\":\"order line\"},\"fields\":[{\"name\":\"commerce_platform\",\"targetType\":\"CommercePlatform\",\"labels\":{\"en\":\"commerce platform\"},\"aliases\":[\"CommercePlatform\",\"commercePlatform\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"customer_order\",\"targetType\":\"CustomerOrder\",\"labels\":{\"en\":\"customer order\"},\"aliases\":[\"CustomerOrder\",\"customerOrder\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"product\",\"targetType\":\"Product\",\"labels\":{\"en\":\"product\"},\"aliases\":[\"Product\"]},{\"name\":\"product_name\",\"labels\":{\"en\":\"product name\"},\"aliases\":[\"ProductName\",\"productName\"]},{\"name\":\"quantity\",\"labels\":{\"en\":\"quantity\"},\"aliases\":[\"Quantity\"]},{\"name\":\"sku\",\"labels\":{\"en\":\"sku\"},\"aliases\":[\"Sku\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"OrderSearchPreset\":{\"labels\":{\"en\":\"order search preset\"},\"fields\":[{\"name\":\"commerce_platform\",\"targetType\":\"CommercePlatform\",\"labels\":{\"en\":\"commerce platform\"},\"aliases\":[\"CommercePlatform\",\"commercePlatform\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"filter_json\",\"labels\":{\"en\":\"filter json\"},\"aliases\":[\"FilterJson\",\"filterJson\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"owner_user_id\",\"labels\":{\"en\":\"owner user id\"},\"aliases\":[\"OwnerUserId\",\"ownerUserId\"]},{\"name\":\"request_id\",\"labels\":{\"en\":\"request id\"},\"aliases\":[\"RequestId\",\"requestId\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"OrderStatus\":{\"labels\":{\"en\":\"order status\"},\"fields\":[{\"name\":\"code\",\"labels\":{\"en\":\"code\"},\"aliases\":[\"Code\"]},{\"name\":\"color\",\"labels\":{\"en\":\"color\"},\"aliases\":[\"Color\"]},{\"name\":\"commerce_platform\",\"targetType\":\"CommercePlatform\",\"labels\":{\"en\":\"commerce platform\"},\"aliases\":[\"CommercePlatform\",\"commercePlatform\"]},{\"name\":\"customer_order_list\",\"targetType\":\"CustomerOrder\",\"labels\":{\"en\":\"customer order\"},\"aliases\":[\"CustomerOrderList\",\"customerOrderList\"]},{\"name\":\"display_order\",\"labels\":{\"en\":\"display order\"},\"aliases\":[\"DisplayOrder\",\"displayOrder\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]},\"Product\":{\"labels\":{\"en\":\"product\"},\"fields\":[{\"name\":\"commerce_platform\",\"targetType\":\"CommercePlatform\",\"labels\":{\"en\":\"commerce platform\"},\"aliases\":[\"CommercePlatform\",\"commercePlatform\"]},{\"name\":\"create_time\",\"labels\":{\"en\":\"create time\"},\"aliases\":[\"CreateTime\",\"createTime\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"image_url\",\"labels\":{\"en\":\"image url\"},\"aliases\":[\"ImageUrl\",\"imageUrl\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"order_line_list\",\"targetType\":\"OrderLine\",\"labels\":{\"en\":\"order line\"},\"aliases\":[\"OrderLineList\",\"orderLineList\"]},{\"name\":\"sku\",\"labels\":{\"en\":\"sku\"},\"aliases\":[\"Sku\"]},{\"name\":\"update_time\",\"labels\":{\"en\":\"update time\"},\"aliases\":[\"UpdateTime\",\"updateTime\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]}}}")).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
 
     private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
     {

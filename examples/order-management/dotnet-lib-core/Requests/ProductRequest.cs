@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public ProductRequest()
@@ -200,55 +200,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ProductRequest WithIdIs(long val)
+                public ProductRequest WithIdIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdIsNot(long val)
+                public ProductRequest WithIdIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdIn(params long[] vals)
+                public ProductRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithIdNotIn(params long[] vals)
+                public ProductRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithIdGreaterThan(long val)
+                public ProductRequest WithIdGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdGreaterThanOrEqualTo(long val)
+                public ProductRequest WithIdGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdLessThan(long val)
+                public ProductRequest WithIdLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdLessThanOrEqualTo(long val)
+                public ProductRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdBetween(long lower, long upper)
+                public ProductRequest WithIdBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -277,49 +277,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
                     return this;
                 }
-                public ProductRequest WithNameIsNot(string val)
+                public ProductRequest WithNameIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameIn(params string[] vals)
+                public ProductRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithNameNotIn(params string[] vals)
+                public ProductRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithNameGreaterThan(string val)
+                public ProductRequest WithNameGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameGreaterThanOrEqualTo(string val)
+                public ProductRequest WithNameGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameLessThan(string val)
+                public ProductRequest WithNameLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameLessThanOrEqualTo(string val)
+                public ProductRequest WithNameLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameBetween(string lower, string upper)
+                public ProductRequest WithNameBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -383,49 +383,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("sku", TeaqlQueryValue(val)));
                     return this;
                 }
-                public ProductRequest WithSkuIsNot(string val)
+                public ProductRequest WithSkuIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("sku", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuIn(params string[] vals)
+                public ProductRequest WithSkuIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("sku", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("sku", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithSkuNotIn(params string[] vals)
+                public ProductRequest WithSkuNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("sku", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("sku", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithSkuGreaterThan(string val)
+                public ProductRequest WithSkuGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("sku", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuGreaterThanOrEqualTo(string val)
+                public ProductRequest WithSkuGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("sku", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuLessThan(string val)
+                public ProductRequest WithSkuLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("sku", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuLessThanOrEqualTo(string val)
+                public ProductRequest WithSkuLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("sku", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuBetween(string lower, string upper)
+                public ProductRequest WithSkuBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("sku", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -489,49 +489,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("image_url", TeaqlQueryValue(val)));
                     return this;
                 }
-                public ProductRequest WithImageUrlIsNot(string val)
+                public ProductRequest WithImageUrlIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("image_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlIn(params string[] vals)
+                public ProductRequest WithImageUrlIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("image_url", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("image_url", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlNotIn(params string[] vals)
+                public ProductRequest WithImageUrlNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("image_url", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("image_url", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlGreaterThan(string val)
+                public ProductRequest WithImageUrlGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("image_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlGreaterThanOrEqualTo(string val)
+                public ProductRequest WithImageUrlGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("image_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlLessThan(string val)
+                public ProductRequest WithImageUrlLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("image_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlLessThanOrEqualTo(string val)
+                public ProductRequest WithImageUrlLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("image_url", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlBetween(string lower, string upper)
+                public ProductRequest WithImageUrlBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("image_url", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -608,55 +608,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeIs(long val)
+                public ProductRequest WithCreateTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeIsNot(long val)
+                public ProductRequest WithCreateTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeIn(params long[] vals)
+                public ProductRequest WithCreateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeNotIn(params long[] vals)
+                public ProductRequest WithCreateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeGreaterThan(long val)
+                public ProductRequest WithCreateTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeGreaterThanOrEqualTo(long val)
+                public ProductRequest WithCreateTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeLessThan(long val)
+                public ProductRequest WithCreateTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeLessThanOrEqualTo(long val)
+                public ProductRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeBetween(long lower, long upper)
+                public ProductRequest WithCreateTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -674,55 +674,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeIs(long val)
+                public ProductRequest WithUpdateTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeIsNot(long val)
+                public ProductRequest WithUpdateTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeIn(params long[] vals)
+                public ProductRequest WithUpdateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeNotIn(params long[] vals)
+                public ProductRequest WithUpdateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeGreaterThan(long val)
+                public ProductRequest WithUpdateTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeGreaterThanOrEqualTo(long val)
+                public ProductRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeLessThan(long val)
+                public ProductRequest WithUpdateTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeLessThanOrEqualTo(long val)
+                public ProductRequest WithUpdateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeBetween(long lower, long upper)
+                public ProductRequest WithUpdateTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -740,55 +740,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ProductRequest WithVersionIs(long val)
+                public ProductRequest WithVersionIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionIsNot(long val)
+                public ProductRequest WithVersionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionIn(params long[] vals)
+                public ProductRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithVersionNotIn(params long[] vals)
+                public ProductRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithVersionGreaterThan(long val)
+                public ProductRequest WithVersionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionGreaterThanOrEqualTo(long val)
+                public ProductRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionLessThan(long val)
+                public ProductRequest WithVersionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionLessThanOrEqualTo(long val)
+                public ProductRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionBetween(long lower, long upper)
+                public ProductRequest WithVersionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -913,8 +913,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy("id"); 
                     return this;
                 }
                 public ProductRequest GroupByName()
@@ -925,8 +924,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name");
-                    _query.ProjectExpr(retName, Expr.Column("name"));
+                    _query.GroupBy("name"); 
                     return this;
                 }
                 public ProductRequest GroupBySku()
@@ -937,8 +935,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupBySkuAs(string retName)
                 {
-                    _query.GroupBy("sku");
-                    _query.ProjectExpr(retName, Expr.Column("sku"));
+                    _query.GroupBy("sku"); 
                     return this;
                 }
                 public ProductRequest GroupByImageUrl()
@@ -949,8 +946,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupByImageUrlAs(string retName)
                 {
-                    _query.GroupBy("image_url");
-                    _query.ProjectExpr(retName, Expr.Column("image_url"));
+                    _query.GroupBy("image_url"); 
                     return this;
                 }
                 public ProductRequest GroupByCommercePlatform()
@@ -961,8 +957,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupByCommercePlatformAs(string retName)
                 {
-                    _query.GroupBy("commerce_platform");
-                    _query.ProjectExpr(retName, Expr.Column("commerce_platform"));
+                    _query.GroupBy("commerce_platform"); 
                     return this;
                 }
                 public ProductRequest GroupByCreateTime()
@@ -973,8 +968,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time");
-                    _query.ProjectExpr(retName, Expr.Column("create_time"));
+                    _query.GroupBy("create_time"); 
                     return this;
                 }
                 public ProductRequest GroupByUpdateTime()
@@ -985,8 +979,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupByUpdateTimeAs(string retName)
                 {
-                    _query.GroupBy("update_time");
-                    _query.ProjectExpr(retName, Expr.Column("update_time"));
+                    _query.GroupBy("update_time"); 
                     return this;
                 }
                 public ProductRequest GroupByVersion()
@@ -997,8 +990,7 @@ namespace Generated.Requests
 
                 public ProductRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy("version"); 
                     return this;
                 }
                 public ProductRequest SelectOrderLineList()
@@ -1181,29 +1173,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.Product?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.Product.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.Product>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.Product>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.Product>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.Product>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -1225,6 +1222,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.Product.FromRecord(row, new EntityRoot()), request.Query),
@@ -1274,11 +1273,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("Product").ConfigureAwait(false));
-            var entity = Generated.Models.Product.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("Product", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("Product", Generated.Models.Product.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 
