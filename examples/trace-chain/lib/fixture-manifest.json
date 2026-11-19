@@ -21,26 +21,26 @@
     "Requests/ShipmentRequest.cs": "1acab6fb80b6941fdf4bcdeae3a62d1b63ba7e5d54460fed4a072cab48681145",
     "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
     "teaql/checker-model.json": "4e3a105f6a25a68a4565f8bb5addf7bb560cc2d53f113c300689986959ad8ec0",
-    "teaql/model-provenance.json": "1716a8cf763ca82ed6ee28c3a780b9e4172bbe5dfdfc5d17f5f0028c655a6f55",
+    "teaql/model-provenance.json": "90311071c90e39a1d7849b5828fa3e05e138bf41f8ba73a082af73f5af3bf2a0",
     "trace-chain-service-lib.csproj": "fd7e02db480f6c2cfa832618d29bbd558fe9f37d2391a6bd13c7ff5c9842e625"
   },
-  "generatedManifestSha256": "36b5b03cbf7b02e7622809f7c75b86475b33ad996c3a701de7cc802552759810",
-  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-compatibility-candidate/dotnet/trace-chain/model/receipt.json",
-  "generatorCommit": "42275522b8405f65f84a7961c66b615a427391f7",
-  "generatorJarSHA256": "6a9420e4ffd686e0813ca9c0d2ad20991fa2f8ff2e365d39148c85e79acad86e",
-  "generatorRelease": "unreleased-source-42275522",
+  "generatedManifestSha256": "5251122bec034c253c86c495b12c7bc13b3b3b9f95534709c4f699cd71d6eac0",
+  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-unified-current-source/dotnet/trace-chain/model/receipt.json",
+  "generatorCommit": "19feda8a0608d7c7e0d64c7d9ec371c9021000fd",
+  "generatorJarSHA256": "dc6e26b561f618e1f9574c5c3b4c03b7a21da9ca630cc73a78ae8ccd0d89bd7e",
+  "generatorRelease": "unreleased-source-19feda8a",
   "modelSha256": "c9743d776718c7b27c97792f75f492fdc99bf427e4bd0c24bf3492de6520c9a2",
   "modelSource": "examples/trace-chain/model.xml",
-  "previousFixtureManifestSha256": "53421219ef7bcb862eacc2cf7dd9c326ad40de53bdc69b42153b5a5f7d0b6572",
+  "previousFixtureManifestSha256": "5dd8835e9fe6ae6bd2db9146220597f3026285e3257ee7da34fb73f0b0d2d35c",
   "previousOrigin": {
-    "commit": "f3b53013447a7556de1a61f29d44cd7ae781ec4d",
+    "commit": "749e06cffccfa356f00167fce41c3bb6badb67cf",
     "path": "examples/trace-chain/lib/fixture-manifest.json"
   },
-  "producerReceiptSha256": "35a88cbb7997c1c7f5a196059909bf311a6078ad02c91d283fd9a17c0d70fb68",
+  "producerReceiptSha256": "840fbed9745d8793e2fb15c5babeb48349b7b298924797b552b6c9ad53a35836",
   "producerSource": {
-    "commit": "42275522b8405f65f84a7961c66b615a427391f7",
-    "jarSHA256": "6a9420e4ffd686e0813ca9c0d2ad20991fa2f8ff2e365d39148c85e79acad86e",
-    "release": "unreleased-source-42275522"
+    "commit": "19feda8a0608d7c7e0d64c7d9ec371c9021000fd",
+    "jarSHA256": "dc6e26b561f618e1f9574c5c3b4c03b7a21da9ca630cc73a78ae8ccd0d89bd7e",
+    "release": "unreleased-source-19feda8a"
   },
   "schema": "teaql.retained-example-fixture/v1"
 }

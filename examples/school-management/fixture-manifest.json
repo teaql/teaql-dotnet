@@ -16,25 +16,25 @@
     "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
     "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
     "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
-    "teaql/model-provenance.json": "fabf54fdec2266a50b5d626f02c1d0ee6c7504c1b669598c15f723337a6fb7d2"
+    "teaql/model-provenance.json": "d74ee1c7e93db13222a84a3be79a99b1276b36ea7f5b030917fa8c0eaa27314a"
   },
-  "generatedManifestSha256": "dff1f9819aa5e11afa40aa3bd3bf54eceaf4e01fbe4991feba98a99f2dc67031",
-  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-compatibility-candidate/dotnet/school-management/models/school-model/receipt.json",
-  "generatorCommit": "42275522b8405f65f84a7961c66b615a427391f7",
-  "generatorJarSHA256": "6a9420e4ffd686e0813ca9c0d2ad20991fa2f8ff2e365d39148c85e79acad86e",
-  "generatorRelease": "unreleased-source-42275522",
+  "generatedManifestSha256": "0caf9731670b42a1d84a0f40cfa089fa84d300f636e989ee5597b852e07ae579",
+  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-unified-current-source/dotnet/school-management/models/school-model/receipt.json",
+  "generatorCommit": "19feda8a0608d7c7e0d64c7d9ec371c9021000fd",
+  "generatorJarSHA256": "dc6e26b561f618e1f9574c5c3b4c03b7a21da9ca630cc73a78ae8ccd0d89bd7e",
+  "generatorRelease": "unreleased-source-19feda8a",
   "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
   "modelSource": "examples/school-management/models/school-model.xml",
-  "previousFixtureManifestSha256": "f705a9502e8e33897d9eb8e19b702173a3fa5823230da5d2e2e94b6b9cbc77ab",
+  "previousFixtureManifestSha256": "9844a2e05b5fa9174c25bdc0ab0f02ea178daaafba370d1dcfec1cccdacfa1f3",
   "previousOrigin": {
-    "commit": "f3b53013447a7556de1a61f29d44cd7ae781ec4d",
+    "commit": "749e06cffccfa356f00167fce41c3bb6badb67cf",
     "path": "examples/school-management/fixture-manifest.json"
   },
-  "producerReceiptSha256": "a11ecaad42d61136f8fc8bf4e2d94a6dd2d66546a943c25790b6eb842f438de1",
+  "producerReceiptSha256": "15302a42b935f5b83faa3ac01bba5bd98618f3441150a9ed202c18f8c24042d9",
   "producerSource": {
-    "commit": "42275522b8405f65f84a7961c66b615a427391f7",
-    "jarSHA256": "6a9420e4ffd686e0813ca9c0d2ad20991fa2f8ff2e365d39148c85e79acad86e",
-    "release": "unreleased-source-42275522"
+    "commit": "19feda8a0608d7c7e0d64c7d9ec371c9021000fd",
+    "jarSHA256": "dc6e26b561f618e1f9574c5c3b4c03b7a21da9ca630cc73a78ae8ccd0d89bd7e",
+    "release": "unreleased-source-19feda8a"
   },
   "schema": "teaql.retained-example-fixture/v1"
 }
