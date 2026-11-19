@@ -1,11 +1,11 @@
 {
-  "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
-  "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
-  "generatorRelease": "v4.2.0",
-  "manifestSha256": "24a0dcd16935950b3a72d5237efd780eb56fc4248c917d9882be06b3f2ecd2df",
+  "generatorCommit": "42275522b8405f65f84a7961c66b615a427391f7",
+  "generatorJarSHA256": "6a9420e4ffd686e0813ca9c0d2ad20991fa2f8ff2e365d39148c85e79acad86e",
+  "generatorRelease": "unreleased-source-42275522",
+  "manifestSha256": "9034bf78099904330eec7664026ee8e420dfd82652098912c2d48af9d8242e94",
   "previousManifestSha256": "c9684ea614eec3b69f879aeff2cd3b859f2f29f1cadcb456f8ab260c37916c92",
   "previousOrigin": {
-    "commit": "7889bfc5dacd86206c17f26749fefe0d01d92671",
+    "commit": "f3b53013447a7556de1a61f29d44cd7ae781ec4d",
     "path": "examples/expression-profiles/provenance.json"
   },
   "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9"

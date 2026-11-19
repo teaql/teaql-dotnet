@@ -457,13 +457,13 @@ namespace Generated.Models
                     {
                         entity.MarkLoaded("RequiredTime");
                         if (requiredTimeValue.Raw != null)
-                            entity.RequiredTime = requiredTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(requiredTimeValue.Raw), System.Globalization.CultureInfo.InvariantCulture);
+                            entity.RequiredTime = requiredTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(requiredTimeValue.Raw) ?? throw new InvalidOperationException("Time value requires a non-null string"), System.Globalization.CultureInfo.InvariantCulture);
                     }
                     if (record.TryGetValue("optional_time", out var optionalTimeValue))
                     {
                         entity.MarkLoaded("OptionalTime");
                         if (optionalTimeValue.Raw != null)
-                            entity.OptionalTime = optionalTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(optionalTimeValue.Raw), System.Globalization.CultureInfo.InvariantCulture);
+                            entity.OptionalTime = optionalTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(optionalTimeValue.Raw) ?? throw new InvalidOperationException("Time value requires a non-null string"), System.Globalization.CultureInfo.InvariantCulture);
                     }
                     if (record.TryGetValue("required_datetime", out var requiredDatetimeValue))
                     {
@@ -882,10 +882,10 @@ namespace Generated.Models
                         this.OptionalDate = optionalDateValue.Raw == null ? null : TeaqlDateTime(optionalDateValue);
 
                     if (record.TryGetValue("required_time", out var requiredTimeValue))
-                        this.RequiredTime = requiredTimeValue.Raw == null ? null : requiredTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(requiredTimeValue.Raw), System.Globalization.CultureInfo.InvariantCulture);
+                        this.RequiredTime = requiredTimeValue.Raw == null ? null : requiredTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(requiredTimeValue.Raw) ?? throw new InvalidOperationException("Time value requires a non-null string"), System.Globalization.CultureInfo.InvariantCulture);
 
                     if (record.TryGetValue("optional_time", out var optionalTimeValue))
-                        this.OptionalTime = optionalTimeValue.Raw == null ? null : optionalTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(optionalTimeValue.Raw), System.Globalization.CultureInfo.InvariantCulture);
+                        this.OptionalTime = optionalTimeValue.Raw == null ? null : optionalTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(optionalTimeValue.Raw) ?? throw new InvalidOperationException("Time value requires a non-null string"), System.Globalization.CultureInfo.InvariantCulture);
 
                     if (record.TryGetValue("required_datetime", out var requiredDatetimeValue))
                         this.RequiredDatetime = requiredDatetimeValue.Raw == null ? null : TeaqlDateTime(requiredDatetimeValue);
