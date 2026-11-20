@@ -52,14 +52,21 @@ catch (MutationPolicyException error) when (error.Message.Contains(denialCode, S
 }
 Require(policy.Reviewed.SequenceEqual(new[] { 2, 2 }), "expected complete review of both submissions");
 Require(audit.Events.Count == 2, "expected audits for only the approved customer and contact");
-foreach (var entry in audit.Events)
+var snapshots = audit.Events.Select(entry => entry["mutationGovernance"] as IReadOnlyDictionary<string, object?>
+    ?? throw new InvalidOperationException("the approved graph identity is missing from the audit")).ToArray();
+foreach (var snapshot in snapshots)
 {
-    Require(entry.TryGetValue("mutationGovernance", out var value)
-        && value is IReadOnlyDictionary<string, object?> governance
-        && Equals(governance["policyId"], identity.Id)
-        && Equals(governance["approvalStatus"], MutationPolicyApprovalStatus.Approved.ToString()),
-        "the approved graph identity is missing from the audit");
+    Require(Equals(snapshot["requestKey"], policyKey)
+        && Equals(snapshot["policyId"], identity.Id)
+        && Equals(snapshot["policyVersion"], identity.Version)
+        && Equals(snapshot["policyFingerprint"], identity.Fingerprint)
+        && Equals(snapshot["approvalStatus"], MutationPolicyApprovalStatus.Approved.ToString())
+        && Equals(snapshot["operationCount"], 2),
+        "both audit events must describe the same approved two-operation plan");
 }
+Require(snapshots[0]["executionId"] is string executionId && executionId.Length > 0
+    && Equals(snapshots[0]["executionId"], snapshots[1]["executionId"]),
+    "the two audits came from distinct governance snapshots");
 
 var found = await ProfileByEmail(context, email)
     ?? throw new InvalidOperationException("the approved profile was not persisted");
@@ -79,7 +86,7 @@ Require(deniedContact is null, "the denied contact was persisted");
 Console.WriteLine("CUSTOMER_APPROVAL=" + JsonSerializer.Serialize(new
 {
     round = label, customerId, email, contactId = contact.Id, channel,
-    reviewedOperations = policy.Reviewed, approvedAudits = audit.Events.Count, denial = denialCode,
+    reviewedOperations = policy.Reviewed, approvedAudits = audit.Events.Count, sameGovernance = true, denial = denialCode,
 }));
 
 static async Task<Customer> PrepareCustomer(UserContext context, string email, string channel)
