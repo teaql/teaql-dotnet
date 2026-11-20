@@ -1,0 +1,42 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/schema-customization",
+  "library": {
+    "generatedFilesManifestSHA256": "53a5a397425244a18d078685c4e135efbf1284197e564f7175a9bccb57b57910",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "5b1004dad1635a7fa24a1e8539a704d7a2c271a3af0b731b60cb8f243db4d322"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build",
+      "jarSHA256": "029f602cf0e2de4ec0910495c340fbeb41f11772b6aca875569f498811158e7d",
+      "qualificationReceiptSHA256": "1012520de60d49cfc1e45c7e08fcf204dd2db36a163909e1e36752065a31047a",
+      "sourceCommit": "99d6bde2351d79b7d8b1b1c5cbc78c5dc777b6f2",
+      "tag": "unreleased-source-99d6bde2"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/customer-approval-first-order-school-schema-generation/receipt.json",
+    "receiptSHA256": "0dfc2d5e5752541338c6f29613e7fa50fc28465c9ad059f9aacffce3c3d60424"
+  },
+  "scene": "Register a school through a custom schema executor",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "implemented-pending-native-qualification",
+  "verification": [
+    "dotnet-app-console/Program.cs"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "calibration/Program.cs",
+      "calibration/schema-customization.csproj",
+      "school-schema-service-console.csproj",
+      "calibration/README.md"
+    ],
+    "generatedFilesManifestSHA256": "d009e7992a57931754b810b04200f1c661784d00fb0b770f4779c155bf437eef",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/mutation-policy",
+  "library": {
+    "generatedFilesManifestSHA256": "bf1b0400600948ab4405c75b6bf63c1c328679cc0cb3930187389269fcdfc725",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "55d87208e2f03d597c194ec4c976a446807f2a004547fec55b5916608a135628"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build",
+      "jarSHA256": "029f602cf0e2de4ec0910495c340fbeb41f11772b6aca875569f498811158e7d",
+      "qualificationReceiptSHA256": "1012520de60d49cfc1e45c7e08fcf204dd2db36a163909e1e36752065a31047a",
+      "sourceCommit": "99d6bde2351d79b7d8b1b1c5cbc78c5dc777b6f2",
+      "tag": "unreleased-source-99d6bde2"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/customer-approval-first-order-school-schema-generation/receipt.json",
+    "receiptSHA256": "0dfc2d5e5752541338c6f29613e7fa50fc28465c9ad059f9aacffce3c3d60424"
+  },
+  "scene": "Approve a customer profile and contact preference",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "implemented-pending-native-qualification",
+  "verification": [
+    "dotnet-app-console/Program.cs"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "calibration/Program.cs",
+      "calibration/mutation-policy.csproj",
+      "customer-onboarding-service-console.csproj",
+      "calibration/README.md"
+    ],
+    "generatedFilesManifestSHA256": "7d8d0166d155cb75ded9e24ac07900d5d3b66f9108a7c6980a25d7c181eb3227",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

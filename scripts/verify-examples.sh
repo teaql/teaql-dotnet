@@ -39,9 +39,15 @@ TEAQL_BUSINESS_ID_KEY_V1_HEX=000102030405060708090a0b0c0d0e0f1011121314151617181
 TEAQL_PURCHASE_NUMBERING_ROUND=inventory TEAQL_PURCHASE_NUMBERING_DATABASE="$inventory_evidence/business-id.sqlite" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/business-id/dotnet-app-console/purchase-order-numbering-console.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/runtime-logging/runtime-logging.csproj"
-dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/schema-customization/schema-customization.csproj"
+dotnet run --project "$repo/examples/schema-customization/dotnet-app-console/calibration/schema-customization.csproj"
+TEAQL_SHOWCASE_ROUND=inventory TEAQL_SHOWCASE_DATABASE="$inventory_evidence/school-schema.sqlite" \
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" \
+  --project "$repo/examples/schema-customization/dotnet-app-console/school-schema-service-console.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/internal-id-customization/internal-id-customization.csproj"
-dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/mutation-policy/mutation-policy.csproj"
+dotnet run --project "$repo/examples/mutation-policy/dotnet-app-console/calibration/mutation-policy.csproj"
+TEAQL_SHOWCASE_ROUND=inventory TEAQL_SHOWCASE_DATABASE="$inventory_evidence/customer-approval.sqlite" \
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" \
+  --project "$repo/examples/mutation-policy/dotnet-app-console/customer-onboarding-service-console.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/school-management/dotnet-app-console/school-management-service-console.csproj"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-school-bootstrap-example.sh"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/security-foundations/security-foundations.csproj"

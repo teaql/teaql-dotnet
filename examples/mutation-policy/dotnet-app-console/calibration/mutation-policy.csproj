@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/TeaQL.Runtime/TeaQL.Runtime.csproj" />
+    <ProjectReference Include="../../../../src/TeaQL.Runtime/TeaQL.Runtime.csproj" />
   </ItemGroup>
 </Project>
