@@ -64,7 +64,8 @@ foreach (var entry in audit.Events)
 var found = await ProfileByEmail(context, email)
     ?? throw new InvalidOperationException("the approved profile was not persisted");
 Require(found.Id == approved.Id && found.Email == email, "the stored profile does not match this approval");
-var contact = await Q.CustomerContacts().FilterByCustomer(found.Id).WithChannelIs(channel).Limit(2)
+var customerId = found.Id ?? throw new InvalidOperationException("the saved customer has no identity");
+var contact = await Q.CustomerContacts().FilterByCustomer(customerId).WithChannelIs(channel).Limit(2)
     .Comment("Read the approved contact preference")
     .Purpose("Confirm it was saved with its customer").ExecuteForOneAsync(context)
     ?? throw new InvalidOperationException("the approved customer contact was not persisted");
@@ -77,7 +78,7 @@ Require(deniedContact is null, "the denied contact was persisted");
 
 Console.WriteLine("CUSTOMER_APPROVAL=" + JsonSerializer.Serialize(new
 {
-    round = label, customerId = found.Id, email, contactId = contact.Id, channel,
+    round = label, customerId, email, contactId = contact.Id, channel,
     reviewedOperations = policy.Reviewed, approvedAudits = audit.Events.Count, denial = denialCode,
 }));
 
