@@ -30,8 +30,8 @@ TEAQL_CONTEXT_FIX_EVIDENCE_DIR="$inventory_evidence/context-derived" node "$repo
 node --test "$repo/scripts/verify-natural-messages.test.cjs"
 node "$repo/scripts/verify-natural-messages.cjs" --output "$inventory_evidence/natural-messages"
 TEAQL_GENERATED_E_PROFILE_EVIDENCE_DIR="$inventory_evidence/expression-profiles" node "$repo/examples/expression-profiles/verify-local.cjs"
-TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify.sh"
-TEAQL_EMPTY_EVIDENCE_DIR="$inventory_evidence/empty-aggregates" TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify-empty.sh"
+TEAQL_FREIGHT_QUOTE_EVIDENCE_DIR="$inventory_evidence/freight-quotes" \
+  bash "$repo/examples/scalar-type-probe/verify-freight-quotes.sh"
 bash "$repo/examples/object-storage/verify.sh"
 TEAQL_CONFORMANCE_EVIDENCE_DIR="$inventory_evidence/conformance" bash "$repo/examples/conformance/verify.sh"
 dotnet run --project "$repo/examples/business-id/dotnet-app-console/calibration/business-id.csproj"
