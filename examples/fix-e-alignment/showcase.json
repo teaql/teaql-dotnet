@@ -22,12 +22,12 @@
     "receiptSHA256": "920c683d71de38e609d2be2c3d8b7f2fb6c014e3b123edd5c4ea694fc6e91a48"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-purchase-order-native-scopes/runtime/fix-e/receipt.json",
-    "businessReceiptSHA256": "2f9e7adf3dc95c73f6cf7d0ef4406534933eea2cc080828c4c375363f38dcdc3",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-purchase-order-native-scopes/receipt.json",
-    "nativeReceiptSHA256": "3b675b44bac1bc217f7b9760910946a15b5f20a7ad80cc4b069e1429d647d3b9",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-purchase-order/runtime/fix-e/receipt.json",
+    "businessReceiptSHA256": "1f79083477ad5ad4239d1068e463398e000c01ad70aedbd7f70c35681a724779",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-purchase-order/receipt.json",
+    "nativeReceiptSHA256": "c36fe14b5b7f46d6e202669241ceb6be00716ba5338b2aa907c8ae4bf85b7da4",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "a8401eb6f5dad0db8fca0a49d50ceb0a665b8228"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "Purchase order Fix, loaded-state and transaction-safe graph mutation boundaries",
   "schema": "teaql.model-workspace-showcase/v1",
