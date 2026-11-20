@@ -626,6 +626,10 @@
           "emittedPath": "Requests/ProductRequest.cs",
           "sha256": "769290df0c4de9d73c6aaf48ef4e325a0bfa8e969c97102e4e5650001454dd63"
         },
+        "examples/order-management/dotnet-lib-core/order-management-service-lib.csproj": {
+          "emittedPath": "order-management-service-lib.csproj",
+          "sha256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        },
         "examples/order-management/dotnet-lib-core/teaql-i18n.json": {
           "emittedPath": "teaql-i18n.json",
           "sha256": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135"
@@ -655,13 +659,6 @@
           "commit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
           "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
           "release": "unreleased-source-021b1ed8"
-        }
-      },
-      "preservedApplicationFiles": {
-        "examples/order-management/dotnet-lib-core/order-management-service-lib.csproj": {
-          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
-          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
-          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
         }
       }
     },

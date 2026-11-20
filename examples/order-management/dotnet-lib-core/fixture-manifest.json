@@ -1,4 +1,5 @@
 {
+  "applicationManifestsPreserved": false,
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
   "evaluationWarnings": 8,
@@ -21,13 +22,13 @@
     "Requests/OrderSearchPresetRequest.cs": "a4514a8b3bc244d015cfbef5520c5c287040b69c2dfe5f7f86b46bcdd9edec62",
     "Requests/OrderStatusRequest.cs": "aad69cf75fb9973e607da06f565f24df73401ebf94d9e1a44c9c2345d3d8dde3",
     "Requests/ProductRequest.cs": "769290df0c4de9d73c6aaf48ef4e325a0bfa8e969c97102e4e5650001454dd63",
-    "order-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+    "order-management-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
     "teaql-i18n.json": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135",
     "teaql/checker-model.json": "82f1556c56fd3ed10f2e947da68d0defb73215bf2192ccd213cc9c7e8eae9b95",
     "teaql/model-provenance.json": "49d9c58bee8d5f8e0f85a915656d61233a99d1288ca1bd6f053a1077afec3382"
   },
   "generatedManifestSha256": "04f0c91513ae297367dcf22ef53b0da2e09ef7be5d648b552326b4015d25da67",
-  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-unified-intent-current-source/dotnet/order-management/model/receipt.json",
+  "generationReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/order-generation/dotnet/order-showcase/library/receipt.json",
   "generatorCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
   "generatorJarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
   "generatorRelease": "unreleased-source-021b1ed8",
@@ -38,7 +39,7 @@
     "commit": "05c15c780ab263d4162ff74a9960c0dcebfb61b4",
     "path": "examples/order-management/dotnet-lib-core/fixture-manifest.json"
   },
-  "producerReceiptSha256": "21ddfd804029cf23b39e0defbabfd73bd86fddab4fb9cddf52829c341242b205",
+  "producerReceiptSha256": "dd945084e5f856cec723aaf4ea8c012026971c91e9b2962fa20b3f4cfd93ab7b",
   "producerSource": {
     "commit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
     "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",

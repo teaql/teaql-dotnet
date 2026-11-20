@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../dotnet-lib-core/order-management-service-lib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="E.cs;GeneratedRuntimeModule.cs;GeneratedSearchModels.cs;Models/CommercePlatform.cs;Models/Customer.cs;Models/CustomerOrder.cs;Models/OrderLine.cs;Models/OrderSearchPreset.cs;Models/OrderStatus.cs;Models/Product.cs;Q.cs;Requests/CommercePlatformRequest.cs;Requests/CustomerOrderRequest.cs;Requests/CustomerRequest.cs;Requests/OrderLineRequest.cs;Requests/OrderSearchPresetRequest.cs;Requests/OrderStatusRequest.cs;Requests/ProductRequest.cs" />
+  </ItemGroup>
+</Project>
+
