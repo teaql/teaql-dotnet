@@ -19,7 +19,7 @@ for round in 1 2; do
   if [[ "$round" == 1 ]]; then expected=1; else expected=0; fi
   rg -q "first_seed_audits=$expected repeat_seed_audits=0" "$evidence/run-$round.log"
   if [[ "${TEAQL_TELEMETRY_ENABLED:-false}" == "true" ]]; then
-    rg -Fq 'TeaQL telemetry: enabled' "$evidence/run-$round.log"
+    rg -Fq 'TeaQL telemetry: starting standard module' "$evidence/run-$round.log"
   else
     for name in TEAQL_TELEMETRY_ENABLED TEAQL_TELEMETRY_SERVICE_NAME TEAQL_TELEMETRY_OTLP_ENDPOINT; do
       rg -q "$name" "$evidence/run-$round.log"

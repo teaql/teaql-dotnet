@@ -12,7 +12,7 @@ for round in 1 2; do
     --property:TeaQLRuntimeSourceRoot="$repo" --nologo > "$evidence/run-$round.log" 2>&1
   rg -q 'DOTNET_STANDARD_TELEMETRY_EXAMPLE PASSED first_seed_audits=1 repeat_seed_audits=0 queries=2 ordinary_sql_logs=0' "$evidence/run-$round.log"
   if [[ "${TEAQL_TELEMETRY_ENABLED:-false}" == "true" ]]; then
-    rg -Fq 'TeaQL telemetry: enabled' "$evidence/run-$round.log"
+    rg -Fq 'TeaQL telemetry: starting standard module' "$evidence/run-$round.log"
   else
     for name in TEAQL_TELEMETRY_ENABLED TEAQL_TELEMETRY_SERVICE_NAME TEAQL_TELEMETRY_OTLP_ENDPOINT; do
       rg -q "$name" "$evidence/run-$round.log"
