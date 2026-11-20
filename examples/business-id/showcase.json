@@ -22,12 +22,12 @@
     "receiptSHA256": "e65136b27d5640fa4cdd62b13413148a267ea25ae0c7947adbea2ad9121c84b4"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-purchase-order-numbering-native/runtime/business-id/receipt.json",
-    "businessReceiptSHA256": "18c789bbbff09de0fd2a63c4661c5fb785b14f6dc9534ea7eb6b58f609dfbc4f",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-purchase-order-numbering-native/receipt.json",
-    "nativeReceiptSHA256": "b78bf8f0b75067ccb3689d3433d857992a24d6ac3e3805d72035cc81e145b9cc",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-business-id/runtime/business-id/receipt.json",
+    "businessReceiptSHA256": "15a2ea5766a876ca40ec3eac7e71f7b3ce41cbfe5a36749d330d08996890be90",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-business-id/receipt.json",
+    "nativeReceiptSHA256": "2b95cd7fa9a3100bf42e4512551157586c1997355c584785f4fcf59dec8d3dd5",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "ffa5352596dc4afa01eeaadc634a4771415c6948"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "Number and re-read two purchase orders with a trusted business date",
   "schema": "teaql.model-workspace-showcase/v1",
