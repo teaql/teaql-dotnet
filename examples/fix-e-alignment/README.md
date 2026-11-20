@@ -1,5 +1,8 @@
 # Generated Q/E, Checker and graph-save regression
 
+`model.xml` owns `dotnet-lib-core` and `dotnet-app-console`. All original business probes now live under `dotnet-app-console/showcase`. The native console project compiles those application-owned files and consumes the sibling generated library. The verifier materializes those same scopes in owned scratch, runs every original assertion twice on retained stores, checks the actual built assembly and runtime origins, and removes its build tree. See `showcase.json` for current qualification state.
+
+
 Run against the runtime source in this repository:
 
 ```sh
