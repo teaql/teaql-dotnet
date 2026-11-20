@@ -21,9 +21,17 @@
     "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/customer-approval-first-order-school-schema-generation/receipt.json",
     "receiptSHA256": "0dfc2d5e5752541338c6f29613e7fa50fc28465c9ad059f9aacffce3c3d60424"
   },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-mutation-policy-shared-governance-candidate/runtime/mutation-policy/receipt.json",
+    "businessReceiptSHA256": "60ae0adb622f47cd159c083120643e8ef6d54ccc82e3279df30c94b2c9715ebc",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-mutation-policy-shared-governance-candidate/receipt.json",
+    "nativeReceiptSHA256": "8aaca1d90528224c5b287543e0a58043c42edc769d98b0d710dec0a496934aa7",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
+  },
   "scene": "Approve a customer profile and contact preference",
   "schema": "teaql.model-workspace-showcase/v1",
-  "status": "implemented-pending-native-qualification",
+  "status": "focused-verified",
   "verification": [
     "dotnet-app-console/Program.cs"
   ],
