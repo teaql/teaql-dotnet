@@ -103,6 +103,60 @@ public class MutationPolicyTests
     }
 
     [Fact]
+    public async Task AwaitedGraphLeavesShareOneSnapshotAndTheNextSaveGetsANewSnapshot()
+    {
+        var provider = new RecordingProvider();
+        var audit = new RecordingAuditSink();
+        var identity = new MutationPolicyIdentity("order-submit", "1", "sha256:approved");
+        var reviews = 0;
+        var policy = new TestPolicy(identity, plan =>
+        {
+            reviews++;
+            Assert.Equal(2, plan.Operations.Count);
+            return MutationDecision.Allowed();
+        });
+        var context = new UserContext()
+            .WithMutationPolicyRegistry(new DelegatingMutationPolicyRegistry(key => key == "Order.saveGraph" ? policy : null))
+            .WithMutationPolicyApprovalProvider(new DelegatingMutationPolicyApprovalProvider(candidate =>
+                candidate == identity ? new MutationPolicyApproval(identity, "owner", DateTimeOffset.UnixEpoch.AddSeconds(1)) : null))
+            .WithAppAuditEventSink(audit)
+            .WithDataService(provider);
+
+        for (var i = 0; i < 2; i++)
+        {
+            await context.ExecuteGraphSaveAsync("submit order and line", async graph =>
+            {
+                var order = OrderInsert();
+                var line = LineInsert();
+                graph.Preflight(order);
+                graph.Preflight(line);
+                await graph.MutateAsync(order);
+                await Task.Yield();
+                return await graph.MutateAsync(line);
+            });
+            Assert.Null(context.CurrentMutationGovernance);
+        }
+
+        Assert.Equal(2, reviews);
+        Assert.Equal(4, provider.MutationCount);
+        Assert.Equal(4, audit.Events.Count);
+        var snapshots = audit.Events.Select(entry =>
+            Assert.IsAssignableFrom<IReadOnlyDictionary<string, object?>>(entry["mutationGovernance"])).ToArray();
+        Assert.All(snapshots, snapshot =>
+        {
+            Assert.Equal("Order.saveGraph", snapshot["requestKey"]);
+            Assert.Equal(identity.Id, snapshot["policyId"]);
+            Assert.Equal(identity.Version, snapshot["policyVersion"]);
+            Assert.Equal(identity.Fingerprint, snapshot["policyFingerprint"]);
+            Assert.Equal("Approved", snapshot["approvalStatus"]);
+            Assert.Equal(2, snapshot["operationCount"]);
+        });
+        Assert.Equal(snapshots[0]["executionId"], snapshots[1]["executionId"]);
+        Assert.Equal(snapshots[2]["executionId"], snapshots[3]["executionId"]);
+        Assert.NotEqual(snapshots[0]["executionId"], snapshots[2]["executionId"]);
+    }
+
+    [Fact]
     public async Task CustomerPolicyFailsClosedWhenGraphSkipsPreflight()
     {
         var provider = new RecordingProvider();
