@@ -31,9 +31,17 @@
     "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/order-generation/receipt.json",
     "receiptSHA256": "5041246b7c9f452219d943efa393ea380ce7f7e172da739a945bb49da2ba5db2"
   },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-order-scopes/runtime/order-management/business-receipt.json",
+    "businessReceiptSHA256": "eb2e12813712930ec234d1c5fd1a3b1a8f2ae0e5bfa54fdb921304c3fc80b8d0",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-order-scopes/receipt.json",
+    "nativeReceiptSHA256": "7db3894284211fdc5dc1618ad7933251a8eea3cf9770f5a7ac76c8ec9edc61fb",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "c36279c83bfa5dd73277c7a4c62f559367fdb857"
+  },
   "scene": "Order terminal workflow with trusted business clock and reusable search",
   "schema": "teaql.model-workspace-showcase/v1",
-  "status": "implemented-pending-native-qualification",
+  "status": "focused-verified",
   "verification": [
     "bash",
     "verify.sh"
