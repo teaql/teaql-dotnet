@@ -50,8 +50,12 @@ Require(policyProbe.Calls == 0 && callbackCount == 0,
 Console.WriteLine("PASS .NET generated required-intent rejection with logs disabled and no provider");
 
 var retainedDatabase = Environment.GetEnvironmentVariable("TEAQL_SCHOOL_BOOTSTRAP_DB");
-var database = retainedDatabase ?? Path.Combine(Path.GetTempPath(), $"teaql-school-dotnet-{Guid.NewGuid():N}.sqlite");
+var retainedBusinessDatabase = Environment.GetEnvironmentVariable("TEAQL_SCHOOL_MANAGEMENT_DB");
+var ownsDatabase = retainedDatabase == null && retainedBusinessDatabase == null;
+var database = retainedDatabase ?? retainedBusinessDatabase ?? Path.Combine(Path.GetTempPath(), $"teaql-school-dotnet-{Guid.NewGuid():N}.sqlite");
 var bootstrapOnly = retainedDatabase != null;
+if (retainedBusinessDatabase != null && File.Exists(database))
+    throw new InvalidOperationException("Use a fresh School demonstration database; existing data is preserved");
 var logging = Environment.GetEnvironmentVariable("TEAQL_SCHOOL_BOOTSTRAP_LOGGING") != "off";
 try
 {
@@ -175,7 +179,7 @@ try
 }
 finally
 {
-    if (!bootstrapOnly && File.Exists(database)) File.Delete(database);
+    if (ownsDatabase && File.Exists(database)) File.Delete(database);
 }
 
 sealed class ModuleSchemaProvider(RuntimeModule module) : ISchemaProvider

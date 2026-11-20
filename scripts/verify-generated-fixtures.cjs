@@ -3,7 +3,7 @@
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'), assert = require('node:assert/strict');
 const repo = path.resolve(__dirname, '..'), sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const roots = ['examples/conformance', 'examples/trace-chain/lib', 'examples/facet-trace/lib',
-  'examples/school-management', 'examples/order-management/dotnet-lib-core',
+  'examples/school-management/dotnet-lib-core', 'examples/order-management/dotnet-lib-core',
   'examples/trace-chain/standard-graph/lib', 'examples/trace-chain/standard-order/lib',
   'examples/task_board/TaskBoardExample/Generated'];
 let files = 0;

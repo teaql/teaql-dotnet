@@ -742,57 +742,61 @@
     },
     {
       "archiveSHA256": "691b038820ce73d33846dcf6ad58822ced612c34acab891d3fe7bc837587c17c",
-      "destination": "examples/school-management",
+      "destination": "examples/school-management/dotnet-lib-core",
       "generatedFiles": {
-        "examples/school-management/E.cs": {
+        "examples/school-management/dotnet-lib-core/E.cs": {
           "emittedPath": "E.cs",
           "sha256": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788"
         },
-        "examples/school-management/GeneratedRuntimeModule.cs": {
+        "examples/school-management/dotnet-lib-core/GeneratedRuntimeModule.cs": {
           "emittedPath": "GeneratedRuntimeModule.cs",
           "sha256": "5331337c0dcd075e4db592f5cbae009fbf194ef5bf2701ac37ff3219c84fd674"
         },
-        "examples/school-management/GeneratedSearchModels.cs": {
+        "examples/school-management/dotnet-lib-core/GeneratedSearchModels.cs": {
           "emittedPath": "GeneratedSearchModels.cs",
           "sha256": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b"
         },
-        "examples/school-management/Models/Platform.cs": {
+        "examples/school-management/dotnet-lib-core/Models/Platform.cs": {
           "emittedPath": "Models/Platform.cs",
           "sha256": "573f2005da8ef3141798bdcd4d7d8458fa6afaaaeb6697614db9314b7f8555fb"
         },
-        "examples/school-management/Models/School.cs": {
+        "examples/school-management/dotnet-lib-core/Models/School.cs": {
           "emittedPath": "Models/School.cs",
           "sha256": "a73200863f93caeb778b160cf44b949445934c34eaf2d1b33c955ff777324fed"
         },
-        "examples/school-management/Models/SchoolType.cs": {
+        "examples/school-management/dotnet-lib-core/Models/SchoolType.cs": {
           "emittedPath": "Models/SchoolType.cs",
           "sha256": "3b6e11348d1fb957b95c81832624de2a41b5338188dd0bf2f0e08fc0f3f03a8b"
         },
-        "examples/school-management/Q.cs": {
+        "examples/school-management/dotnet-lib-core/Q.cs": {
           "emittedPath": "Q.cs",
           "sha256": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
         },
-        "examples/school-management/Requests/PlatformRequest.cs": {
+        "examples/school-management/dotnet-lib-core/Requests/PlatformRequest.cs": {
           "emittedPath": "Requests/PlatformRequest.cs",
           "sha256": "8be18eb89c10c961275d8bec7ac9b71b5fa552e4cc6e515677a02d016549975a"
         },
-        "examples/school-management/Requests/SchoolRequest.cs": {
+        "examples/school-management/dotnet-lib-core/Requests/SchoolRequest.cs": {
           "emittedPath": "Requests/SchoolRequest.cs",
           "sha256": "4879d4784a630975dc3c3a87845725f43474e02b0ece73b70b3c4ee27116a869"
         },
-        "examples/school-management/Requests/SchoolTypeRequest.cs": {
+        "examples/school-management/dotnet-lib-core/Requests/SchoolTypeRequest.cs": {
           "emittedPath": "Requests/SchoolTypeRequest.cs",
           "sha256": "7251586aeec9a2449953040c087e5c77d86b39add656cfab60e2b0bcb847a74a"
         },
-        "examples/school-management/teaql-i18n.json": {
+        "examples/school-management/dotnet-lib-core/school-management-service-lib.csproj": {
+          "emittedPath": "school-management-service-lib.csproj",
+          "sha256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        },
+        "examples/school-management/dotnet-lib-core/teaql-i18n.json": {
           "emittedPath": "teaql-i18n.json",
           "sha256": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d"
         },
-        "examples/school-management/teaql/checker-model.json": {
+        "examples/school-management/dotnet-lib-core/teaql/checker-model.json": {
           "emittedPath": "teaql/checker-model.json",
           "sha256": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71"
         },
-        "examples/school-management/teaql/model-provenance.json": {
+        "examples/school-management/dotnet-lib-core/teaql/model-provenance.json": {
           "emittedPath": "teaql/model-provenance.json",
           "sha256": "37dfcdffaeb5cabe6ffb233212ec4afec39d19c242b3cbcee53e3634c3715a2e"
         }
@@ -813,13 +817,6 @@
           "commit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
           "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
           "release": "unreleased-source-021b1ed8"
-        }
-      },
-      "preservedApplicationFiles": {
-        "examples/school-management/school-management-service-lib.csproj": {
-          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
-          "reason": "Application manifest, local dependency wiring or application-specific instructions preserved",
-          "sha256": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d"
         }
       }
     },
