@@ -22,12 +22,12 @@
     "receiptSHA256": "0dfc2d5e5752541338c6f29613e7fa50fc28465c9ad059f9aacffce3c3d60424"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-schema-customization-generated-workspace/runtime/schema-customization/receipt.json",
-    "businessReceiptSHA256": "5b6f600699ed18e8c4a2aa79805a16e3a5799e8273bc4215187c9eb521cc9f33",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-schema-customization-generated-workspace/receipt.json",
-    "nativeReceiptSHA256": "77bd57cad371e2c8db2e6415ba4896b126637ccd74057fac384d9c918d28555f",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-schema/runtime/schema-customization/receipt.json",
+    "businessReceiptSHA256": "22d9022fc5c71012f51d7e1416022e3f62b7b030c875cfd9bff5a3a0ad4e03d1",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-schema/receipt.json",
+    "nativeReceiptSHA256": "aa67f46621a5070c5f2dcb254a059664927d6e4d9ad470c17e2751c59e388fd6",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "6df11b66365d4e2804a81047067360da2ce33199"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "Register a school through a custom schema executor",
   "schema": "teaql.model-workspace-showcase/v1",
