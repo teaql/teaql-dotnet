@@ -22,12 +22,12 @@
     "receiptSHA256": "c321d972c75d8f73f7f62525162f64337461996c487f3ab3abdaef25cba5e23a"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-natural-catalog-native-scopes/runtime/natural-messages/receipt.json",
-    "businessReceiptSHA256": "e6bef867b25cffa0a6b7fc79ff0d3fc57b0823f6cd012342126d79498946414f",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-natural-catalog-native-scopes/receipt.json",
-    "nativeReceiptSHA256": "2c45c1857ef410a7e59617360ee602ef78a4d9ff53aaf8df654d0c1da33fb2ce",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-catalog/runtime/natural-messages/receipt.json",
+    "businessReceiptSHA256": "85285e5ecb58c7896ff1665342c284e80db8b870cd8844cd75746dfd2e8f8fe4",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-catalog/receipt.json",
+    "nativeReceiptSHA256": "57b13f8e7b181ee90de76d79c217197955e0a55c428379450dba23eadeff8275",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "608b817f6e809d0e389dabd9f139814187054e1f"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "Catalog entry validation with natural messages, exact locations and private values",
   "schema": "teaql.model-workspace-showcase/v1",
