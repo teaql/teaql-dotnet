@@ -38,7 +38,7 @@ dotnet run --project "$repo/examples/business-id/dotnet-app-console/calibration/
 TEAQL_BUSINESS_ID_KEY_V1_HEX=000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f \
 TEAQL_PURCHASE_NUMBERING_ROUND=inventory TEAQL_PURCHASE_NUMBERING_DATABASE="$inventory_evidence/business-id.sqlite" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/business-id/dotnet-app-console/purchase-order-numbering-console.csproj"
-dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/runtime-logging/runtime-logging.csproj"
+TEAQL_SHIPPING_LOG_EVIDENCE_DIR="$inventory_evidence/runtime-logging" bash "$repo/examples/runtime-logging/verify.sh"
 dotnet run --project "$repo/examples/schema-customization/dotnet-app-console/calibration/schema-customization.csproj"
 TEAQL_SHOWCASE_ROUND=inventory TEAQL_SHOWCASE_DATABASE="$inventory_evidence/school-schema.sqlite" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" \

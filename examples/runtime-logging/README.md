@@ -1,6 +1,21 @@
-# Runtime logging example
+# Shipping order changes in human and JSON logs
 
-This executable references the runtime projects in this repository directly.
+The dispatch team adds an item to a shipping order and changes its handling
+instructions. The model in `model.xml` masks the customer reference. The
+generated `dotnet-app-console` uses `dotnet-lib-core` for the order, item and
+warehouse API. It queries the order by customer reference, loads its item and
+records both the accepted amendment and the provider's rejection of an
+unauthorized override.
+
+Run `bash examples/runtime-logging/verify.sh` from the runtime repository.
+The two launches use fresh stores and the same application operations. The
+human and JSON files show the SQL, intent, result counts and relation trace.
+The Context's safe audit sink records committed events, with the customer
+reference masked. Each database keeps the accepted instructions at version 2.
+
+## SQLite privacy calibration
+
+The calibration references the runtime projects in this repository directly.
 It proves the default-on query and mutation logs, structured intent, safe SQL
 diagnostics, result metrics, and relation trace without relying on a published
 NuGet package or an embedded generated runtime. SQL stays expanded: known
@@ -43,5 +58,5 @@ and a subsequent graph query verifies that no fixture rows were lost. Binding
 provenance is invocation-local and is removed by the safe output projection.
 
 ```bash
-dotnet run --project examples/runtime-logging/runtime-logging.csproj
+dotnet run --project examples/runtime-logging/dotnet-app-console/calibration/runtime-logging.csproj
 ```
