@@ -29,7 +29,7 @@ node "$repo/examples/fix-e-alignment/verify-local.cjs"
 TEAQL_CONTEXT_FIX_EVIDENCE_DIR="$inventory_evidence/context-derived" node "$repo/examples/context-derived/verify-local.cjs"
 node --test "$repo/scripts/verify-natural-messages.test.cjs"
 node "$repo/scripts/verify-natural-messages.cjs" --output "$inventory_evidence/natural-messages"
-TEAQL_GENERATED_E_PROFILE_EVIDENCE_DIR="$inventory_evidence/expression-profiles" node "$repo/examples/expression-profiles/verify-local.cjs"
+TEAQL_DISPATCH_PROFILE_EVIDENCE_DIR="$inventory_evidence/expression-profiles" bash "$repo/examples/expression-profiles/verify-dispatch.sh"
 TEAQL_FREIGHT_QUOTE_EVIDENCE_DIR="$inventory_evidence/freight-quotes" \
   bash "$repo/examples/scalar-type-probe/verify-freight-quotes.sh"
 bash "$repo/examples/object-storage/verify.sh"
