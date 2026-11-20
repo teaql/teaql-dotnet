@@ -51,6 +51,7 @@ dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/school-management/dotnet-app-console/school-management-service-console.csproj"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-school-bootstrap-example.sh"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/security-foundations/security-foundations.csproj"
+TEAQL_ORDER_PRIVACY_EVIDENCE_DIR="$inventory_evidence/order-privacy" bash "$repo/examples/security-foundations/verify-privacy.sh"
 TEAQL_ORDER_EVIDENCE_DIR="$inventory_evidence/order-management" bash "$repo/examples/order-management/verify.sh"
 TEAQL_TASK_BOARD_DB="$inventory_evidence/task-board.sqlite" dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/task_board/dotnet-app-console/robot-task-board-service-console.csproj"
 TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-trace-chain-example.sh"
