@@ -1,0 +1,40 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/facet-trace",
+  "library": {
+    "generatedFilesManifestSHA256": "9ec26b00a58edf235af80f356d1246ced13cb54c6294a6cfd3536047cc7ae415",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build; not a public release",
+      "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
+      "qualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
+      "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+      "tag": "unreleased-source-021b1ed8"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/facet-remaining-generation/receipt.json",
+    "receiptSHA256": "45c7ecfe08aa1f8b0d1a77c8476f2a3133d1f70220ec4f5f2738a5f4b0343d77"
+  },
+  "scene": "School catalog Facets, full membership counts and retained business/privacy assertions",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "implemented-pending-native-qualification",
+  "verification": [
+    "bash",
+    "verify.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "school-management-service-console.csproj"
+    ],
+    "generatedFilesManifestSHA256": "81a28cd354d2ad9de775d734d0afbba47233e9c2baaab89ee57dd1b984e59cef",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

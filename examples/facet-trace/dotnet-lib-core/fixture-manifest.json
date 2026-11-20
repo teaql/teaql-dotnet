@@ -1,4 +1,5 @@
 {
+  "applicationManifestsPreserved": false,
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
   "evaluationWarnings": 0,
@@ -13,23 +14,26 @@
     "Requests/PlatformRequest.cs": "8be18eb89c10c961275d8bec7ac9b71b5fa552e4cc6e515677a02d016549975a",
     "Requests/SchoolRequest.cs": "4879d4784a630975dc3c3a87845725f43474e02b0ece73b70b3c4ee27116a869",
     "Requests/SchoolTypeRequest.cs": "7251586aeec9a2449953040c087e5c77d86b39add656cfab60e2b0bcb847a74a",
-    "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
+    "school-management-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
     "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
     "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
     "teaql/model-provenance.json": "396fea230e5dd2f3df9ebd204d442af34005208d9de809db27b1fe1d6dde0332"
   },
+  "generatedManifestSHA256": "9ec26b00a58edf235af80f356d1246ced13cb54c6294a6cfd3536047cc7ae415",
   "generatedManifestSha256": "9ec26b00a58edf235af80f356d1246ced13cb54c6294a6cfd3536047cc7ae415",
-  "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-unified-intent-current-source/dotnet/facet-trace/model/receipt.json",
+  "generationReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/facet-remaining-generation/dotnet/facet-showcase/library/receipt.json",
   "generatorCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
   "generatorJarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
   "generatorRelease": "unreleased-source-021b1ed8",
   "modelSha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e",
   "modelSource": "examples/facet-trace/model.xml",
+  "previousFixtureManifestSHA256": "a1fe4e8e9120f7a84d417491ea5e5cbab8432192d2fbefdc61ea334432051b2a",
   "previousFixtureManifestSha256": "fe9583e2e14b9e0010c9b6841a67f1a4b00eaa4dd3b49640eeb0a993359736f2",
   "previousOrigin": {
     "commit": "05c15c780ab263d4162ff74a9960c0dcebfb61b4",
     "path": "examples/facet-trace/lib/fixture-manifest.json"
   },
+  "producerReceiptSHA256": "45c7ecfe08aa1f8b0d1a77c8476f2a3133d1f70220ec4f5f2738a5f4b0343d77",
   "producerReceiptSha256": "447db49b0b41a5f9d0fdb19729aea781ff5d926bab1713661911518134200dfe",
   "producerSource": {
     "commit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
