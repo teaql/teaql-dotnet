@@ -77,7 +77,9 @@ static async Task<OrderItem> NewItemAsync(UserContext context, long order, strin
 
 static async Task<PurchaseOrder[]> LoadOrdersAsync(UserContext context)
 {
-    var rows = await Q.PurchaseOrders().OrderByIdAscending().Limit(10).SelectOrderItemList()
+    var items = Q.OrderItems().SelectSku().SelectQuantity().OrderByIdAscending().Limit(10)
+        .Comment("Read the received SKU and quantity");
+    var rows = await Q.PurchaseOrders().OrderByIdAscending().Limit(10).SelectOrderItemListWith(items)
         .Comment("Read assigned order IDs and items").Purpose("Reconcile the warehouse ledger").ExecuteForListAsync(context);
     return rows.ToArray();
 }
