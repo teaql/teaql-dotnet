@@ -52,7 +52,7 @@ static async Task Verify(string database, string download, int round)
     await using var sqlite = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = database }.ToString());
     await sqlite.OpenAsync();
     var module = GeneratedRuntimeModule.Module;
-    var executor = new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(sqlite), new ModuleSchemaProvider(module));
+    var executor = new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(sqlite), new MetadataSchemaProvider(module.Metadata.GetEntity));
     var audit = new Audits();
     var observations = new Observations();
     var context = module.IntoContext().WithDataService(executor).WithAppAuditEventSink(audit)
