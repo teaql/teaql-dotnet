@@ -40,34 +40,36 @@ var secondary = await Q.Merchants().Comment("Prepare an independent merchant")
 secondary.UpdateName("Independent retailer " + round);
 await secondary.AuditAs("Register a second merchant").SaveAsync(context);
 
+var merchantId = primary.Id ?? throw new InvalidOperationException("The primary merchant has no ID");
+var foreignMerchantId = secondary.Id ?? throw new InvalidOperationException("The second merchant has no ID");
 var reference = "SHIP-PRIVATE-" + round;
 var email = $"sealed-{round}@example.test";
 var foreignReference = "SHIP-OTHER-" + round;
 var foreignEmail = $"foreign-{round}@example.test";
-var own = await PlaceOrder(primary.Id, reference, email);
-var foreign = await PlaceOrder(secondary.Id, foreignReference, foreignEmail);
-var purpose = $"view-dispatch:{primary.Id}";
+var own = await PlaceOrder(merchantId, reference, email);
+var foreign = await PlaceOrder(foreignMerchantId, foreignReference, foreignEmail);
+var purpose = $"view-dispatch:{merchantId}";
 var token = context.EncodeEntityReference("CustomerOrder", own.Id, own.Version, purpose, TimeSpan.FromMinutes(5));
 RejectReference("edit-dispatch");
-RejectReference($"view-dispatch:{secondary.Id}");
+RejectReference($"view-dispatch:{foreignMerchantId}");
 var claims = context.DecodeEntityReference(token, "CustomerOrder", purpose);
 
-var loaded = await Lookup(primary.Id, claims.Id, reference, email)
+var loaded = await Lookup(merchantId, claims.Id, reference, email)
     ?? throw new InvalidOperationException("The authorized dispatch order was not returned");
 var profile = E.CustomerOrder(loaded).CustomerProfile().Eval()
     ?? throw new InvalidOperationException("The selected customer profile was not loaded");
 if (E.CustomerProfile(profile).Email().Eval() != email || loaded.Id != own.Id || loaded.Version != claims.Version)
     throw new InvalidOperationException("The scoped dispatch data did not round-trip");
-if (await Lookup(primary.Id, foreign.Id, foreignReference, foreignEmail) is not null)
+if (await Lookup(merchantId, foreign.Id, foreignReference, foreignEmail) is not null)
     throw new InvalidOperationException("The primary merchant read a second merchant's order");
 Console.WriteLine("ORDER_PRIVACY=" + JsonSerializer.Serialize(new
 {
     round, authorizedOrder = loaded.Id, foreignOrder = foreign.Id,
-    merchant = primary.Id, foreignMerchant = secondary.Id, version = loaded.Version,
+    merchant = merchantId, foreignMerchant = foreignMerchantId, version = loaded.Version,
     purposeDenied = true, foreignDenied = true,
 }));
 
-async Task<CustomerOrder> PlaceOrder(ulong merchant, string number, string deliveryEmail)
+async Task<CustomerOrder> PlaceOrder(long merchant, string number, string deliveryEmail)
 {
     var profile = await Q.CustomerProfiles().Comment("Prepare a delivery profile")
         .Purpose("Associate a customer with one merchant").NewEntityAsync(context);
@@ -81,10 +83,10 @@ async Task<CustomerOrder> PlaceOrder(ulong merchant, string number, string deliv
     return shipment;
 }
 
-async Task<CustomerOrder?> Lookup(ulong merchant, ulong id, string number, string deliveryEmail)
+async Task<CustomerOrder?> Lookup(long merchant, ulong id, string number, string deliveryEmail)
 {
     return await Q.CustomerOrders().WithIdIs(id).WithOrderNumberIs(number)
-        .WithMerchantMatching(Q.MerchantsWithMinimalFields().WithIdIs(merchant))
+        .WithMerchantMatching(Q.MerchantsWithMinimalFields().WithIdIs(checked((ulong)merchant)))
         .WithCustomerProfileMatching(Q.CustomerProfilesWithMinimalFields().WithEmailIs(deliveryEmail))
         .SelectCustomerProfile().Limit(1).Comment("Load the scoped order and delivery profile")
         .Purpose("Review a dispatch order for the authenticated merchant").ExecuteForOneAsync(context);
