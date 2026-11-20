@@ -49,7 +49,8 @@ var foreignEmail = $"foreign-{round}@example.test";
 var own = await PlaceOrder(merchantId, reference, email);
 var foreign = await PlaceOrder(foreignMerchantId, foreignReference, foreignEmail);
 var purpose = $"view-dispatch:{merchantId}";
-var token = context.EncodeEntityReference("CustomerOrder", own.Id, own.Version, purpose, TimeSpan.FromMinutes(5));
+var ownVersion = own.Version ?? throw new InvalidOperationException("The dispatch order has no version");
+var token = context.EncodeEntityReference("CustomerOrder", OrderId(own), ownVersion, purpose, TimeSpan.FromMinutes(5));
 RejectReference("edit-dispatch");
 RejectReference($"view-dispatch:{foreignMerchantId}");
 var claims = context.DecodeEntityReference(token, "CustomerOrder", purpose);
@@ -60,7 +61,7 @@ var profile = E.CustomerOrder(loaded).CustomerProfile().Eval()
     ?? throw new InvalidOperationException("The selected customer profile was not loaded");
 if (E.CustomerProfile(profile).Email().Eval() != email || loaded.Id != own.Id || loaded.Version != claims.Version)
     throw new InvalidOperationException("The scoped dispatch data did not round-trip");
-if (await Lookup(merchantId, foreign.Id, foreignReference, foreignEmail) is not null)
+if (await Lookup(merchantId, OrderId(foreign), foreignReference, foreignEmail) is not null)
     throw new InvalidOperationException("The primary merchant read a second merchant's order");
 Console.WriteLine("ORDER_PRIVACY=" + JsonSerializer.Serialize(new
 {
@@ -90,6 +91,11 @@ async Task<CustomerOrder?> Lookup(long merchant, ulong id, string number, string
         .WithCustomerProfileMatching(Q.CustomerProfilesWithMinimalFields().WithEmailIs(deliveryEmail))
         .SelectCustomerProfile().Limit(1).Comment("Load the scoped order and delivery profile")
         .Purpose("Review a dispatch order for the authenticated merchant").ExecuteForOneAsync(context);
+}
+
+static ulong OrderId(CustomerOrder order)
+{
+    return checked((ulong)(order.Id ?? throw new InvalidOperationException("The dispatch order has no ID")));
 }
 
 void RejectReference(string deniedPurpose)
