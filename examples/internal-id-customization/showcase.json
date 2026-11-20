@@ -21,9 +21,17 @@
     "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/warehouse-order-allocation-generation/receipt.json",
     "receiptSHA256": "7df96905babebd689595a8eea7d0178b6b5b3a2555158c3bacfdba3b194cd9cd"
   },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-warehouse-internal-id-item-projection/runtime/internal-id/receipt.json",
+    "businessReceiptSHA256": "2f35e308c59748a022555e016abef8fb5e07022958d24fd6737b62f128bd57ab",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-warehouse-internal-id-item-projection/receipt.json",
+    "nativeReceiptSHA256": "b3f7528b753ee71535d9aa2b6ee178ad76bde1ab6cfba08ff3f43e2026c9d245",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "e7630345261c3d6e78747e9a6326ee4e118f854c"
+  },
   "scene": "Context-assigned internal IDs for a warehouse purchase order and its items",
   "schema": "teaql.model-workspace-showcase/v1",
-  "status": "implemented-pending-native-qualification",
+  "status": "focused-verified",
   "verification": [
     "dotnet",
     "run",
