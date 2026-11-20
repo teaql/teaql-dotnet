@@ -16,7 +16,7 @@ violations and the SQLite database. It removes only its own temporary build
 tree after its child processes exit. Existing evidence is never overwritten.
 Runner lifecycle checks run with `node --test scripts/verify-natural-messages.test.cjs`.
 
-`automatic-fixture/` contains 12 unchanged generated files, the validated model,
+`dotnet-lib-core/` contains 12 unchanged generated files, the validated model,
 passive metadata, provenance and six real object/field Assist responses. The
 generated project selects repository-local runtime projects through the supported
 `TeaQLRuntimeSourceRoot` property. No generated source or dependency manifest is
@@ -52,3 +52,23 @@ Complete example inventory and published artifacts remain separate gates.
 Neither this example nor a local test run publishes packages.
 
 Tracking: [teaql-dotnet #70](https://github.com/teaql/teaql-dotnet/issues/70).
+
+## Current model and workspace
+
+`model.xml` defines the Catalog and Entry business graph. The exact generated
+domain library is read-only in `dotnet-lib-core/`; its current provenance points to
+the qualified generator source build, with the prior generation identity retained
+separately in its metadata. The application lives in `dotnet-app-console/showcase/Program.cs`.
+
+Run this focused business entry from the SDK repository root:
+
+```bash
+node scripts/verify-natural-messages.cjs --example-only --output /new/absolute/evidence
+```
+
+The same graph is rejected before writes for an invalid second Entry, then
+corrected and saved through generated Q/E and audited Save. Two runs check
+actual stored values, precise machine locations, English/Chinese messages and
+private-value redaction. Language-specific native length rules remain intact.
+The verifier preserves result stores and compact receipts and removes owned
+build outputs. Full runtime example qualification remains a separate gate.
