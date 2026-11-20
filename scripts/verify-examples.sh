@@ -43,7 +43,7 @@ dotnet run --project "$repo/examples/schema-customization/dotnet-app-console/cal
 TEAQL_SHOWCASE_ROUND=inventory TEAQL_SHOWCASE_DATABASE="$inventory_evidence/school-schema.sqlite" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" \
   --project "$repo/examples/schema-customization/dotnet-app-console/school-schema-service-console.csproj"
-dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/internal-id-customization/internal-id-customization.csproj"
+TEAQL_INTERNAL_ID_EVIDENCE_DIR="$inventory_evidence/internal-id" bash "$repo/examples/internal-id-customization/verify.sh"
 dotnet run --project "$repo/examples/mutation-policy/dotnet-app-console/calibration/mutation-policy.csproj"
 TEAQL_SHOWCASE_ROUND=inventory TEAQL_SHOWCASE_DATABASE="$inventory_evidence/customer-approval.sqlite" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" \
