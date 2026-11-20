@@ -21,9 +21,17 @@
     "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/shipping-order-logging-generation/receipt.json",
     "receiptSHA256": "6cff8ca2271c5bcae314b0b4f79b4862b4ca3f7692af51cccff1da2c5a135883"
   },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shipping-order-logging-native/runtime/shipping-order-logging/receipt.json",
+    "businessReceiptSHA256": "c4bc9e03956eb9de92945aea0391a5907d6a5679d72d5481fe97df5a1df32a2c",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shipping-order-logging-native/receipt.json",
+    "nativeReceiptSHA256": "127f4e2fae0dea8bc9cd885fc2d23773116c82a75c7856639bd82af39bfb4ccf",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "c6f6f995078a497e747965f560ccb1ae03cba244"
+  },
   "scene": "Shipping order amendment, denied override and safe human/JSON diagnostics",
   "schema": "teaql.model-workspace-showcase/v1",
-  "status": "implemented-pending-native-qualification",
+  "status": "focused-verified",
   "verification": [
     "bash",
     "examples/runtime-logging/verify.sh"
