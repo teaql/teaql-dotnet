@@ -1,0 +1,40 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/natural-messages",
+  "library": {
+    "generatedFilesManifestSHA256": "d5fcb039887dc6760b2f5568fb7b17bc9050ad7ab0fb5b7d21205061cebde2c0",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build; not a public release",
+      "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
+      "qualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
+      "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+      "tag": "unreleased-source-021b1ed8"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/catalog-natural-generation/receipt.json",
+    "receiptSHA256": "c321d972c75d8f73f7f62525162f64337461996c487f3ab3abdaef25cba5e23a"
+  },
+  "scene": "Catalog entry validation with natural messages, exact locations and private values",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "implemented-pending-native-qualification",
+  "verification": [
+    "node",
+    "verify-local.cjs"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "checker-natural-message-service-console.csproj",
+      "showcase/Program.cs"
+    ],
+    "generatedFilesManifestSHA256": "0081141ae6c42195864b5dac3c7a87adaaf7194b4b341af1a8cb86175e783cd7",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}
