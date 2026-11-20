@@ -24,13 +24,21 @@
     "receipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-v430-candidate/receipt.json",
     "receiptSHA256": "9bf2a08fa9c5bec0d9b1a2e1420044ffdd6bc71c6a1a09ce70d81d1cf0cdbd0a"
   },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-trace-chain-native-scopes/runtime/trace-chain/receipt.json",
+    "businessReceiptSHA256": "10f8051a5b53f2e3de840e170647bb142d5f8d684a9749deac7044a976b52ba0",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-trace-chain-native-scopes/receipt.json",
+    "nativeReceiptSHA256": "e966e1a9ca157661210ba7f00fd0644e6b57edc3bc2b14a0fc8f3a2a5331d49d",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "9c38ec65e86666ba2f3bb981dcf791dc3596e013"
+  },
   "relatedShowcases": [
     "standard-order/showcase.json",
     "standard-graph/showcase.json"
   ],
   "scene": "Order graph and observations at real query, commit, rollback and restart boundaries",
   "schema": "teaql.model-workspace-showcase/v1",
-  "status": "implemented-pending-native-qualification",
+  "status": "focused-verified",
   "verification": [
     "bash",
     "scripts/verify-trace-chain-example.sh"
