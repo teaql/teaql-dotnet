@@ -34,7 +34,10 @@ TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-p
 TEAQL_EMPTY_EVIDENCE_DIR="$inventory_evidence/empty-aggregates" TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/scalar-type-probe/verify-empty.sh"
 bash "$repo/examples/object-storage/verify.sh"
 TEAQL_CONFORMANCE_EVIDENCE_DIR="$inventory_evidence/conformance" bash "$repo/examples/conformance/verify.sh"
-dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/business-id/business-id.csproj"
+dotnet run --project "$repo/examples/business-id/dotnet-app-console/calibration/business-id.csproj"
+TEAQL_BUSINESS_ID_KEY_V1_HEX=000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f \
+TEAQL_PURCHASE_NUMBERING_ROUND=inventory TEAQL_PURCHASE_NUMBERING_DATABASE="$inventory_evidence/business-id.sqlite" \
+dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/business-id/dotnet-app-console/purchase-order-numbering-console.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/runtime-logging/runtime-logging.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/schema-customization/schema-customization.csproj"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/internal-id-customization/internal-id-customization.csproj"
