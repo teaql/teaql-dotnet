@@ -43,3 +43,26 @@ The application decorates the actual generated Checker through an observation
 seam; it neither edits generated source nor substitutes manual mutation SQL.
 This fixture reflects the candidate generator's API surface; it does not claim
 additional managed-factory APIs from other generator branches.
+
+## Current business model and workspace
+
+`model.xml` defines Catalog and Entry. Trusted Context supplies collection/edit
+times, IP and actor fields; the example shows why saving an unchanged entry
+must leave those business values untouched. `dotnet-lib-core/` is the exact, read-only
+current generated domain library. The application is in `dotnet-app-console/showcase/Program.cs`.
+The historical `fixture/` remains byte-identical and retains all of its original
+fingerprint checks; a separate guard verifies the current library before and
+after business execution.
+
+Run the focused source qualifier entry from the SDK repository root:
+
+```bash
+node examples/context-derived/verify-local.cjs
+```
+
+The original assertions run twice on retained stores: no-op saves produce no
+updates, genuine edits consume the trusted Context, failed validation/provider
+work preserves edits, and a later invalid child rolls back staged graph fields.
+Current managed creation results are explicitly awaited or checked. No generated
+implementation is hand-edited. Compact receipts and result stores are retained;
+owned build output is removed. Full runtime inventories remain separate gates.
