@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <ProjectReference Include="Generated/robot-task-board-service-lib.csproj"
+    <ProjectReference Include="../dotnet-lib-core/robot-task-board-service-lib.csproj"
                       AdditionalProperties="TeaQLRuntimeSourceRoot=$(TeaQLRuntimeSourceRoot)" />
   </ItemGroup>
 

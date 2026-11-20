@@ -5,7 +5,7 @@ const repo = path.resolve(__dirname, '..'), sha = bytes => crypto.createHash('sh
 const roots = ['examples/conformance/dotnet-lib-core', 'examples/trace-chain/lib', 'examples/facet-trace/dotnet-lib-core',
   'examples/school-management/dotnet-lib-core', 'examples/order-management/dotnet-lib-core',
   'examples/trace-chain/standard-graph/lib', 'examples/trace-chain/standard-order/lib',
-  'examples/task_board/TaskBoardExample/Generated'];
+  'examples/task_board/dotnet-lib-core'];
 let files = 0;
 for (const relative of roots) {
   const root = path.join(repo, relative), manifest = JSON.parse(fs.readFileSync(path.join(root, 'fixture-manifest.json')));
