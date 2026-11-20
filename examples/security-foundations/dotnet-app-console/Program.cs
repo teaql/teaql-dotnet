@@ -89,7 +89,8 @@ async Task<CustomerOrder?> Lookup(long merchant, ulong id, string number, string
     return await Q.CustomerOrders().WithIdIs(id).WithOrderNumberIs(number)
         .WithMerchantMatching(Q.MerchantsWithMinimalFields().WithIdIs(checked((ulong)merchant)))
         .WithCustomerProfileMatching(Q.CustomerProfilesWithMinimalFields().WithEmailIs(deliveryEmail))
-        .SelectCustomerProfile().Limit(1).Comment("Load the scoped order and delivery profile")
+        .SelectCustomerProfileWith(Q.CustomerProfilesWithMinimalFields().SelectEmail().Comment("Read the authorized delivery email"))
+        .Limit(1).Comment("Load the scoped order and delivery profile")
         .Purpose("Review a dispatch order for the authenticated merchant").ExecuteForOneAsync(context);
 }
 
