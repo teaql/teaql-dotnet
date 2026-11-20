@@ -21,9 +21,17 @@
     "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/order-privacy-and-federation-generation/receipt.json",
     "receiptSHA256": "0ae62ffb613692c2d0922b4da1b1dbb9ca6081e8a36a5786a27029a614b711d1"
   },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-merchant-order-privacy-native-with-profile/business-receipt.json",
+    "businessReceiptSHA256": "35b9ce0be059714e498ba61afeeeabe8e02f710f139131c179279918de6d80a9",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-merchant-order-privacy-native-with-profile/receipt.json",
+    "nativeReceiptSHA256": "eab1631bf6c5d9c22a9817ce504fdaa53dec75fd4c803b789bdd2f4cd88a5f61",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "6b0584ac166ccae6d530ceb26536e5efac481aee"
+  },
   "scene": "View one authorized merchant order while protecting customer data in SQL diagnostics",
   "schema": "teaql.model-workspace-showcase/v1",
-  "status": "implemented-pending-native-qualification",
+  "status": "focused-verified",
   "verification": [
     "bash",
     "examples/security-foundations/verify-privacy.sh"
