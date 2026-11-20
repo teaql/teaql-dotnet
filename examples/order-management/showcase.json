@@ -32,12 +32,12 @@
     "receiptSHA256": "5041246b7c9f452219d943efa393ea380ce7f7e172da739a945bb49da2ba5db2"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-order-scopes/runtime/order-management/business-receipt.json",
-    "businessReceiptSHA256": "eb2e12813712930ec234d1c5fd1a3b1a8f2ae0e5bfa54fdb921304c3fc80b8d0",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-order-scopes/receipt.json",
-    "nativeReceiptSHA256": "7db3894284211fdc5dc1618ad7933251a8eea3cf9770f5a7ac76c8ec9edc61fb",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-order-checksummed/runtime/order-management/business-receipt.json",
+    "businessReceiptSHA256": "0afd6b674b061db5b0995af2719a0e9bef90ccb4fa4ee4988b0d357fe20d9ff0",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-order-checksummed/receipt.json",
+    "nativeReceiptSHA256": "63095514a076ce8d5bba3796069c1d7cd124441cf017113a26d7d1b384cf8a8c",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "c36279c83bfa5dd73277c7a4c62f559367fdb857"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "Order terminal workflow with trusted business clock and reusable search",
   "schema": "teaql.model-workspace-showcase/v1",
