@@ -29,11 +29,12 @@ fingerprint() {
 fingerprint > "$evidence/library-before.sha256"
 dotnet build "${properties[@]}" \
   "$example/dotnet-app-console/school-management-service-console.csproj"
+assembly="$TEAQL_SCHOOL_ARTIFACTS_DIR/bin/school-management-service-console/debug/school-management-service-console.dll"
+[[ -f "$assembly" && -f "${assembly%.dll}.runtimeconfig.json" ]]
 for logging in on off; do
   for round in 1 2; do
     TEAQL_SCHOOL_BOOTSTRAP_DB="$evidence/$logging.sqlite" TEAQL_SCHOOL_BOOTSTRAP_LOGGING="$logging" \
-      dotnet run --no-build --no-restore "${properties[@]}" \
-      --project "$example/dotnet-app-console/school-management-service-console.csproj" | tee "$evidence/$logging-$round.log"
+      dotnet "$assembly" | tee "$evidence/$logging-$round.log"
     expected_logging=True; [[ "$logging" == off ]] && expected_logging=False
     fresh=True; version=1
     if [[ "$round" == 2 ]]; then fresh=False; version=3; fi

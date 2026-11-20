@@ -19,12 +19,14 @@ fingerprint() {
 }
 fingerprint > "$evidence/source-before.sha256"
 dotnet build "${properties[@]}" "$project" > "$evidence/build.log" 2>&1
+assembly="$TEAQL_SCHOOL_ARTIFACTS_DIR/bin/school-management-service-console/debug/school-management-service-console.dll"
+[[ -f "$assembly" && -f "${assembly%.dll}.runtimeconfig.json" ]]
 TEAQL_SCHOOL_MANAGEMENT_DB="$evidence/showcase.sqlite" \
-  dotnet run --no-build --no-restore "${properties[@]}" --project "$project" > "$evidence/application.log" 2>&1
+  dotnet "$assembly" > "$evidence/application.log" 2>&1
 sha256sum "$evidence/showcase.sqlite" > "$evidence/database-before-rejection.sha256"
 set +e
 TEAQL_SCHOOL_MANAGEMENT_DB="$evidence/showcase.sqlite" \
-  dotnet run --no-build --no-restore "${properties[@]}" --project "$project" > "$evidence/existing-database-rejected.log" 2>&1
+  dotnet "$assembly" > "$evidence/existing-database-rejected.log" 2>&1
 rejected=$?
 set -e
 [[ "$rejected" != 0 ]]
@@ -35,9 +37,9 @@ TEAQL_SCHOOL_BOOTSTRAP_EVIDENCE_DIR="$evidence/bootstrap" \
   bash "$repo/scripts/verify-school-bootstrap-example.sh" > "$evidence/bootstrap.log" 2>&1
 fingerprint > "$evidence/source-after.sha256"
 cmp "$evidence/source-before.sha256" "$evidence/source-after.sha256"
-python3 -B - "$evidence" "$TEAQL_SCHOOL_ARTIFACTS_DIR" "$project" "$repo" <<'PY'
+python3 -B - "$evidence" "$TEAQL_SCHOOL_ARTIFACTS_DIR" "$project" "$repo" "$assembly" <<'PY'
 import hashlib, json, pathlib, sqlite3, sys
-root, artifacts, project, runtime = map(pathlib.Path, sys.argv[1:])
+root, artifacts, project, runtime, assembly = map(pathlib.Path, sys.argv[1:])
 matches = []
 for path in artifacts.rglob('project.assets.json'):
     data = json.loads(path.read_text())
@@ -65,6 +67,7 @@ with sqlite3.connect(database.resolve().as_uri() + '?mode=ro&immutable=1', uri=T
 receipt = dict(schema='teaql.dotnet-school-business/v1', passed=True,
     originalApplicationAssertionsPassed=True, runtimeProjectReferences=sorted(actual),
     assetsSHA256=hashlib.sha256(assets.read_bytes()).hexdigest(),
+    executedAssemblySHA256=hashlib.sha256(assembly.read_bytes()).hexdigest(),
     bootstrapRoundsPerMode=2, loggingModes=['on', 'off'], sameBootstrapDatabases=True,
     preexistingDatabaseRejectedWithoutModification=True, generatedScopesUnchanged=True,
     sqliteRows=rows, databaseSHA256=hashlib.sha256(database.read_bytes()).hexdigest())
