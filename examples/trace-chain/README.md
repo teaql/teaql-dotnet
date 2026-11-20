@@ -1,5 +1,9 @@
 # Generated Trace Chain SQLite example
 
+The executable order graph and its checks now live in `dotnet-app-console`.
+The verification commands below replay the same domain with the generated library.
+
+
 This example verifies the branch-local Trace Chain contract against the local
 .NET runtime and an unchanged generated six-entity library. It is local-source
 evidence, not a claim about the published 0.2.9 packages.

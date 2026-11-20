@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AggregateChecks.cs" />
+    <Compile Include="AggregateMembershipChecks.cs" />
+    <Compile Include="BootstrapChecks.cs" />
+    <Compile Include="CheckerOverlapChecks.cs" />
+    <Compile Include="CheckerOverlapClock.cs" />
+    <Compile Include="LoadedPrivacyChecks.cs" />
+    <Compile Include="LoadedPrivacyRollbackChecks.cs" />
+    <Compile Include="PageChecks.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ReadbackChecks.cs" />
+    <Compile Include="SharedReferenceChecks.cs" />
+    <Compile Include="StreamChecks.cs" />
+
+    <Compile Remove="lib/**" />
+    <Compile Remove="standard-telemetry/**" />
+    <Compile Remove="standard-order/**" />
+    <Compile Remove="standard-graph/**" />
+    <Compile Remove="standard-stream/**" />
+    <ProjectReference Include="../dotnet-lib-core/trace-chain-service-lib.csproj" />
+  </ItemGroup>
+</Project>

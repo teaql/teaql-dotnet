@@ -2,9 +2,9 @@
 "use strict";
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'), assert = require('node:assert/strict');
 const repo = path.resolve(__dirname, '..'), sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
-const roots = ['examples/conformance/dotnet-lib-core', 'examples/trace-chain/lib', 'examples/facet-trace/dotnet-lib-core',
+const roots = ['examples/conformance/dotnet-lib-core', 'examples/trace-chain/dotnet-lib-core', 'examples/facet-trace/dotnet-lib-core',
   'examples/school-management/dotnet-lib-core', 'examples/order-management/dotnet-lib-core',
-  'examples/trace-chain/standard-graph/lib', 'examples/trace-chain/standard-order/lib',
+  'examples/trace-chain/standard-graph/dotnet-lib-core', 'examples/trace-chain/standard-order/dotnet-lib-core',
   'examples/task_board/dotnet-lib-core'];
 let files = 0;
 for (const relative of roots) {
