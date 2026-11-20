@@ -22,12 +22,12 @@
     "receiptSHA256": "45c7ecfe08aa1f8b0d1a77c8476f2a3133d1f70220ec4f5f2738a5f4b0343d77"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-facet-native-scopes/runtime/facet-trace/business-receipt.json",
-    "businessReceiptSHA256": "2ddb8344caa74e729787afc681a36bb2a51a6bf36c89308eb53a5fac83506ffd",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-facet-native-scopes/receipt.json",
-    "nativeReceiptSHA256": "af2b3ae9ccc6a4abdf791eee6d87267a6ed3ed297287676f81ace4e858802bf5",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-facet/runtime/facet-trace/business-receipt.json",
+    "businessReceiptSHA256": "9aede849b96f02c4cdfcc5934ad72768d3c6fe69eb69238be62c3c0acf77395a",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-facet/receipt.json",
+    "nativeReceiptSHA256": "84520c7fe0108e358ae2e7fdedc1f4e706a4c72aa8ca5de4b5c3eb324d54bba0",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "f59885638e99f7455846f6f1e1f05a169cb3affc"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "School catalog Facets, full membership counts and retained business/privacy assertions",
   "schema": "teaql.model-workspace-showcase/v1",
