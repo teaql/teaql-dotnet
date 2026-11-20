@@ -22,12 +22,12 @@
     "receiptSHA256": "fd8c37aeb5622a41a2dd8768724e432d5f97b58bf720f39217a8f31a8f4c1d90"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-context-field-native-scopes/runtime/context-derived/receipt.json",
-    "businessReceiptSHA256": "1d6b02aa1150cb0d50aced81f078634c9487818e0e8df2e1c243082e9a85dbee",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-context-field-native-scopes/receipt.json",
-    "nativeReceiptSHA256": "95565a9a1c44144ed727a6c0bd5f6c65883154b1778dd46d2c075a2fa90c9153",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-context/runtime/context-derived/receipt.json",
+    "businessReceiptSHA256": "5a995551efa898001051a7b87d264145e2515a9d31c99a8764ebba99704f9579",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-context/receipt.json",
+    "nativeReceiptSHA256": "3fcf46d5edd6bd6ed8b36c6d33880188ece4dfb4a89c32b243511c4cdba85ead",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "545f8f681020e30d646ee759bfc0abed763e7f06"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "Catalog entry edits with trusted Context defaults, no-op saves and rollback",
   "schema": "teaql.model-workspace-showcase/v1",
