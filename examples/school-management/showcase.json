@@ -31,12 +31,12 @@
     "receiptSHA256": "86cdc634a758fdf746de3323e8cd5c4fd32a050e50c0b7b04c5e64b397a1165f"
   },
   "qualification": {
-    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-school-built-assembly/runtime/school-management/business-receipt.json",
-    "businessReceiptSHA256": "f2d25a5fd00bd5c82eee74266665f5a4f2df6ab1d84320af54aaa82c22ddfeb6",
-    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-school-built-assembly/receipt.json",
-    "nativeReceiptSHA256": "e2dd3acb6dba596911b5baa255db86d25c043bf2ea4fc54006d119ea8d240d6b",
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-school/runtime/school-management/business-receipt.json",
+    "businessReceiptSHA256": "e07c0b5031ec8ab7b4023319ebe27d7c801e75df05ce3567b31d4d90bde02951",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-school/receipt.json",
+    "nativeReceiptSHA256": "8f50bd4c49500d7cabeaeddeb74631b2db50e8d776fde3243c163963e6c57941",
     "remainingFullRuntimeInventory": true,
-    "sourceCommit": "57d74791e2b5cd631442f3dea04ddfafb8e55b51"
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
   },
   "scene": "School startup, constant reconciliation and governed School queries",
   "schema": "teaql.model-workspace-showcase/v1",
