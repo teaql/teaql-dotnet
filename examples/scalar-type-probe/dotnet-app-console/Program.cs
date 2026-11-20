@@ -49,7 +49,9 @@ if (phase == "first")
             .Purpose("Price the shipment for its delivery window").NewEntityAsync(caller);
         quote.UpdatePlatform(1).UpdateReference(seed.Reference).UpdateAmount(seed.Amount)
             .UpdateShipmentNumber(seed.Number).UpdatePackageCount(seed.Count).UpdateDeliveryDate(deliveryDate)
-            .UpdatePickupTime(pickup).UpdateQuotedAt(quoted).UpdateInstructions(seed.Instructions);
+            .UpdatePickupTime(pickup).UpdateQuotedAt(quoted);
+        if (seed.Instructions is not null)
+            quote.UpdateInstructions(seed.Instructions);
         await quote.AuditAs("Register a freight quote").SaveAsync(caller);
     }
     var revised = await ReadAsync("SEA-003");
