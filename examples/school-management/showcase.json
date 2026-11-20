@@ -48,7 +48,20 @@
   "workspace": {
     "applicationOwnedFiles": [
       "Program.cs",
-      "BootstrapEvidence.cs"
+      "BootstrapEvidence.cs",
+      "school-management-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/School.cs",
+      "Models/SchoolType.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/SchoolRequest.cs",
+      "Requests/SchoolTypeRequest.cs"
     ],
     "generatedFilesManifestSHA256": "5a8bd0b61ae253bc7a619156ab02ddac2843dfad8e83be979add943104a29c4c",
     "root": "dotnet-app-console",

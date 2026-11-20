@@ -45,6 +45,24 @@
       "Program.cs",
       "trace-chain-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/CustomerOrder.cs",
+      "Models/OrderItem.cs",
+      "Models/Payment.cs",
+      "Models/PaymentAttempt.cs",
+      "Models/Platform.cs",
+      "Models/Shipment.cs",
+      "Q.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/OrderItemRequest.cs",
+      "Requests/PaymentAttemptRequest.cs",
+      "Requests/PaymentRequest.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/ShipmentRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "31badbe667da7dea494de5025f4d4f48d18d1f0e06612a4432a12dd6f2992cbd",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

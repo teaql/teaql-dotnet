@@ -45,6 +45,22 @@
       "Program.cs",
       "request-tree-order-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Customer.cs",
+      "Models/CustomerOrder.cs",
+      "Models/OrderItem.cs",
+      "Models/OrderStatus.cs",
+      "Models/Platform.cs",
+      "Q.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/CustomerRequest.cs",
+      "Requests/OrderItemRequest.cs",
+      "Requests/OrderStatusRequest.cs",
+      "Requests/PlatformRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "1361e2b9e05107c1295a99529f4d4b7a3b10e3a59de613e255fb33a454abd311",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

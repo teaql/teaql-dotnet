@@ -45,6 +45,18 @@
       "calibration/Program.cs",
       "calibration/internal-id-customization.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/OrderItem.cs",
+      "Models/PurchaseOrder.cs",
+      "Models/Warehouse.cs",
+      "Q.cs",
+      "Requests/OrderItemRequest.cs",
+      "Requests/PurchaseOrderRequest.cs",
+      "Requests/WarehouseRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "c376e01b00d22e9997c7b907df6dd8dabd502d8be404111abcc61a4c555aad5c",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

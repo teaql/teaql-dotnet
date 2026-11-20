@@ -40,6 +40,20 @@
       "Program.cs",
       "robot-task-board-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/Task.cs",
+      "Models/TaskExecutionLog.cs",
+      "Models/TaskStatus.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/TaskExecutionLogRequest.cs",
+      "Requests/TaskRequest.cs",
+      "Requests/TaskStatusRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "28b42fdd7028bde309e5c17e1eb7472ba86c7209de4419e7207fb9acffdaee63",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

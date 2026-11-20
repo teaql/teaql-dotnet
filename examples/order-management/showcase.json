@@ -51,6 +51,26 @@
       "Program.cs",
       "order-management-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/CommercePlatform.cs",
+      "Models/Customer.cs",
+      "Models/CustomerOrder.cs",
+      "Models/OrderLine.cs",
+      "Models/OrderSearchPreset.cs",
+      "Models/OrderStatus.cs",
+      "Models/Product.cs",
+      "Q.cs",
+      "Requests/CommercePlatformRequest.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/CustomerRequest.cs",
+      "Requests/OrderLineRequest.cs",
+      "Requests/OrderSearchPresetRequest.cs",
+      "Requests/OrderStatusRequest.cs",
+      "Requests/ProductRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "da1c0517bd6f971bbbd5f6371dd3d371ec4c5b5252fc3c0d834d131fe2ac4fa2",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

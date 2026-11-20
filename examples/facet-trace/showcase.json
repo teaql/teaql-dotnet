@@ -41,6 +41,18 @@
       "Program.cs",
       "school-management-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/School.cs",
+      "Models/SchoolType.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/SchoolRequest.cs",
+      "Requests/SchoolTypeRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "81a28cd354d2ad9de775d734d0afbba47233e9c2baaab89ee57dd1b984e59cef",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

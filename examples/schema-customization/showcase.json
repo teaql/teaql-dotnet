@@ -43,6 +43,16 @@
       "school-schema-service-console.csproj",
       "calibration/README.md"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/School.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/SchoolRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "d009e7992a57931754b810b04200f1c661784d00fb0b770f4779c155bf437eef",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

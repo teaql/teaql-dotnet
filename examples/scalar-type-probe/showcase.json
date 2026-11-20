@@ -41,6 +41,16 @@
       "freight-quote-settlement-console.csproj",
       "Program.cs"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/FreightQuote.cs",
+      "Models/Platform.cs",
+      "Q.cs",
+      "Requests/FreightQuoteRequest.cs",
+      "Requests/PlatformRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "6cf111efa873798e9b56df4d98a355657cf973105e91d3e4b64bb4059431d814",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

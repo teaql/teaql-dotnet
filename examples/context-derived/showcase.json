@@ -41,6 +41,16 @@
       "context-fix-service-console.csproj",
       "showcase/Program.cs"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Catalog.cs",
+      "Models/Entry.cs",
+      "Q.cs",
+      "Requests/CatalogRequest.cs",
+      "Requests/EntryRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "3fd2a70eb39d0973d49e47f5e7bfa94a7bf4e516ab7c63009f731238afeb1398",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

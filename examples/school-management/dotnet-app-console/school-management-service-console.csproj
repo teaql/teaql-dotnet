@@ -23,6 +23,7 @@
     <ProjectReference Include="$(TeaQLRuntimeSourceRoot)/src/TeaQL.Provider.Sqlite/TeaQL.Provider.Sqlite.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="../dotnet-lib-core/school-management-service-lib.csproj" />
     <Using Include="TeaQL.Core" />
     <Using Include="TeaQL.DataService" />
     <Using Include="TeaQL.Runtime" />

@@ -45,6 +45,16 @@
       "Program.cs",
       "dispatch-document-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/DispatchOrder.cs",
+      "Models/DistributionCenter.cs",
+      "Q.cs",
+      "Requests/DispatchOrderRequest.cs",
+      "Requests/DistributionCenterRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "225af2f5e439541a56d867f9dccb6206f89dc4a77a5edf4a1aab43a5ef3a0a33",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

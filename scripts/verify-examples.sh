@@ -48,8 +48,7 @@ dotnet run --project "$repo/examples/mutation-policy/dotnet-app-console/calibrat
 TEAQL_SHOWCASE_ROUND=inventory TEAQL_SHOWCASE_DATABASE="$inventory_evidence/customer-approval.sqlite" \
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" \
   --project "$repo/examples/mutation-policy/dotnet-app-console/customer-onboarding-service-console.csproj"
-dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/school-management/dotnet-app-console/school-management-service-console.csproj"
-TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/scripts/verify-school-bootstrap-example.sh"
+TEAQL_SCHOOL_EVIDENCE_DIR="$inventory_evidence/school-management" bash "$repo/examples/school-management/verify.sh"
 dotnet run --property:TeaQLRuntimeSourceRoot="$runtime_source_root" --project "$repo/examples/security-foundations/security-foundations.csproj"
 TEAQL_ORDER_PRIVACY_EVIDENCE_DIR="$inventory_evidence/order-privacy" bash "$repo/examples/security-foundations/verify-privacy.sh"
 TEAQL_ORDER_EVIDENCE_DIR="$inventory_evidence/order-management" bash "$repo/examples/order-management/verify.sh"

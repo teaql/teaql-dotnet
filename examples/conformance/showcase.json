@@ -42,6 +42,16 @@
       "ManagedConstructionChecks.cs",
       "runtime-example-conformance-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/WorkItem.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/WorkItemRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "6295c108e68044e25da63f6f132661c0c56761effa9948402cf3ce71113ad3fb",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

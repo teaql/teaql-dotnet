@@ -56,6 +56,18 @@
       "showcase/CancelledNewProbe.cs",
       "showcase/GraphFixLifecycleProbe.cs"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/OrderItem.cs",
+      "Models/PurchaseOrder.cs",
+      "Models/Tenant.cs",
+      "Q.cs",
+      "Requests/OrderItemRequest.cs",
+      "Requests/PurchaseOrderRequest.cs",
+      "Requests/TenantRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "258767be1617e1d4f183ba7c98ea66be2f6a64cf032ca27cff02cee66d728373",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

@@ -37,6 +37,16 @@
       "Program.cs",
       "order-federation-service-web.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/FederatedOrder.cs",
+      "Models/Merchant.cs",
+      "Q.cs",
+      "Requests/FederatedOrderRequest.cs",
+      "Requests/MerchantRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "5fd37a9cdd8db9785652a897d2b28c94c2222af8e173692c1215c9e612ba70a2",
     "root": "dotnet-web-aspnet",
     "scope": "dotnet-web-aspnet"

@@ -43,6 +43,18 @@
       "customer-onboarding-service-console.csproj",
       "calibration/README.md"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Customer.cs",
+      "Models/CustomerContact.cs",
+      "Models/Platform.cs",
+      "Q.cs",
+      "Requests/CustomerContactRequest.cs",
+      "Requests/CustomerRequest.cs",
+      "Requests/PlatformRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "7d8d0166d155cb75ded9e24ac07900d5d3b66f9108a7c6980a25d7c181eb3227",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

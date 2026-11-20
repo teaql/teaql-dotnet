@@ -41,6 +41,18 @@
       "Program.cs",
       "order-attachment-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/CommercePlatform.cs",
+      "Models/CustomerOrder.cs",
+      "Models/OrderAttachment.cs",
+      "Q.cs",
+      "Requests/CommercePlatformRequest.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/OrderAttachmentRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "9cfd6f6ce1242172d8a4754cfef5d8b8c9f7886943772590f547c286ac6aa9cf",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

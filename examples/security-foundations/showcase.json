@@ -41,6 +41,18 @@
       "Program.cs",
       "merchant-order-privacy-service-console.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/CustomerOrder.cs",
+      "Models/CustomerProfile.cs",
+      "Models/Merchant.cs",
+      "Q.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/CustomerProfileRequest.cs",
+      "Requests/MerchantRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "278c3ad5976b87ce85e004e2baa1a7bceec158c0186d139d782d94b9f11514f3",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

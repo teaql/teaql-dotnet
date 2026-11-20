@@ -43,6 +43,18 @@
       "calibration/Program.cs",
       "calibration/runtime-logging.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/ShippingItem.cs",
+      "Models/ShippingOrder.cs",
+      "Models/Warehouse.cs",
+      "Q.cs",
+      "Requests/ShippingItemRequest.cs",
+      "Requests/ShippingOrderRequest.cs",
+      "Requests/WarehouseRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "34c270549e7c286f233778b4a7e5a5b0b6120b38cf467e1f4e0af410b100872c",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

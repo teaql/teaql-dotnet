@@ -41,6 +41,16 @@
       "checker-natural-message-service-console.csproj",
       "showcase/Program.cs"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Catalog.cs",
+      "Models/Entry.cs",
+      "Q.cs",
+      "Requests/CatalogRequest.cs",
+      "Requests/EntryRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "0081141ae6c42195864b5dac3c7a87adaaf7194b4b341af1a8cb86175e783cd7",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"

@@ -42,6 +42,16 @@
       "calibration/Program.cs",
       "calibration/business-id.csproj"
     ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/PurchaseOrder.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/PurchaseOrderRequest.cs"
+    ],
     "generatedFilesManifestSHA256": "26764c6ee682d4bb3a37e316469a605c146546947f798a792cd3916dd3ee2a97",
     "root": "dotnet-app-console",
     "scope": "dotnet-app-console"
