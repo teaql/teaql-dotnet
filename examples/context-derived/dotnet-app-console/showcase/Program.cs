@@ -31,8 +31,8 @@ var context = module.IntoContext().WithDataService(new SqlDataServiceExecutor(ne
 context.InsertResource<IContextFixResolver>(resolver);
 await context.EnsureSchemaAsync();
 var suffix = Guid.NewGuid().ToString("N")[..10];
-Entry New(string name) => Q.Entries().Comment("Prepare a Context Fix subject")
-    .Purpose("Verify generated typed mutation boundaries").NewEntity(context).UpdateCatalogId(1).UpdateName(name);
+async Task<Entry> New(string name) => (await Q.Entries().Comment("Prepare a Context Fix subject")
+    .Purpose("Verify generated typed mutation boundaries").NewEntityAsync(context)).UpdateCatalogId(1).UpdateName(name);
 async Task<Entry> Load(long id) => (await Q.Entries().WithIdIs(id).Limit(1)
     .Comment("Reload the persisted Context Fix subject").Purpose("Assert real SQLite values using E").ExecuteForListAsync(context)).Single();
 async Task<CheckException> Reject(Func<Task> work) {
@@ -42,7 +42,7 @@ async Task<CheckException> Reject(Func<Task> work) {
 void Zero(string label) => Require(transport.Calls == 0 && audit.Calls == 0, label + " must not call provider/audit");
 void Reset() { transport.Calls = 0; audit.Calls = 0; resolver.Calls = 0; }
 
-var entry = New("initial-" + suffix);
+var entry = await New("initial-" + suffix);
 await entry.AuditAs("Create with Context defaults").SaveAsync(context);
 var loaded = await Load(entry.Id!.Value);
 Require(E.Entry(loaded).BornAt().Eval() == now.UtcDateTime && E.Entry(loaded).TouchedAt().Eval() == now.UtcDateTime, "Business Clock create values");
@@ -78,15 +78,15 @@ loaded.UpdateName("retry-" + suffix); Reset();
 await loaded.AuditAs("Retry a corrected business edit").SaveAsync(context);
 loaded = await Load(loaded.Id!.Value); Require(loaded.LastIp == "ip-C", "retry resolved Context");
 
-var failing = New("provider-fail-" + suffix); resolver.FailToken = true; Reset();
+var failing = await New("provider-fail-" + suffix); resolver.FailToken = true; Reset();
 var providerError = await Reject(async () => await failing.AuditAs("Reject a failed automatic provider").SaveAsync(context));
 Require(providerError.Violations.Any(v => v.ModelPath == "guarded_token"), "safe provider error field");
 Require(providerError.InnerException == null && !providerError.ToString().Contains("PRIVATE_PROVIDER_SECRET"), "no raw provider exception");
 Zero("failed Context provider"); resolver.FailToken = false;
 await failing.AuditAs("Retry after fixing the automatic provider").SaveAsync(context);
 
-var parent = Q.Catalogs().Comment("Prepare a complete parent graph").Purpose("Verify per-node Context undo").NewEntity(context).UpdateName("graph-" + suffix);
-var first = New("first-" + suffix); var second = New("second-" + suffix);
+var parent = (await Q.Catalogs().Comment("Prepare a complete parent graph").Purpose("Verify per-node Context undo").NewEntityAsync(context)).UpdateName("graph-" + suffix);
+var first = await New("first-" + suffix); var second = await New("second-" + suffix);
 parent.EntryList.Add(first); parent.EntryList.Add(second);
 await parent.AuditAs("Create a graph with two Context-bearing children").SaveAsync(context);
 parent = (await Q.Catalogs().WithIdIs(parent.Id!.Value).SelectEntryListWith(Q.Entries().OrderByIdAscending().Limit(10)).Limit(1)
