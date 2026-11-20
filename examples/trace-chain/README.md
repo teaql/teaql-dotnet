@@ -99,7 +99,7 @@ COUNT), no child canary in safe SQL/comment/purpose, independent root/child
 saves and persisted version checks. The model marks `order_item.name` as masked.
 `TEAQL_TRACE_CHAIN_SCENARIO=page` runs this focused acceptance only; the full
 verifier ignores that selector. Direct `dotnet run --project
-examples/trace-chain/trace-chain.csproj -- --database /absolute/path.sqlite`
+examples/trace-chain/dotnet-app-console/trace-chain-service-console.csproj -- --database /absolute/path.sqlite`
 also propagates its local runtime path to the generated project reference.
 
 Hydration records original versions without leaving temporary new keys. Graph
