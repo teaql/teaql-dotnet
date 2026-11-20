@@ -19,7 +19,6 @@
     "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
     "teaql/model-provenance.json": "396fea230e5dd2f3df9ebd204d442af34005208d9de809db27b1fe1d6dde0332"
   },
-  "generatedManifestSHA256": "9ec26b00a58edf235af80f356d1246ced13cb54c6294a6cfd3536047cc7ae415",
   "generatedManifestSha256": "9ec26b00a58edf235af80f356d1246ced13cb54c6294a6cfd3536047cc7ae415",
   "generationReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/facet-remaining-generation/dotnet/facet-showcase/library/receipt.json",
   "generatorCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
@@ -27,18 +26,22 @@
   "generatorRelease": "unreleased-source-021b1ed8",
   "modelSha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e",
   "modelSource": "examples/facet-trace/model.xml",
-  "previousFixtureManifestSHA256": "a1fe4e8e9120f7a84d417491ea5e5cbab8432192d2fbefdc61ea334432051b2a",
   "previousFixtureManifestSha256": "fe9583e2e14b9e0010c9b6841a67f1a4b00eaa4dd3b49640eeb0a993359736f2",
   "previousOrigin": {
     "commit": "05c15c780ab263d4162ff74a9960c0dcebfb61b4",
     "path": "examples/facet-trace/lib/fixture-manifest.json"
   },
-  "producerReceiptSHA256": "45c7ecfe08aa1f8b0d1a77c8476f2a3133d1f70220ec4f5f2738a5f4b0343d77",
-  "producerReceiptSha256": "447db49b0b41a5f9d0fdb19729aea781ff5d926bab1713661911518134200dfe",
+  "producerReceiptSha256": "a06da8ef37efdf3a1302f5757a83b3c8e0c09693feeb53887dc3627719ed7373",
   "producerSource": {
     "commit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
     "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
     "release": "unreleased-source-021b1ed8"
   },
-  "schema": "teaql.retained-example-fixture/v1"
+  "schema": "teaql.retained-example-fixture/v1",
+  "supersededProvenanceAliases": {
+    "generatedManifestSHA256": "9ec26b00a58edf235af80f356d1246ced13cb54c6294a6cfd3536047cc7ae415",
+    "previousFixtureManifestSHA256": "a1fe4e8e9120f7a84d417491ea5e5cbab8432192d2fbefdc61ea334432051b2a",
+    "producerReceiptSHA256": "45c7ecfe08aa1f8b0d1a77c8476f2a3133d1f70220ec4f5f2738a5f4b0343d77",
+    "producerReceiptSha256": "447db49b0b41a5f9d0fdb19729aea781ff5d926bab1713661911518134200dfe"
+  }
 }

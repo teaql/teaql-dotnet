@@ -6,7 +6,8 @@
     <OutputType Condition="!Exists('Program.cs')">Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.2.5</TeaQLRuntimeVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TeaQLRuntimeVersion Condition="'$(TeaQLRuntimeVersion)' == ''">0.6.0</TeaQLRuntimeVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TeaQLRuntimeSourceRoot)' == ''">
     <PackageReference Include="TeaQL.Provider.Sqlite" Version="$(TeaQLRuntimeVersion)" />
@@ -26,4 +27,9 @@
     <Using Include="TeaQL.Provider.Sqlite" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="Program.cs"/>
+    <Compile Include="ManagedConstructionChecks.cs"/>
+    <ProjectReference Include="../dotnet-lib-core/runtime-example-conformance-service-lib.csproj"/>
+  </ItemGroup>
 </Project>

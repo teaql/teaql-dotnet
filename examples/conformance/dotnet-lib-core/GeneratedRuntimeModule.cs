@@ -1,0 +1,136 @@
+using TeaQL.Core;
+
+namespace Generated;
+
+internal sealed class PlatformChecker : IEntityChecker
+{
+    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now)
+    {
+        var values = request is InsertMutationRequest insert ? insert.Command.Values
+            : request is UpdateMutationRequest update ? update.Command.Values : new Record();
+        var creating = request is InsertMutationRequest;
+        var updating = request is UpdateMutationRequest;
+        var results = new List<CheckResult>();
+        if ((creating && !values.ContainsKey("name")) || (values.TryGetValue("name", out var checkName) && checkName is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "Platform", Location = ObjectLocation.Property("name") });
+        if (values.TryGetValue("name", out var maxLenName) && maxLenName.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "Platform", Location = ObjectLocation.Property("name"), SystemValue = 100 });
+
+
+        return results;
+    }
+}
+
+internal sealed class WorkItemChecker : IEntityChecker
+{
+    public IReadOnlyList<CheckResult> CheckAndFix(UserContext context, MutationRequest request, DateTimeOffset now)
+    {
+        var values = request is InsertMutationRequest insert ? insert.Command.Values
+            : request is UpdateMutationRequest update ? update.Command.Values : new Record();
+        var creating = request is InsertMutationRequest;
+        var updating = request is UpdateMutationRequest;
+        var results = new List<CheckResult>();
+        if ((creating && !values.ContainsKey("title")) || (values.TryGetValue("title", out var checkTitle) && checkTitle is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "WorkItem", Location = ObjectLocation.Property("title") });
+        if (values.TryGetValue("title", out var minLenTitle) && minLenTitle.Raw?.ToString()?.Length.CompareTo(1) == -1) results.Add(new CheckResult { RuleId = "min_length", EntityType = "WorkItem", Location = ObjectLocation.Property("title"), SystemValue = 1 });
+        if (values.TryGetValue("title", out var maxLenTitle) && maxLenTitle.Raw?.ToString()?.Length > 80) results.Add(new CheckResult { RuleId = "max_length", EntityType = "WorkItem", Location = ObjectLocation.Property("title"), SystemValue = 80 });
+
+        if (values.TryGetValue("description", out var maxLenDescription) && maxLenDescription.Raw?.ToString()?.Length > 100) results.Add(new CheckResult { RuleId = "max_length", EntityType = "WorkItem", Location = ObjectLocation.Property("description"), SystemValue = 100 });
+
+        if ((creating && !values.ContainsKey("platform")) || (values.TryGetValue("platform", out var checkPlatform) && checkPlatform is Value.NullValue)) results.Add(new CheckResult { RuleId = "required", EntityType = "WorkItem", Location = ObjectLocation.Property("platform") });
+
+
+        return results;
+    }
+}
+
+// Passive generated manifest. EnsureSchemaAsync remains an explicit application action.
+public static class GeneratedRuntimeModule
+{
+    public static RuntimeModule Module { get; } = new RuntimeModule(new[]
+    {
+       "Platform",
+       "WorkItem"
+    }, new Dictionary<string, IEntityChecker>
+    {
+       ["Platform"] = new PlatformChecker(),
+       ["WorkItem"] = new WorkItemChecker()
+    }, new Dictionary<string, Record>
+    {
+       ["Platform"] = new Record {
+            ["id"] = new Value.I64Value(0),
+            ["name"] = new Value.TextValue(""),
+            ["version"] = new Value.I64Value(0)
+        },
+       ["WorkItem"] = new Record {
+            ["id"] = new Value.I64Value(0),
+            ["title"] = new Value.TextValue(""),
+            ["description"] = new Value.TextValue(""),
+            ["platform"] = new Value.I64Value(0),
+            ["version"] = new Value.I64Value(0)
+        }
+    }, new Dictionary<string, IReadOnlyDictionary<string, bool>>
+    {
+       ["Platform"] = new Dictionary<string, bool> {
+           ["id"] = true,
+           ["name"] = true,
+           ["version"] = true
+        },
+       ["WorkItem"] = new Dictionary<string, bool> {
+           ["id"] = true,
+           ["title"] = true,
+           ["description"] = false,
+           ["platform"] = true,
+           ["version"] = true
+        }
+    }, new Dictionary<string, IReadOnlyList<RelationDescriptor>>
+    {
+       ["Platform"] = new List<RelationDescriptor> {
+            RelationDescriptor.New("WorkItemList", "WorkItem").LocalKey("id").ForeignKey("platform").Many()
+        },
+       ["WorkItem"] = new List<RelationDescriptor> {
+            RelationDescriptor.New("Platform", "Platform").LocalKey("platform").ForeignKey("id")
+        }
+    }, new Dictionary<string, string>
+    {
+       ["Platform"] = "platform_data",
+       ["WorkItem"] = "work_item_data"
+    }, integer32Fields: new Dictionary<string, IReadOnlyList<string>>
+    {
+       ["Platform"] = new List<string> {
+        },
+       ["WorkItem"] = new List<string> {
+        }
+    }).WireEntity(WireFields.CreateMetadata("Platform", ["id", "name", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["name"] = ["name"], ["version"] = ["version"] })).WireEntity(WireFields.CreateMetadata("WorkItem", ["id", "title", "description", "platform", "version"], profile: JsonFieldNamingProfiles.Parse("camelCase"), aliases: new Dictionary<string, IReadOnlyList<string>> { ["id"] = ["id"], ["title"] = ["title"], ["description"] = ["description"], ["platform"] = ["platform"], ["version"] = ["version"] })).CheckerPresentation(CheckerPresentationModel.FromJson("{\"schema\":\"teaql.checker-model/v1\",\"revision\":\"sha256:f026153870cc54db18171cbbe02db1db174f3dea513e9d21e0ffe8af787ebaed\",\"entities\":{\"Platform\":{\"labels\":{\"en\":\"Platform\"},\"fields\":[{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"name\",\"labels\":{\"en\":\"name\"},\"aliases\":[\"Name\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]},{\"name\":\"work_item_list\",\"targetType\":\"WorkItem\",\"labels\":{\"en\":\"Work Item\"},\"aliases\":[\"WorkItemList\",\"workItemList\"]}]},\"WorkItem\":{\"labels\":{\"en\":\"Work Item\"},\"fields\":[{\"name\":\"description\",\"labels\":{\"en\":\"description\"},\"aliases\":[\"Description\"]},{\"name\":\"id\",\"labels\":{\"en\":\"id\"},\"aliases\":[\"Id\"]},{\"name\":\"platform\",\"targetType\":\"Platform\",\"labels\":{\"en\":\"Platform\"},\"aliases\":[\"Platform\"]},{\"name\":\"title\",\"labels\":{\"en\":\"title\"},\"aliases\":[\"Title\"]},{\"name\":\"version\",\"labels\":{\"en\":\"version\"},\"aliases\":[\"Version\"]}]}}}")).GeneratedBootstrap(EnsureGeneratedBootstrapAsync);
+
+    private static async Task EnsureGeneratedBootstrapAsync(UserContext context)
+    {
+        Exception? lastError = null;
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            try { await EnsureGeneratedBootstrapOnceAsync(context); return; }
+            catch (Exception error) { lastError = error; if (attempt < 4) await Task.Delay((attempt + 1) * 10); }
+        }
+        throw lastError!;
+    }
+
+    private static async Task EnsureGeneratedBootstrapOnceAsync(UserContext context)
+    {
+        {
+            using var bootstrapScope = context.EnterGeneratedBootstrap("Platform", 1);
+        var domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: locate generated Domain Root").Purpose("why: idempotent runtime bootstrap").ExecuteForOneAsync(context);
+        if (domainRoot == null)
+        {
+            var created = Generated.Models.Platform.TeaqlNewWithFixedId(1);
+            created.UpdateName("Runtime Example");
+            try { domainRoot = await created.AuditAs("create generated Domain Root Platform").SaveAsync(context); }
+            catch { domainRoot = await Q.Platforms().WithIdIs(1).Comment("what: recover concurrent Domain Root bootstrap").Purpose("why: make bootstrap idempotent").ExecuteForOneAsync(context); if (domainRoot == null) throw; }
+        }
+        }
+        context.WithActiveRoot("Platform", 1);
+    }
+
+
+    static GeneratedRuntimeModule()
+    {
+        Module.Entity(Module.Metadata.GetEntity("Platform")!.AuditMaskFields(new List<string> {  }));
+        Module.Entity(Module.Metadata.GetEntity("WorkItem")!.AuditMaskFields(new List<string> {  }));
+    }
+}
