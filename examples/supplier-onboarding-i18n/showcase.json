@@ -1,0 +1,66 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/supplier-onboarding-i18n",
+  "library": {
+    "generatedFilesManifestSHA256": "f5b948fc82fcb2eb11bf8369b39ec20e5bba2a6e68f31d1df75cb01c54e3f3c7",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "961f3048ca9c8e9120d81fc0ce9a3ea35629c8d9607aab80319156c21391e2c5"
+  },
+  "producer": {
+    "assistSHA256": {
+      "dotnet-assist-create-supplier.md": "ac8225794c3b0ecc31125e6a6421df7621fbf174759f50f38f404a9b38f42d3e",
+      "dotnet-assist-i18n.md": "c00b1627e344b90f69f97c0bf54e89daef0d90f7fa091a26cddff650a442656b",
+      "dotnet-assist-query-supplier.md": "26c54680bcf97b8c4da10e38900e258b62cf7c7093b4fcd95767158652cc19e7"
+    },
+    "evaluationSHA256": "c7a0b3fe8953aec1f5c4a1ebc0ce02f6f17a11bd0db1fceddd395d7848dc985c",
+    "generatorBaseCommit": "92d612e95cde33c323a1b026b5c567f8c8fa4562",
+    "scopes": [
+      "dotnet-app-console",
+      "dotnet-lib-core"
+    ]
+  },
+  "qualification": {
+    "baseCommit": "7889bfc5dacd86206c17f26749fefe0d01d92671",
+    "evidence": "teaql-conformance/evidence/2026-11-21-i18n-standard-examples/dotnet.jsonl",
+    "stdoutSHA256": "2202483f2a4ccb55bb34e48b4e818ebeb163e864c638db22b85c9c1ec54e25c0"
+  },
+  "scene": "Warehouse supplier onboarding with two real checker rejections and locale isolation",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "semanticModel": {
+    "path": "semantics.json",
+    "sha256": "5ac183bbe622b4bf7bfc157d367714d36a88722c03d64fc1ba68d8ef01faaf18"
+  },
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "run.sh",
+    "--verify"
+  ],
+  "workspace": {
+    "applicationEntry": "Program.cs",
+    "applicationOwnedFiles": [
+      "dotnet-app-console/Program.cs"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Supplier.cs",
+      "Models/Warehouse.cs",
+      "Q.cs",
+      "Requests/SupplierRequest.cs",
+      "Requests/WarehouseRequest.cs",
+      "supplier-onboarding-service-lib.csproj",
+      "teaql-i18n.json",
+      "teaql/checker-model.json",
+      "teaql/model-provenance.json"
+    ],
+    "generatedFilesManifestSHA256": "f5b948fc82fcb2eb11bf8369b39ec20e5bba2a6e68f31d1df75cb01c54e3f3c7",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

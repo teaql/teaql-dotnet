@@ -336,6 +336,7 @@ Request JSON is not allowed to replace those trusted capabilities.
 - [Facet example](examples/facet-trace/README.md)
 - [Trace Chain example](examples/trace-chain/README.md)
 - [Binary object storage and temporary S3 URLs](examples/object-storage/README.md)
+- [Supplier onboarding in 15 locales](examples/supplier-onboarding-i18n/README.md)
 - [Modules and native SPI](RUNTIME_GUIDE.md#3-available-modules)
 
 ## Safe troubleshooting
