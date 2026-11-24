@@ -15,10 +15,13 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
     ISchemaConnectionInitializer, ISchemaCompatibilityVerifier
 {
     private readonly SqliteConnection _connection;
+    private static readonly ConditionalWeakTable<SqliteConnection, SemaphoreSlim> ConnectionGates = new();
+    private readonly SemaphoreSlim _connectionGate;
 
     public SqliteTransport(SqliteConnection connection)
     {
         _connection = connection;
+        _connectionGate = ConnectionGates.GetValue(connection, _ => new SemaphoreSlim(1, 1));
         _connection.CreateCollation("TEAQL_DECIMAL", CompareExactDecimal);
         _connection.CreateFunction<string?, bool>("teaql_decimal_valid", ExactDecimal.IsValid,
             isDeterministic: true);
@@ -36,16 +39,17 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         return ExactDecimal.Parse(left).CompareTo(ExactDecimal.Parse(right));
     }
 
-    public Task EnsureSchemaFunctionsAsync()
+    public async Task EnsureSchemaFunctionsAsync()
     {
+        using var lease = await LeaseConnectionAsync();
         _connection.CreateFunction<string?, string>("soundex", Soundex, isDeterministic: true);
-        return Task.CompletedTask;
     }
 
     public async Task VerifySchemaCompatibilityAsync(SqlDialect dialect, EntityDescriptor entity)
     {
         var decimals = entity.Properties.Where(property => property.DataType == DataType.Decimal).ToArray();
         if (decimals.Length == 0) return;
+        using var lease = await LeaseConnectionAsync();
         using var command = _connection.CreateCommand();
         command.CommandText = $"PRAGMA table_info({dialect.QuoteIdent(entity.TableNameValue)})";
         var types = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -100,6 +104,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
 
     public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
     {
+        using var lease = await LeaseConnectionAsync();
         var records = new List<Record>();
         using var cmd = _connection.CreateCommand();
         cmd.CommandText = query.SqlWithComment();
@@ -132,6 +137,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         CompiledQuery query,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        using var lease = await LeaseConnectionAsync(cancellationToken);
         using var cmd = _connection.CreateCommand();
         cmd.CommandText = query.SqlWithComment();
         for (var i = 0; i < query.Params.Count; i++)
@@ -141,7 +147,13 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             BindValue(p, query.Params[i]);
             cmd.Parameters.Add(p);
         }
-        using var reader = await cmd.ExecuteReaderAsync(
+        await foreach (var row in ReadStreamAsync(cmd, query, cancellationToken)) yield return row;
+    }
+
+    private async IAsyncEnumerable<Record> ReadStreamAsync(SqliteCommand command, CompiledQuery query,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        using var reader = await command.ExecuteReaderAsync(
             System.Data.CommandBehavior.SequentialAccess,
             cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
@@ -155,6 +167,7 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
 
     public async Task<ulong> ExecuteSqlAsync(CompiledQuery query)
     {
+        using var lease = await LeaseConnectionAsync();
         using var cmd = _connection.CreateCommand();
         cmd.CommandText = query.SqlWithComment();
         
@@ -172,21 +185,45 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
 
     public async Task<ISqlTransaction> BeginSqlAsync()
     {
-        var transaction = await _connection.BeginTransactionAsync();
-        return new Transaction(_connection, (SqliteTransaction)transaction, this);
+        var lease = await LeaseConnectionAsync();
+        try
+        {
+            var transaction = await _connection.BeginTransactionAsync();
+            return new Transaction(_connection, (SqliteTransaction)transaction, this, lease);
+        }
+        catch
+        {
+            lease.Dispose();
+            throw;
+        }
     }
 
-    private sealed class Transaction : ISqlTransaction
+    private async Task<IDisposable> LeaseConnectionAsync(CancellationToken cancellationToken = default)
+    {
+        await _connectionGate.WaitAsync(cancellationToken);
+        return new ConnectionLease(_connectionGate);
+    }
+
+    private sealed class ConnectionLease(SemaphoreSlim gate) : IDisposable
+    {
+        private SemaphoreSlim? _gate = gate;
+        public void Dispose() => Interlocked.Exchange(ref _gate, null)?.Release();
+    }
+
+    private sealed class Transaction : ISqlTransaction, IStreamingSqlTransport
     {
         private readonly SqliteConnection _connection;
         private readonly SqliteTransaction _transaction;
         private readonly SqliteTransport _owner;
+        private readonly IDisposable _lease;
 
-        public Transaction(SqliteConnection connection, SqliteTransaction transaction, SqliteTransport owner)
+        public Transaction(SqliteConnection connection, SqliteTransaction transaction, SqliteTransport owner,
+            IDisposable lease)
         {
             _connection = connection;
             _transaction = transaction;
             _owner = owner;
+            _lease = lease;
         }
 
         public async Task<List<Record>> FetchAllSqlAsync(CompiledQuery query)
@@ -211,6 +248,13 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             return (ulong)(rows > 0 ? rows : 0);
         }
 
+        public async IAsyncEnumerable<Record> StreamSqlAsync(CompiledQuery query,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            using var command = CreateCommand(query);
+            await foreach (var row in _owner.ReadStreamAsync(command, query, cancellationToken)) yield return row;
+        }
+
         private SqliteCommand CreateCommand(CompiledQuery query)
         {
             var command = _connection.CreateCommand();
@@ -226,9 +270,23 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             return command;
         }
 
-        public Task CommitSqlAsync() => _transaction.CommitAsync();
-        public Task RollbackSqlAsync() => _transaction.RollbackAsync();
-        public void Dispose() => _transaction.Dispose();
+        public async Task CommitSqlAsync()
+        {
+            await _transaction.CommitAsync();
+            _lease.Dispose();
+        }
+
+        public async Task RollbackSqlAsync()
+        {
+            await _transaction.RollbackAsync();
+            _lease.Dispose();
+        }
+
+        public void Dispose()
+        {
+            try { _transaction.Dispose(); }
+            finally { _lease.Dispose(); }
+        }
     }
 
     private void BindValue(SqliteParameter p, Value value)

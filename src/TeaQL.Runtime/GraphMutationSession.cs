@@ -11,10 +11,12 @@ public sealed partial class GraphMutationSession
     private RuntimeDataService? _service;
     private readonly HashSet<MutationTraceScope> _scopes = new();
     private readonly List<Func<Task>> _commit = new();
+    private readonly List<Action> _readback = new();
     private readonly List<Action> _rollback = new();
     private readonly List<Value> _intentValues = new();
     private bool _active = true;
     public MutationIntent Intent { get; }
+    public bool HasOuterTransaction => _context.HasExplicitTransaction;
     internal bool IsPreparing => _active && _transaction == null;
     internal CheckerMessageConfiguration CheckerConfiguration { get; }
     internal string? CheckerOrigin { get; private set; }
@@ -90,17 +92,32 @@ public sealed partial class GraphMutationSession
             .MutateAsync(Request(request, scope));
     }
 
-    public Task<ulong> AllocateIdAsync(string entity)
+    public async Task<ulong> AllocateIdAsync(string entity)
     {
         RequireActive();
         if (_transaction == null) throw new InvalidOperationException("GRAPH_PREPARATION_CANNOT_ALLOCATE_ID");
-        return (_context.InternalIdAllocator ?? _transaction as IInternalIdAllocator
-            ?? throw new NotSupportedException("Graph provider requires ID allocation support")).NextIdAsync(entity);
+        var allocator = _context.InternalIdAllocator ?? _transaction as IInternalIdAllocator
+            ?? throw new NotSupportedException("Graph provider requires ID allocation support");
+        using var command = await _context.EnterTransactionCommandAsync().ConfigureAwait(false);
+        return await allocator.NextIdAsync(entity).ConfigureAwait(false);
     }
 
     public void AfterCommit(Action action) => AfterCommit(() => { action(); return Task.CompletedTask; });
     internal void AfterCommit(Func<Task> action) { RequireActive(); _commit.Add(action); }
     public void AfterRollback(Action action) { RequireActive(); _rollback.Add(action); }
+
+    public void AcceptSavedState(Action action)
+    {
+        RequireActive();
+        if (HasOuterTransaction) _readback.Add(action);
+        else AfterCommit(action);
+    }
+
+    internal void StageSavedState()
+    {
+        foreach (var accept in _readback) accept();
+        _readback.Clear();
+    }
 
     internal async Task CompleteAsync()
     {
@@ -125,6 +142,7 @@ public sealed partial class GraphMutationSession
     {
         CheckerOrigin = null;
         _active = false;
+        _readback.Clear();
         ClearPreparedMutations();
     }
 }

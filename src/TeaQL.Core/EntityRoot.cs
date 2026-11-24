@@ -27,6 +27,10 @@ public sealed class EntityRoot
     private readonly ConcurrentDictionary<EntityKey, byte> _deletedKeys = new();
     private readonly ConcurrentDictionary<EntityKey, IReadOnlyList<TraceNode>> _traces = new();
     private readonly object _gate = new();
+    private volatile bool _transactionOutcomeUnknown;
+
+    internal void FenceTransactionOutcome() => _transactionOutcomeUnknown = true;
+    internal bool TransactionOutcomeUnknown => _transactionOutcomeUnknown;
 
     /// <summary>Complete per-entity replacement, not a suffix or a Context trace.</summary>
     public void SetTraceChain(EntityKey key, IEnumerable<TraceNode> chain)
@@ -190,6 +194,24 @@ public sealed class EntityRoot
     {
         lock (_gate) return new Entry(key, Change(key), OriginalVersion(key), IsNew(key), IsDeleted(key),
             _traces.TryGetValue(key, out var trace) ? trace : null);
+    }
+
+    /// <summary>Generated graph rollback preserves a key's original baseline and later pending edits.</summary>
+    public Action<Record, bool> CaptureTransactionKey(EntityKey key)
+    {
+        var entry = Snapshot(key);
+        return (later, deleted) =>
+        {
+            lock (_gate)
+            {
+                ClearEntity(key);
+                _originalVersions.TryRemove(key, out _);
+                Import(entry);
+                if (deleted) MarkAsDeleted(key);
+                else if (!entry.Deleted)
+                    foreach (var (field, value) in later) Set(key, field, value);
+            }
+        };
     }
     private Entry[] Snapshots()
     {
