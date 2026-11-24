@@ -15,13 +15,19 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
     ISchemaConnectionInitializer, ISchemaCompatibilityVerifier
 {
     private readonly SqliteConnection _connection;
-    private static readonly ConditionalWeakTable<SqliteConnection, SemaphoreSlim> ConnectionGates = new();
-    private readonly SemaphoreSlim _connectionGate;
+    private static readonly ConditionalWeakTable<SqliteConnection, ConnectionState> Connections = new();
+    private readonly ConnectionState _connectionState;
+
+    private sealed class ConnectionState
+    {
+        public readonly SemaphoreSlim Gate = new(1, 1);
+        public int OpenStreams;
+    }
 
     public SqliteTransport(SqliteConnection connection)
     {
         _connection = connection;
-        _connectionGate = ConnectionGates.GetValue(connection, _ => new SemaphoreSlim(1, 1));
+        _connectionState = Connections.GetValue(connection, _ => new ConnectionState());
         _connection.CreateCollation("TEAQL_DECIMAL", CompareExactDecimal);
         _connection.CreateFunction<string?, bool>("teaql_decimal_valid", ExactDecimal.IsValid,
             isDeterministic: true);
@@ -137,7 +143,6 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         CompiledQuery query,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        using var lease = await LeaseConnectionAsync(cancellationToken);
         using var cmd = _connection.CreateCommand();
         cmd.CommandText = query.SqlWithComment();
         for (var i = 0; i < query.Params.Count; i++)
@@ -147,7 +152,26 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
             BindValue(p, query.Params[i]);
             cmd.Parameters.Add(p);
         }
-        await foreach (var row in ReadStreamAsync(cmd, query, cancellationToken)) yield return row;
+        var cursor = ReadStreamAsync(cmd, query, cancellationToken).GetAsyncEnumerator(cancellationToken);
+        using (await LeaseConnectionAsync(cancellationToken))
+            _connectionState.OpenStreams++;
+        try
+        {
+            while (true)
+            {
+                bool hasRow;
+                using (await LeaseConnectionAsync(cancellationToken))
+                    hasRow = await cursor.MoveNextAsync();
+                if (!hasRow) break;
+                yield return cursor.Current;
+            }
+        }
+        finally
+        {
+            using var lease = await LeaseConnectionAsync();
+            try { await cursor.DisposeAsync(); }
+            finally { _connectionState.OpenStreams--; }
+        }
     }
 
     private async IAsyncEnumerable<Record> ReadStreamAsync(SqliteCommand command, CompiledQuery query,
@@ -188,6 +212,8 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
         var lease = await LeaseConnectionAsync();
         try
         {
+            if (_connectionState.OpenStreams > 0)
+                throw new InvalidOperationException("Close the active SQLite streams before starting a transaction");
             var transaction = await _connection.BeginTransactionAsync();
             return new Transaction(_connection, (SqliteTransaction)transaction, this, lease);
         }
@@ -200,8 +226,8 @@ public class SqliteTransport : IStreamingSqlTransport, IAutomaticMutationTransac
 
     private async Task<IDisposable> LeaseConnectionAsync(CancellationToken cancellationToken = default)
     {
-        await _connectionGate.WaitAsync(cancellationToken);
-        return new ConnectionLease(_connectionGate);
+        await _connectionState.Gate.WaitAsync(cancellationToken);
+        return new ConnectionLease(_connectionState.Gate);
     }
 
     private sealed class ConnectionLease(SemaphoreSlim gate) : IDisposable
