@@ -120,78 +120,78 @@ namespace Generated.Requests
 
         public FreightQuoteRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("platform");
-            _query.Project("reference");
-            _query.Project("amount");
-            _query.Project("shipment_number");
-            _query.Project("package_count");
-            _query.Project("delivery_date");
-            _query.Project("pickup_time");
-            _query.Project("quoted_at");
-            _query.Project("instructions");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public FreightQuoteRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public FreightQuoteRequest SelectReference()
                 {
-                    _query.Project("reference");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectAmount()
                 {
-                    _query.Project("amount");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectShipmentNumber()
                 {
-                    _query.Project("shipment_number");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectPackageCount()
                 {
-                    _query.Project("package_count");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectDeliveryDate()
                 {
-                    _query.Project("delivery_date");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectPickupTime()
                 {
-                    _query.Project("pickup_time");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectQuotedAt()
                 {
-                    _query.Project("quoted_at");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectInstructions()
                 {
-                    _query.Project("instructions");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -202,907 +202,907 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SelectPlatformWith(PlatformRequest related)
                 {
-                    _query.Project("platform");
-                    _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, "Platform", global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: "Platform")
+                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public FreightQuoteRequest WithPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public FreightQuoteRequest WithoutPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest FilterByPlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest FilterByPlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("reference", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public FreightQuoteRequest WithReferenceIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("reference", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("reference"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("reference"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
                 public FreightQuoteRequest WithReferenceNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("reference", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("reference", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("reference", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("reference", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("reference", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithReferenceSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("reference", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("amount", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("amount", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("amount", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("amount", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("amount", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("amount", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("amount", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("amount", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("amount", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("amount"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithAmountIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("amount"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("shipment_number", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("shipment_number", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("shipment_number", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("shipment_number", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("shipment_number", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("shipment_number", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("shipment_number", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("shipment_number", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("shipment_number", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("shipment_number"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithShipmentNumberIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("shipment_number"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("package_count", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("package_count", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("package_count", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("package_count", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("package_count", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("package_count", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("package_count", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("package_count", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("package_count", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("package_count"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPackageCountIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("package_count"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("delivery_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("delivery_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("delivery_date", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("delivery_date", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("delivery_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("delivery_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("delivery_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("delivery_date", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("delivery_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("delivery_date"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithDeliveryDateIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("delivery_date"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("pickup_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("pickup_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("pickup_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("pickup_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("pickup_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("pickup_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("pickup_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("pickup_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("pickup_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("pickup_time"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithPickupTimeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("pickup_time"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("quoted_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("quoted_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("quoted_at", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("quoted_at", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("quoted_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("quoted_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("quoted_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("quoted_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("quoted_at", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("quoted_at"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithQuotedAtIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("quoted_at"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("instructions", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public FreightQuoteRequest WithInstructionsIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("instructions", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("instructions", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("instructions", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("instructions"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("instructions"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY));
                     return this;
                 }
                 public FreightQuoteRequest WithInstructionsNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("instructions", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("instructions", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("instructions", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("instructions", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("instructions", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithInstructionsSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("instructions", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public FreightQuoteRequest OrderByReferenceAscending()
                 {
-                    _query.OrderBy("reference", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByReferenceDescending()
                 {
-                    _query.OrderBy("reference", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByAmountAscending()
                 {
-                    _query.OrderBy("amount", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByAmountDescending()
                 {
-                    _query.OrderBy("amount", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByShipmentNumberAscending()
                 {
-                    _query.OrderBy("shipment_number", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByShipmentNumberDescending()
                 {
-                    _query.OrderBy("shipment_number", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByPackageCountAscending()
                 {
-                    _query.OrderBy("package_count", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByPackageCountDescending()
                 {
-                    _query.OrderBy("package_count", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByDeliveryDateAscending()
                 {
-                    _query.OrderBy("delivery_date", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByDeliveryDateDescending()
                 {
-                    _query.OrderBy("delivery_date", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByPickupTimeAscending()
                 {
-                    _query.OrderBy("pickup_time", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByPickupTimeDescending()
                 {
-                    _query.OrderBy("pickup_time", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByQuotedAtAscending()
                 {
-                    _query.OrderBy("quoted_at", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByQuotedAtDescending()
                 {
-                    _query.OrderBy("quoted_at", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByInstructionsAscending()
                 {
-                    _query.OrderBy("instructions", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByInstructionsDescending()
                 {
-                    _query.OrderBy("instructions", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public FreightQuoteRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -1127,7 +1127,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest MinAmountAs(string retName)
                 {
-                    _query.Aggregate("min", "amount", retName);
+                    _query.Aggregate("min", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest MaxAmount()
@@ -1137,7 +1137,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest MaxAmountAs(string retName)
                 {
-                    _query.Aggregate("max", "amount", retName);
+                    _query.Aggregate("max", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SumAmount()
@@ -1147,7 +1147,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SumAmountAs(string retName)
                 {
-                    _query.Aggregate("sum", "amount", retName);
+                    _query.Aggregate("sum", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest AvgAmount()
@@ -1157,7 +1157,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest AvgAmountAs(string retName)
                 {
-                    _query.Aggregate("avg", "amount", retName);
+                    _query.Aggregate("avg", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest StandardDeviationAmount()
@@ -1167,7 +1167,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest StandardDeviationAmountAs(string retName)
                 {
-                    _query.Aggregate("stddev", "amount", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SquareRootOfPopulationStandardDeviationAmount()
@@ -1177,7 +1177,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SquareRootOfPopulationStandardDeviationAmountAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "amount", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SampleVarianceAmount()
@@ -1187,7 +1187,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SampleVarianceAmountAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "amount", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SamplePopulationVarianceAmount()
@@ -1197,7 +1197,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SamplePopulationVarianceAmountAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "amount", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest MinShipmentNumber()
@@ -1207,7 +1207,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest MinShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("min", "shipment_number", retName);
+                    _query.Aggregate("min", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest MaxShipmentNumber()
@@ -1217,7 +1217,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest MaxShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("max", "shipment_number", retName);
+                    _query.Aggregate("max", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SumShipmentNumber()
@@ -1227,7 +1227,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SumShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("sum", "shipment_number", retName);
+                    _query.Aggregate("sum", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest AvgShipmentNumber()
@@ -1237,7 +1237,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest AvgShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("avg", "shipment_number", retName);
+                    _query.Aggregate("avg", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest StandardDeviationShipmentNumber()
@@ -1247,7 +1247,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest StandardDeviationShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("stddev", "shipment_number", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SquareRootOfPopulationStandardDeviationShipmentNumber()
@@ -1257,7 +1257,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SquareRootOfPopulationStandardDeviationShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "shipment_number", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SampleVarianceShipmentNumber()
@@ -1267,7 +1267,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SampleVarianceShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "shipment_number", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SamplePopulationVarianceShipmentNumber()
@@ -1277,7 +1277,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SamplePopulationVarianceShipmentNumberAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "shipment_number", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest MinPackageCount()
@@ -1287,7 +1287,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest MinPackageCountAs(string retName)
                 {
-                    _query.Aggregate("min", "package_count", retName);
+                    _query.Aggregate("min", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest MaxPackageCount()
@@ -1297,7 +1297,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest MaxPackageCountAs(string retName)
                 {
-                    _query.Aggregate("max", "package_count", retName);
+                    _query.Aggregate("max", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SumPackageCount()
@@ -1307,7 +1307,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SumPackageCountAs(string retName)
                 {
-                    _query.Aggregate("sum", "package_count", retName);
+                    _query.Aggregate("sum", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest AvgPackageCount()
@@ -1317,7 +1317,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest AvgPackageCountAs(string retName)
                 {
-                    _query.Aggregate("avg", "package_count", retName);
+                    _query.Aggregate("avg", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest StandardDeviationPackageCount()
@@ -1327,7 +1327,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest StandardDeviationPackageCountAs(string retName)
                 {
-                    _query.Aggregate("stddev", "package_count", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SquareRootOfPopulationStandardDeviationPackageCount()
@@ -1337,7 +1337,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SquareRootOfPopulationStandardDeviationPackageCountAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "package_count", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SampleVariancePackageCount()
@@ -1347,7 +1347,7 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SampleVariancePackageCountAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "package_count", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest SamplePopulationVariancePackageCount()
@@ -1357,128 +1357,128 @@ namespace Generated.Requests
 
                 public FreightQuoteRequest SamplePopulationVariancePackageCountAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "package_count", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public FreightQuoteRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByPlatform()
                 {
-                    _query.GroupBy("platform");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByPlatformAs(string retName)
                 {
-                    _query.GroupBy("platform"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByReference()
                 {
-                    _query.GroupBy("reference");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByReferenceAs(string retName)
                 {
-                    _query.GroupBy("reference"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByAmount()
                 {
-                    _query.GroupBy("amount");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByAmountAs(string retName)
                 {
-                    _query.GroupBy("amount"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByShipmentNumber()
                 {
-                    _query.GroupBy("shipment_number");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByShipmentNumberAs(string retName)
                 {
-                    _query.GroupBy("shipment_number"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByPackageCount()
                 {
-                    _query.GroupBy("package_count");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByPackageCountAs(string retName)
                 {
-                    _query.GroupBy("package_count"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByDeliveryDate()
                 {
-                    _query.GroupBy("delivery_date");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByDeliveryDateAs(string retName)
                 {
-                    _query.GroupBy("delivery_date"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByPickupTime()
                 {
-                    _query.GroupBy("pickup_time");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByPickupTimeAs(string retName)
                 {
-                    _query.GroupBy("pickup_time"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByQuotedAt()
                 {
-                    _query.GroupBy("quoted_at");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByQuotedAtAs(string retName)
                 {
-                    _query.GroupBy("quoted_at"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByInstructions()
                 {
-                    _query.GroupBy("instructions");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByInstructionsAs(string retName)
                 {
-                    _query.GroupBy("instructions"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public FreightQuoteRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public FreightQuoteRequest FacetByPlatformAs(
@@ -1486,8 +1486,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Platform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, "platform")
+                        name, global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, global::Generated.Models.FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }

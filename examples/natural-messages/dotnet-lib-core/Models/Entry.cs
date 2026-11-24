@@ -9,13 +9,41 @@ namespace Generated.Models
 
     public class Entry : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string CATALOG_PROPERTY_MEMBER = "Catalog";
+            internal const string CATALOG_PROPERTY_QUERY = "catalog";
+            internal const string CATALOG_PROPERTY_STORAGE = "catalog";
+            internal const string CATALOG_PROPERTY_MODEL = "catalog";
+            internal const string NAME_PROPERTY_MEMBER = "Name";
+            internal const string NAME_PROPERTY_QUERY = "name";
+            internal const string NAME_PROPERTY_STORAGE = "name";
+            internal const string NAME_PROPERTY_MODEL = "name";
+            internal const string CREATE_TIME_PROPERTY_MEMBER = "CreateTime";
+            internal const string CREATE_TIME_PROPERTY_QUERY = "create_time";
+            internal const string CREATE_TIME_PROPERTY_STORAGE = "create_time";
+            internal const string CREATE_TIME_PROPERTY_MODEL = "create_time";
+            internal const string UPDATE_TIME_PROPERTY_MEMBER = "UpdateTime";
+            internal const string UPDATE_TIME_PROPERTY_QUERY = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_STORAGE = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_MODEL = "update_time";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("Entry", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("catalog", global::TeaQL.Runtime.EntityJsonKind.Reference, "catalog", () => global::Generated.Models.Catalog._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("name", global::TeaQL.Runtime.EntityJsonKind.Text, "name"),
-            new global::TeaQL.Runtime.EntityJsonField("create_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "create_time"),
-            new global::TeaQL.Runtime.EntityJsonField("update_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "update_time"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, Entry.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.CATALOG_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, () => global::Generated.Models.Catalog._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Entry.__TeaqlFields.NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -29,31 +57,31 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Catalog"))
+            if (IsLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER))
             {
                 object? jsonCatalog = IsLoaded("CatalogEntity") && CatalogEntity != null && CatalogEntity.Id == Catalog
                     ? CatalogEntity : Catalog;
-                yield return new KeyValuePair<string, object?>("catalog", jsonCatalog);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, jsonCatalog);
             }
-            if (IsLoaded("Name"))
+            if (IsLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("name", Name);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, Name);
             }
-            if (IsLoaded("CreateTime"))
+            if (IsLoaded(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("create_time", CreateTime);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, CreateTime);
             }
-            if (IsLoaded("UpdateTime"))
+            if (IsLoaded(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("update_time", UpdateTime);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, UpdateTime);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -200,16 +228,16 @@ namespace Generated.Models
         {
             var entity = new Entry().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Catalog", out var catalogValue)
-                        || record.TryGetValue("catalog", out catalogValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER, out var catalogValue)
+                        || record.TryGetValue(Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, out catalogValue))
                     {
-                        entity.MarkLoaded("Catalog");
+                        entity.MarkLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER);
                         if (catalogValue.Raw is Record catalogRow)
                         {
                             entity.CatalogEntity = global::Generated.Models.Catalog.FromRecord(catalogRow);
@@ -231,33 +259,33 @@ namespace Generated.Models
                         else if (catalogValue.Raw != null)
                             entity.Catalog = Convert.ToInt64(catalogValue.Raw);
                     }
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                     {
-                        entity.MarkLoaded("Name");
+                        entity.MarkLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER);
                         if (nameValue.Raw != null)
                             entity.Name = Convert.ToString(nameValue.Raw);
                     }
-                    if (record.TryGetValue("create_time", out var createTimeValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
                     {
-                        entity.MarkLoaded("CreateTime");
+                        entity.MarkLoaded(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
                         if (createTimeValue.Raw != null)
                             entity.CreateTime = TeaqlDateTime(createTimeValue);
                     }
-                    if (record.TryGetValue("update_time", out var updateTimeValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
                     {
-                        entity.MarkLoaded("UpdateTime");
+                        entity.MarkLoaded(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
                         if (updateTimeValue.Raw != null)
                             entity.UpdateTime = TeaqlDateTime(updateTimeValue);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "catalog", "name", "create_time", "update_time", "version",
-                "Id", "Catalog", "Name", "CreateTime", "UpdateTime", "Version",
+                Entry.__TeaqlFields.ID_PROPERTY_QUERY, Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY, Entry.__TeaqlFields.NAME_PROPERTY_QUERY, Entry.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, Entry.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                Entry.__TeaqlFields.ID_PROPERTY_MEMBER, Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER, Entry.__TeaqlFields.NAME_PROPERTY_MEMBER, Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER, Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER, Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -316,18 +344,18 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Catalog"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("catalog"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CreateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("UpdateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.CATALOG_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -454,12 +482,12 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Catalog")) record["catalog"] = TeaqlValue(Catalog);
-                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
-                        if (IsLoaded("CreateTime")) record["create_time"] = TeaqlValue(CreateTime);
-                        if (IsLoaded("UpdateTime")) record["update_time"] = TeaqlValue(UpdateTime);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE] = TeaqlValue(Catalog);
+                        if (IsLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.NAME_PROPERTY_STORAGE] = TeaqlValue(Name);
+                        if (IsLoaded(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = TeaqlValue(CreateTime);
+                        if (IsLoaded(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = TeaqlValue(UpdateTime);
+                        if (IsLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -467,16 +495,16 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("catalog", out var catalogValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, out var catalogValue))
                         this.Catalog = catalogValue.Raw == null ? null : Convert.ToInt64(catalogValue.Raw);
 
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                         this.Name = nameValue.Raw == null ? null : Convert.ToString(nameValue.Raw);
 
-                    if (record.TryGetValue("create_time", out var createTimeValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
                         this.CreateTime = createTimeValue.Raw == null ? null : TeaqlDateTime(createTimeValue);
 
-                    if (record.TryGetValue("update_time", out var updateTimeValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
                         this.UpdateTime = updateTimeValue.Raw == null ? null : TeaqlDateTime(updateTimeValue);
 
 
@@ -485,17 +513,17 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[Entry.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Catalog.HasValue) record["catalog"] = new Value.I64Value(Catalog.Value);
+                    if (Catalog.HasValue) record[Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE] = new Value.I64Value(Catalog.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[Entry.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "Entry", Values = record };
         }
@@ -503,15 +531,15 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Catalog.HasValue) record["catalog"] = new Value.I64Value(Catalog.Value);
+                    if (Catalog.HasValue) record[Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE] = new Value.I64Value(Catalog.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[Entry.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "Entry", 
@@ -540,8 +568,8 @@ namespace Generated.Models
                 public Entry UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -549,40 +577,40 @@ namespace Generated.Models
                 {
                     if (this.Catalog != value) this.CatalogEntity = null;
                     this.Catalog = value;
-                    MarkLoaded("Catalog");
-                    _entityRoot.Set(TeaqlEntityKey(), "catalog", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateName(string value)
                 {
                     this.Name = value;
-                    MarkLoaded("Name");
-                    _entityRoot.Set(TeaqlEntityKey(), "name", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateCreateTime(DateTime? value)
                 {
                     this.CreateTime = value;
-                    MarkLoaded("CreateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "create_time", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateUpdateTime(DateTime? value)
                 {
                     this.UpdateTime = value;
-                    MarkLoaded("UpdateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "update_time", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public Entry UpdateCatalog(Catalog value)

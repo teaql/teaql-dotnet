@@ -120,50 +120,50 @@ namespace Generated.Requests
 
         public OrderStatusRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("name");
-            _query.Project("code");
-            _query.Project("color");
-            _query.Project("display_order");
-            _query.Project("commerce_platform");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public OrderStatusRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest SelectCode()
                 {
-                    _query.Project("code");
+                    _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest SelectColor()
                 {
-                    _query.Project("color");
+                    _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest SelectDisplayOrder()
                 {
-                    _query.Project("display_order");
+                    _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public OrderStatusRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -174,635 +174,635 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SelectCommercePlatformWith(CommercePlatformRequest related)
                 {
-                    _query.Project("commerce_platform");
-                    _query.ForwardRelationQuery("CommercePlatform", "CommercePlatform", "commerce_platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, "CommercePlatform", global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCommercePlatformWith", Relation: "CommercePlatform")
+                        Operation = new QueryOperation("relation", "SelectCommercePlatformWith", Relation: global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public OrderStatusRequest WithCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderStatusRequest WithoutCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderStatusRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderStatusRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("code", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderStatusRequest WithCodeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("code"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("code"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderStatusRequest WithCodeNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("code", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("code", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("code", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("code", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("code", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithCodeSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("code", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("color", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderStatusRequest WithColorIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("color", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("color", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("color", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("color"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("color"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderStatusRequest WithColorNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("color", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("color", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("color", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("color", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("color", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithColorSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("color", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("display_order", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("display_order"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithDisplayOrderIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("display_order"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest FilterByCommercePlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("commerce_platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderStatusRequest FilterByCommercePlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("commerce_platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public OrderStatusRequest WithCommercePlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("commerce_platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithCommercePlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("commerce_platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderStatusRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByCodeAscending()
                 {
-                    _query.OrderBy("code", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByCodeDescending()
                 {
-                    _query.OrderBy("code", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByColorAscending()
                 {
-                    _query.OrderBy("color", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByColorDescending()
                 {
-                    _query.OrderBy("color", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByDisplayOrderAscending()
                 {
-                    _query.OrderBy("display_order", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByDisplayOrderDescending()
                 {
-                    _query.OrderBy("display_order", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public OrderStatusRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderStatusRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -827,7 +827,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest MinDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("min", "display_order", retName);
+                    _query.Aggregate("min", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest MaxDisplayOrder()
@@ -837,7 +837,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest MaxDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("max", "display_order", retName);
+                    _query.Aggregate("max", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest SumDisplayOrder()
@@ -847,7 +847,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SumDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("sum", "display_order", retName);
+                    _query.Aggregate("sum", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest AvgDisplayOrder()
@@ -857,7 +857,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest AvgDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("avg", "display_order", retName);
+                    _query.Aggregate("avg", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest StandardDeviationDisplayOrder()
@@ -867,7 +867,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest StandardDeviationDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("stddev", "display_order", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest SquareRootOfPopulationStandardDeviationDisplayOrder()
@@ -877,7 +877,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SquareRootOfPopulationStandardDeviationDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "display_order", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest SampleVarianceDisplayOrder()
@@ -887,7 +887,7 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SampleVarianceDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "display_order", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest SamplePopulationVarianceDisplayOrder()
@@ -897,84 +897,84 @@ namespace Generated.Requests
 
                 public OrderStatusRequest SamplePopulationVarianceDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "display_order", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderStatusRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderStatusRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderStatusRequest GroupByCode()
                 {
-                    _query.GroupBy("code");
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest GroupByCodeAs(string retName)
                 {
-                    _query.GroupBy("code"); 
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderStatusRequest GroupByColor()
                 {
-                    _query.GroupBy("color");
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest GroupByColorAs(string retName)
                 {
-                    _query.GroupBy("color"); 
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderStatusRequest GroupByDisplayOrder()
                 {
-                    _query.GroupBy("display_order");
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest GroupByDisplayOrderAs(string retName)
                 {
-                    _query.GroupBy("display_order"); 
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderStatusRequest GroupByCommercePlatform()
                 {
-                    _query.GroupBy("commerce_platform");
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest GroupByCommercePlatformAs(string retName)
                 {
-                    _query.GroupBy("commerce_platform"); 
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderStatusRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderStatusRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.OrderStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderStatusRequest SelectCustomerOrderList()
@@ -1139,8 +1139,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "CommercePlatform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCommercePlatformAs", name, "commerce_platform")
+                        name, global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCommercePlatformAs", name, global::Generated.Models.OrderStatus.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }

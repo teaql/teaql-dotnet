@@ -9,11 +9,31 @@ namespace Generated.Models
 
     public class PaymentAttempt : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string PAYMENT_PROPERTY_MEMBER = "Payment";
+            internal const string PAYMENT_PROPERTY_QUERY = "payment";
+            internal const string PAYMENT_PROPERTY_STORAGE = "payment";
+            internal const string PAYMENT_PROPERTY_MODEL = "payment";
+            internal const string REFERENCE_CODE_PROPERTY_MEMBER = "ReferenceCode";
+            internal const string REFERENCE_CODE_PROPERTY_QUERY = "reference_code";
+            internal const string REFERENCE_CODE_PROPERTY_STORAGE = "reference_code";
+            internal const string REFERENCE_CODE_PROPERTY_MODEL = "reference_code";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("PaymentAttempt", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("payment", global::TeaQL.Runtime.EntityJsonKind.Reference, "payment", () => global::Generated.Models.Payment._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("reference_code", global::TeaQL.Runtime.EntityJsonKind.Text, "reference_code"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(PaymentAttempt.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, PaymentAttempt.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE, () => global::Generated.Models.Payment._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -27,23 +47,23 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(PaymentAttempt.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(PaymentAttempt.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Payment"))
+            if (IsLoaded(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER))
             {
                 object? jsonPayment = IsLoaded("PaymentEntity") && PaymentEntity != null && PaymentEntity.Id == Payment
                     ? PaymentEntity : Payment;
-                yield return new KeyValuePair<string, object?>("payment", jsonPayment);
+                yield return new KeyValuePair<string, object?>(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE, jsonPayment);
             }
-            if (IsLoaded("ReferenceCode"))
+            if (IsLoaded(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("reference_code", ReferenceCode);
+                yield return new KeyValuePair<string, object?>(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE, ReferenceCode);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -188,16 +208,16 @@ namespace Generated.Models
         {
             var entity = new PaymentAttempt().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(PaymentAttempt.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(PaymentAttempt.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Payment", out var paymentValue)
-                        || record.TryGetValue("payment", out paymentValue))
+                    if (record.TryGetValue(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER, out var paymentValue)
+                        || record.TryGetValue(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE, out paymentValue))
                     {
-                        entity.MarkLoaded("Payment");
+                        entity.MarkLoaded(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER);
                         if (paymentValue.Raw is Record paymentRow)
                         {
                             entity.PaymentEntity = global::Generated.Models.Payment.FromRecord(paymentRow);
@@ -219,21 +239,21 @@ namespace Generated.Models
                         else if (paymentValue.Raw != null)
                             entity.Payment = Convert.ToInt64(paymentValue.Raw);
                     }
-                    if (record.TryGetValue("reference_code", out var referenceCodeValue))
+                    if (record.TryGetValue(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE, out var referenceCodeValue))
                     {
-                        entity.MarkLoaded("ReferenceCode");
+                        entity.MarkLoaded(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MEMBER);
                         if (referenceCodeValue.Raw != null)
                             entity.ReferenceCode = Convert.ToString(referenceCodeValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "payment", "reference_code", "version",
-                "Id", "Payment", "ReferenceCode", "Version",
+                PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY, PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                PaymentAttempt.__TeaqlFields.ID_PROPERTY_MEMBER, PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER, PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MEMBER, PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -292,14 +312,14 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Payment"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property("payment"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ReferenceCode"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property("reference_code"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PaymentAttempt.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property(PaymentAttempt.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PaymentAttempt", Location = ObjectLocation.Property(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -420,10 +440,10 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Payment")) record["payment"] = TeaqlValue(Payment);
-                        if (IsLoaded("ReferenceCode")) record["reference_code"] = TeaqlValue(ReferenceCode);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(PaymentAttempt.__TeaqlFields.ID_PROPERTY_MEMBER)) record[PaymentAttempt.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER)) record[PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE] = TeaqlValue(Payment);
+                        if (IsLoaded(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MEMBER)) record[PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE] = TeaqlValue(ReferenceCode);
+                        if (IsLoaded(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -431,10 +451,10 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("payment", out var paymentValue))
+                    if (record.TryGetValue(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE, out var paymentValue))
                         this.Payment = paymentValue.Raw == null ? null : Convert.ToInt64(paymentValue.Raw);
 
-                    if (record.TryGetValue("reference_code", out var referenceCodeValue))
+                    if (record.TryGetValue(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE, out var referenceCodeValue))
                         this.ReferenceCode = referenceCodeValue.Raw == null ? null : Convert.ToString(referenceCodeValue.Raw);
 
 
@@ -443,13 +463,13 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[PaymentAttempt.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Payment.HasValue) record["payment"] = new Value.I64Value(Payment.Value);
+                    if (Payment.HasValue) record[PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE] = new Value.I64Value(Payment.Value);
 
-                    if (ReferenceCode != null) record["reference_code"] = new Value.TextValue(ReferenceCode);
+                    if (ReferenceCode != null) record[PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE] = new Value.TextValue(ReferenceCode);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "PaymentAttempt", Values = record };
         }
@@ -457,11 +477,11 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Payment.HasValue) record["payment"] = new Value.I64Value(Payment.Value);
+                    if (Payment.HasValue) record[PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE] = new Value.I64Value(Payment.Value);
 
-                    if (ReferenceCode != null) record["reference_code"] = new Value.TextValue(ReferenceCode);
+                    if (ReferenceCode != null) record[PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE] = new Value.TextValue(ReferenceCode);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "PaymentAttempt", 
@@ -490,8 +510,8 @@ namespace Generated.Models
                 public PaymentAttempt UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(PaymentAttempt.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PaymentAttempt.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -499,24 +519,24 @@ namespace Generated.Models
                 {
                     if (this.Payment != value) this.PaymentEntity = null;
                     this.Payment = value;
-                    MarkLoaded("Payment");
-                    _entityRoot.Set(TeaqlEntityKey(), "payment", TeaqlValue(value));
+                    MarkLoaded(PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PaymentAttempt UpdateReferenceCode(string value)
                 {
                     this.ReferenceCode = value;
-                    MarkLoaded("ReferenceCode");
-                    _entityRoot.Set(TeaqlEntityKey(), "reference_code", TeaqlValue(value));
+                    MarkLoaded(PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PaymentAttempt UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public PaymentAttempt UpdatePayment(Payment value)

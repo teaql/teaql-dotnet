@@ -120,78 +120,78 @@ namespace Generated.Requests
 
         public EntryRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("catalog");
-            _query.Project("name");
-            _query.Project("born_at");
-            _query.Project("touched_at");
-            _query.Project("source_ip");
-            _query.Project("last_ip");
-            _query.Project("opened_by");
-            _query.Project("changed_by");
-            _query.Project("guarded_token");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public EntryRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public EntryRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectBornAt()
                 {
-                    _query.Project("born_at");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectTouchedAt()
                 {
-                    _query.Project("touched_at");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectSourceIp()
                 {
-                    _query.Project("source_ip");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectLastIp()
                 {
-                    _query.Project("last_ip");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectOpenedBy()
                 {
-                    _query.Project("opened_by");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectChangedBy()
                 {
-                    _query.Project("changed_by");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectGuardedToken()
                 {
-                    _query.Project("guarded_token");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -202,1067 +202,1067 @@ namespace Generated.Requests
 
                 public EntryRequest SelectCatalogWith(CatalogRequest related)
                 {
-                    _query.Project("catalog");
-                    _query.ForwardRelationQuery("Catalog", "Catalog", "catalog", related.GetQuery());
+                    _query.Project(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER, "Catalog", global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCatalogWith", Relation: "Catalog")
+                        Operation = new QueryOperation("relation", "SelectCatalogWith", Relation: global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public EntryRequest WithCatalogMatching(CatalogRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("catalog", GeneratedRuntimeModule.Module.Metadata.GetEntity("Catalog")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Catalog")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public EntryRequest WithoutCatalogMatching(CatalogRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("catalog", GeneratedRuntimeModule.Module.Metadata.GetEntity("Catalog")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Catalog")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public EntryRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest FilterByCatalog(object val)
                 {
-                    _query.AndFilter(Expr.Eq("catalog", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest FilterByCatalogIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("catalog", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public EntryRequest WithCatalogIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("catalog"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithCatalogIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("catalog"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public EntryRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public EntryRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithBornAtIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("born_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithBornAtIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("born_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithBornAtIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("born_at", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithBornAtNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("born_at", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithBornAtGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("born_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithBornAtGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("born_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithBornAtLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("born_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithBornAtLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("born_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithBornAtBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("born_at", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithBornAtIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("born_at"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithBornAtIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("born_at"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("touched_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("touched_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("touched_at", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("touched_at", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("touched_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("touched_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("touched_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("touched_at", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("touched_at", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("touched_at"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithTouchedAtIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("touched_at"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("source_ip", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("source_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public EntryRequest WithSourceIpIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("source_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("source_ip", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("source_ip", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("source_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("source_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("source_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("source_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("source_ip", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("source_ip"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("source_ip"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY));
                     return this;
                 }
                 public EntryRequest WithSourceIpNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("source_ip", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("source_ip", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("source_ip", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("source_ip", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("source_ip", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithSourceIpSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("source_ip", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithLastIpContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("last_ip", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithLastIpIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("last_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public EntryRequest WithLastIpIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("last_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithLastIpIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("last_ip", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithLastIpNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("last_ip", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithLastIpGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("last_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithLastIpGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("last_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithLastIpLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("last_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithLastIpLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("last_ip", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithLastIpBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("last_ip", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithLastIpIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("last_ip"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithLastIpIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("last_ip"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY));
                     return this;
                 }
                 public EntryRequest WithLastIpNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("last_ip", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithLastIpStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("last_ip", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithLastIpNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("last_ip", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithLastIpEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("last_ip", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithLastIpNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("last_ip", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithLastIpSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("last_ip", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("opened_by", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("opened_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public EntryRequest WithOpenedByIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("opened_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("opened_by", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("opened_by", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("opened_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("opened_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("opened_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("opened_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("opened_by", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("opened_by"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("opened_by"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY));
                     return this;
                 }
                 public EntryRequest WithOpenedByNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("opened_by", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("opened_by", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("opened_by", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("opened_by", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithOpenedByNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("opened_by", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithOpenedBySoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("opened_by", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithChangedByContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("changed_by", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithChangedByIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("changed_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public EntryRequest WithChangedByIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("changed_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithChangedByIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("changed_by", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithChangedByNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("changed_by", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithChangedByGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("changed_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithChangedByGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("changed_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithChangedByLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("changed_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithChangedByLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("changed_by", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithChangedByBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("changed_by", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithChangedByIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("changed_by"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithChangedByIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("changed_by"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY));
                     return this;
                 }
                 public EntryRequest WithChangedByNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("changed_by", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithChangedByStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("changed_by", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithChangedByNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("changed_by", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithChangedByEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("changed_by", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithChangedByNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("changed_by", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithChangedBySoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("changed_by", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("guarded_token", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("guarded_token", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public EntryRequest WithGuardedTokenIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("guarded_token", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("guarded_token", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("guarded_token", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("guarded_token", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("guarded_token", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("guarded_token", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("guarded_token", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("guarded_token", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("guarded_token"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("guarded_token"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY));
                     return this;
                 }
                 public EntryRequest WithGuardedTokenNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("guarded_token", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("guarded_token", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("guarded_token", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("guarded_token", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("guarded_token", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithGuardedTokenSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("guarded_token", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public EntryRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public EntryRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public EntryRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public EntryRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public EntryRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public EntryRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderByBornAtAscending()
                 {
-                    _query.OrderBy("born_at", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByBornAtDescending()
                 {
-                    _query.OrderBy("born_at", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderByTouchedAtAscending()
                 {
-                    _query.OrderBy("touched_at", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByTouchedAtDescending()
                 {
-                    _query.OrderBy("touched_at", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderBySourceIpAscending()
                 {
-                    _query.OrderBy("source_ip", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderBySourceIpDescending()
                 {
-                    _query.OrderBy("source_ip", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderByLastIpAscending()
                 {
-                    _query.OrderBy("last_ip", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByLastIpDescending()
                 {
-                    _query.OrderBy("last_ip", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderByOpenedByAscending()
                 {
-                    _query.OrderBy("opened_by", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByOpenedByDescending()
                 {
-                    _query.OrderBy("opened_by", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderByChangedByAscending()
                 {
-                    _query.OrderBy("changed_by", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByChangedByDescending()
                 {
-                    _query.OrderBy("changed_by", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderByGuardedTokenAscending()
                 {
-                    _query.OrderBy("guarded_token", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByGuardedTokenDescending()
                 {
-                    _query.OrderBy("guarded_token", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public EntryRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public EntryRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -1282,123 +1282,123 @@ namespace Generated.Requests
 
                 public EntryRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByCatalog()
                 {
-                    _query.GroupBy("catalog");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByCatalogAs(string retName)
                 {
-                    _query.GroupBy("catalog"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByBornAt()
                 {
-                    _query.GroupBy("born_at");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByBornAtAs(string retName)
                 {
-                    _query.GroupBy("born_at"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByTouchedAt()
                 {
-                    _query.GroupBy("touched_at");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByTouchedAtAs(string retName)
                 {
-                    _query.GroupBy("touched_at"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupBySourceIp()
                 {
-                    _query.GroupBy("source_ip");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupBySourceIpAs(string retName)
                 {
-                    _query.GroupBy("source_ip"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByLastIp()
                 {
-                    _query.GroupBy("last_ip");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByLastIpAs(string retName)
                 {
-                    _query.GroupBy("last_ip"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByOpenedBy()
                 {
-                    _query.GroupBy("opened_by");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByOpenedByAs(string retName)
                 {
-                    _query.GroupBy("opened_by"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByChangedBy()
                 {
-                    _query.GroupBy("changed_by");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByChangedByAs(string retName)
                 {
-                    _query.GroupBy("changed_by"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByGuardedToken()
                 {
-                    _query.GroupBy("guarded_token");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByGuardedTokenAs(string retName)
                 {
-                    _query.GroupBy("guarded_token"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public EntryRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.Entry.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public EntryRequest FacetByCatalogAs(
@@ -1406,8 +1406,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Catalog", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCatalogAs", name, "catalog")
+                        name, global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCatalogAs", name, global::Generated.Models.Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY)
                     });
                     return this;
                 }

@@ -9,14 +9,46 @@ namespace Generated.Models
 
     public class PurchaseOrder : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string TENANT_PROPERTY_MEMBER = "Tenant";
+            internal const string TENANT_PROPERTY_QUERY = "tenant";
+            internal const string TENANT_PROPERTY_STORAGE = "tenant";
+            internal const string TENANT_PROPERTY_MODEL = "tenant";
+            internal const string CONTACT_PHONE_PROPERTY_MEMBER = "ContactPhone";
+            internal const string CONTACT_PHONE_PROPERTY_QUERY = "contact_phone";
+            internal const string CONTACT_PHONE_PROPERTY_STORAGE = "contact_phone";
+            internal const string CONTACT_PHONE_PROPERTY_MODEL = "contact_phone";
+            internal const string INTERNAL_NOTE_PROPERTY_MEMBER = "InternalNote";
+            internal const string INTERNAL_NOTE_PROPERTY_QUERY = "internal_note";
+            internal const string INTERNAL_NOTE_PROPERTY_STORAGE = "internal_note";
+            internal const string INTERNAL_NOTE_PROPERTY_MODEL = "internal_note";
+            internal const string CREATE_TIME_PROPERTY_MEMBER = "CreateTime";
+            internal const string CREATE_TIME_PROPERTY_QUERY = "create_time";
+            internal const string CREATE_TIME_PROPERTY_STORAGE = "create_time";
+            internal const string CREATE_TIME_PROPERTY_MODEL = "create_time";
+            internal const string UPDATE_TIME_PROPERTY_MEMBER = "UpdateTime";
+            internal const string UPDATE_TIME_PROPERTY_QUERY = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_STORAGE = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_MODEL = "update_time";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("PurchaseOrder", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("tenant", global::TeaQL.Runtime.EntityJsonKind.Reference, "tenant", () => global::Generated.Models.Tenant._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("contact_phone", global::TeaQL.Runtime.EntityJsonKind.Text, "contact_phone"),
-            new global::TeaQL.Runtime.EntityJsonField("internal_note", global::TeaQL.Runtime.EntityJsonKind.Text, "internal_note"),
-            new global::TeaQL.Runtime.EntityJsonField("create_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "create_time"),
-            new global::TeaQL.Runtime.EntityJsonField("update_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "update_time"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE, () => global::Generated.Models.Tenant._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE),
             new global::TeaQL.Runtime.EntityJsonField("order_item_list", global::TeaQL.Runtime.EntityJsonKind.Many, "OrderItemList", () => global::Generated.Models.OrderItem._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
@@ -31,35 +63,35 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Tenant"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MEMBER))
             {
                 object? jsonTenant = IsLoaded("TenantEntity") && TenantEntity != null && TenantEntity.Id == Tenant
                     ? TenantEntity : Tenant;
-                yield return new KeyValuePair<string, object?>("tenant", jsonTenant);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE, jsonTenant);
             }
-            if (IsLoaded("ContactPhone"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("contact_phone", ContactPhone);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE, ContactPhone);
             }
-            if (IsLoaded("InternalNote"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("internal_note", InternalNote);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE, InternalNote);
             }
-            if (IsLoaded("CreateTime"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("create_time", CreateTime);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, CreateTime);
             }
-            if (IsLoaded("UpdateTime"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("update_time", UpdateTime);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, UpdateTime);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
             if (OrderItemList.IsLoaded || OrderItemList.Any(child => child.TeaqlHasPending()))
                 yield return new KeyValuePair<string, object?>("OrderItemList", OrderItemList);
@@ -216,16 +248,16 @@ namespace Generated.Models
         {
             var entity = new PurchaseOrder().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Tenant", out var tenantValue)
-                        || record.TryGetValue("tenant", out tenantValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MEMBER, out var tenantValue)
+                        || record.TryGetValue(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE, out tenantValue))
                     {
-                        entity.MarkLoaded("Tenant");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MEMBER);
                         if (tenantValue.Raw is Record tenantRow)
                         {
                             entity.TenantEntity = global::Generated.Models.Tenant.FromRecord(tenantRow);
@@ -247,33 +279,33 @@ namespace Generated.Models
                         else if (tenantValue.Raw != null)
                             entity.Tenant = Convert.ToInt64(tenantValue.Raw);
                     }
-                    if (record.TryGetValue("contact_phone", out var contactPhoneValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE, out var contactPhoneValue))
                     {
-                        entity.MarkLoaded("ContactPhone");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MEMBER);
                         if (contactPhoneValue.Raw != null)
                             entity.ContactPhone = Convert.ToString(contactPhoneValue.Raw);
                     }
-                    if (record.TryGetValue("internal_note", out var internalNoteValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE, out var internalNoteValue))
                     {
-                        entity.MarkLoaded("InternalNote");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MEMBER);
                         if (internalNoteValue.Raw != null)
                             entity.InternalNote = Convert.ToString(internalNoteValue.Raw);
                     }
-                    if (record.TryGetValue("create_time", out var createTimeValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
                     {
-                        entity.MarkLoaded("CreateTime");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
                         if (createTimeValue.Raw != null)
                             entity.CreateTime = TeaqlDateTime(createTimeValue);
                     }
-                    if (record.TryGetValue("update_time", out var updateTimeValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
                     {
-                        entity.MarkLoaded("UpdateTime");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
                         if (updateTimeValue.Raw != null)
                             entity.UpdateTime = TeaqlDateTime(updateTimeValue);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
@@ -290,8 +322,8 @@ namespace Generated.Models
                             }
                         }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "tenant", "contact_phone", "internal_note", "create_time", "update_time", "version",
-                "Id", "Tenant", "ContactPhone", "InternalNote", "CreateTime", "UpdateTime", "Version",
+                PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER,
                 "OrderItemList"
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
@@ -354,20 +386,20 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Tenant"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("tenant"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ContactPhone"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("contact_phone"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("InternalNote"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("internal_note"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CreateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("UpdateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -540,13 +572,13 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Tenant")) record["tenant"] = TeaqlValue(Tenant);
-                        if (IsLoaded("ContactPhone")) record["contact_phone"] = TeaqlValue(ContactPhone);
-                        if (IsLoaded("InternalNote")) record["internal_note"] = TeaqlValue(InternalNote);
-                        if (IsLoaded("CreateTime")) record["create_time"] = TeaqlValue(CreateTime);
-                        if (IsLoaded("UpdateTime")) record["update_time"] = TeaqlValue(UpdateTime);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE] = TeaqlValue(Tenant);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE] = TeaqlValue(ContactPhone);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE] = TeaqlValue(InternalNote);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = TeaqlValue(CreateTime);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = TeaqlValue(UpdateTime);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -554,19 +586,19 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("tenant", out var tenantValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE, out var tenantValue))
                         this.Tenant = tenantValue.Raw == null ? null : Convert.ToInt64(tenantValue.Raw);
 
-                    if (record.TryGetValue("contact_phone", out var contactPhoneValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE, out var contactPhoneValue))
                         this.ContactPhone = contactPhoneValue.Raw == null ? null : Convert.ToString(contactPhoneValue.Raw);
 
-                    if (record.TryGetValue("internal_note", out var internalNoteValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE, out var internalNoteValue))
                         this.InternalNote = internalNoteValue.Raw == null ? null : Convert.ToString(internalNoteValue.Raw);
 
-                    if (record.TryGetValue("create_time", out var createTimeValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
                         this.CreateTime = createTimeValue.Raw == null ? null : TeaqlDateTime(createTimeValue);
 
-                    if (record.TryGetValue("update_time", out var updateTimeValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
                         this.UpdateTime = updateTimeValue.Raw == null ? null : TeaqlDateTime(updateTimeValue);
 
 
@@ -575,19 +607,19 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Tenant.HasValue) record["tenant"] = new Value.I64Value(Tenant.Value);
+                    if (Tenant.HasValue) record[PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE] = new Value.I64Value(Tenant.Value);
 
-                    if (ContactPhone != null) record["contact_phone"] = new Value.TextValue(ContactPhone);
+                    if (ContactPhone != null) record[PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE] = new Value.TextValue(ContactPhone);
 
-                    if (InternalNote != null) record["internal_note"] = new Value.TextValue(InternalNote);
+                    if (InternalNote != null) record[PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE] = new Value.TextValue(InternalNote);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "PurchaseOrder", Values = record };
         }
@@ -595,17 +627,17 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Tenant.HasValue) record["tenant"] = new Value.I64Value(Tenant.Value);
+                    if (Tenant.HasValue) record[PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE] = new Value.I64Value(Tenant.Value);
 
-                    if (ContactPhone != null) record["contact_phone"] = new Value.TextValue(ContactPhone);
+                    if (ContactPhone != null) record[PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE] = new Value.TextValue(ContactPhone);
 
-                    if (InternalNote != null) record["internal_note"] = new Value.TextValue(InternalNote);
+                    if (InternalNote != null) record[PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE] = new Value.TextValue(InternalNote);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "PurchaseOrder", 
@@ -634,8 +666,8 @@ namespace Generated.Models
                 public PurchaseOrder UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -643,48 +675,48 @@ namespace Generated.Models
                 {
                     if (this.Tenant != value) this.TenantEntity = null;
                     this.Tenant = value;
-                    MarkLoaded("Tenant");
-                    _entityRoot.Set(TeaqlEntityKey(), "tenant", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.TENANT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PurchaseOrder UpdateContactPhone(string value)
                 {
                     this.ContactPhone = value;
-                    MarkLoaded("ContactPhone");
-                    _entityRoot.Set(TeaqlEntityKey(), "contact_phone", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.CONTACT_PHONE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PurchaseOrder UpdateInternalNote(string value)
                 {
                     this.InternalNote = value;
-                    MarkLoaded("InternalNote");
-                    _entityRoot.Set(TeaqlEntityKey(), "internal_note", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.INTERNAL_NOTE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PurchaseOrder UpdateCreateTime(DateTime? value)
                 {
                     this.CreateTime = value;
-                    MarkLoaded("CreateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "create_time", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PurchaseOrder UpdateUpdateTime(DateTime? value)
                 {
                     this.UpdateTime = value;
-                    MarkLoaded("UpdateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "update_time", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PurchaseOrder UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 internal PurchaseOrder UpdateTenant(Tenant value)

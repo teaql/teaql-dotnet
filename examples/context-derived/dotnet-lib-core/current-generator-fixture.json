@@ -6,20 +6,26 @@
     "E.cs": "a4839677213d1943c84e5765fc0976b75172759f790a3d5d2ba4ec8d96284ef9",
     "GeneratedRuntimeModule.cs": "c0fc45c2108f82ea60e0843125b3eb56c4b9f64962205bbacd4277243bf97163",
     "GeneratedSearchModels.cs": "398cc6b278a3f4d9c891f8f2fa36e7e5fb18a5abcb8b6206eed67dd8577fa94d",
-    "Models/Catalog.cs": "188a5d6b0a7195a81654a68c4ee4dcc24e150b22ca6e32cb56735fb498d628c0",
-    "Models/Entry.cs": "1fb4740104ae5a69e331aa181809c7871d10e9275bed18e500e69d1cbe02b229",
+    "Models/Catalog.cs": "be9f929dcd7b01184105d5ca953f771ae83dd3212f10c6339decea7eabe48308",
+    "Models/Entry.cs": "2d7166c933be00f3bf5c4c0ef9d2e031c4bb3c074c02b372d1b06259e1da7223",
     "Q.cs": "c5ed8382ab2236c771413964ee54f9013fd122d72adf6b3be0b69e4e79ac9c2e",
-    "Requests/CatalogRequest.cs": "b2a4f33bed2faa9c0ee992f8905e6a6515051de9a8032b6b70c672fbe71ee8cf",
-    "Requests/EntryRequest.cs": "49e8f1458b2eed041df999906c00ed87922d46d217bf0bd5d7b0c38ad1ff3ef6",
+    "Requests/CatalogRequest.cs": "3f34ba15b1d2ee9bd2c53507835646e0fa7142d7024dc94d57972d332e066b81",
+    "Requests/EntryRequest.cs": "47ed2c55e9fb5f4a186494fc2e3adbea3a30880b7d9d40e981e699925ea61e0d",
     "context-fix-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
     "teaql-i18n.json": "872f2be4fb4df7d76c732d627ae016b07cb39591ef833169277c67db4ec726e8",
     "teaql/checker-model.json": "b0cce8e03720ef6aefdf8ed8386c79d1270268dc6e41f762033d32516da2cbfd",
-    "teaql/model-provenance.json": "e53112264999fea5486628f71bd6715ba1dc32b44e962b5669b4f00e52fbd0ea"
+    "teaql/model-provenance.json": "9f174126167aff9b4230221790d4a6ca525dd4cde29d122a7ff27e34e1c5947c"
   },
-  "generatedManifestSha256": "6c4a95e5b6b64e99365c652b5cf4d5141ed4c932fa1b2b25a1510b7f1ec16344",
-  "generationReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/context-field-qualified-generation/dotnet/context-field-showcase/library/receipt.json",
+  "generationReceipt": "../../generator-v5.0.2.json",
+  "generatorCommit": "80fe610d358e923724ddccac84a48d6e4ec5c806",
+  "generatorJarSHA256": "107fb340c0534fb2548dc0b7228554ce3fc080524353df6a9f6d7ad9388471bb",
+  "generatorRelease": "v5.0.2",
   "language": "dotnet",
   "modelSha256": "c999381a5e3051e5b6ab9e5b027a2f1f5b568adf32d97c2accec5a4fb4472c0a",
-  "producerReceiptSha256": "52c28c9caf600cbfb58f8223dbf20ffcf6983961414409cf3443b3af085e0d9a",
+  "previousOrigin": {
+    "commit": "e62edea17a950c837e6be2cab2db10f703ec72bd",
+    "path": "examples/context-derived/dotnet-lib-core/current-generator-fixture.json",
+    "sha256": "d4b06cb9ec5c814fc540df231728184d7780fdc7e3de00ebdf2a64230c451871"
+  },
   "schema": "teaql.current-model-scope-fixture/v1"
 }

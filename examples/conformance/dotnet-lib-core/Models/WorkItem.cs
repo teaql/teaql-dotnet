@@ -9,12 +9,36 @@ namespace Generated.Models
 
     public class WorkItem : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string TITLE_PROPERTY_MEMBER = "Title";
+            internal const string TITLE_PROPERTY_QUERY = "title";
+            internal const string TITLE_PROPERTY_STORAGE = "title";
+            internal const string TITLE_PROPERTY_MODEL = "title";
+            internal const string DESCRIPTION_PROPERTY_MEMBER = "Description";
+            internal const string DESCRIPTION_PROPERTY_QUERY = "description";
+            internal const string DESCRIPTION_PROPERTY_STORAGE = "description";
+            internal const string DESCRIPTION_PROPERTY_MODEL = "description";
+            internal const string PLATFORM_PROPERTY_MEMBER = "Platform";
+            internal const string PLATFORM_PROPERTY_QUERY = "platform";
+            internal const string PLATFORM_PROPERTY_STORAGE = "platform";
+            internal const string PLATFORM_PROPERTY_MODEL = "platform";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("WorkItem", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("title", global::TeaQL.Runtime.EntityJsonKind.Text, "title"),
-            new global::TeaQL.Runtime.EntityJsonField("description", global::TeaQL.Runtime.EntityJsonKind.Text, "description"),
-            new global::TeaQL.Runtime.EntityJsonField("platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "platform", () => global::Generated.Models.Platform._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(WorkItem.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, WorkItem.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(WorkItem.__TeaqlFields.TITLE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, () => global::Generated.Models.Platform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(WorkItem.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, WorkItem.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -28,27 +52,27 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(WorkItem.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(WorkItem.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Title"))
+            if (IsLoaded(WorkItem.__TeaqlFields.TITLE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("title", Title);
+                yield return new KeyValuePair<string, object?>(WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE, Title);
             }
-            if (IsLoaded("Description"))
+            if (IsLoaded(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("description", Description);
+                yield return new KeyValuePair<string, object?>(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE, Description);
             }
-            if (IsLoaded("Platform"))
+            if (IsLoaded(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
             {
                 object? jsonPlatform = IsLoaded("PlatformEntity") && PlatformEntity != null && PlatformEntity.Id == Platform
                     ? PlatformEntity : Platform;
-                yield return new KeyValuePair<string, object?>("platform", jsonPlatform);
+                yield return new KeyValuePair<string, object?>(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, jsonPlatform);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(WorkItem.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(WorkItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -194,28 +218,28 @@ namespace Generated.Models
         {
             var entity = new WorkItem().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(WorkItem.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("title", out var titleValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE, out var titleValue))
                     {
-                        entity.MarkLoaded("Title");
+                        entity.MarkLoaded(WorkItem.__TeaqlFields.TITLE_PROPERTY_MEMBER);
                         if (titleValue.Raw != null)
                             entity.Title = Convert.ToString(titleValue.Raw);
                     }
-                    if (record.TryGetValue("description", out var descriptionValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE, out var descriptionValue))
                     {
-                        entity.MarkLoaded("Description");
+                        entity.MarkLoaded(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MEMBER);
                         if (descriptionValue.Raw != null)
                             entity.Description = Convert.ToString(descriptionValue.Raw);
                     }
-                    if (record.TryGetValue("Platform", out var platformValue)
-                        || record.TryGetValue("platform", out platformValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, out var platformValue)
+                        || record.TryGetValue(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out platformValue))
                     {
-                        entity.MarkLoaded("Platform");
+                        entity.MarkLoaded(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
                         if (platformValue.Raw is Record platformRow)
                         {
                             entity.PlatformEntity = global::Generated.Models.Platform.FromRecord(platformRow);
@@ -237,15 +261,15 @@ namespace Generated.Models
                         else if (platformValue.Raw != null)
                             entity.Platform = Convert.ToInt64(platformValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(WorkItem.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "title", "description", "platform", "version",
-                "Id", "Title", "Description", "Platform", "Version",
+                WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY, WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                WorkItem.__TeaqlFields.ID_PROPERTY_MEMBER, WorkItem.__TeaqlFields.TITLE_PROPERTY_MEMBER, WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MEMBER, WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, WorkItem.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -304,16 +328,16 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Title"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property("title"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Description"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property("description"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Platform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(WorkItem.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property(WorkItem.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(WorkItem.__TeaqlFields.TITLE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property(WorkItem.__TeaqlFields.TITLE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(WorkItem.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "WorkItem", Location = ObjectLocation.Property(WorkItem.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -437,11 +461,11 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Title")) record["title"] = TeaqlValue(Title);
-                        if (IsLoaded("Description")) record["description"] = TeaqlValue(Description);
-                        if (IsLoaded("Platform")) record["platform"] = TeaqlValue(Platform);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(WorkItem.__TeaqlFields.ID_PROPERTY_MEMBER)) record[WorkItem.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(WorkItem.__TeaqlFields.TITLE_PROPERTY_MEMBER)) record[WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE] = TeaqlValue(Title);
+                        if (IsLoaded(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MEMBER)) record[WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE] = TeaqlValue(Description);
+                        if (IsLoaded(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)) record[WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = TeaqlValue(Platform);
+                        if (IsLoaded(WorkItem.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[WorkItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -449,13 +473,13 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("title", out var titleValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE, out var titleValue))
                         this.Title = titleValue.Raw == null ? null : Convert.ToString(titleValue.Raw);
 
-                    if (record.TryGetValue("description", out var descriptionValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE, out var descriptionValue))
                         this.Description = descriptionValue.Raw == null ? null : Convert.ToString(descriptionValue.Raw);
 
-                    if (record.TryGetValue("platform", out var platformValue))
+                    if (record.TryGetValue(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out var platformValue))
                         this.Platform = platformValue.Raw == null ? null : Convert.ToInt64(platformValue.Raw);
 
 
@@ -464,15 +488,15 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[WorkItem.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Title != null) record["title"] = new Value.TextValue(Title);
+                    if (Title != null) record[WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE] = new Value.TextValue(Title);
 
-                    if (Description != null) record["description"] = new Value.TextValue(Description);
+                    if (Description != null) record[WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE] = new Value.TextValue(Description);
 
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[WorkItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "WorkItem", Values = record };
         }
@@ -480,13 +504,13 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Title != null) record["title"] = new Value.TextValue(Title);
+                    if (Title != null) record[WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE] = new Value.TextValue(Title);
 
-                    if (Description != null) record["description"] = new Value.TextValue(Description);
+                    if (Description != null) record[WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE] = new Value.TextValue(Description);
 
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[WorkItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "WorkItem", 
@@ -515,24 +539,24 @@ namespace Generated.Models
                 public WorkItem UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(WorkItem.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), WorkItem.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public WorkItem UpdateTitle(string value)
                 {
                     this.Title = value;
-                    MarkLoaded("Title");
-                    _entityRoot.Set(TeaqlEntityKey(), "title", TeaqlValue(value));
+                    MarkLoaded(WorkItem.__TeaqlFields.TITLE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), WorkItem.__TeaqlFields.TITLE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public WorkItem UpdateDescription(string value)
                 {
                     this.Description = value;
-                    MarkLoaded("Description");
-                    _entityRoot.Set(TeaqlEntityKey(), "description", TeaqlValue(value));
+                    MarkLoaded(WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -540,16 +564,16 @@ namespace Generated.Models
                 {
                     if (this.Platform != value) this.PlatformEntity = null;
                     this.Platform = value;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
+                    MarkLoaded(WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), WorkItem.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public WorkItem UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(WorkItem.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), WorkItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public WorkItem UpdatePlatform(Platform value)

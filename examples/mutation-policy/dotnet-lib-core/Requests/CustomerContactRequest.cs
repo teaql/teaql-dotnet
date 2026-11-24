@@ -120,29 +120,29 @@ namespace Generated.Requests
 
         public CustomerContactRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("customer");
-            _query.Project("channel");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public CustomerContactRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public CustomerContactRequest SelectChannel()
                 {
-                    _query.Project("channel");
+                    _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerContactRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -153,321 +153,321 @@ namespace Generated.Requests
 
                 public CustomerContactRequest SelectCustomerWith(CustomerRequest related)
                 {
-                    _query.Project("customer");
-                    _query.ForwardRelationQuery("Customer", "Customer", "customer", related.GetQuery());
+                    _query.Project(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_MEMBER, "Customer", global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCustomerWith", Relation: "Customer")
+                        Operation = new QueryOperation("relation", "SelectCustomerWith", Relation: global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public CustomerContactRequest WithCustomerMatching(CustomerRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("customer", GeneratedRuntimeModule.Module.Metadata.GetEntity("Customer")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Customer")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerContactRequest WithoutCustomerMatching(CustomerRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("customer", GeneratedRuntimeModule.Module.Metadata.GetEntity("Customer")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Customer")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerContactRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerContactRequest FilterByCustomer(object val)
                 {
-                    _query.AndFilter(Expr.Eq("customer", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest FilterByCustomerIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("customer", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public CustomerContactRequest WithCustomerIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("customer"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerContactRequest WithCustomerIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("customer"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("channel", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("channel", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public CustomerContactRequest WithChannelIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("channel", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("channel", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("channel", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("channel", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("channel", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("channel", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("channel", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("channel", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("channel"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("channel"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY));
                     return this;
                 }
                 public CustomerContactRequest WithChannelNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("channel", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("channel", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("channel", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("channel", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("channel", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest WithChannelSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("channel", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerContactRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerContactRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerContactRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public CustomerContactRequest OrderByChannelAscending()
                 {
-                    _query.OrderBy("channel", "asc");
+                    _query.OrderBy(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerContactRequest OrderByChannelDescending()
                 {
-                    _query.OrderBy("channel", "desc");
+                    _query.OrderBy(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public CustomerContactRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerContactRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -487,46 +487,46 @@ namespace Generated.Requests
 
                 public CustomerContactRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerContactRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerContactRequest GroupByCustomer()
                 {
-                    _query.GroupBy("customer");
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerContactRequest GroupByCustomerAs(string retName)
                 {
-                    _query.GroupBy("customer"); 
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerContactRequest GroupByChannel()
                 {
-                    _query.GroupBy("channel");
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerContactRequest GroupByChannelAs(string retName)
                 {
-                    _query.GroupBy("channel"); 
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.CHANNEL_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerContactRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerContactRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.CustomerContact.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerContactRequest FacetByCustomerAs(
@@ -534,8 +534,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Customer", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCustomerAs", name, "customer")
+                        name, global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCustomerAs", name, global::Generated.Models.CustomerContact.__TeaqlFields.CUSTOMER_PROPERTY_QUERY)
                     });
                     return this;
                 }

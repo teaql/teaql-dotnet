@@ -9,13 +9,41 @@ namespace Generated.Models
 
     public class OrderItem : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string CUSTOMER_ORDER_PROPERTY_MEMBER = "CustomerOrder";
+            internal const string CUSTOMER_ORDER_PROPERTY_QUERY = "customer_order";
+            internal const string CUSTOMER_ORDER_PROPERTY_STORAGE = "customer_order";
+            internal const string CUSTOMER_ORDER_PROPERTY_MODEL = "customer_order";
+            internal const string PRODUCT_NAME_PROPERTY_MEMBER = "ProductName";
+            internal const string PRODUCT_NAME_PROPERTY_QUERY = "product_name";
+            internal const string PRODUCT_NAME_PROPERTY_STORAGE = "product_name";
+            internal const string PRODUCT_NAME_PROPERTY_MODEL = "product_name";
+            internal const string QUANTITY_PROPERTY_MEMBER = "Quantity";
+            internal const string QUANTITY_PROPERTY_QUERY = "quantity";
+            internal const string QUANTITY_PROPERTY_STORAGE = "quantity";
+            internal const string QUANTITY_PROPERTY_MODEL = "quantity";
+            internal const string UNIT_PRICE_PROPERTY_MEMBER = "UnitPrice";
+            internal const string UNIT_PRICE_PROPERTY_QUERY = "unit_price";
+            internal const string UNIT_PRICE_PROPERTY_STORAGE = "unit_price";
+            internal const string UNIT_PRICE_PROPERTY_MODEL = "unit_price";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("OrderItem", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("customer_order", global::TeaQL.Runtime.EntityJsonKind.Reference, "customer_order", () => global::Generated.Models.CustomerOrder._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("product_name", global::TeaQL.Runtime.EntityJsonKind.Text, "product_name"),
-            new global::TeaQL.Runtime.EntityJsonField("quantity", global::TeaQL.Runtime.EntityJsonKind.Integer, "quantity"),
-            new global::TeaQL.Runtime.EntityJsonField("unit_price", global::TeaQL.Runtime.EntityJsonKind.Decimal, "unit_price"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(OrderItem.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, OrderItem.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, () => global::Generated.Models.CustomerOrder._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Integer, OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Decimal, OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderItem.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, OrderItem.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -29,31 +57,31 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(OrderItem.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(OrderItem.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("CustomerOrder"))
+            if (IsLoaded(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER))
             {
                 object? jsonCustomerOrder = IsLoaded("CustomerOrderEntity") && CustomerOrderEntity != null && CustomerOrderEntity.Id == CustomerOrder
                     ? CustomerOrderEntity : CustomerOrder;
-                yield return new KeyValuePair<string, object?>("customer_order", jsonCustomerOrder);
+                yield return new KeyValuePair<string, object?>(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, jsonCustomerOrder);
             }
-            if (IsLoaded("ProductName"))
+            if (IsLoaded(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("product_name", ProductName);
+                yield return new KeyValuePair<string, object?>(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE, ProductName);
             }
-            if (IsLoaded("Quantity"))
+            if (IsLoaded(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("quantity", Quantity);
+                yield return new KeyValuePair<string, object?>(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, Quantity);
             }
-            if (IsLoaded("UnitPrice"))
+            if (IsLoaded(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("unit_price", UnitPrice);
+                yield return new KeyValuePair<string, object?>(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE, UnitPrice);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(OrderItem.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(OrderItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -200,16 +228,16 @@ namespace Generated.Models
         {
             var entity = new OrderItem().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(OrderItem.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("CustomerOrder", out var customerOrderValue)
-                        || record.TryGetValue("customer_order", out customerOrderValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, out var customerOrderValue)
+                        || record.TryGetValue(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, out customerOrderValue))
                     {
-                        entity.MarkLoaded("CustomerOrder");
+                        entity.MarkLoaded(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER);
                         if (customerOrderValue.Raw is Record customerOrderRow)
                         {
                             entity.CustomerOrderEntity = global::Generated.Models.CustomerOrder.FromRecord(customerOrderRow);
@@ -231,33 +259,33 @@ namespace Generated.Models
                         else if (customerOrderValue.Raw != null)
                             entity.CustomerOrder = Convert.ToInt64(customerOrderValue.Raw);
                     }
-                    if (record.TryGetValue("product_name", out var productNameValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE, out var productNameValue))
                     {
-                        entity.MarkLoaded("ProductName");
+                        entity.MarkLoaded(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MEMBER);
                         if (productNameValue.Raw != null)
                             entity.ProductName = Convert.ToString(productNameValue.Raw);
                     }
-                    if (record.TryGetValue("quantity", out var quantityValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, out var quantityValue))
                     {
-                        entity.MarkLoaded("Quantity");
+                        entity.MarkLoaded(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER);
                         if (quantityValue.Raw != null)
                             entity.Quantity = Convert.ToInt64(quantityValue.Raw);
                     }
-                    if (record.TryGetValue("unit_price", out var unitPriceValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE, out var unitPriceValue))
                     {
-                        entity.MarkLoaded("UnitPrice");
+                        entity.MarkLoaded(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MEMBER);
                         if (unitPriceValue.Raw != null)
                             entity.UnitPrice = Convert.ToDecimal(unitPriceValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(OrderItem.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "customer_order", "product_name", "quantity", "unit_price", "version",
-                "Id", "CustomerOrder", "ProductName", "Quantity", "UnitPrice", "Version",
+                OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, OrderItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_QUERY, OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                OrderItem.__TeaqlFields.ID_PROPERTY_MEMBER, OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MEMBER, OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER, OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MEMBER, OrderItem.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -316,18 +344,18 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CustomerOrder"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property("customer_order"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ProductName"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property("product_name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Quantity"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property("quantity"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("UnitPrice"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property("unit_price"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderItem.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property(OrderItem.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderItem.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderItem", Location = ObjectLocation.Property(OrderItem.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -454,12 +482,12 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("CustomerOrder")) record["customer_order"] = TeaqlValue(CustomerOrder);
-                        if (IsLoaded("ProductName")) record["product_name"] = TeaqlValue(ProductName);
-                        if (IsLoaded("Quantity")) record["quantity"] = TeaqlValue(Quantity);
-                        if (IsLoaded("UnitPrice")) record["unit_price"] = TeaqlValue(UnitPrice);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(OrderItem.__TeaqlFields.ID_PROPERTY_MEMBER)) record[OrderItem.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER)) record[OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE] = TeaqlValue(CustomerOrder);
+                        if (IsLoaded(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MEMBER)) record[OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE] = TeaqlValue(ProductName);
+                        if (IsLoaded(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER)) record[OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE] = TeaqlValue(Quantity);
+                        if (IsLoaded(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MEMBER)) record[OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE] = TeaqlValue(UnitPrice);
+                        if (IsLoaded(OrderItem.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[OrderItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -467,16 +495,16 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("customer_order", out var customerOrderValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, out var customerOrderValue))
                         this.CustomerOrder = customerOrderValue.Raw == null ? null : Convert.ToInt64(customerOrderValue.Raw);
 
-                    if (record.TryGetValue("product_name", out var productNameValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE, out var productNameValue))
                         this.ProductName = productNameValue.Raw == null ? null : Convert.ToString(productNameValue.Raw);
 
-                    if (record.TryGetValue("quantity", out var quantityValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, out var quantityValue))
                         this.Quantity = quantityValue.Raw == null ? null : Convert.ToInt64(quantityValue.Raw);
 
-                    if (record.TryGetValue("unit_price", out var unitPriceValue))
+                    if (record.TryGetValue(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE, out var unitPriceValue))
                         this.UnitPrice = unitPriceValue.Raw == null ? null : Convert.ToDecimal(unitPriceValue.Raw);
 
 
@@ -485,17 +513,17 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[OrderItem.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (CustomerOrder.HasValue) record["customer_order"] = new Value.I64Value(CustomerOrder.Value);
+                    if (CustomerOrder.HasValue) record[OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE] = new Value.I64Value(CustomerOrder.Value);
 
-                    if (ProductName != null) record["product_name"] = new Value.TextValue(ProductName);
+                    if (ProductName != null) record[OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE] = new Value.TextValue(ProductName);
 
-                    if (Quantity.HasValue) record["quantity"] = new Value.I64Value(Quantity.Value);
+                    if (Quantity.HasValue) record[OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE] = new Value.I64Value(Quantity.Value);
 
-                    if (UnitPrice.HasValue) record["unit_price"] = new Value.DecimalValue(UnitPrice.Value);
+                    if (UnitPrice.HasValue) record[OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE] = new Value.DecimalValue(UnitPrice.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[OrderItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "OrderItem", Values = record };
         }
@@ -503,15 +531,15 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (CustomerOrder.HasValue) record["customer_order"] = new Value.I64Value(CustomerOrder.Value);
+                    if (CustomerOrder.HasValue) record[OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE] = new Value.I64Value(CustomerOrder.Value);
 
-                    if (ProductName != null) record["product_name"] = new Value.TextValue(ProductName);
+                    if (ProductName != null) record[OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE] = new Value.TextValue(ProductName);
 
-                    if (Quantity.HasValue) record["quantity"] = new Value.I64Value(Quantity.Value);
+                    if (Quantity.HasValue) record[OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE] = new Value.I64Value(Quantity.Value);
 
-                    if (UnitPrice.HasValue) record["unit_price"] = new Value.DecimalValue(UnitPrice.Value);
+                    if (UnitPrice.HasValue) record[OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE] = new Value.DecimalValue(UnitPrice.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[OrderItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "OrderItem", 
@@ -540,8 +568,8 @@ namespace Generated.Models
                 public OrderItem UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(OrderItem.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderItem.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -549,40 +577,40 @@ namespace Generated.Models
                 {
                     if (this.CustomerOrder != value) this.CustomerOrderEntity = null;
                     this.CustomerOrder = value;
-                    MarkLoaded("CustomerOrder");
-                    _entityRoot.Set(TeaqlEntityKey(), "customer_order", TeaqlValue(value));
+                    MarkLoaded(OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderItem UpdateProductName(string value)
                 {
                     this.ProductName = value;
-                    MarkLoaded("ProductName");
-                    _entityRoot.Set(TeaqlEntityKey(), "product_name", TeaqlValue(value));
+                    MarkLoaded(OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderItem.__TeaqlFields.PRODUCT_NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderItem UpdateQuantity(long? value)
                 {
                     this.Quantity = value;
-                    MarkLoaded("Quantity");
-                    _entityRoot.Set(TeaqlEntityKey(), "quantity", TeaqlValue(value));
+                    MarkLoaded(OrderItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderItem UpdateUnitPrice(decimal? value)
                 {
                     this.UnitPrice = value;
-                    MarkLoaded("UnitPrice");
-                    _entityRoot.Set(TeaqlEntityKey(), "unit_price", TeaqlValue(value));
+                    MarkLoaded(OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderItem.__TeaqlFields.UNIT_PRICE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderItem UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(OrderItem.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public OrderItem UpdateCustomerOrder(CustomerOrder value)

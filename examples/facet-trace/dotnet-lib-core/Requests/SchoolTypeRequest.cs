@@ -120,42 +120,42 @@ namespace Generated.Requests
 
         public SchoolTypeRequest SelectSelfFields()
         {
-            _query.Project("platform");
-            _query.Project("id");
-            _query.Project("name");
-            _query.Project("code");
-            _query.Project("display_order");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public SchoolTypeRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest SelectCode()
                 {
-                    _query.Project("code");
+                    _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest SelectDisplayOrder()
                 {
-                    _query.Project("display_order");
+                    _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -166,516 +166,516 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest SelectPlatformWith(PlatformRequest related)
                 {
-                    _query.Project("platform");
-                    _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, "Platform", global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: "Platform")
+                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public SchoolTypeRequest WithPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public SchoolTypeRequest WithoutPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public SchoolTypeRequest FilterByPlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest FilterByPlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public SchoolTypeRequest WithPlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithPlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public SchoolTypeRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public SchoolTypeRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("code", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public SchoolTypeRequest WithCodeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("code"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("code"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY));
                     return this;
                 }
                 public SchoolTypeRequest WithCodeNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("code", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("code", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("code", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("code", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("code", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithCodeSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("code", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("display_order", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("display_order"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithDisplayOrderIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("display_order"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByCodeAscending()
                 {
-                    _query.OrderBy("code", "asc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByCodeDescending()
                 {
-                    _query.OrderBy("code", "desc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByDisplayOrderAscending()
                 {
-                    _query.OrderBy("display_order", "asc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByDisplayOrderDescending()
                 {
-                    _query.OrderBy("display_order", "desc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public SchoolTypeRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -700,7 +700,7 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest MinDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("min", "display_order", retName);
+                    _query.Aggregate("min", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest MaxDisplayOrder()
@@ -710,7 +710,7 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest MaxDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("max", "display_order", retName);
+                    _query.Aggregate("max", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest SumDisplayOrder()
@@ -720,7 +720,7 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest SumDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("sum", "display_order", retName);
+                    _query.Aggregate("sum", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest AvgDisplayOrder()
@@ -730,7 +730,7 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest AvgDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("avg", "display_order", retName);
+                    _query.Aggregate("avg", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest StandardDeviationDisplayOrder()
@@ -740,7 +740,7 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest StandardDeviationDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("stddev", "display_order", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest SquareRootOfPopulationStandardDeviationDisplayOrder()
@@ -750,7 +750,7 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest SquareRootOfPopulationStandardDeviationDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "display_order", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest SampleVarianceDisplayOrder()
@@ -760,7 +760,7 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest SampleVarianceDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "display_order", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest SamplePopulationVarianceDisplayOrder()
@@ -770,73 +770,73 @@ namespace Generated.Requests
 
                 public SchoolTypeRequest SamplePopulationVarianceDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "display_order", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public SchoolTypeRequest GroupByPlatform()
                 {
-                    _query.GroupBy("platform");
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest GroupByPlatformAs(string retName)
                 {
-                    _query.GroupBy("platform"); 
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public SchoolTypeRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public SchoolTypeRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public SchoolTypeRequest GroupByCode()
                 {
-                    _query.GroupBy("code");
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest GroupByCodeAs(string retName)
                 {
-                    _query.GroupBy("code"); 
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
                 public SchoolTypeRequest GroupByDisplayOrder()
                 {
-                    _query.GroupBy("display_order");
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest GroupByDisplayOrderAs(string retName)
                 {
-                    _query.GroupBy("display_order"); 
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
                 public SchoolTypeRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public SchoolTypeRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public SchoolTypeRequest SelectSchoolList()
@@ -1001,8 +1001,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Platform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, "platform")
+                        name, global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, global::Generated.Models.SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }

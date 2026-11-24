@@ -9,10 +9,26 @@ namespace Generated.Models
 
     public class DistributionCenter : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string DOCK_NAME_PROPERTY_MEMBER = "DockName";
+            internal const string DOCK_NAME_PROPERTY_QUERY = "dock_name";
+            internal const string DOCK_NAME_PROPERTY_STORAGE = "dock_name";
+            internal const string DOCK_NAME_PROPERTY_MODEL = "dock_name";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("DistributionCenter", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("dock_name", global::TeaQL.Runtime.EntityJsonKind.Text, "dock_name"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField(DistributionCenter.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, DistributionCenter.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, DistributionCenter.__TeaqlFields.VERSION_PROPERTY_STORAGE),
             new global::TeaQL.Runtime.EntityJsonField("dispatch_order_list", global::TeaQL.Runtime.EntityJsonKind.Many, "DispatchOrderList", () => global::Generated.Models.DispatchOrder._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
@@ -27,17 +43,17 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(DistributionCenter.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(DistributionCenter.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("DockName"))
+            if (IsLoaded(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("dock_name", DockName);
+                yield return new KeyValuePair<string, object?>(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE, DockName);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
             if (DispatchOrderList.IsLoaded || DispatchOrderList.Any(child => child.TeaqlHasPending()))
                 yield return new KeyValuePair<string, object?>("DispatchOrderList", DispatchOrderList);
@@ -189,21 +205,21 @@ namespace Generated.Models
         {
             var entity = new DistributionCenter().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(DistributionCenter.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(DistributionCenter.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("dock_name", out var dockNameValue))
+                    if (record.TryGetValue(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE, out var dockNameValue))
                     {
-                        entity.MarkLoaded("DockName");
+                        entity.MarkLoaded(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MEMBER);
                         if (dockNameValue.Raw != null)
                             entity.DockName = Convert.ToString(dockNameValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
@@ -220,8 +236,8 @@ namespace Generated.Models
                             }
                         }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "dock_name", "version",
-                "Id", "DockName", "Version",
+                DistributionCenter.__TeaqlFields.ID_PROPERTY_QUERY, DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_QUERY, DistributionCenter.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                DistributionCenter.__TeaqlFields.ID_PROPERTY_MEMBER, DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MEMBER, DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MEMBER,
                 "DispatchOrderList"
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
@@ -284,12 +300,12 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "DistributionCenter", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("DockName"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "DistributionCenter", Location = ObjectLocation.Property("dock_name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "DistributionCenter", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(DistributionCenter.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "DistributionCenter", Location = ObjectLocation.Property(DistributionCenter.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "DistributionCenter", Location = ObjectLocation.Property(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "DistributionCenter", Location = ObjectLocation.Property(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -450,9 +466,9 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("DockName")) record["dock_name"] = TeaqlValue(DockName);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(DistributionCenter.__TeaqlFields.ID_PROPERTY_MEMBER)) record[DistributionCenter.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MEMBER)) record[DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE] = TeaqlValue(DockName);
+                        if (IsLoaded(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[DistributionCenter.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -460,7 +476,7 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("dock_name", out var dockNameValue))
+                    if (record.TryGetValue(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE, out var dockNameValue))
                         this.DockName = dockNameValue.Raw == null ? null : Convert.ToString(dockNameValue.Raw);
 
 
@@ -469,11 +485,11 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[DistributionCenter.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (DockName != null) record["dock_name"] = new Value.TextValue(DockName);
+                    if (DockName != null) record[DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE] = new Value.TextValue(DockName);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[DistributionCenter.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "DistributionCenter", Values = record };
         }
@@ -481,9 +497,9 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (DockName != null) record["dock_name"] = new Value.TextValue(DockName);
+                    if (DockName != null) record[DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE] = new Value.TextValue(DockName);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[DistributionCenter.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "DistributionCenter", 
@@ -512,24 +528,24 @@ namespace Generated.Models
                 public DistributionCenter UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(DistributionCenter.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), DistributionCenter.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public DistributionCenter UpdateDockName(string value)
                 {
                     this.DockName = value;
-                    MarkLoaded("DockName");
-                    _entityRoot.Set(TeaqlEntityKey(), "dock_name", TeaqlValue(value));
+                    MarkLoaded(DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), DistributionCenter.__TeaqlFields.DOCK_NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public DistributionCenter UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(DistributionCenter.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), DistributionCenter.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
     }

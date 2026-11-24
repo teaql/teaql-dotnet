@@ -9,18 +9,66 @@ namespace Generated.Models
 
     public class School : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string PLATFORM_PROPERTY_MEMBER = "Platform";
+            internal const string PLATFORM_PROPERTY_QUERY = "platform";
+            internal const string PLATFORM_PROPERTY_STORAGE = "platform";
+            internal const string PLATFORM_PROPERTY_MODEL = "platform";
+            internal const string SCHOOL_TYPE_PROPERTY_MEMBER = "SchoolType";
+            internal const string SCHOOL_TYPE_PROPERTY_QUERY = "school_type";
+            internal const string SCHOOL_TYPE_PROPERTY_STORAGE = "school_type";
+            internal const string SCHOOL_TYPE_PROPERTY_MODEL = "school_type";
+            internal const string NAME_PROPERTY_MEMBER = "Name";
+            internal const string NAME_PROPERTY_QUERY = "name";
+            internal const string NAME_PROPERTY_STORAGE = "name";
+            internal const string NAME_PROPERTY_MODEL = "name";
+            internal const string ADDRESS_PROPERTY_MEMBER = "Address";
+            internal const string ADDRESS_PROPERTY_QUERY = "address";
+            internal const string ADDRESS_PROPERTY_STORAGE = "address";
+            internal const string ADDRESS_PROPERTY_MODEL = "address";
+            internal const string ESTABLISHED_DATE_PROPERTY_MEMBER = "EstablishedDate";
+            internal const string ESTABLISHED_DATE_PROPERTY_QUERY = "established_date";
+            internal const string ESTABLISHED_DATE_PROPERTY_STORAGE = "established_date";
+            internal const string ESTABLISHED_DATE_PROPERTY_MODEL = "established_date";
+            internal const string STUDENT_CAPACITY_PROPERTY_MEMBER = "StudentCapacity";
+            internal const string STUDENT_CAPACITY_PROPERTY_QUERY = "student_capacity";
+            internal const string STUDENT_CAPACITY_PROPERTY_STORAGE = "student_capacity";
+            internal const string STUDENT_CAPACITY_PROPERTY_MODEL = "student_capacity";
+            internal const string ACTIVE_PROPERTY_MEMBER = "Active";
+            internal const string ACTIVE_PROPERTY_QUERY = "active";
+            internal const string ACTIVE_PROPERTY_STORAGE = "active";
+            internal const string ACTIVE_PROPERTY_MODEL = "active";
+            internal const string CREATE_TIME_PROPERTY_MEMBER = "CreateTime";
+            internal const string CREATE_TIME_PROPERTY_QUERY = "create_time";
+            internal const string CREATE_TIME_PROPERTY_STORAGE = "create_time";
+            internal const string CREATE_TIME_PROPERTY_MODEL = "create_time";
+            internal const string UPDATE_TIME_PROPERTY_MEMBER = "UpdateTime";
+            internal const string UPDATE_TIME_PROPERTY_QUERY = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_STORAGE = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_MODEL = "update_time";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("School", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "platform", () => global::Generated.Models.Platform._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("school_type", global::TeaQL.Runtime.EntityJsonKind.Reference, "school_type", () => global::Generated.Models.SchoolType._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("name", global::TeaQL.Runtime.EntityJsonKind.Text, "name"),
-            new global::TeaQL.Runtime.EntityJsonField("address", global::TeaQL.Runtime.EntityJsonKind.Text, "address"),
-            new global::TeaQL.Runtime.EntityJsonField("established_date", global::TeaQL.Runtime.EntityJsonKind.Date, "established_date"),
-            new global::TeaQL.Runtime.EntityJsonField("student_capacity", global::TeaQL.Runtime.EntityJsonKind.Integer, "student_capacity"),
-            new global::TeaQL.Runtime.EntityJsonField("active", global::TeaQL.Runtime.EntityJsonKind.Boolean, "active"),
-            new global::TeaQL.Runtime.EntityJsonField("create_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "create_time"),
-            new global::TeaQL.Runtime.EntityJsonField("update_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "update_time"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, School.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.PLATFORM_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, () => global::Generated.Models.Platform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE, () => global::Generated.Models.SchoolType._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, School.__TeaqlFields.NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.ADDRESS_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Date, School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Integer, School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.ACTIVE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Boolean, School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(School.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, School.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -34,53 +82,53 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(School.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Platform"))
+            if (IsLoaded(School.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
             {
                 object? jsonPlatform = IsLoaded("PlatformEntity") && PlatformEntity != null && PlatformEntity.Id == Platform
                     ? PlatformEntity : Platform;
-                yield return new KeyValuePair<string, object?>("platform", jsonPlatform);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, jsonPlatform);
             }
-            if (IsLoaded("SchoolType"))
+            if (IsLoaded(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MEMBER))
             {
                 object? jsonSchoolType = IsLoaded("SchoolTypeEntity") && SchoolTypeEntity != null && SchoolTypeEntity.Id == SchoolType
                     ? SchoolTypeEntity : SchoolType;
-                yield return new KeyValuePair<string, object?>("school_type", jsonSchoolType);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE, jsonSchoolType);
             }
-            if (IsLoaded("Name"))
+            if (IsLoaded(School.__TeaqlFields.NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("name", Name);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.NAME_PROPERTY_STORAGE, Name);
             }
-            if (IsLoaded("Address"))
+            if (IsLoaded(School.__TeaqlFields.ADDRESS_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("address", Address);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE, Address);
             }
-            if (IsLoaded("EstablishedDate"))
+            if (IsLoaded(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("established_date", EstablishedDate);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE, EstablishedDate);
             }
-            if (IsLoaded("StudentCapacity"))
+            if (IsLoaded(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("student_capacity", StudentCapacity);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE, StudentCapacity);
             }
-            if (IsLoaded("Active"))
+            if (IsLoaded(School.__TeaqlFields.ACTIVE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("active", Active);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE, Active);
             }
-            if (IsLoaded("CreateTime"))
+            if (IsLoaded(School.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("create_time", CreateTime);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, CreateTime);
             }
-            if (IsLoaded("UpdateTime"))
+            if (IsLoaded(School.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("update_time", UpdateTime);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, UpdateTime);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(School.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(School.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -233,16 +281,16 @@ namespace Generated.Models
         {
             var entity = new School().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(School.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(School.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Platform", out var platformValue)
-                        || record.TryGetValue("platform", out platformValue))
+                    if (record.TryGetValue(School.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, out var platformValue)
+                        || record.TryGetValue(School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out platformValue))
                     {
-                        entity.MarkLoaded("Platform");
+                        entity.MarkLoaded(School.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
                         if (platformValue.Raw is Record platformRow)
                         {
                             entity.PlatformEntity = global::Generated.Models.Platform.FromRecord(platformRow);
@@ -264,10 +312,10 @@ namespace Generated.Models
                         else if (platformValue.Raw != null)
                             entity.Platform = Convert.ToInt64(platformValue.Raw);
                     }
-                    if (record.TryGetValue("SchoolType", out var schoolTypeValue)
-                        || record.TryGetValue("school_type", out schoolTypeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MEMBER, out var schoolTypeValue)
+                        || record.TryGetValue(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE, out schoolTypeValue))
                     {
-                        entity.MarkLoaded("SchoolType");
+                        entity.MarkLoaded(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MEMBER);
                         if (schoolTypeValue.Raw is Record schoolTypeRow)
                         {
                             entity.SchoolTypeEntity = global::Generated.Models.SchoolType.FromRecord(schoolTypeRow);
@@ -289,57 +337,57 @@ namespace Generated.Models
                         else if (schoolTypeValue.Raw != null)
                             entity.SchoolType = Convert.ToInt64(schoolTypeValue.Raw);
                     }
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(School.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                     {
-                        entity.MarkLoaded("Name");
+                        entity.MarkLoaded(School.__TeaqlFields.NAME_PROPERTY_MEMBER);
                         if (nameValue.Raw != null)
                             entity.Name = Convert.ToString(nameValue.Raw);
                     }
-                    if (record.TryGetValue("address", out var addressValue))
+                    if (record.TryGetValue(School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE, out var addressValue))
                     {
-                        entity.MarkLoaded("Address");
+                        entity.MarkLoaded(School.__TeaqlFields.ADDRESS_PROPERTY_MEMBER);
                         if (addressValue.Raw != null)
                             entity.Address = Convert.ToString(addressValue.Raw);
                     }
-                    if (record.TryGetValue("established_date", out var establishedDateValue))
+                    if (record.TryGetValue(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE, out var establishedDateValue))
                     {
-                        entity.MarkLoaded("EstablishedDate");
+                        entity.MarkLoaded(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MEMBER);
                         if (establishedDateValue.Raw != null)
                             entity.EstablishedDate = TeaqlDateTime(establishedDateValue);
                     }
-                    if (record.TryGetValue("student_capacity", out var studentCapacityValue))
+                    if (record.TryGetValue(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE, out var studentCapacityValue))
                     {
-                        entity.MarkLoaded("StudentCapacity");
+                        entity.MarkLoaded(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MEMBER);
                         if (studentCapacityValue.Raw != null)
                             entity.StudentCapacity = Convert.ToInt64(studentCapacityValue.Raw);
                     }
-                    if (record.TryGetValue("active", out var activeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE, out var activeValue))
                     {
-                        entity.MarkLoaded("Active");
+                        entity.MarkLoaded(School.__TeaqlFields.ACTIVE_PROPERTY_MEMBER);
                         if (activeValue.Raw != null)
                             entity.Active = Convert.ToBoolean(activeValue.Raw);
                     }
-                    if (record.TryGetValue("create_time", out var createTimeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
                     {
-                        entity.MarkLoaded("CreateTime");
+                        entity.MarkLoaded(School.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
                         if (createTimeValue.Raw != null)
                             entity.CreateTime = TeaqlDateTime(createTimeValue);
                     }
-                    if (record.TryGetValue("update_time", out var updateTimeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
                     {
-                        entity.MarkLoaded("UpdateTime");
+                        entity.MarkLoaded(School.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
                         if (updateTimeValue.Raw != null)
                             entity.UpdateTime = TeaqlDateTime(updateTimeValue);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(School.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(School.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "platform", "school_type", "name", "address", "established_date", "student_capacity", "active", "create_time", "update_time", "version",
-                "Id", "Platform", "SchoolType", "Name", "Address", "EstablishedDate", "StudentCapacity", "Active", "CreateTime", "UpdateTime", "Version",
+                School.__TeaqlFields.ID_PROPERTY_QUERY, School.__TeaqlFields.PLATFORM_PROPERTY_QUERY, School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_QUERY, School.__TeaqlFields.NAME_PROPERTY_QUERY, School.__TeaqlFields.ADDRESS_PROPERTY_QUERY, School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_QUERY, School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_QUERY, School.__TeaqlFields.ACTIVE_PROPERTY_QUERY, School.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, School.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, School.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                School.__TeaqlFields.ID_PROPERTY_MEMBER, School.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MEMBER, School.__TeaqlFields.NAME_PROPERTY_MEMBER, School.__TeaqlFields.ADDRESS_PROPERTY_MEMBER, School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MEMBER, School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MEMBER, School.__TeaqlFields.ACTIVE_PROPERTY_MEMBER, School.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER, School.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER, School.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -398,28 +446,28 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Platform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("SchoolType"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("school_type"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Address"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("address"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("EstablishedDate"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("established_date"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("StudentCapacity"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("student_capacity"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Active"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("active"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CreateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("UpdateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.PLATFORM_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.ADDRESS_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.ADDRESS_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.ACTIVE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.ACTIVE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(School.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "School", Location = ObjectLocation.Property(School.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -561,17 +609,17 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Platform")) record["platform"] = TeaqlValue(Platform);
-                        if (IsLoaded("SchoolType")) record["school_type"] = TeaqlValue(SchoolType);
-                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
-                        if (IsLoaded("Address")) record["address"] = TeaqlValue(Address);
-                        if (IsLoaded("EstablishedDate")) record["established_date"] = TeaqlValue(EstablishedDate);
-                        if (IsLoaded("StudentCapacity")) record["student_capacity"] = TeaqlValue(StudentCapacity);
-                        if (IsLoaded("Active")) record["active"] = TeaqlValue(Active);
-                        if (IsLoaded("CreateTime")) record["create_time"] = TeaqlValue(CreateTime);
-                        if (IsLoaded("UpdateTime")) record["update_time"] = TeaqlValue(UpdateTime);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(School.__TeaqlFields.ID_PROPERTY_MEMBER)) record[School.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(School.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)) record[School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = TeaqlValue(Platform);
+                        if (IsLoaded(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MEMBER)) record[School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE] = TeaqlValue(SchoolType);
+                        if (IsLoaded(School.__TeaqlFields.NAME_PROPERTY_MEMBER)) record[School.__TeaqlFields.NAME_PROPERTY_STORAGE] = TeaqlValue(Name);
+                        if (IsLoaded(School.__TeaqlFields.ADDRESS_PROPERTY_MEMBER)) record[School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE] = TeaqlValue(Address);
+                        if (IsLoaded(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MEMBER)) record[School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE] = TeaqlValue(EstablishedDate);
+                        if (IsLoaded(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MEMBER)) record[School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE] = TeaqlValue(StudentCapacity);
+                        if (IsLoaded(School.__TeaqlFields.ACTIVE_PROPERTY_MEMBER)) record[School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE] = TeaqlValue(Active);
+                        if (IsLoaded(School.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER)) record[School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = TeaqlValue(CreateTime);
+                        if (IsLoaded(School.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER)) record[School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = TeaqlValue(UpdateTime);
+                        if (IsLoaded(School.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[School.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -579,31 +627,31 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("platform", out var platformValue))
+                    if (record.TryGetValue(School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out var platformValue))
                         this.Platform = platformValue.Raw == null ? null : Convert.ToInt64(platformValue.Raw);
 
-                    if (record.TryGetValue("school_type", out var schoolTypeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE, out var schoolTypeValue))
                         this.SchoolType = schoolTypeValue.Raw == null ? null : Convert.ToInt64(schoolTypeValue.Raw);
 
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(School.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                         this.Name = nameValue.Raw == null ? null : Convert.ToString(nameValue.Raw);
 
-                    if (record.TryGetValue("address", out var addressValue))
+                    if (record.TryGetValue(School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE, out var addressValue))
                         this.Address = addressValue.Raw == null ? null : Convert.ToString(addressValue.Raw);
 
-                    if (record.TryGetValue("established_date", out var establishedDateValue))
+                    if (record.TryGetValue(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE, out var establishedDateValue))
                         this.EstablishedDate = establishedDateValue.Raw == null ? null : TeaqlDateTime(establishedDateValue);
 
-                    if (record.TryGetValue("student_capacity", out var studentCapacityValue))
+                    if (record.TryGetValue(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE, out var studentCapacityValue))
                         this.StudentCapacity = studentCapacityValue.Raw == null ? null : Convert.ToInt64(studentCapacityValue.Raw);
 
-                    if (record.TryGetValue("active", out var activeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE, out var activeValue))
                         this.Active = activeValue.Raw == null ? null : Convert.ToBoolean(activeValue.Raw);
 
-                    if (record.TryGetValue("create_time", out var createTimeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
                         this.CreateTime = createTimeValue.Raw == null ? null : TeaqlDateTime(createTimeValue);
 
-                    if (record.TryGetValue("update_time", out var updateTimeValue))
+                    if (record.TryGetValue(School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
                         this.UpdateTime = updateTimeValue.Raw == null ? null : TeaqlDateTime(updateTimeValue);
 
 
@@ -612,27 +660,27 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[School.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
-                    if (SchoolType.HasValue) record["school_type"] = new Value.I64Value(SchoolType.Value);
+                    if (SchoolType.HasValue) record[School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE] = new Value.I64Value(SchoolType.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[School.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (Address != null) record["address"] = new Value.TextValue(Address);
+                    if (Address != null) record[School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE] = new Value.TextValue(Address);
 
-                    if (EstablishedDate.HasValue) record["established_date"] = new Value.DateValue(EstablishedDate.Value);
+                    if (EstablishedDate.HasValue) record[School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE] = new Value.DateValue(EstablishedDate.Value);
 
-                    if (StudentCapacity.HasValue) record["student_capacity"] = new Value.I64Value(StudentCapacity.Value);
+                    if (StudentCapacity.HasValue) record[School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE] = new Value.I64Value(StudentCapacity.Value);
 
-                    if (Active.HasValue) record["active"] = new Value.BoolValue(Active.Value);
+                    if (Active.HasValue) record[School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE] = new Value.BoolValue(Active.Value);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[School.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "School", Values = record };
         }
@@ -640,25 +688,25 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
-                    if (SchoolType.HasValue) record["school_type"] = new Value.I64Value(SchoolType.Value);
+                    if (SchoolType.HasValue) record[School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE] = new Value.I64Value(SchoolType.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[School.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (Address != null) record["address"] = new Value.TextValue(Address);
+                    if (Address != null) record[School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE] = new Value.TextValue(Address);
 
-                    if (EstablishedDate.HasValue) record["established_date"] = new Value.DateValue(EstablishedDate.Value);
+                    if (EstablishedDate.HasValue) record[School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE] = new Value.DateValue(EstablishedDate.Value);
 
-                    if (StudentCapacity.HasValue) record["student_capacity"] = new Value.I64Value(StudentCapacity.Value);
+                    if (StudentCapacity.HasValue) record[School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE] = new Value.I64Value(StudentCapacity.Value);
 
-                    if (Active.HasValue) record["active"] = new Value.BoolValue(Active.Value);
+                    if (Active.HasValue) record[School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE] = new Value.BoolValue(Active.Value);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[School.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "School", 
@@ -687,8 +735,8 @@ namespace Generated.Models
                 public School UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -696,8 +744,8 @@ namespace Generated.Models
                 {
                     if (this.Platform != value) this.PlatformEntity = null;
                     this.Platform = value;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -705,72 +753,72 @@ namespace Generated.Models
                 {
                     if (this.SchoolType != value) this.SchoolTypeEntity = null;
                     this.SchoolType = value;
-                    MarkLoaded("SchoolType");
-                    _entityRoot.Set(TeaqlEntityKey(), "school_type", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.SCHOOL_TYPE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateName(string value)
                 {
                     this.Name = value;
-                    MarkLoaded("Name");
-                    _entityRoot.Set(TeaqlEntityKey(), "name", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateAddress(string value)
                 {
                     this.Address = value;
-                    MarkLoaded("Address");
-                    _entityRoot.Set(TeaqlEntityKey(), "address", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.ADDRESS_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.ADDRESS_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateEstablishedDate(DateTime? value)
                 {
                     this.EstablishedDate = value;
-                    MarkLoaded("EstablishedDate");
-                    _entityRoot.Set(TeaqlEntityKey(), "established_date", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.ESTABLISHED_DATE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateStudentCapacity(long? value)
                 {
                     this.StudentCapacity = value;
-                    MarkLoaded("StudentCapacity");
-                    _entityRoot.Set(TeaqlEntityKey(), "student_capacity", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.STUDENT_CAPACITY_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateActive(bool? value)
                 {
                     this.Active = value;
-                    MarkLoaded("Active");
-                    _entityRoot.Set(TeaqlEntityKey(), "active", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.ACTIVE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.ACTIVE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateCreateTime(DateTime? value)
                 {
                     this.CreateTime = value;
-                    MarkLoaded("CreateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "create_time", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateUpdateTime(DateTime? value)
                 {
                     this.UpdateTime = value;
-                    MarkLoaded("UpdateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "update_time", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public School UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(School.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), School.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public School UpdatePlatform(Platform value)

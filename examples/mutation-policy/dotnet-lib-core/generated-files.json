@@ -2,15 +2,15 @@
   "E.cs": "1d42b75f7ebcc9e4b68ced701df396f3590f943f9e01bfd835698dc2824c81ce",
   "GeneratedRuntimeModule.cs": "80fd939e67de1c77a3c2f2c8cbc16be4af8b9699d3008467fb547255f31309fe",
   "GeneratedSearchModels.cs": "62bb989984d4fe9573cd5c727cca880247e98179cfc3dcb6ffba7ec2c7ed7b65",
-  "Models/Customer.cs": "3ceaa9923e251553fd068324f389cd58f8bdc02933bc27a6adbee855ab9c9499",
-  "Models/CustomerContact.cs": "648870c6e11313893219430f13553ce945011cca17f7105224fc180b260adb72",
-  "Models/Platform.cs": "f231675c8141c5959ea5176171a0ebdb677e4469cb30ce1006138f29d225bc16",
+  "Models/Customer.cs": "def2fb6c303a183fe9e96d6fce0417088e5bb23f805ce8c738c0cc88ff440ee9",
+  "Models/CustomerContact.cs": "2a2a04aecf83dfd45eda1d439b239a0f079bf0b84fe162d75337ea273fbf3f15",
+  "Models/Platform.cs": "2a6fa2e6d6254ac57a38403ab1be800796917401cd8a78d203e8dbd7be249755",
   "Q.cs": "8126d9d3e78b4ed1700b35fde1ab02a5dc4cf54550e741346ffba529c5cc5a69",
-  "Requests/CustomerContactRequest.cs": "6474fe54b2f2bbf442093917ef392c5bd8f44f77180e52582ed5a5454b6bceb9",
-  "Requests/CustomerRequest.cs": "9b585f27b5f9b8987027d5e4ddb5ea2b66ab6335a33f88a66a5220123aa687d6",
-  "Requests/PlatformRequest.cs": "69c574e52e2fd3b643f908960b915a7b0afc9ce39d9a01a068a1e6c8e1d07671",
+  "Requests/CustomerContactRequest.cs": "ea1869207b544d80e3568bf28464eae68a051feaf4036b16c5d5ba0d6242d1ff",
+  "Requests/CustomerRequest.cs": "c144cf5f24e1edb31ceaaf285a29570a5eef7bf213a1c2dc46ddcb9585742ccb",
+  "Requests/PlatformRequest.cs": "5ac04c965f5305f6d6664ed218dd0784ed99daba06880da27bbb12db5e381278",
   "customer-onboarding-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
   "teaql-i18n.json": "b4acee7d90d29cc295800609f9fb64076667d9bd672aea4dd507f5afad7dcb2c",
   "teaql/checker-model.json": "a5097202b16fd99e2cd34705d0a094a9429d50674a339fe4a31fbb9b133efeda",
-  "teaql/model-provenance.json": "60e6f66c41e91cbeb54ad562eec6fed6edae669e8066e1263720b8d3ccdbd10c"
+  "teaql/model-provenance.json": "09a5d0cb2d0fe4e3cdb5432f659b07c0a131ae7da8dd8eb63dc72c62fde294d4"
 }

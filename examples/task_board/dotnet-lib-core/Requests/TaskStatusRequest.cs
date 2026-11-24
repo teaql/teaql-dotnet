@@ -120,57 +120,57 @@ namespace Generated.Requests
 
         public TaskStatusRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("name");
-            _query.Project("code");
-            _query.Project("color");
-            _query.Project("display_order");
-            _query.Project("progress");
-            _query.Project("platform");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public TaskStatusRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest SelectCode()
                 {
-                    _query.Project("code");
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest SelectColor()
                 {
-                    _query.Project("color");
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest SelectDisplayOrder()
                 {
-                    _query.Project("display_order");
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest SelectProgress()
                 {
-                    _query.Project("progress");
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public TaskStatusRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -181,713 +181,713 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SelectPlatformWith(PlatformRequest related)
                 {
-                    _query.Project("platform");
-                    _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, "Platform", global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: "Platform")
+                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public TaskStatusRequest WithPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public TaskStatusRequest WithoutPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public TaskStatusRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public TaskStatusRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("code", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public TaskStatusRequest WithCodeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("code"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("code"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY));
                     return this;
                 }
                 public TaskStatusRequest WithCodeNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("code", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("code", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("code", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("code", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("code", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithCodeSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("code", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("color", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public TaskStatusRequest WithColorIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("color", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("color", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("color", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("color", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("color"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("color"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY));
                     return this;
                 }
                 public TaskStatusRequest WithColorNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("color", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("color", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("color", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("color", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("color", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithColorSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("color", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("display_order", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("display_order", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("display_order", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("display_order"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithDisplayOrderIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("display_order"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("progress", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("progress", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("progress", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("progress", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("progress", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("progress", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("progress", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("progress", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("progress", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("progress"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithProgressIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("progress"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest FilterByPlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskStatusRequest FilterByPlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public TaskStatusRequest WithPlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithPlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskStatusRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByCodeAscending()
                 {
-                    _query.OrderBy("code", "asc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByCodeDescending()
                 {
-                    _query.OrderBy("code", "desc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByColorAscending()
                 {
-                    _query.OrderBy("color", "asc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByColorDescending()
                 {
-                    _query.OrderBy("color", "desc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByDisplayOrderAscending()
                 {
-                    _query.OrderBy("display_order", "asc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByDisplayOrderDescending()
                 {
-                    _query.OrderBy("display_order", "desc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByProgressAscending()
                 {
-                    _query.OrderBy("progress", "asc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByProgressDescending()
                 {
-                    _query.OrderBy("progress", "desc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public TaskStatusRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskStatusRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -912,7 +912,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest MinDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("min", "display_order", retName);
+                    _query.Aggregate("min", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest MaxDisplayOrder()
@@ -922,7 +922,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest MaxDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("max", "display_order", retName);
+                    _query.Aggregate("max", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SumDisplayOrder()
@@ -932,7 +932,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SumDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("sum", "display_order", retName);
+                    _query.Aggregate("sum", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest AvgDisplayOrder()
@@ -942,7 +942,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest AvgDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("avg", "display_order", retName);
+                    _query.Aggregate("avg", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest StandardDeviationDisplayOrder()
@@ -952,7 +952,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest StandardDeviationDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("stddev", "display_order", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SquareRootOfPopulationStandardDeviationDisplayOrder()
@@ -962,7 +962,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SquareRootOfPopulationStandardDeviationDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "display_order", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SampleVarianceDisplayOrder()
@@ -972,7 +972,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SampleVarianceDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "display_order", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SamplePopulationVarianceDisplayOrder()
@@ -982,7 +982,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SamplePopulationVarianceDisplayOrderAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "display_order", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest MinProgress()
@@ -992,7 +992,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest MinProgressAs(string retName)
                 {
-                    _query.Aggregate("min", "progress", retName);
+                    _query.Aggregate("min", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest MaxProgress()
@@ -1002,7 +1002,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest MaxProgressAs(string retName)
                 {
-                    _query.Aggregate("max", "progress", retName);
+                    _query.Aggregate("max", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SumProgress()
@@ -1012,7 +1012,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SumProgressAs(string retName)
                 {
-                    _query.Aggregate("sum", "progress", retName);
+                    _query.Aggregate("sum", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest AvgProgress()
@@ -1022,7 +1022,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest AvgProgressAs(string retName)
                 {
-                    _query.Aggregate("avg", "progress", retName);
+                    _query.Aggregate("avg", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest StandardDeviationProgress()
@@ -1032,7 +1032,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest StandardDeviationProgressAs(string retName)
                 {
-                    _query.Aggregate("stddev", "progress", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SquareRootOfPopulationStandardDeviationProgress()
@@ -1042,7 +1042,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SquareRootOfPopulationStandardDeviationProgressAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "progress", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SampleVarianceProgress()
@@ -1052,7 +1052,7 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SampleVarianceProgressAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "progress", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest SamplePopulationVarianceProgress()
@@ -1062,95 +1062,95 @@ namespace Generated.Requests
 
                 public TaskStatusRequest SamplePopulationVarianceProgressAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "progress", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public TaskStatusRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest GroupByCode()
                 {
-                    _query.GroupBy("code");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByCodeAs(string retName)
                 {
-                    _query.GroupBy("code"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.CODE_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest GroupByColor()
                 {
-                    _query.GroupBy("color");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByColorAs(string retName)
                 {
-                    _query.GroupBy("color"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.COLOR_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest GroupByDisplayOrder()
                 {
-                    _query.GroupBy("display_order");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByDisplayOrderAs(string retName)
                 {
-                    _query.GroupBy("display_order"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest GroupByProgress()
                 {
-                    _query.GroupBy("progress");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByProgressAs(string retName)
                 {
-                    _query.GroupBy("progress"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.PROGRESS_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest GroupByPlatform()
                 {
-                    _query.GroupBy("platform");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByPlatformAs(string retName)
                 {
-                    _query.GroupBy("platform"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskStatusRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.TaskStatus.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskStatusRequest SelectTaskList()
@@ -1212,8 +1212,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Platform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, "platform")
+                        name, global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, global::Generated.Models.TaskStatus.__TeaqlFields.PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }

@@ -9,18 +9,66 @@ namespace Generated.Models
 
     public class FreightQuote : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string PLATFORM_PROPERTY_MEMBER = "Platform";
+            internal const string PLATFORM_PROPERTY_QUERY = "platform";
+            internal const string PLATFORM_PROPERTY_STORAGE = "platform";
+            internal const string PLATFORM_PROPERTY_MODEL = "platform";
+            internal const string REFERENCE_PROPERTY_MEMBER = "Reference";
+            internal const string REFERENCE_PROPERTY_QUERY = "reference";
+            internal const string REFERENCE_PROPERTY_STORAGE = "reference";
+            internal const string REFERENCE_PROPERTY_MODEL = "reference";
+            internal const string AMOUNT_PROPERTY_MEMBER = "Amount";
+            internal const string AMOUNT_PROPERTY_QUERY = "amount";
+            internal const string AMOUNT_PROPERTY_STORAGE = "amount";
+            internal const string AMOUNT_PROPERTY_MODEL = "amount";
+            internal const string SHIPMENT_NUMBER_PROPERTY_MEMBER = "ShipmentNumber";
+            internal const string SHIPMENT_NUMBER_PROPERTY_QUERY = "shipment_number";
+            internal const string SHIPMENT_NUMBER_PROPERTY_STORAGE = "shipment_number";
+            internal const string SHIPMENT_NUMBER_PROPERTY_MODEL = "shipment_number";
+            internal const string PACKAGE_COUNT_PROPERTY_MEMBER = "PackageCount";
+            internal const string PACKAGE_COUNT_PROPERTY_QUERY = "package_count";
+            internal const string PACKAGE_COUNT_PROPERTY_STORAGE = "package_count";
+            internal const string PACKAGE_COUNT_PROPERTY_MODEL = "package_count";
+            internal const string DELIVERY_DATE_PROPERTY_MEMBER = "DeliveryDate";
+            internal const string DELIVERY_DATE_PROPERTY_QUERY = "delivery_date";
+            internal const string DELIVERY_DATE_PROPERTY_STORAGE = "delivery_date";
+            internal const string DELIVERY_DATE_PROPERTY_MODEL = "delivery_date";
+            internal const string PICKUP_TIME_PROPERTY_MEMBER = "PickupTime";
+            internal const string PICKUP_TIME_PROPERTY_QUERY = "pickup_time";
+            internal const string PICKUP_TIME_PROPERTY_STORAGE = "pickup_time";
+            internal const string PICKUP_TIME_PROPERTY_MODEL = "pickup_time";
+            internal const string QUOTED_AT_PROPERTY_MEMBER = "QuotedAt";
+            internal const string QUOTED_AT_PROPERTY_QUERY = "quoted_at";
+            internal const string QUOTED_AT_PROPERTY_STORAGE = "quoted_at";
+            internal const string QUOTED_AT_PROPERTY_MODEL = "quoted_at";
+            internal const string INSTRUCTIONS_PROPERTY_MEMBER = "Instructions";
+            internal const string INSTRUCTIONS_PROPERTY_QUERY = "instructions";
+            internal const string INSTRUCTIONS_PROPERTY_STORAGE = "instructions";
+            internal const string INSTRUCTIONS_PROPERTY_MODEL = "instructions";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("FreightQuote", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "platform", () => global::Generated.Models.Platform._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("reference", global::TeaQL.Runtime.EntityJsonKind.Text, "reference"),
-            new global::TeaQL.Runtime.EntityJsonField("amount", global::TeaQL.Runtime.EntityJsonKind.Decimal, "amount"),
-            new global::TeaQL.Runtime.EntityJsonField("shipment_number", global::TeaQL.Runtime.EntityJsonKind.Long, "shipment_number"),
-            new global::TeaQL.Runtime.EntityJsonField("package_count", global::TeaQL.Runtime.EntityJsonKind.Integer, "package_count"),
-            new global::TeaQL.Runtime.EntityJsonField("delivery_date", global::TeaQL.Runtime.EntityJsonKind.Date, "delivery_date"),
-            new global::TeaQL.Runtime.EntityJsonField("pickup_time", global::TeaQL.Runtime.EntityJsonKind.Time, "pickup_time"),
-            new global::TeaQL.Runtime.EntityJsonField("quoted_at", global::TeaQL.Runtime.EntityJsonKind.DateTime, "quoted_at"),
-            new global::TeaQL.Runtime.EntityJsonField("instructions", global::TeaQL.Runtime.EntityJsonKind.Text, "instructions"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, FreightQuote.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, () => global::Generated.Models.Platform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Decimal, FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Long, FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Integer, FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Date, FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Time, FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(FreightQuote.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, FreightQuote.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -34,51 +82,51 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Platform"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
             {
                 object? jsonPlatform = IsLoaded("PlatformEntity") && PlatformEntity != null && PlatformEntity.Id == Platform
                     ? PlatformEntity : Platform;
-                yield return new KeyValuePair<string, object?>("platform", jsonPlatform);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, jsonPlatform);
             }
-            if (IsLoaded("Reference"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("reference", Reference);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, Reference);
             }
-            if (IsLoaded("Amount"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("amount", Amount);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE, Amount);
             }
-            if (IsLoaded("ShipmentNumber"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("shipment_number", ShipmentNumber);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE, ShipmentNumber);
             }
-            if (IsLoaded("PackageCount"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("package_count", PackageCount);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE, PackageCount);
             }
-            if (IsLoaded("DeliveryDate"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("delivery_date", DeliveryDate);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE, DeliveryDate);
             }
-            if (IsLoaded("PickupTime"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("pickup_time", PickupTime);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE, PickupTime);
             }
-            if (IsLoaded("QuotedAt"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("quoted_at", QuotedAt);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE, QuotedAt);
             }
-            if (IsLoaded("Instructions"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("instructions", Instructions);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE, Instructions);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(FreightQuote.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(FreightQuote.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -230,16 +278,16 @@ namespace Generated.Models
         {
             var entity = new FreightQuote().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Platform", out var platformValue)
-                        || record.TryGetValue("platform", out platformValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, out var platformValue)
+                        || record.TryGetValue(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out platformValue))
                     {
-                        entity.MarkLoaded("Platform");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
                         if (platformValue.Raw is Record platformRow)
                         {
                             entity.PlatformEntity = global::Generated.Models.Platform.FromRecord(platformRow);
@@ -261,63 +309,63 @@ namespace Generated.Models
                         else if (platformValue.Raw != null)
                             entity.Platform = Convert.ToInt64(platformValue.Raw);
                     }
-                    if (record.TryGetValue("reference", out var referenceValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, out var referenceValue))
                     {
-                        entity.MarkLoaded("Reference");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MEMBER);
                         if (referenceValue.Raw != null)
                             entity.Reference = Convert.ToString(referenceValue.Raw);
                     }
-                    if (record.TryGetValue("amount", out var amountValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE, out var amountValue))
                     {
-                        entity.MarkLoaded("Amount");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MEMBER);
                         if (amountValue.Raw != null)
                             entity.Amount = Convert.ToDecimal(amountValue.Raw);
                     }
-                    if (record.TryGetValue("shipment_number", out var shipmentNumberValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE, out var shipmentNumberValue))
                     {
-                        entity.MarkLoaded("ShipmentNumber");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MEMBER);
                         if (shipmentNumberValue.Raw != null)
                             entity.ShipmentNumber = Convert.ToInt64(shipmentNumberValue.Raw);
                     }
-                    if (record.TryGetValue("package_count", out var packageCountValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE, out var packageCountValue))
                     {
-                        entity.MarkLoaded("PackageCount");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MEMBER);
                         if (packageCountValue.Raw != null)
                             entity.PackageCount = Convert.ToInt64(packageCountValue.Raw);
                     }
-                    if (record.TryGetValue("delivery_date", out var deliveryDateValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE, out var deliveryDateValue))
                     {
-                        entity.MarkLoaded("DeliveryDate");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MEMBER);
                         if (deliveryDateValue.Raw != null)
                             entity.DeliveryDate = TeaqlDateTime(deliveryDateValue);
                     }
-                    if (record.TryGetValue("pickup_time", out var pickupTimeValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE, out var pickupTimeValue))
                     {
-                        entity.MarkLoaded("PickupTime");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MEMBER);
                         if (pickupTimeValue.Raw != null)
                             entity.PickupTime = pickupTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(pickupTimeValue.Raw) ?? throw new InvalidOperationException("Time value requires a non-null string"), System.Globalization.CultureInfo.InvariantCulture);
                     }
-                    if (record.TryGetValue("quoted_at", out var quotedAtValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE, out var quotedAtValue))
                     {
-                        entity.MarkLoaded("QuotedAt");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MEMBER);
                         if (quotedAtValue.Raw != null)
                             entity.QuotedAt = TeaqlDateTime(quotedAtValue);
                     }
-                    if (record.TryGetValue("instructions", out var instructionsValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE, out var instructionsValue))
                     {
-                        entity.MarkLoaded("Instructions");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MEMBER);
                         if (instructionsValue.Raw != null)
                             entity.Instructions = Convert.ToString(instructionsValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(FreightQuote.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "platform", "reference", "amount", "shipment_number", "package_count", "delivery_date", "pickup_time", "quoted_at", "instructions", "version",
-                "Id", "Platform", "Reference", "Amount", "ShipmentNumber", "PackageCount", "DeliveryDate", "PickupTime", "QuotedAt", "Instructions", "Version",
+                FreightQuote.__TeaqlFields.ID_PROPERTY_QUERY, FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_QUERY, FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_QUERY, FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_QUERY, FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_QUERY, FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_QUERY, FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_QUERY, FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_QUERY, FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_QUERY, FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, FreightQuote.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                FreightQuote.__TeaqlFields.ID_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MEMBER, FreightQuote.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -376,28 +424,28 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Platform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Reference"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("reference"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Amount"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("amount"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ShipmentNumber"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("shipment_number"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("PackageCount"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("package_count"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("DeliveryDate"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("delivery_date"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("PickupTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("pickup_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("QuotedAt"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("quoted_at"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Instructions"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("instructions"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(FreightQuote.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "FreightQuote", Location = ObjectLocation.Property(FreightQuote.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -539,17 +587,17 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Platform")) record["platform"] = TeaqlValue(Platform);
-                        if (IsLoaded("Reference")) record["reference"] = TeaqlValue(Reference);
-                        if (IsLoaded("Amount")) record["amount"] = TeaqlValue(Amount);
-                        if (IsLoaded("ShipmentNumber")) record["shipment_number"] = TeaqlValue(ShipmentNumber);
-                        if (IsLoaded("PackageCount")) record["package_count"] = TeaqlValue(PackageCount);
-                        if (IsLoaded("DeliveryDate")) record["delivery_date"] = TeaqlValue(DeliveryDate);
-                        if (IsLoaded("PickupTime")) record["pickup_time"] = TeaqlValue(PickupTime);
-                        if (IsLoaded("QuotedAt")) record["quoted_at"] = TeaqlValue(QuotedAt);
-                        if (IsLoaded("Instructions")) record["instructions"] = TeaqlValue(Instructions);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.ID_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = TeaqlValue(Platform);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE] = TeaqlValue(Reference);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE] = TeaqlValue(Amount);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE] = TeaqlValue(ShipmentNumber);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE] = TeaqlValue(PackageCount);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE] = TeaqlValue(DeliveryDate);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE] = TeaqlValue(PickupTime);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE] = TeaqlValue(QuotedAt);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE] = TeaqlValue(Instructions);
+                        if (IsLoaded(FreightQuote.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[FreightQuote.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -557,31 +605,31 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("platform", out var platformValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out var platformValue))
                         this.Platform = platformValue.Raw == null ? null : Convert.ToInt64(platformValue.Raw);
 
-                    if (record.TryGetValue("reference", out var referenceValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, out var referenceValue))
                         this.Reference = referenceValue.Raw == null ? null : Convert.ToString(referenceValue.Raw);
 
-                    if (record.TryGetValue("amount", out var amountValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE, out var amountValue))
                         this.Amount = amountValue.Raw == null ? null : Convert.ToDecimal(amountValue.Raw);
 
-                    if (record.TryGetValue("shipment_number", out var shipmentNumberValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE, out var shipmentNumberValue))
                         this.ShipmentNumber = shipmentNumberValue.Raw == null ? null : Convert.ToInt64(shipmentNumberValue.Raw);
 
-                    if (record.TryGetValue("package_count", out var packageCountValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE, out var packageCountValue))
                         this.PackageCount = packageCountValue.Raw == null ? null : Convert.ToInt64(packageCountValue.Raw);
 
-                    if (record.TryGetValue("delivery_date", out var deliveryDateValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE, out var deliveryDateValue))
                         this.DeliveryDate = deliveryDateValue.Raw == null ? null : TeaqlDateTime(deliveryDateValue);
 
-                    if (record.TryGetValue("pickup_time", out var pickupTimeValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE, out var pickupTimeValue))
                         this.PickupTime = pickupTimeValue.Raw == null ? null : pickupTimeValue.Raw is TimeSpan time ? time : TimeSpan.Parse(Convert.ToString(pickupTimeValue.Raw) ?? throw new InvalidOperationException("Time value requires a non-null string"), System.Globalization.CultureInfo.InvariantCulture);
 
-                    if (record.TryGetValue("quoted_at", out var quotedAtValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE, out var quotedAtValue))
                         this.QuotedAt = quotedAtValue.Raw == null ? null : TeaqlDateTime(quotedAtValue);
 
-                    if (record.TryGetValue("instructions", out var instructionsValue))
+                    if (record.TryGetValue(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE, out var instructionsValue))
                         this.Instructions = instructionsValue.Raw == null ? null : Convert.ToString(instructionsValue.Raw);
 
 
@@ -590,27 +638,27 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[FreightQuote.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
-                    if (Reference != null) record["reference"] = new Value.TextValue(Reference);
+                    if (Reference != null) record[FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE] = new Value.TextValue(Reference);
 
-                    if (Amount.HasValue) record["amount"] = new Value.DecimalValue(Amount.Value);
+                    if (Amount.HasValue) record[FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE] = new Value.DecimalValue(Amount.Value);
 
-                    if (ShipmentNumber.HasValue) record["shipment_number"] = new Value.I64Value(ShipmentNumber.Value);
+                    if (ShipmentNumber.HasValue) record[FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE] = new Value.I64Value(ShipmentNumber.Value);
 
-                    if (PackageCount.HasValue) record["package_count"] = new Value.I64Value(PackageCount.Value);
+                    if (PackageCount.HasValue) record[FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE] = new Value.I64Value(PackageCount.Value);
 
-                    if (DeliveryDate.HasValue) record["delivery_date"] = new Value.DateValue(DeliveryDate.Value);
+                    if (DeliveryDate.HasValue) record[FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE] = new Value.DateValue(DeliveryDate.Value);
 
-                    if (PickupTime.HasValue) record["pickup_time"] = new Value.TimeValue(PickupTime.Value);
+                    if (PickupTime.HasValue) record[FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE] = new Value.TimeValue(PickupTime.Value);
 
-                    if (QuotedAt.HasValue) record["quoted_at"] = new Value.TimestampValue(new DateTimeOffset(QuotedAt.Value).ToUnixTimeMilliseconds());
+                    if (QuotedAt.HasValue) record[FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(QuotedAt.Value).ToUnixTimeMilliseconds());
 
-                    if (Instructions != null) record["instructions"] = new Value.TextValue(Instructions);
+                    if (Instructions != null) record[FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE] = new Value.TextValue(Instructions);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[FreightQuote.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "FreightQuote", Values = record };
         }
@@ -618,25 +666,25 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
-                    if (Reference != null) record["reference"] = new Value.TextValue(Reference);
+                    if (Reference != null) record[FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE] = new Value.TextValue(Reference);
 
-                    if (Amount.HasValue) record["amount"] = new Value.DecimalValue(Amount.Value);
+                    if (Amount.HasValue) record[FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE] = new Value.DecimalValue(Amount.Value);
 
-                    if (ShipmentNumber.HasValue) record["shipment_number"] = new Value.I64Value(ShipmentNumber.Value);
+                    if (ShipmentNumber.HasValue) record[FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE] = new Value.I64Value(ShipmentNumber.Value);
 
-                    if (PackageCount.HasValue) record["package_count"] = new Value.I64Value(PackageCount.Value);
+                    if (PackageCount.HasValue) record[FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE] = new Value.I64Value(PackageCount.Value);
 
-                    if (DeliveryDate.HasValue) record["delivery_date"] = new Value.DateValue(DeliveryDate.Value);
+                    if (DeliveryDate.HasValue) record[FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE] = new Value.DateValue(DeliveryDate.Value);
 
-                    if (PickupTime.HasValue) record["pickup_time"] = new Value.TimeValue(PickupTime.Value);
+                    if (PickupTime.HasValue) record[FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE] = new Value.TimeValue(PickupTime.Value);
 
-                    if (QuotedAt.HasValue) record["quoted_at"] = new Value.TimestampValue(new DateTimeOffset(QuotedAt.Value).ToUnixTimeMilliseconds());
+                    if (QuotedAt.HasValue) record[FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(QuotedAt.Value).ToUnixTimeMilliseconds());
 
-                    if (Instructions != null) record["instructions"] = new Value.TextValue(Instructions);
+                    if (Instructions != null) record[FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE] = new Value.TextValue(Instructions);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[FreightQuote.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "FreightQuote", 
@@ -665,8 +713,8 @@ namespace Generated.Models
                 public FreightQuote UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -674,80 +722,80 @@ namespace Generated.Models
                 {
                     if (this.Platform != value) this.PlatformEntity = null;
                     this.Platform = value;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdateReference(string value)
                 {
                     this.Reference = value;
-                    MarkLoaded("Reference");
-                    _entityRoot.Set(TeaqlEntityKey(), "reference", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdateAmount(decimal? value)
                 {
                     this.Amount = value;
-                    MarkLoaded("Amount");
-                    _entityRoot.Set(TeaqlEntityKey(), "amount", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.AMOUNT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdateShipmentNumber(long? value)
                 {
                     this.ShipmentNumber = value;
-                    MarkLoaded("ShipmentNumber");
-                    _entityRoot.Set(TeaqlEntityKey(), "shipment_number", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.SHIPMENT_NUMBER_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdatePackageCount(long? value)
                 {
                     this.PackageCount = value;
-                    MarkLoaded("PackageCount");
-                    _entityRoot.Set(TeaqlEntityKey(), "package_count", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.PACKAGE_COUNT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdateDeliveryDate(DateTime? value)
                 {
                     this.DeliveryDate = value;
-                    MarkLoaded("DeliveryDate");
-                    _entityRoot.Set(TeaqlEntityKey(), "delivery_date", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.DELIVERY_DATE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdatePickupTime(TimeSpan? value)
                 {
                     this.PickupTime = value;
-                    MarkLoaded("PickupTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "pickup_time", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.PICKUP_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdateQuotedAt(DateTime? value)
                 {
                     this.QuotedAt = value;
-                    MarkLoaded("QuotedAt");
-                    _entityRoot.Set(TeaqlEntityKey(), "quoted_at", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.QUOTED_AT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdateInstructions(string value)
                 {
                     this.Instructions = value;
-                    MarkLoaded("Instructions");
-                    _entityRoot.Set(TeaqlEntityKey(), "instructions", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.INSTRUCTIONS_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public FreightQuote UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(FreightQuote.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), FreightQuote.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public FreightQuote UpdatePlatform(Platform value)

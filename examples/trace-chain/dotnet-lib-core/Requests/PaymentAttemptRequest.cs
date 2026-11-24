@@ -120,29 +120,29 @@ namespace Generated.Requests
 
         public PaymentAttemptRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("payment");
-            _query.Project("reference_code");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public PaymentAttemptRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public PaymentAttemptRequest SelectReferenceCode()
                 {
-                    _query.Project("reference_code");
+                    _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PaymentAttemptRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -153,321 +153,321 @@ namespace Generated.Requests
 
                 public PaymentAttemptRequest SelectPaymentWith(PaymentRequest related)
                 {
-                    _query.Project("payment");
-                    _query.ForwardRelationQuery("Payment", "Payment", "payment", related.GetQuery());
+                    _query.Project(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER, "Payment", global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectPaymentWith", Relation: "Payment")
+                        Operation = new QueryOperation("relation", "SelectPaymentWith", Relation: global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public PaymentAttemptRequest WithPaymentMatching(PaymentRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("payment", GeneratedRuntimeModule.Module.Metadata.GetEntity("Payment")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Payment")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithoutPaymentMatching(PaymentRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("payment", GeneratedRuntimeModule.Module.Metadata.GetEntity("Payment")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Payment")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PaymentAttemptRequest FilterByPayment(object val)
                 {
-                    _query.AndFilter(Expr.Eq("payment", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest FilterByPaymentIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("payment", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithPaymentIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("payment"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithPaymentIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("payment"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("reference_code", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("reference_code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public PaymentAttemptRequest WithReferenceCodeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("reference_code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("reference_code", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("reference_code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("reference_code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("reference_code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("reference_code", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("reference_code", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("reference_code"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("reference_code"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY));
                     return this;
                 }
                 public PaymentAttemptRequest WithReferenceCodeNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("reference_code", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("reference_code", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("reference_code", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("reference_code", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("reference_code", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithReferenceCodeSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("reference_code", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PaymentAttemptRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PaymentAttemptRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PaymentAttemptRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public PaymentAttemptRequest OrderByReferenceCodeAscending()
                 {
-                    _query.OrderBy("reference_code", "asc");
+                    _query.OrderBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PaymentAttemptRequest OrderByReferenceCodeDescending()
                 {
-                    _query.OrderBy("reference_code", "desc");
+                    _query.OrderBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public PaymentAttemptRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PaymentAttemptRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -487,46 +487,46 @@ namespace Generated.Requests
 
                 public PaymentAttemptRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PaymentAttemptRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public PaymentAttemptRequest GroupByPayment()
                 {
-                    _query.GroupBy("payment");
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PaymentAttemptRequest GroupByPaymentAs(string retName)
                 {
-                    _query.GroupBy("payment"); 
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY);
                     return this;
                 }
                 public PaymentAttemptRequest GroupByReferenceCode()
                 {
-                    _query.GroupBy("reference_code");
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PaymentAttemptRequest GroupByReferenceCodeAs(string retName)
                 {
-                    _query.GroupBy("reference_code"); 
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.REFERENCE_CODE_PROPERTY_QUERY);
                     return this;
                 }
                 public PaymentAttemptRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PaymentAttemptRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.PaymentAttempt.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public PaymentAttemptRequest FacetByPaymentAs(
@@ -534,8 +534,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Payment", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByPaymentAs", name, "payment")
+                        name, global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPaymentAs", name, global::Generated.Models.PaymentAttempt.__TeaqlFields.PAYMENT_PROPERTY_QUERY)
                     });
                     return this;
                 }

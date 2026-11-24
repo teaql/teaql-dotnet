@@ -9,15 +9,51 @@ namespace Generated.Models
 
     public class OrderAttachment : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string CUSTOMER_ORDER_PROPERTY_MEMBER = "CustomerOrder";
+            internal const string CUSTOMER_ORDER_PROPERTY_QUERY = "customer_order";
+            internal const string CUSTOMER_ORDER_PROPERTY_STORAGE = "customer_order";
+            internal const string CUSTOMER_ORDER_PROPERTY_MODEL = "customer_order";
+            internal const string FILE_NAME_PROPERTY_MEMBER = "FileName";
+            internal const string FILE_NAME_PROPERTY_QUERY = "file_name";
+            internal const string FILE_NAME_PROPERTY_STORAGE = "file_name";
+            internal const string FILE_NAME_PROPERTY_MODEL = "file_name";
+            internal const string CONTENT_TYPE_PROPERTY_MEMBER = "ContentType";
+            internal const string CONTENT_TYPE_PROPERTY_QUERY = "content_type";
+            internal const string CONTENT_TYPE_PROPERTY_STORAGE = "content_type";
+            internal const string CONTENT_TYPE_PROPERTY_MODEL = "content_type";
+            internal const string CONTENT_LENGTH_PROPERTY_MEMBER = "ContentLength";
+            internal const string CONTENT_LENGTH_PROPERTY_QUERY = "content_length";
+            internal const string CONTENT_LENGTH_PROPERTY_STORAGE = "content_length";
+            internal const string CONTENT_LENGTH_PROPERTY_MODEL = "content_length";
+            internal const string CONTENT_SHA256_PROPERTY_MEMBER = "ContentSha256";
+            internal const string CONTENT_SHA256_PROPERTY_QUERY = "content_sha256";
+            internal const string CONTENT_SHA256_PROPERTY_STORAGE = "content_sha256";
+            internal const string CONTENT_SHA256_PROPERTY_MODEL = "content_sha256";
+            internal const string OBJECT_KEY_PROPERTY_MEMBER = "ObjectKey";
+            internal const string OBJECT_KEY_PROPERTY_QUERY = "object_key";
+            internal const string OBJECT_KEY_PROPERTY_STORAGE = "object_key";
+            internal const string OBJECT_KEY_PROPERTY_MODEL = "object_key";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("OrderAttachment", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("customer_order", global::TeaQL.Runtime.EntityJsonKind.Reference, "customer_order", () => global::Generated.Models.CustomerOrder._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("file_name", global::TeaQL.Runtime.EntityJsonKind.Text, "file_name"),
-            new global::TeaQL.Runtime.EntityJsonField("content_type", global::TeaQL.Runtime.EntityJsonKind.Text, "content_type"),
-            new global::TeaQL.Runtime.EntityJsonField("content_length", global::TeaQL.Runtime.EntityJsonKind.Integer, "content_length"),
-            new global::TeaQL.Runtime.EntityJsonField("content_sha256", global::TeaQL.Runtime.EntityJsonKind.Text, "content_sha256"),
-            new global::TeaQL.Runtime.EntityJsonField("object_key", global::TeaQL.Runtime.EntityJsonKind.Text, "object_key"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, OrderAttachment.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, () => global::Generated.Models.CustomerOrder._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Integer, OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, OrderAttachment.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -31,39 +67,39 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("CustomerOrder"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER))
             {
                 object? jsonCustomerOrder = IsLoaded("CustomerOrderEntity") && CustomerOrderEntity != null && CustomerOrderEntity.Id == CustomerOrder
                     ? CustomerOrderEntity : CustomerOrder;
-                yield return new KeyValuePair<string, object?>("customer_order", jsonCustomerOrder);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, jsonCustomerOrder);
             }
-            if (IsLoaded("FileName"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("file_name", FileName);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE, FileName);
             }
-            if (IsLoaded("ContentType"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("content_type", ContentType);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE, ContentType);
             }
-            if (IsLoaded("ContentLength"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("content_length", ContentLength);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE, ContentLength);
             }
-            if (IsLoaded("ContentSha256"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("content_sha256", ContentSha256);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE, ContentSha256);
             }
-            if (IsLoaded("ObjectKey"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("object_key", ObjectKey);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE, ObjectKey);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -212,16 +248,16 @@ namespace Generated.Models
         {
             var entity = new OrderAttachment().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("CustomerOrder", out var customerOrderValue)
-                        || record.TryGetValue("customer_order", out customerOrderValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, out var customerOrderValue)
+                        || record.TryGetValue(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, out customerOrderValue))
                     {
-                        entity.MarkLoaded("CustomerOrder");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER);
                         if (customerOrderValue.Raw is Record customerOrderRow)
                         {
                             entity.CustomerOrderEntity = global::Generated.Models.CustomerOrder.FromRecord(customerOrderRow);
@@ -243,45 +279,45 @@ namespace Generated.Models
                         else if (customerOrderValue.Raw != null)
                             entity.CustomerOrder = Convert.ToInt64(customerOrderValue.Raw);
                     }
-                    if (record.TryGetValue("file_name", out var fileNameValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE, out var fileNameValue))
                     {
-                        entity.MarkLoaded("FileName");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MEMBER);
                         if (fileNameValue.Raw != null)
                             entity.FileName = Convert.ToString(fileNameValue.Raw);
                     }
-                    if (record.TryGetValue("content_type", out var contentTypeValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE, out var contentTypeValue))
                     {
-                        entity.MarkLoaded("ContentType");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MEMBER);
                         if (contentTypeValue.Raw != null)
                             entity.ContentType = Convert.ToString(contentTypeValue.Raw);
                     }
-                    if (record.TryGetValue("content_length", out var contentLengthValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE, out var contentLengthValue))
                     {
-                        entity.MarkLoaded("ContentLength");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MEMBER);
                         if (contentLengthValue.Raw != null)
                             entity.ContentLength = Convert.ToInt64(contentLengthValue.Raw);
                     }
-                    if (record.TryGetValue("content_sha256", out var contentSha256Value))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE, out var contentSha256Value))
                     {
-                        entity.MarkLoaded("ContentSha256");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MEMBER);
                         if (contentSha256Value.Raw != null)
                             entity.ContentSha256 = Convert.ToString(contentSha256Value.Raw);
                     }
-                    if (record.TryGetValue("object_key", out var objectKeyValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE, out var objectKeyValue))
                     {
-                        entity.MarkLoaded("ObjectKey");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MEMBER);
                         if (objectKeyValue.Raw != null)
                             entity.ObjectKey = Convert.ToString(objectKeyValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "customer_order", "file_name", "content_type", "content_length", "content_sha256", "object_key", "version",
-                "Id", "CustomerOrder", "FileName", "ContentType", "ContentLength", "ContentSha256", "ObjectKey", "Version",
+                OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                OrderAttachment.__TeaqlFields.ID_PROPERTY_MEMBER, OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MEMBER, OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MEMBER, OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MEMBER, OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MEMBER, OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MEMBER, OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -340,22 +376,22 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CustomerOrder"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("customer_order"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("FileName"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("file_name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ContentType"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("content_type"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ContentLength"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("content_length"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ContentSha256"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("content_sha256"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ObjectKey"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("object_key"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "OrderAttachment", Location = ObjectLocation.Property(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -488,14 +524,14 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("CustomerOrder")) record["customer_order"] = TeaqlValue(CustomerOrder);
-                        if (IsLoaded("FileName")) record["file_name"] = TeaqlValue(FileName);
-                        if (IsLoaded("ContentType")) record["content_type"] = TeaqlValue(ContentType);
-                        if (IsLoaded("ContentLength")) record["content_length"] = TeaqlValue(ContentLength);
-                        if (IsLoaded("ContentSha256")) record["content_sha256"] = TeaqlValue(ContentSha256);
-                        if (IsLoaded("ObjectKey")) record["object_key"] = TeaqlValue(ObjectKey);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.ID_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE] = TeaqlValue(CustomerOrder);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE] = TeaqlValue(FileName);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE] = TeaqlValue(ContentType);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE] = TeaqlValue(ContentLength);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE] = TeaqlValue(ContentSha256);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE] = TeaqlValue(ObjectKey);
+                        if (IsLoaded(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[OrderAttachment.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -503,22 +539,22 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("customer_order", out var customerOrderValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, out var customerOrderValue))
                         this.CustomerOrder = customerOrderValue.Raw == null ? null : Convert.ToInt64(customerOrderValue.Raw);
 
-                    if (record.TryGetValue("file_name", out var fileNameValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE, out var fileNameValue))
                         this.FileName = fileNameValue.Raw == null ? null : Convert.ToString(fileNameValue.Raw);
 
-                    if (record.TryGetValue("content_type", out var contentTypeValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE, out var contentTypeValue))
                         this.ContentType = contentTypeValue.Raw == null ? null : Convert.ToString(contentTypeValue.Raw);
 
-                    if (record.TryGetValue("content_length", out var contentLengthValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE, out var contentLengthValue))
                         this.ContentLength = contentLengthValue.Raw == null ? null : Convert.ToInt64(contentLengthValue.Raw);
 
-                    if (record.TryGetValue("content_sha256", out var contentSha256Value))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE, out var contentSha256Value))
                         this.ContentSha256 = contentSha256Value.Raw == null ? null : Convert.ToString(contentSha256Value.Raw);
 
-                    if (record.TryGetValue("object_key", out var objectKeyValue))
+                    if (record.TryGetValue(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE, out var objectKeyValue))
                         this.ObjectKey = objectKeyValue.Raw == null ? null : Convert.ToString(objectKeyValue.Raw);
 
 
@@ -527,21 +563,21 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[OrderAttachment.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (CustomerOrder.HasValue) record["customer_order"] = new Value.I64Value(CustomerOrder.Value);
+                    if (CustomerOrder.HasValue) record[OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE] = new Value.I64Value(CustomerOrder.Value);
 
-                    if (FileName != null) record["file_name"] = new Value.TextValue(FileName);
+                    if (FileName != null) record[OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE] = new Value.TextValue(FileName);
 
-                    if (ContentType != null) record["content_type"] = new Value.TextValue(ContentType);
+                    if (ContentType != null) record[OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE] = new Value.TextValue(ContentType);
 
-                    if (ContentLength.HasValue) record["content_length"] = new Value.I64Value(ContentLength.Value);
+                    if (ContentLength.HasValue) record[OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE] = new Value.I64Value(ContentLength.Value);
 
-                    if (ContentSha256 != null) record["content_sha256"] = new Value.TextValue(ContentSha256);
+                    if (ContentSha256 != null) record[OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE] = new Value.TextValue(ContentSha256);
 
-                    if (ObjectKey != null) record["object_key"] = new Value.TextValue(ObjectKey);
+                    if (ObjectKey != null) record[OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE] = new Value.TextValue(ObjectKey);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[OrderAttachment.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "OrderAttachment", Values = record };
         }
@@ -549,19 +585,19 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (CustomerOrder.HasValue) record["customer_order"] = new Value.I64Value(CustomerOrder.Value);
+                    if (CustomerOrder.HasValue) record[OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE] = new Value.I64Value(CustomerOrder.Value);
 
-                    if (FileName != null) record["file_name"] = new Value.TextValue(FileName);
+                    if (FileName != null) record[OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE] = new Value.TextValue(FileName);
 
-                    if (ContentType != null) record["content_type"] = new Value.TextValue(ContentType);
+                    if (ContentType != null) record[OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE] = new Value.TextValue(ContentType);
 
-                    if (ContentLength.HasValue) record["content_length"] = new Value.I64Value(ContentLength.Value);
+                    if (ContentLength.HasValue) record[OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE] = new Value.I64Value(ContentLength.Value);
 
-                    if (ContentSha256 != null) record["content_sha256"] = new Value.TextValue(ContentSha256);
+                    if (ContentSha256 != null) record[OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE] = new Value.TextValue(ContentSha256);
 
-                    if (ObjectKey != null) record["object_key"] = new Value.TextValue(ObjectKey);
+                    if (ObjectKey != null) record[OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE] = new Value.TextValue(ObjectKey);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[OrderAttachment.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "OrderAttachment", 
@@ -590,8 +626,8 @@ namespace Generated.Models
                 public OrderAttachment UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -599,56 +635,56 @@ namespace Generated.Models
                 {
                     if (this.CustomerOrder != value) this.CustomerOrderEntity = null;
                     this.CustomerOrder = value;
-                    MarkLoaded("CustomerOrder");
-                    _entityRoot.Set(TeaqlEntityKey(), "customer_order", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderAttachment UpdateFileName(string value)
                 {
                     this.FileName = value;
-                    MarkLoaded("FileName");
-                    _entityRoot.Set(TeaqlEntityKey(), "file_name", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderAttachment UpdateContentType(string value)
                 {
                     this.ContentType = value;
-                    MarkLoaded("ContentType");
-                    _entityRoot.Set(TeaqlEntityKey(), "content_type", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderAttachment UpdateContentLength(long? value)
                 {
                     this.ContentLength = value;
-                    MarkLoaded("ContentLength");
-                    _entityRoot.Set(TeaqlEntityKey(), "content_length", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderAttachment UpdateContentSha256(string value)
                 {
                     this.ContentSha256 = value;
-                    MarkLoaded("ContentSha256");
-                    _entityRoot.Set(TeaqlEntityKey(), "content_sha256", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderAttachment UpdateObjectKey(string value)
                 {
                     this.ObjectKey = value;
-                    MarkLoaded("ObjectKey");
-                    _entityRoot.Set(TeaqlEntityKey(), "object_key", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public OrderAttachment UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(OrderAttachment.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), OrderAttachment.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public OrderAttachment UpdateCustomerOrder(CustomerOrder value)

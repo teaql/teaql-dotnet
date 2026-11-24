@@ -9,11 +9,31 @@ namespace Generated.Models
 
     public class PurchaseOrder : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string WAREHOUSE_PROPERTY_MEMBER = "Warehouse";
+            internal const string WAREHOUSE_PROPERTY_QUERY = "warehouse";
+            internal const string WAREHOUSE_PROPERTY_STORAGE = "warehouse";
+            internal const string WAREHOUSE_PROPERTY_MODEL = "warehouse";
+            internal const string REFERENCE_PROPERTY_MEMBER = "Reference";
+            internal const string REFERENCE_PROPERTY_QUERY = "reference";
+            internal const string REFERENCE_PROPERTY_STORAGE = "reference";
+            internal const string REFERENCE_PROPERTY_MODEL = "reference";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("PurchaseOrder", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("warehouse", global::TeaQL.Runtime.EntityJsonKind.Reference, "warehouse", () => global::Generated.Models.Warehouse._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("reference", global::TeaQL.Runtime.EntityJsonKind.Text, "reference"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE, () => global::Generated.Models.Warehouse._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE),
             new global::TeaQL.Runtime.EntityJsonField("order_item_list", global::TeaQL.Runtime.EntityJsonKind.Many, "OrderItemList", () => global::Generated.Models.OrderItem._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
@@ -28,23 +48,23 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Warehouse"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER))
             {
                 object? jsonWarehouse = IsLoaded("WarehouseEntity") && WarehouseEntity != null && WarehouseEntity.Id == Warehouse
                     ? WarehouseEntity : Warehouse;
-                yield return new KeyValuePair<string, object?>("warehouse", jsonWarehouse);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE, jsonWarehouse);
             }
-            if (IsLoaded("Reference"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("reference", Reference);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, Reference);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
             if (OrderItemList.IsLoaded || OrderItemList.Any(child => child.TeaqlHasPending()))
                 yield return new KeyValuePair<string, object?>("OrderItemList", OrderItemList);
@@ -198,16 +218,16 @@ namespace Generated.Models
         {
             var entity = new PurchaseOrder().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Warehouse", out var warehouseValue)
-                        || record.TryGetValue("warehouse", out warehouseValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER, out var warehouseValue)
+                        || record.TryGetValue(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE, out warehouseValue))
                     {
-                        entity.MarkLoaded("Warehouse");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER);
                         if (warehouseValue.Raw is Record warehouseRow)
                         {
                             entity.WarehouseEntity = global::Generated.Models.Warehouse.FromRecord(warehouseRow);
@@ -229,15 +249,15 @@ namespace Generated.Models
                         else if (warehouseValue.Raw != null)
                             entity.Warehouse = Convert.ToInt64(warehouseValue.Raw);
                     }
-                    if (record.TryGetValue("reference", out var referenceValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, out var referenceValue))
                     {
-                        entity.MarkLoaded("Reference");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MEMBER);
                         if (referenceValue.Raw != null)
                             entity.Reference = Convert.ToString(referenceValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
@@ -254,8 +274,8 @@ namespace Generated.Models
                             }
                         }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "warehouse", "reference", "version",
-                "Id", "Warehouse", "Reference", "Version",
+                PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MEMBER, PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER,
                 "OrderItemList"
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
@@ -318,14 +338,14 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Warehouse"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("warehouse"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Reference"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("reference"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "PurchaseOrder", Location = ObjectLocation.Property(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -489,10 +509,10 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Warehouse")) record["warehouse"] = TeaqlValue(Warehouse);
-                        if (IsLoaded("Reference")) record["reference"] = TeaqlValue(Reference);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE] = TeaqlValue(Warehouse);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE] = TeaqlValue(Reference);
+                        if (IsLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -500,10 +520,10 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("warehouse", out var warehouseValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE, out var warehouseValue))
                         this.Warehouse = warehouseValue.Raw == null ? null : Convert.ToInt64(warehouseValue.Raw);
 
-                    if (record.TryGetValue("reference", out var referenceValue))
+                    if (record.TryGetValue(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, out var referenceValue))
                         this.Reference = referenceValue.Raw == null ? null : Convert.ToString(referenceValue.Raw);
 
 
@@ -512,13 +532,13 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Warehouse.HasValue) record["warehouse"] = new Value.I64Value(Warehouse.Value);
+                    if (Warehouse.HasValue) record[PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE] = new Value.I64Value(Warehouse.Value);
 
-                    if (Reference != null) record["reference"] = new Value.TextValue(Reference);
+                    if (Reference != null) record[PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE] = new Value.TextValue(Reference);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "PurchaseOrder", Values = record };
         }
@@ -526,11 +546,11 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Warehouse.HasValue) record["warehouse"] = new Value.I64Value(Warehouse.Value);
+                    if (Warehouse.HasValue) record[PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE] = new Value.I64Value(Warehouse.Value);
 
-                    if (Reference != null) record["reference"] = new Value.TextValue(Reference);
+                    if (Reference != null) record[PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE] = new Value.TextValue(Reference);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "PurchaseOrder", 
@@ -559,8 +579,8 @@ namespace Generated.Models
                 public PurchaseOrder UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -568,24 +588,24 @@ namespace Generated.Models
                 {
                     if (this.Warehouse != value) this.WarehouseEntity = null;
                     this.Warehouse = value;
-                    MarkLoaded("Warehouse");
-                    _entityRoot.Set(TeaqlEntityKey(), "warehouse", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PurchaseOrder UpdateReference(string value)
                 {
                     this.Reference = value;
-                    MarkLoaded("Reference");
-                    _entityRoot.Set(TeaqlEntityKey(), "reference", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public PurchaseOrder UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public PurchaseOrder UpdateWarehouse(Warehouse value)

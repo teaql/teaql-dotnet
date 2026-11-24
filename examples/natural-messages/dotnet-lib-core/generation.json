@@ -1,120 +1,19 @@
 {
-  "artifactKind": "qualified generator source build; not a public release",
-  "generationReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/catalog-natural-generation/dotnet/catalog-natural-messages/library/receipt.json",
-  "generationReceiptSha256": "0f944df2eeb319855039ac024e5c463264f96bdc5c41547dfd7d1609455da7b4",
+  "artifactKind": "published generator release",
+  "generationReceipt": "../../generator-v5.0.2.json",
   "generator": {
-    "artifactKind": "qualified source build; not a public release",
-    "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
-    "qualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
-    "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
-    "tag": "unreleased-source-021b1ed8"
+    "jarSHA256": "107fb340c0534fb2548dc0b7228554ce3fc080524353df6a9f6d7ad9388471bb",
+    "kind": "published generator release",
+    "release": "v5.0.2",
+    "sourceCommit": "80fe610d358e923724ddccac84a48d6e4ec5c806",
+    "url": "https://github.com/teaql/teaql-code-gen/releases/tag/v5.0.2"
   },
   "implementationHandEdited": false,
   "modelSha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
-  "previousGeneration": {
-    "evaluatedScope": "dotnet-lib-core",
-    "evaluationErrors": 0,
-    "evaluationWarnings": 2,
-    "generatedManifestSha256": "d5fcb039887dc6760b2f5568fb7b17bc9050ad7ab0fb5b7d21205061cebde2c0",
-    "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-unified-intent-current-source/dotnet/natural-messages/automatic-fixture/model/receipt.json",
-    "generationReceiptSha256": "89855de786c340aca29a7f666f9ad5e91fd7eebb02d1dae19be3262c48e9ea68",
-    "generatorCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
-    "generatorJarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
-    "generatorRelease": "unreleased-source-021b1ed8",
-    "implementationHandEdited": false,
-    "modelSha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
-    "previousGeneration": {
-      "evaluatedScope": "dotnet-lib-core",
-      "evaluationErrors": 0,
-      "evaluationWarnings": 2,
-      "generatedManifestSha256": "a36dc6ae9fec779f3a15b45175c9a157a89f04bddc1bf53a4ccf880fcf12bea5",
-      "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-unified-current-source/dotnet/natural-messages/automatic-fixture/model/receipt.json",
-      "generationReceiptSha256": "6e3e30c26a4e13f584935f62543c100bf3159f09d795fb557af3d9b32a7190f9",
-      "generatorCommit": "19feda8a0608d7c7e0d64c7d9ec371c9021000fd",
-      "generatorJarSHA256": "dc6e26b561f618e1f9574c5c3b4c03b7a21da9ca630cc73a78ae8ccd0d89bd7e",
-      "generatorRelease": "unreleased-source-19feda8a",
-      "implementationHandEdited": false,
-      "modelSha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
-      "previousGeneration": {
-        "evaluatedScope": "dotnet-lib-core",
-        "evaluationErrors": 0,
-        "evaluationWarnings": 2,
-        "generatedManifestSha256": "611c84e8bb48ff4b16a86e1da128d52fac81977480f9103e945a3e62c9e72d96",
-        "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-compatibility-candidate/dotnet/natural-messages/automatic-fixture/model/receipt.json",
-        "generationReceiptSha256": "38b37822f088ff341c63268f78bb5012fd1b223688dd89398b2eaa2b2cc8ec69",
-        "generatorCommit": "42275522b8405f65f84a7961c66b615a427391f7",
-        "generatorJarSHA256": "6a9420e4ffd686e0813ca9c0d2ad20991fa2f8ff2e365d39148c85e79acad86e",
-        "generatorRelease": "unreleased-source-42275522",
-        "implementationHandEdited": false,
-        "modelSha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
-        "previousGeneration": {
-          "evaluatedScope": "dotnet-lib-core",
-          "evaluationErrors": 0,
-          "evaluationWarnings": 2,
-          "generatedManifestSha256": "7cba8d995dec339d4b27c7538d8ae36e58439bbb49808f3367b9356e3cbd8ec7",
-          "generationReceipt": "teaql-conformance/evidence/2026-11-19-runtime-examples-refresh/generation-catalog/dotnet/natural-messages/automatic-fixture/model/receipt.json",
-          "generationReceiptSha256": "1e7743625ff0bf1b612230bbfa8f7c3e01e89a1ffb184899d72c88bf0b8383bb",
-          "generatorCommit": "97830096360553381a3221ad5bdbe9837c68a9b4",
-          "generatorJarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
-          "generatorRelease": "v4.2.0",
-          "implementationHandEdited": false,
-          "modelSha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
-          "previousGeneration": {
-            "fixtureOutputProperty": "teaql.dotnet.natural.fixture.output",
-            "generationReceipt": "teaql-conformance/evidence/2026-11-12-natural-checker-dotnet-graph-generation/receipt.json",
-            "generationReceiptSha256": "1cdd1b762d4116d6d1f7845d28ad2aa6a5d236d082953cd130f766a8b5825606",
-            "generatorCommit": "d9f6ef400fb96b9f6d81363b7a70e67e7d2c6a67",
-            "implementationHandEdited": false,
-            "modelSha256": "9e9b4e1336ee9c91135fb97718ec593d499a3efef408a7e563245f5dc14f3a20",
-            "publicPublication": false,
-            "runtimeDependency": "local repository source",
-            "schema": "teaql.generated-example-provenance/v1",
-            "scope": "dotnet-lib-core",
-            "upstreamTest": "com.skynet.codegenerator.DotnetNaturalMessagesGenerationTest"
-          },
-          "producerReceiptSha256": "1e7743625ff0bf1b612230bbfa8f7c3e01e89a1ffb184899d72c88bf0b8383bb",
-          "producerSource": {
-            "commit": "97830096360553381a3221ad5bdbe9837c68a9b4",
-            "jarSHA256": "a22cfb9d9442958404cfb0d8e085af2c223c618018bbeb5e42a78765c23c4dd6",
-            "release": "v4.2.0"
-          },
-          "publicPublication": false,
-          "runtimeDependency": "local repository source",
-          "schema": "teaql.generated-example-provenance/v1",
-          "scope": "dotnet-lib-core"
-        },
-        "producerReceiptSha256": "38b37822f088ff341c63268f78bb5012fd1b223688dd89398b2eaa2b2cc8ec69",
-        "producerSource": {
-          "commit": "42275522b8405f65f84a7961c66b615a427391f7",
-          "jarSHA256": "6a9420e4ffd686e0813ca9c0d2ad20991fa2f8ff2e365d39148c85e79acad86e",
-          "release": "unreleased-source-42275522"
-        },
-        "publicPublication": false,
-        "runtimeDependency": "local repository source",
-        "schema": "teaql.generated-example-provenance/v1",
-        "scope": "dotnet-lib-core"
-      },
-      "producerReceiptSha256": "6e3e30c26a4e13f584935f62543c100bf3159f09d795fb557af3d9b32a7190f9",
-      "producerSource": {
-        "commit": "19feda8a0608d7c7e0d64c7d9ec371c9021000fd",
-        "jarSHA256": "dc6e26b561f618e1f9574c5c3b4c03b7a21da9ca630cc73a78ae8ccd0d89bd7e",
-        "release": "unreleased-source-19feda8a"
-      },
-      "publicPublication": false,
-      "runtimeDependency": "local repository source",
-      "schema": "teaql.generated-example-provenance/v1",
-      "scope": "dotnet-lib-core"
-    },
-    "producerReceiptSha256": "89855de786c340aca29a7f666f9ad5e91fd7eebb02d1dae19be3262c48e9ea68",
-    "producerSource": {
-      "commit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
-      "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
-      "release": "unreleased-source-021b1ed8"
-    },
-    "publicPublication": false,
-    "runtimeDependency": "local repository source",
-    "schema": "teaql.generated-example-provenance/v1",
-    "scope": "dotnet-lib-core"
+  "previousOrigin": {
+    "commit": "e62edea17a950c837e6be2cab2db10f703ec72bd",
+    "path": "examples/natural-messages/dotnet-lib-core/generation.json",
+    "sha256": "23d94774894572d5424eaad9555ffc8ea8395f56fe829852385885aecbd9fb57"
   },
   "publicPublication": false,
   "schema": "teaql.native-natural-message-generation/v1"

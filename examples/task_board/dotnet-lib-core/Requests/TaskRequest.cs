@@ -120,23 +120,23 @@ namespace Generated.Requests
 
         public TaskRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("name");
-            _query.Project("status");
-            _query.Project("platform");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public TaskRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -144,7 +144,7 @@ namespace Generated.Requests
 
                 public TaskRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -155,10 +155,10 @@ namespace Generated.Requests
 
                 public TaskRequest SelectStatusWith(TaskStatusRequest related)
                 {
-                    _query.Project("status");
-                    _query.ForwardRelationQuery("Status", "TaskStatus", "status", related.GetQuery());
+                    _query.Project(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_MEMBER, "TaskStatus", global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectStatusWith", Relation: "Status")
+                        Operation = new QueryOperation("relation", "SelectStatusWith", Relation: global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_MEMBER)
                     };
                     return this;
                 }
@@ -169,367 +169,367 @@ namespace Generated.Requests
 
                 public TaskRequest SelectPlatformWith(PlatformRequest related)
                 {
-                    _query.Project("platform");
-                    _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, "Platform", global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: "Platform")
+                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public TaskRequest WithStatusMatching(TaskStatusRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("status", GeneratedRuntimeModule.Module.Metadata.GetEntity("TaskStatus")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("TaskStatus")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public TaskRequest WithoutStatusMatching(TaskStatusRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("status", GeneratedRuntimeModule.Module.Metadata.GetEntity("TaskStatus")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("TaskStatus")!, related.GetQuery(), "id"));
                     return this;
                 }
                 public TaskRequest WithPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public TaskRequest WithoutPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public TaskRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public TaskRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public TaskRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest FilterByStatus(object val)
                 {
-                    _query.AndFilter(Expr.Eq("status", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest FilterByStatusIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("status", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public TaskRequest WithStatusIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("status"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest WithStatusIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("status"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY));
                     return this;
                 }
                 public TaskRequest WithStatusIsPlanned()
                 {
-                    _query.AndFilter(Expr.Eq("status", 1001L));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, 1001L));
                     return this;
                 }
 
                 public TaskRequest WithStatusIsReady()
                 {
-                    _query.AndFilter(Expr.Eq("status", 1002L));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, 1002L));
                     return this;
                 }
 
                 public TaskRequest WithStatusIsExecuting()
                 {
-                    _query.AndFilter(Expr.Eq("status", 1003L));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, 1003L));
                     return this;
                 }
 
                 public TaskRequest WithStatusIsVerified()
                 {
-                    _query.AndFilter(Expr.Eq("status", 1004L));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY, 1004L));
                     return this;
                 }
 
 
                 public TaskRequest FilterByPlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public TaskRequest FilterByPlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public TaskRequest WithPlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest WithPlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public TaskRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public TaskRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public TaskRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public TaskRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public TaskRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -537,13 +537,13 @@ namespace Generated.Requests
 
                 public TaskRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public TaskRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -563,57 +563,57 @@ namespace Generated.Requests
 
                 public TaskRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskRequest GroupByStatus()
                 {
-                    _query.GroupBy("status");
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskRequest GroupByStatusAs(string retName)
                 {
-                    _query.GroupBy("status"); 
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskRequest GroupByPlatform()
                 {
-                    _query.GroupBy("platform");
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskRequest GroupByPlatformAs(string retName)
                 {
-                    _query.GroupBy("platform"); 
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public TaskRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.Task.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public TaskRequest SelectTaskExecutionLogList()
@@ -675,8 +675,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Status", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByStatusAs", name, "status")
+                        name, global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByStatusAs", name, global::Generated.Models.Task.__TeaqlFields.STATUS_PROPERTY_QUERY)
                     });
                     return this;
                 }
@@ -686,8 +686,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Platform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, "platform")
+                        name, global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, global::Generated.Models.Task.__TeaqlFields.PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }

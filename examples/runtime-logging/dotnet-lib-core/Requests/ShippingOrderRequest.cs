@@ -120,43 +120,43 @@ namespace Generated.Requests
 
         public ShippingOrderRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("warehouse");
-            _query.Project("reference");
-            _query.Project("customer_reference");
-            _query.Project("instructions");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public ShippingOrderRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public ShippingOrderRequest SelectReference()
                 {
-                    _query.Project("reference");
+                    _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest SelectCustomerReference()
                 {
-                    _query.Project("customer_reference");
+                    _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest SelectInstructions()
                 {
-                    _query.Project("instructions");
+                    _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -167,557 +167,557 @@ namespace Generated.Requests
 
                 public ShippingOrderRequest SelectWarehouseWith(WarehouseRequest related)
                 {
-                    _query.Project("warehouse");
-                    _query.ForwardRelationQuery("Warehouse", "Warehouse", "warehouse", related.GetQuery());
+                    _query.Project(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER, "Warehouse", global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectWarehouseWith", Relation: "Warehouse")
+                        Operation = new QueryOperation("relation", "SelectWarehouseWith", Relation: global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public ShippingOrderRequest WithWarehouseMatching(WarehouseRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("warehouse", GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public ShippingOrderRequest WithoutWarehouseMatching(WarehouseRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("warehouse", GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest FilterByWarehouse(object val)
                 {
-                    _query.AndFilter(Expr.Eq("warehouse", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest FilterByWarehouseIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("warehouse", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public ShippingOrderRequest WithWarehouseIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("warehouse"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest WithWarehouseIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("warehouse"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("reference", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public ShippingOrderRequest WithReferenceIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("reference", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("reference"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("reference"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
                 public ShippingOrderRequest WithReferenceNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("reference", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("reference", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("reference", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("reference", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("reference", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithReferenceSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("reference", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("customer_reference", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("customer_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public ShippingOrderRequest WithCustomerReferenceIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("customer_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("customer_reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("customer_reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("customer_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("customer_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("customer_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("customer_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("customer_reference", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("customer_reference"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("customer_reference"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
                 public ShippingOrderRequest WithCustomerReferenceNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("customer_reference", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("customer_reference", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("customer_reference", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("customer_reference", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("customer_reference", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithCustomerReferenceSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("customer_reference", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("instructions", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public ShippingOrderRequest WithInstructionsIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("instructions", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("instructions", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("instructions", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("instructions", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("instructions"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("instructions"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY));
                     return this;
                 }
                 public ShippingOrderRequest WithInstructionsNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("instructions", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("instructions", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("instructions", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("instructions", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("instructions", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithInstructionsSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("instructions", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public ShippingOrderRequest OrderByReferenceAscending()
                 {
-                    _query.OrderBy("reference", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByReferenceDescending()
                 {
-                    _query.OrderBy("reference", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByCustomerReferenceAscending()
                 {
-                    _query.OrderBy("customer_reference", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByCustomerReferenceDescending()
                 {
-                    _query.OrderBy("customer_reference", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByInstructionsAscending()
                 {
-                    _query.OrderBy("instructions", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByInstructionsDescending()
                 {
-                    _query.OrderBy("instructions", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingOrderRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -737,68 +737,68 @@ namespace Generated.Requests
 
                 public ShippingOrderRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingOrderRequest GroupByWarehouse()
                 {
-                    _query.GroupBy("warehouse");
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest GroupByWarehouseAs(string retName)
                 {
-                    _query.GroupBy("warehouse"); 
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingOrderRequest GroupByReference()
                 {
-                    _query.GroupBy("reference");
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest GroupByReferenceAs(string retName)
                 {
-                    _query.GroupBy("reference"); 
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingOrderRequest GroupByCustomerReference()
                 {
-                    _query.GroupBy("customer_reference");
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest GroupByCustomerReferenceAs(string retName)
                 {
-                    _query.GroupBy("customer_reference"); 
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.CUSTOMER_REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingOrderRequest GroupByInstructions()
                 {
-                    _query.GroupBy("instructions");
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest GroupByInstructionsAs(string retName)
                 {
-                    _query.GroupBy("instructions"); 
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.INSTRUCTIONS_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingOrderRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingOrderRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.ShippingOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingOrderRequest SelectShippingItemList()
@@ -963,8 +963,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Warehouse", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByWarehouseAs", name, "warehouse")
+                        name, global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByWarehouseAs", name, global::Generated.Models.ShippingOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY)
                     });
                     return this;
                 }

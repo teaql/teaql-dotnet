@@ -120,36 +120,36 @@ namespace Generated.Requests
 
         public WorkItemRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("title");
-            _query.Project("description");
-            _query.Project("platform");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public WorkItemRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public WorkItemRequest SelectTitle()
                 {
-                    _query.Project("title");
+                    _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public WorkItemRequest SelectDescription()
                 {
-                    _query.Project("description");
+                    _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public WorkItemRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -160,439 +160,439 @@ namespace Generated.Requests
 
                 public WorkItemRequest SelectPlatformWith(PlatformRequest related)
                 {
-                    _query.Project("platform");
-                    _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, "Platform", global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: "Platform")
+                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public WorkItemRequest WithPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public WorkItemRequest WithoutPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("title", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("title", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public WorkItemRequest WithTitleIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("title", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("title", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("title", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("title", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("title", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("title", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("title", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("title", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("title"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("title"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY));
                     return this;
                 }
                 public WorkItemRequest WithTitleNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("title", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("title", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("title", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("title", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("title", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithTitleSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("title", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("description", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("description", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public WorkItemRequest WithDescriptionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("description", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("description", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("description", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("description", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("description", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("description", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("description", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("description", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("description"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("description"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY));
                     return this;
                 }
                 public WorkItemRequest WithDescriptionNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("description", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("description", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("description", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("description", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("description", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest WithDescriptionSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("description", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest FilterByPlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public WorkItemRequest FilterByPlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public WorkItemRequest WithPlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest WithPlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public WorkItemRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public WorkItemRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public WorkItemRequest OrderByTitleAscending()
                 {
-                    _query.OrderBy("title", "asc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public WorkItemRequest OrderByTitleDescending()
                 {
-                    _query.OrderBy("title", "desc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public WorkItemRequest OrderByDescriptionAscending()
                 {
-                    _query.OrderBy("description", "asc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public WorkItemRequest OrderByDescriptionDescending()
                 {
-                    _query.OrderBy("description", "desc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public WorkItemRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public WorkItemRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -612,57 +612,57 @@ namespace Generated.Requests
 
                 public WorkItemRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public WorkItemRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public WorkItemRequest GroupByTitle()
                 {
-                    _query.GroupBy("title");
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public WorkItemRequest GroupByTitleAs(string retName)
                 {
-                    _query.GroupBy("title"); 
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.TITLE_PROPERTY_QUERY);
                     return this;
                 }
                 public WorkItemRequest GroupByDescription()
                 {
-                    _query.GroupBy("description");
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public WorkItemRequest GroupByDescriptionAs(string retName)
                 {
-                    _query.GroupBy("description"); 
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.DESCRIPTION_PROPERTY_QUERY);
                     return this;
                 }
                 public WorkItemRequest GroupByPlatform()
                 {
-                    _query.GroupBy("platform");
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public WorkItemRequest GroupByPlatformAs(string retName)
                 {
-                    _query.GroupBy("platform"); 
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public WorkItemRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public WorkItemRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.WorkItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public WorkItemRequest FacetByPlatformAs(
@@ -670,8 +670,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Platform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, "platform")
+                        name, global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, global::Generated.Models.WorkItem.__TeaqlFields.PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }

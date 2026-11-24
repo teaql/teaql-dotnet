@@ -120,29 +120,29 @@ namespace Generated.Requests
 
         public OrderItemRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("customer_order");
-            _query.Project("name");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public OrderItemRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public OrderItemRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderItemRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -153,321 +153,321 @@ namespace Generated.Requests
 
                 public OrderItemRequest SelectCustomerOrderWith(CustomerOrderRequest related)
                 {
-                    _query.Project("customer_order");
-                    _query.ForwardRelationQuery("CustomerOrder", "CustomerOrder", "customer_order", related.GetQuery());
+                    _query.Project(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, "CustomerOrder", global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCustomerOrderWith", Relation: "CustomerOrder")
+                        Operation = new QueryOperation("relation", "SelectCustomerOrderWith", Relation: global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public OrderItemRequest WithCustomerOrderMatching(CustomerOrderRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("customer_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderItemRequest WithoutCustomerOrderMatching(CustomerOrderRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("customer_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderItemRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderItemRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderItemRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderItemRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderItemRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderItemRequest FilterByCustomerOrder(object val)
                 {
-                    _query.AndFilter(Expr.Eq("customer_order", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest FilterByCustomerOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("customer_order", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public OrderItemRequest WithCustomerOrderIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("customer_order"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderItemRequest WithCustomerOrderIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("customer_order"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderItemRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderItemRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderItemRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderItemRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderItemRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderItemRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderItemRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderItemRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderItemRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderItemRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public OrderItemRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderItemRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderItemRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderItemRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -487,46 +487,46 @@ namespace Generated.Requests
 
                 public OrderItemRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderItemRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderItemRequest GroupByCustomerOrder()
                 {
-                    _query.GroupBy("customer_order");
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderItemRequest GroupByCustomerOrderAs(string retName)
                 {
-                    _query.GroupBy("customer_order"); 
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderItemRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderItemRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderItemRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderItemRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.OrderItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderItemRequest FacetByCustomerOrderAs(
@@ -534,8 +534,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "CustomerOrder", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCustomerOrderAs", name, "customer_order")
+                        name, global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCustomerOrderAs", name, global::Generated.Models.OrderItem.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY)
                     });
                     return this;
                 }

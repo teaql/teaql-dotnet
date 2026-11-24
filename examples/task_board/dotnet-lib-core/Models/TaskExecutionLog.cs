@@ -9,12 +9,36 @@ namespace Generated.Models
 
     public class TaskExecutionLog : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string TASK_PROPERTY_MEMBER = "Task";
+            internal const string TASK_PROPERTY_QUERY = "task";
+            internal const string TASK_PROPERTY_STORAGE = "task";
+            internal const string TASK_PROPERTY_MODEL = "task";
+            internal const string ACTION_PROPERTY_MEMBER = "Action";
+            internal const string ACTION_PROPERTY_QUERY = "action";
+            internal const string ACTION_PROPERTY_STORAGE = "action";
+            internal const string ACTION_PROPERTY_MODEL = "action";
+            internal const string DETAIL_PROPERTY_MEMBER = "Detail";
+            internal const string DETAIL_PROPERTY_QUERY = "detail";
+            internal const string DETAIL_PROPERTY_STORAGE = "detail";
+            internal const string DETAIL_PROPERTY_MODEL = "detail";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("TaskExecutionLog", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("task", global::TeaQL.Runtime.EntityJsonKind.Reference, "task", () => global::Generated.Models.Task._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("action", global::TeaQL.Runtime.EntityJsonKind.Text, "action"),
-            new global::TeaQL.Runtime.EntityJsonField("detail", global::TeaQL.Runtime.EntityJsonKind.Text, "detail"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, TaskExecutionLog.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE, () => global::Generated.Models.Task._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -28,27 +52,27 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Task"))
+            if (IsLoaded(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MEMBER))
             {
                 object? jsonTask = IsLoaded("TaskEntity") && TaskEntity != null && TaskEntity.Id == Task
                     ? TaskEntity : Task;
-                yield return new KeyValuePair<string, object?>("task", jsonTask);
+                yield return new KeyValuePair<string, object?>(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE, jsonTask);
             }
-            if (IsLoaded("Action"))
+            if (IsLoaded(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("action", Action);
+                yield return new KeyValuePair<string, object?>(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE, Action);
             }
-            if (IsLoaded("Detail"))
+            if (IsLoaded(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("detail", Detail);
+                yield return new KeyValuePair<string, object?>(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE, Detail);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -194,16 +218,16 @@ namespace Generated.Models
         {
             var entity = new TaskExecutionLog().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Task", out var taskValue)
-                        || record.TryGetValue("task", out taskValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MEMBER, out var taskValue)
+                        || record.TryGetValue(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE, out taskValue))
                     {
-                        entity.MarkLoaded("Task");
+                        entity.MarkLoaded(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MEMBER);
                         if (taskValue.Raw is Record taskRow)
                         {
                             entity.TaskEntity = global::Generated.Models.Task.FromRecord(taskRow);
@@ -225,27 +249,27 @@ namespace Generated.Models
                         else if (taskValue.Raw != null)
                             entity.Task = Convert.ToInt64(taskValue.Raw);
                     }
-                    if (record.TryGetValue("action", out var actionValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE, out var actionValue))
                     {
-                        entity.MarkLoaded("Action");
+                        entity.MarkLoaded(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MEMBER);
                         if (actionValue.Raw != null)
                             entity.Action = Convert.ToString(actionValue.Raw);
                     }
-                    if (record.TryGetValue("detail", out var detailValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE, out var detailValue))
                     {
-                        entity.MarkLoaded("Detail");
+                        entity.MarkLoaded(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MEMBER);
                         if (detailValue.Raw != null)
                             entity.Detail = Convert.ToString(detailValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "task", "action", "detail", "version",
-                "Id", "Task", "Action", "Detail", "Version",
+                TaskExecutionLog.__TeaqlFields.ID_PROPERTY_QUERY, TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_QUERY, TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_QUERY, TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_QUERY, TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MEMBER, TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MEMBER, TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MEMBER, TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MEMBER, TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -304,16 +328,16 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Task"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property("task"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Action"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property("action"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Detail"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property("detail"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "TaskExecutionLog", Location = ObjectLocation.Property(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -437,11 +461,11 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Task")) record["task"] = TeaqlValue(Task);
-                        if (IsLoaded("Action")) record["action"] = TeaqlValue(Action);
-                        if (IsLoaded("Detail")) record["detail"] = TeaqlValue(Detail);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MEMBER)) record[TaskExecutionLog.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MEMBER)) record[TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE] = TeaqlValue(Task);
+                        if (IsLoaded(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MEMBER)) record[TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE] = TeaqlValue(Action);
+                        if (IsLoaded(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MEMBER)) record[TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE] = TeaqlValue(Detail);
+                        if (IsLoaded(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -449,13 +473,13 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("task", out var taskValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE, out var taskValue))
                         this.Task = taskValue.Raw == null ? null : Convert.ToInt64(taskValue.Raw);
 
-                    if (record.TryGetValue("action", out var actionValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE, out var actionValue))
                         this.Action = actionValue.Raw == null ? null : Convert.ToString(actionValue.Raw);
 
-                    if (record.TryGetValue("detail", out var detailValue))
+                    if (record.TryGetValue(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE, out var detailValue))
                         this.Detail = detailValue.Raw == null ? null : Convert.ToString(detailValue.Raw);
 
 
@@ -464,15 +488,15 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[TaskExecutionLog.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Task.HasValue) record["task"] = new Value.I64Value(Task.Value);
+                    if (Task.HasValue) record[TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE] = new Value.I64Value(Task.Value);
 
-                    if (Action != null) record["action"] = new Value.TextValue(Action);
+                    if (Action != null) record[TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE] = new Value.TextValue(Action);
 
-                    if (Detail != null) record["detail"] = new Value.TextValue(Detail);
+                    if (Detail != null) record[TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE] = new Value.TextValue(Detail);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "TaskExecutionLog", Values = record };
         }
@@ -480,13 +504,13 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Task.HasValue) record["task"] = new Value.I64Value(Task.Value);
+                    if (Task.HasValue) record[TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE] = new Value.I64Value(Task.Value);
 
-                    if (Action != null) record["action"] = new Value.TextValue(Action);
+                    if (Action != null) record[TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE] = new Value.TextValue(Action);
 
-                    if (Detail != null) record["detail"] = new Value.TextValue(Detail);
+                    if (Detail != null) record[TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE] = new Value.TextValue(Detail);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "TaskExecutionLog", 
@@ -515,8 +539,8 @@ namespace Generated.Models
                 public TaskExecutionLog UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(TaskExecutionLog.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), TaskExecutionLog.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -524,32 +548,32 @@ namespace Generated.Models
                 {
                     if (this.Task != value) this.TaskEntity = null;
                     this.Task = value;
-                    MarkLoaded("Task");
-                    _entityRoot.Set(TeaqlEntityKey(), "task", TeaqlValue(value));
+                    MarkLoaded(TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), TaskExecutionLog.__TeaqlFields.TASK_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public TaskExecutionLog UpdateAction(string value)
                 {
                     this.Action = value;
-                    MarkLoaded("Action");
-                    _entityRoot.Set(TeaqlEntityKey(), "action", TeaqlValue(value));
+                    MarkLoaded(TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), TaskExecutionLog.__TeaqlFields.ACTION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public TaskExecutionLog UpdateDetail(string value)
                 {
                     this.Detail = value;
-                    MarkLoaded("Detail");
-                    _entityRoot.Set(TeaqlEntityKey(), "detail", TeaqlValue(value));
+                    MarkLoaded(TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), TaskExecutionLog.__TeaqlFields.DETAIL_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public TaskExecutionLog UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), TaskExecutionLog.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public TaskExecutionLog UpdateTask(Task value)

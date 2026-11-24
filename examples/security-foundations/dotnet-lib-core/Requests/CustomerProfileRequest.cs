@@ -120,29 +120,29 @@ namespace Generated.Requests
 
         public CustomerProfileRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("merchant");
-            _query.Project("email");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public CustomerProfileRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public CustomerProfileRequest SelectEmail()
                 {
-                    _query.Project("email");
+                    _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerProfileRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -153,321 +153,321 @@ namespace Generated.Requests
 
                 public CustomerProfileRequest SelectMerchantWith(MerchantRequest related)
                 {
-                    _query.Project("merchant");
-                    _query.ForwardRelationQuery("Merchant", "Merchant", "merchant", related.GetQuery());
+                    _query.Project(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_MEMBER, "Merchant", global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectMerchantWith", Relation: "Merchant")
+                        Operation = new QueryOperation("relation", "SelectMerchantWith", Relation: global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public CustomerProfileRequest WithMerchantMatching(MerchantRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("merchant", GeneratedRuntimeModule.Module.Metadata.GetEntity("Merchant")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Merchant")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerProfileRequest WithoutMerchantMatching(MerchantRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("merchant", GeneratedRuntimeModule.Module.Metadata.GetEntity("Merchant")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Merchant")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerProfileRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerProfileRequest FilterByMerchant(object val)
                 {
-                    _query.AndFilter(Expr.Eq("merchant", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest FilterByMerchantIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("merchant", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public CustomerProfileRequest WithMerchantIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("merchant"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerProfileRequest WithMerchantIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("merchant"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("email", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public CustomerProfileRequest WithEmailIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("email", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("email", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("email", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("email"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("email"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY));
                     return this;
                 }
                 public CustomerProfileRequest WithEmailNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("email", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("email", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("email", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("email", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("email", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest WithEmailSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("email", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerProfileRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerProfileRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerProfileRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public CustomerProfileRequest OrderByEmailAscending()
                 {
-                    _query.OrderBy("email", "asc");
+                    _query.OrderBy(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerProfileRequest OrderByEmailDescending()
                 {
-                    _query.OrderBy("email", "desc");
+                    _query.OrderBy(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public CustomerProfileRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerProfileRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -487,46 +487,46 @@ namespace Generated.Requests
 
                 public CustomerProfileRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerProfileRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerProfileRequest GroupByMerchant()
                 {
-                    _query.GroupBy("merchant");
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerProfileRequest GroupByMerchantAs(string retName)
                 {
-                    _query.GroupBy("merchant"); 
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerProfileRequest GroupByEmail()
                 {
-                    _query.GroupBy("email");
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerProfileRequest GroupByEmailAs(string retName)
                 {
-                    _query.GroupBy("email"); 
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.EMAIL_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerProfileRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerProfileRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.CustomerProfile.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerProfileRequest SelectCustomerOrderList()
@@ -588,8 +588,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Merchant", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByMerchantAs", name, "merchant")
+                        name, global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByMerchantAs", name, global::Generated.Models.CustomerProfile.__TeaqlFields.MERCHANT_PROPERTY_QUERY)
                     });
                     return this;
                 }

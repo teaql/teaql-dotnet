@@ -120,29 +120,29 @@ namespace Generated.Requests
 
         public PurchaseOrderRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("warehouse");
-            _query.Project("reference");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public PurchaseOrderRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public PurchaseOrderRequest SelectReference()
                 {
-                    _query.Project("reference");
+                    _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PurchaseOrderRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -153,321 +153,321 @@ namespace Generated.Requests
 
                 public PurchaseOrderRequest SelectWarehouseWith(WarehouseRequest related)
                 {
-                    _query.Project("warehouse");
-                    _query.ForwardRelationQuery("Warehouse", "Warehouse", "warehouse", related.GetQuery());
+                    _query.Project(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER, "Warehouse", global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectWarehouseWith", Relation: "Warehouse")
+                        Operation = new QueryOperation("relation", "SelectWarehouseWith", Relation: global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public PurchaseOrderRequest WithWarehouseMatching(WarehouseRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("warehouse", GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithoutWarehouseMatching(WarehouseRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("warehouse", GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Warehouse")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PurchaseOrderRequest FilterByWarehouse(object val)
                 {
-                    _query.AndFilter(Expr.Eq("warehouse", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest FilterByWarehouseIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("warehouse", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithWarehouseIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("warehouse"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithWarehouseIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("warehouse"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("reference", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public PurchaseOrderRequest WithReferenceIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("reference", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("reference"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("reference"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
                 public PurchaseOrderRequest WithReferenceNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("reference", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("reference", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("reference", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("reference", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("reference", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithReferenceSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("reference", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PurchaseOrderRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PurchaseOrderRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PurchaseOrderRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public PurchaseOrderRequest OrderByReferenceAscending()
                 {
-                    _query.OrderBy("reference", "asc");
+                    _query.OrderBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PurchaseOrderRequest OrderByReferenceDescending()
                 {
-                    _query.OrderBy("reference", "desc");
+                    _query.OrderBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public PurchaseOrderRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PurchaseOrderRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -487,46 +487,46 @@ namespace Generated.Requests
 
                 public PurchaseOrderRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PurchaseOrderRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public PurchaseOrderRequest GroupByWarehouse()
                 {
-                    _query.GroupBy("warehouse");
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PurchaseOrderRequest GroupByWarehouseAs(string retName)
                 {
-                    _query.GroupBy("warehouse"); 
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY);
                     return this;
                 }
                 public PurchaseOrderRequest GroupByReference()
                 {
-                    _query.GroupBy("reference");
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PurchaseOrderRequest GroupByReferenceAs(string retName)
                 {
-                    _query.GroupBy("reference"); 
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
                 public PurchaseOrderRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PurchaseOrderRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.PurchaseOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public PurchaseOrderRequest SelectOrderItemList()
@@ -691,8 +691,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Warehouse", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByWarehouseAs", name, "warehouse")
+                        name, global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByWarehouseAs", name, global::Generated.Models.PurchaseOrder.__TeaqlFields.WAREHOUSE_PROPERTY_QUERY)
                     });
                     return this;
                 }

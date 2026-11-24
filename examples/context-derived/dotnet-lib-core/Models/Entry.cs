@@ -9,18 +9,66 @@ namespace Generated.Models
 
     public class Entry : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string CATALOG_PROPERTY_MEMBER = "Catalog";
+            internal const string CATALOG_PROPERTY_QUERY = "catalog";
+            internal const string CATALOG_PROPERTY_STORAGE = "catalog";
+            internal const string CATALOG_PROPERTY_MODEL = "catalog";
+            internal const string NAME_PROPERTY_MEMBER = "Name";
+            internal const string NAME_PROPERTY_QUERY = "name";
+            internal const string NAME_PROPERTY_STORAGE = "name";
+            internal const string NAME_PROPERTY_MODEL = "name";
+            internal const string BORN_AT_PROPERTY_MEMBER = "BornAt";
+            internal const string BORN_AT_PROPERTY_QUERY = "born_at";
+            internal const string BORN_AT_PROPERTY_STORAGE = "born_at";
+            internal const string BORN_AT_PROPERTY_MODEL = "born_at";
+            internal const string TOUCHED_AT_PROPERTY_MEMBER = "TouchedAt";
+            internal const string TOUCHED_AT_PROPERTY_QUERY = "touched_at";
+            internal const string TOUCHED_AT_PROPERTY_STORAGE = "touched_at";
+            internal const string TOUCHED_AT_PROPERTY_MODEL = "touched_at";
+            internal const string SOURCE_IP_PROPERTY_MEMBER = "SourceIp";
+            internal const string SOURCE_IP_PROPERTY_QUERY = "source_ip";
+            internal const string SOURCE_IP_PROPERTY_STORAGE = "source_ip";
+            internal const string SOURCE_IP_PROPERTY_MODEL = "source_ip";
+            internal const string LAST_IP_PROPERTY_MEMBER = "LastIp";
+            internal const string LAST_IP_PROPERTY_QUERY = "last_ip";
+            internal const string LAST_IP_PROPERTY_STORAGE = "last_ip";
+            internal const string LAST_IP_PROPERTY_MODEL = "last_ip";
+            internal const string OPENED_BY_PROPERTY_MEMBER = "OpenedBy";
+            internal const string OPENED_BY_PROPERTY_QUERY = "opened_by";
+            internal const string OPENED_BY_PROPERTY_STORAGE = "opened_by";
+            internal const string OPENED_BY_PROPERTY_MODEL = "opened_by";
+            internal const string CHANGED_BY_PROPERTY_MEMBER = "ChangedBy";
+            internal const string CHANGED_BY_PROPERTY_QUERY = "changed_by";
+            internal const string CHANGED_BY_PROPERTY_STORAGE = "changed_by";
+            internal const string CHANGED_BY_PROPERTY_MODEL = "changed_by";
+            internal const string GUARDED_TOKEN_PROPERTY_MEMBER = "GuardedToken";
+            internal const string GUARDED_TOKEN_PROPERTY_QUERY = "guarded_token";
+            internal const string GUARDED_TOKEN_PROPERTY_STORAGE = "guarded_token";
+            internal const string GUARDED_TOKEN_PROPERTY_MODEL = "guarded_token";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("Entry", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("catalog", global::TeaQL.Runtime.EntityJsonKind.Reference, "catalog", () => global::Generated.Models.Catalog._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("name", global::TeaQL.Runtime.EntityJsonKind.Text, "name"),
-            new global::TeaQL.Runtime.EntityJsonField("born_at", global::TeaQL.Runtime.EntityJsonKind.DateTime, "born_at"),
-            new global::TeaQL.Runtime.EntityJsonField("touched_at", global::TeaQL.Runtime.EntityJsonKind.DateTime, "touched_at"),
-            new global::TeaQL.Runtime.EntityJsonField("source_ip", global::TeaQL.Runtime.EntityJsonKind.Text, "source_ip"),
-            new global::TeaQL.Runtime.EntityJsonField("last_ip", global::TeaQL.Runtime.EntityJsonKind.Text, "last_ip"),
-            new global::TeaQL.Runtime.EntityJsonField("opened_by", global::TeaQL.Runtime.EntityJsonKind.Text, "opened_by"),
-            new global::TeaQL.Runtime.EntityJsonField("changed_by", global::TeaQL.Runtime.EntityJsonKind.Text, "changed_by"),
-            new global::TeaQL.Runtime.EntityJsonField("guarded_token", global::TeaQL.Runtime.EntityJsonKind.Text, "guarded_token"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, Entry.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.CATALOG_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, () => global::Generated.Models.Catalog._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Entry.__TeaqlFields.NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.BORN_AT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.LAST_IP_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.OPENED_BY_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Entry.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -34,51 +82,51 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Catalog"))
+            if (IsLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER))
             {
                 object? jsonCatalog = IsLoaded("CatalogEntity") && CatalogEntity != null && CatalogEntity.Id == Catalog
                     ? CatalogEntity : Catalog;
-                yield return new KeyValuePair<string, object?>("catalog", jsonCatalog);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, jsonCatalog);
             }
-            if (IsLoaded("Name"))
+            if (IsLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("name", Name);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, Name);
             }
-            if (IsLoaded("BornAt"))
+            if (IsLoaded(Entry.__TeaqlFields.BORN_AT_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("born_at", BornAt);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE, BornAt);
             }
-            if (IsLoaded("TouchedAt"))
+            if (IsLoaded(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("touched_at", TouchedAt);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE, TouchedAt);
             }
-            if (IsLoaded("SourceIp"))
+            if (IsLoaded(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("source_ip", SourceIp);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE, SourceIp);
             }
-            if (IsLoaded("LastIp"))
+            if (IsLoaded(Entry.__TeaqlFields.LAST_IP_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("last_ip", LastIp);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE, LastIp);
             }
-            if (IsLoaded("OpenedBy"))
+            if (IsLoaded(Entry.__TeaqlFields.OPENED_BY_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("opened_by", OpenedBy);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE, OpenedBy);
             }
-            if (IsLoaded("ChangedBy"))
+            if (IsLoaded(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("changed_by", ChangedBy);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE, ChangedBy);
             }
-            if (IsLoaded("GuardedToken"))
+            if (IsLoaded(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("guarded_token", GuardedToken);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE, GuardedToken);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -230,16 +278,16 @@ namespace Generated.Models
         {
             var entity = new Entry().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Catalog", out var catalogValue)
-                        || record.TryGetValue("catalog", out catalogValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER, out var catalogValue)
+                        || record.TryGetValue(Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, out catalogValue))
                     {
-                        entity.MarkLoaded("Catalog");
+                        entity.MarkLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER);
                         if (catalogValue.Raw is Record catalogRow)
                         {
                             entity.CatalogEntity = global::Generated.Models.Catalog.FromRecord(catalogRow);
@@ -261,63 +309,63 @@ namespace Generated.Models
                         else if (catalogValue.Raw != null)
                             entity.Catalog = Convert.ToInt64(catalogValue.Raw);
                     }
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                     {
-                        entity.MarkLoaded("Name");
+                        entity.MarkLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER);
                         if (nameValue.Raw != null)
                             entity.Name = Convert.ToString(nameValue.Raw);
                     }
-                    if (record.TryGetValue("born_at", out var bornAtValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE, out var bornAtValue))
                     {
-                        entity.MarkLoaded("BornAt");
+                        entity.MarkLoaded(Entry.__TeaqlFields.BORN_AT_PROPERTY_MEMBER);
                         if (bornAtValue.Raw != null)
                             entity.BornAt = TeaqlDateTime(bornAtValue);
                     }
-                    if (record.TryGetValue("touched_at", out var touchedAtValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE, out var touchedAtValue))
                     {
-                        entity.MarkLoaded("TouchedAt");
+                        entity.MarkLoaded(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MEMBER);
                         if (touchedAtValue.Raw != null)
                             entity.TouchedAt = TeaqlDateTime(touchedAtValue);
                     }
-                    if (record.TryGetValue("source_ip", out var sourceIpValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE, out var sourceIpValue))
                     {
-                        entity.MarkLoaded("SourceIp");
+                        entity.MarkLoaded(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MEMBER);
                         if (sourceIpValue.Raw != null)
                             entity.SourceIp = Convert.ToString(sourceIpValue.Raw);
                     }
-                    if (record.TryGetValue("last_ip", out var lastIpValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE, out var lastIpValue))
                     {
-                        entity.MarkLoaded("LastIp");
+                        entity.MarkLoaded(Entry.__TeaqlFields.LAST_IP_PROPERTY_MEMBER);
                         if (lastIpValue.Raw != null)
                             entity.LastIp = Convert.ToString(lastIpValue.Raw);
                     }
-                    if (record.TryGetValue("opened_by", out var openedByValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE, out var openedByValue))
                     {
-                        entity.MarkLoaded("OpenedBy");
+                        entity.MarkLoaded(Entry.__TeaqlFields.OPENED_BY_PROPERTY_MEMBER);
                         if (openedByValue.Raw != null)
                             entity.OpenedBy = Convert.ToString(openedByValue.Raw);
                     }
-                    if (record.TryGetValue("changed_by", out var changedByValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE, out var changedByValue))
                     {
-                        entity.MarkLoaded("ChangedBy");
+                        entity.MarkLoaded(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MEMBER);
                         if (changedByValue.Raw != null)
                             entity.ChangedBy = Convert.ToString(changedByValue.Raw);
                     }
-                    if (record.TryGetValue("guarded_token", out var guardedTokenValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE, out var guardedTokenValue))
                     {
-                        entity.MarkLoaded("GuardedToken");
+                        entity.MarkLoaded(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MEMBER);
                         if (guardedTokenValue.Raw != null)
                             entity.GuardedToken = Convert.ToString(guardedTokenValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "catalog", "name", "born_at", "touched_at", "source_ip", "last_ip", "opened_by", "changed_by", "guarded_token", "version",
-                "Id", "Catalog", "Name", "BornAt", "TouchedAt", "SourceIp", "LastIp", "OpenedBy", "ChangedBy", "GuardedToken", "Version",
+                Entry.__TeaqlFields.ID_PROPERTY_QUERY, Entry.__TeaqlFields.CATALOG_PROPERTY_QUERY, Entry.__TeaqlFields.NAME_PROPERTY_QUERY, Entry.__TeaqlFields.BORN_AT_PROPERTY_QUERY, Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_QUERY, Entry.__TeaqlFields.SOURCE_IP_PROPERTY_QUERY, Entry.__TeaqlFields.LAST_IP_PROPERTY_QUERY, Entry.__TeaqlFields.OPENED_BY_PROPERTY_QUERY, Entry.__TeaqlFields.CHANGED_BY_PROPERTY_QUERY, Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_QUERY, Entry.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                Entry.__TeaqlFields.ID_PROPERTY_MEMBER, Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER, Entry.__TeaqlFields.NAME_PROPERTY_MEMBER, Entry.__TeaqlFields.BORN_AT_PROPERTY_MEMBER, Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MEMBER, Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MEMBER, Entry.__TeaqlFields.LAST_IP_PROPERTY_MEMBER, Entry.__TeaqlFields.OPENED_BY_PROPERTY_MEMBER, Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MEMBER, Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MEMBER, Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -376,28 +424,28 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Catalog"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("catalog"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("BornAt"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("born_at"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("TouchedAt"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("touched_at"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("SourceIp"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("source_ip"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("LastIp"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("last_ip"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("OpenedBy"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("opened_by"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ChangedBy"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("changed_by"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("GuardedToken"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("guarded_token"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.CATALOG_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.BORN_AT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.BORN_AT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.LAST_IP_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.LAST_IP_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.OPENED_BY_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.OPENED_BY_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Entry", Location = ObjectLocation.Property(Entry.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -539,17 +587,17 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Catalog")) record["catalog"] = TeaqlValue(Catalog);
-                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
-                        if (IsLoaded("BornAt")) record["born_at"] = TeaqlValue(BornAt);
-                        if (IsLoaded("TouchedAt")) record["touched_at"] = TeaqlValue(TouchedAt);
-                        if (IsLoaded("SourceIp")) record["source_ip"] = TeaqlValue(SourceIp);
-                        if (IsLoaded("LastIp")) record["last_ip"] = TeaqlValue(LastIp);
-                        if (IsLoaded("OpenedBy")) record["opened_by"] = TeaqlValue(OpenedBy);
-                        if (IsLoaded("ChangedBy")) record["changed_by"] = TeaqlValue(ChangedBy);
-                        if (IsLoaded("GuardedToken")) record["guarded_token"] = TeaqlValue(GuardedToken);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE] = TeaqlValue(Catalog);
+                        if (IsLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.NAME_PROPERTY_STORAGE] = TeaqlValue(Name);
+                        if (IsLoaded(Entry.__TeaqlFields.BORN_AT_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE] = TeaqlValue(BornAt);
+                        if (IsLoaded(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE] = TeaqlValue(TouchedAt);
+                        if (IsLoaded(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE] = TeaqlValue(SourceIp);
+                        if (IsLoaded(Entry.__TeaqlFields.LAST_IP_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE] = TeaqlValue(LastIp);
+                        if (IsLoaded(Entry.__TeaqlFields.OPENED_BY_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE] = TeaqlValue(OpenedBy);
+                        if (IsLoaded(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE] = TeaqlValue(ChangedBy);
+                        if (IsLoaded(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE] = TeaqlValue(GuardedToken);
+                        if (IsLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -557,31 +605,31 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("catalog", out var catalogValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, out var catalogValue))
                         this.Catalog = catalogValue.Raw == null ? null : Convert.ToInt64(catalogValue.Raw);
 
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                         this.Name = nameValue.Raw == null ? null : Convert.ToString(nameValue.Raw);
 
-                    if (record.TryGetValue("born_at", out var bornAtValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE, out var bornAtValue))
                         this.BornAt = bornAtValue.Raw == null ? null : TeaqlDateTime(bornAtValue);
 
-                    if (record.TryGetValue("touched_at", out var touchedAtValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE, out var touchedAtValue))
                         this.TouchedAt = touchedAtValue.Raw == null ? null : TeaqlDateTime(touchedAtValue);
 
-                    if (record.TryGetValue("source_ip", out var sourceIpValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE, out var sourceIpValue))
                         this.SourceIp = sourceIpValue.Raw == null ? null : Convert.ToString(sourceIpValue.Raw);
 
-                    if (record.TryGetValue("last_ip", out var lastIpValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE, out var lastIpValue))
                         this.LastIp = lastIpValue.Raw == null ? null : Convert.ToString(lastIpValue.Raw);
 
-                    if (record.TryGetValue("opened_by", out var openedByValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE, out var openedByValue))
                         this.OpenedBy = openedByValue.Raw == null ? null : Convert.ToString(openedByValue.Raw);
 
-                    if (record.TryGetValue("changed_by", out var changedByValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE, out var changedByValue))
                         this.ChangedBy = changedByValue.Raw == null ? null : Convert.ToString(changedByValue.Raw);
 
-                    if (record.TryGetValue("guarded_token", out var guardedTokenValue))
+                    if (record.TryGetValue(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE, out var guardedTokenValue))
                         this.GuardedToken = guardedTokenValue.Raw == null ? null : Convert.ToString(guardedTokenValue.Raw);
 
 
@@ -590,27 +638,27 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[Entry.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Catalog.HasValue) record["catalog"] = new Value.I64Value(Catalog.Value);
+                    if (Catalog.HasValue) record[Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE] = new Value.I64Value(Catalog.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[Entry.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (BornAt.HasValue) record["born_at"] = new Value.TimestampValue(new DateTimeOffset(BornAt.Value).ToUnixTimeMilliseconds());
+                    if (BornAt.HasValue) record[Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(BornAt.Value).ToUnixTimeMilliseconds());
 
-                    if (TouchedAt.HasValue) record["touched_at"] = new Value.TimestampValue(new DateTimeOffset(TouchedAt.Value).ToUnixTimeMilliseconds());
+                    if (TouchedAt.HasValue) record[Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(TouchedAt.Value).ToUnixTimeMilliseconds());
 
-                    if (SourceIp != null) record["source_ip"] = new Value.TextValue(SourceIp);
+                    if (SourceIp != null) record[Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE] = new Value.TextValue(SourceIp);
 
-                    if (LastIp != null) record["last_ip"] = new Value.TextValue(LastIp);
+                    if (LastIp != null) record[Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE] = new Value.TextValue(LastIp);
 
-                    if (OpenedBy != null) record["opened_by"] = new Value.TextValue(OpenedBy);
+                    if (OpenedBy != null) record[Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE] = new Value.TextValue(OpenedBy);
 
-                    if (ChangedBy != null) record["changed_by"] = new Value.TextValue(ChangedBy);
+                    if (ChangedBy != null) record[Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE] = new Value.TextValue(ChangedBy);
 
-                    if (GuardedToken != null) record["guarded_token"] = new Value.TextValue(GuardedToken);
+                    if (GuardedToken != null) record[Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE] = new Value.TextValue(GuardedToken);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "Entry", Values = record };
         }
@@ -618,25 +666,25 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Catalog.HasValue) record["catalog"] = new Value.I64Value(Catalog.Value);
+                    if (Catalog.HasValue) record[Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE] = new Value.I64Value(Catalog.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[Entry.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (BornAt.HasValue) record["born_at"] = new Value.TimestampValue(new DateTimeOffset(BornAt.Value).ToUnixTimeMilliseconds());
+                    if (BornAt.HasValue) record[Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(BornAt.Value).ToUnixTimeMilliseconds());
 
-                    if (TouchedAt.HasValue) record["touched_at"] = new Value.TimestampValue(new DateTimeOffset(TouchedAt.Value).ToUnixTimeMilliseconds());
+                    if (TouchedAt.HasValue) record[Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(TouchedAt.Value).ToUnixTimeMilliseconds());
 
-                    if (SourceIp != null) record["source_ip"] = new Value.TextValue(SourceIp);
+                    if (SourceIp != null) record[Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE] = new Value.TextValue(SourceIp);
 
-                    if (LastIp != null) record["last_ip"] = new Value.TextValue(LastIp);
+                    if (LastIp != null) record[Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE] = new Value.TextValue(LastIp);
 
-                    if (OpenedBy != null) record["opened_by"] = new Value.TextValue(OpenedBy);
+                    if (OpenedBy != null) record[Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE] = new Value.TextValue(OpenedBy);
 
-                    if (ChangedBy != null) record["changed_by"] = new Value.TextValue(ChangedBy);
+                    if (ChangedBy != null) record[Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE] = new Value.TextValue(ChangedBy);
 
-                    if (GuardedToken != null) record["guarded_token"] = new Value.TextValue(GuardedToken);
+                    if (GuardedToken != null) record[Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE] = new Value.TextValue(GuardedToken);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "Entry", 
@@ -665,8 +713,8 @@ namespace Generated.Models
                 public Entry UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -674,80 +722,80 @@ namespace Generated.Models
                 {
                     if (this.Catalog != value) this.CatalogEntity = null;
                     this.Catalog = value;
-                    MarkLoaded("Catalog");
-                    _entityRoot.Set(TeaqlEntityKey(), "catalog", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.CATALOG_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.CATALOG_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateName(string value)
                 {
                     this.Name = value;
-                    MarkLoaded("Name");
-                    _entityRoot.Set(TeaqlEntityKey(), "name", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateBornAt(DateTime? value)
                 {
                     this.BornAt = value;
-                    MarkLoaded("BornAt");
-                    _entityRoot.Set(TeaqlEntityKey(), "born_at", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.BORN_AT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.BORN_AT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateTouchedAt(DateTime? value)
                 {
                     this.TouchedAt = value;
-                    MarkLoaded("TouchedAt");
-                    _entityRoot.Set(TeaqlEntityKey(), "touched_at", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.TOUCHED_AT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateSourceIp(string value)
                 {
                     this.SourceIp = value;
-                    MarkLoaded("SourceIp");
-                    _entityRoot.Set(TeaqlEntityKey(), "source_ip", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.SOURCE_IP_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.SOURCE_IP_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateLastIp(string value)
                 {
                     this.LastIp = value;
-                    MarkLoaded("LastIp");
-                    _entityRoot.Set(TeaqlEntityKey(), "last_ip", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.LAST_IP_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.LAST_IP_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateOpenedBy(string value)
                 {
                     this.OpenedBy = value;
-                    MarkLoaded("OpenedBy");
-                    _entityRoot.Set(TeaqlEntityKey(), "opened_by", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.OPENED_BY_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.OPENED_BY_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateChangedBy(string value)
                 {
                     this.ChangedBy = value;
-                    MarkLoaded("ChangedBy");
-                    _entityRoot.Set(TeaqlEntityKey(), "changed_by", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.CHANGED_BY_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.CHANGED_BY_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateGuardedToken(string value)
                 {
                     this.GuardedToken = value;
-                    MarkLoaded("GuardedToken");
-                    _entityRoot.Set(TeaqlEntityKey(), "guarded_token", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.GUARDED_TOKEN_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Entry UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(Entry.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Entry.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public Entry UpdateCatalog(Catalog value)

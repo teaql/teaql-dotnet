@@ -2,13 +2,13 @@
   "E.cs": "29ae7bb7d1ffd2eeef5a98d966194c9874d5b287056c314c9db28805115bb5c3",
   "GeneratedRuntimeModule.cs": "0103cc56de1538aa2e2c57fb4990cfce6a0519a49a80bd10c1ad18058e3661af",
   "GeneratedSearchModels.cs": "4af57adc7c35cfbf42a817b2283dc4245b8fce23369dc00bda90db381199b43b",
-  "Models/Catalog.cs": "188a5d6b0a7195a81654a68c4ee4dcc24e150b22ca6e32cb56735fb498d628c0",
-  "Models/Entry.cs": "9a13021bc8ee205b3cf167f3be08e1875a0a3ad631c2b23fb57e2a0d37aa95b9",
+  "Models/Catalog.cs": "be9f929dcd7b01184105d5ca953f771ae83dd3212f10c6339decea7eabe48308",
+  "Models/Entry.cs": "548680bd796f633d3809896e39af1f522c99fe5cd51b6b2d88e68e7739337493",
   "Q.cs": "c5ed8382ab2236c771413964ee54f9013fd122d72adf6b3be0b69e4e79ac9c2e",
-  "Requests/CatalogRequest.cs": "b2a4f33bed2faa9c0ee992f8905e6a6515051de9a8032b6b70c672fbe71ee8cf",
-  "Requests/EntryRequest.cs": "534aed23957266987b7655ccfef1909531e998e213328ac05e4b761828ed2ea2",
+  "Requests/CatalogRequest.cs": "3f34ba15b1d2ee9bd2c53507835646e0fa7142d7024dc94d57972d332e066b81",
+  "Requests/EntryRequest.cs": "52b0b918ca6346e685fa271605d070f207a57430c9a4fd1141e833ba9ddefe93",
   "checker-natural-message-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
   "teaql-i18n.json": "8bbd8285869941b68b39a8c9ebe58965619fe00f8f5f0a34f9e4366a5b438ce5",
   "teaql/checker-model.json": "dbac03cd54b294e3e60a62752aeb170ad1ad722a7dfb8feb639c569ff3e73b1a",
-  "teaql/model-provenance.json": "7a1c08d3bcc033947aa11600d1a18ea30f8fa7d31951680e81ed39eed4f9cece"
+  "teaql/model-provenance.json": "edb7fa28f20a4e9d48a4321602189e733ed4f2db69f3a3e76a20effb6f352f87"
 }

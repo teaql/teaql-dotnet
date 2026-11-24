@@ -120,29 +120,29 @@ namespace Generated.Requests
 
         public CustomerRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("platform");
-            _query.Project("email");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public CustomerRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public CustomerRequest SelectEmail()
                 {
-                    _query.Project("email");
+                    _query.Project(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -153,321 +153,321 @@ namespace Generated.Requests
 
                 public CustomerRequest SelectPlatformWith(PlatformRequest related)
                 {
-                    _query.Project("platform");
-                    _query.ForwardRelationQuery("Platform", "Platform", "platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, "Platform", global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: "Platform")
+                        Operation = new QueryOperation("relation", "SelectPlatformWith", Relation: global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public CustomerRequest WithPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerRequest WithoutPlatformMatching(PlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Platform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public CustomerRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerRequest FilterByPlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest FilterByPlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public CustomerRequest WithPlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerRequest WithPlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerRequest WithEmailContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("email", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest WithEmailIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public CustomerRequest WithEmailIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithEmailIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("email", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerRequest WithEmailNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("email", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerRequest WithEmailGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithEmailGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithEmailLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithEmailLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("email", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithEmailBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("email", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerRequest WithEmailIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("email"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerRequest WithEmailIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("email"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY));
                     return this;
                 }
                 public CustomerRequest WithEmailNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("email", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest WithEmailStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("email", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest WithEmailNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("email", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest WithEmailEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("email", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest WithEmailNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("email", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest WithEmailSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("email", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public CustomerRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public CustomerRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public CustomerRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public CustomerRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public CustomerRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public CustomerRequest OrderByEmailAscending()
                 {
-                    _query.OrderBy("email", "asc");
+                    _query.OrderBy(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerRequest OrderByEmailDescending()
                 {
-                    _query.OrderBy("email", "desc");
+                    _query.OrderBy(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public CustomerRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public CustomerRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -487,46 +487,46 @@ namespace Generated.Requests
 
                 public CustomerRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerRequest GroupByPlatform()
                 {
-                    _query.GroupBy("platform");
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerRequest GroupByPlatformAs(string retName)
                 {
-                    _query.GroupBy("platform"); 
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerRequest GroupByEmail()
                 {
-                    _query.GroupBy("email");
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerRequest GroupByEmailAs(string retName)
                 {
-                    _query.GroupBy("email"); 
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.EMAIL_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public CustomerRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.Customer.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public CustomerRequest SelectCustomerContactList()
@@ -588,8 +588,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Platform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, "platform")
+                        name, global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByPlatformAs", name, global::Generated.Models.Customer.__TeaqlFields.PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }

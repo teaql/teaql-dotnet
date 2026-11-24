@@ -120,597 +120,597 @@ namespace Generated.Requests
 
         public PlatformRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("name");
-            _query.Project("base_url");
-            _query.Project("create_time");
-            _query.Project("update_time");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public PlatformRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest SelectBaseUrl()
                 {
-                    _query.Project("base_url");
+                    _query.Project(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest SelectCreateTime()
                 {
-                    _query.Project("create_time");
+                    _query.Project(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest SelectUpdateTime()
                 {
-                    _query.Project("update_time");
+                    _query.Project(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public PlatformRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PlatformRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public PlatformRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PlatformRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public PlatformRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("base_url", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("base_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public PlatformRequest WithBaseUrlIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("base_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("base_url", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("base_url", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("base_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("base_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("base_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("base_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("base_url", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("base_url"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("base_url"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY));
                     return this;
                 }
                 public PlatformRequest WithBaseUrlNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("base_url", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("base_url", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("base_url", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("base_url", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("base_url", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithBaseUrlSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("base_url", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("create_time"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithCreateTimeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("create_time"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("update_time"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithUpdateTimeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("update_time"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public PlatformRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public PlatformRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public PlatformRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public PlatformRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PlatformRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public PlatformRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PlatformRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public PlatformRequest OrderByBaseUrlAscending()
                 {
-                    _query.OrderBy("base_url", "asc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PlatformRequest OrderByBaseUrlDescending()
                 {
-                    _query.OrderBy("base_url", "desc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public PlatformRequest OrderByCreateTimeAscending()
                 {
-                    _query.OrderBy("create_time", "asc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PlatformRequest OrderByCreateTimeDescending()
                 {
-                    _query.OrderBy("create_time", "desc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public PlatformRequest OrderByUpdateTimeAscending()
                 {
-                    _query.OrderBy("update_time", "asc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PlatformRequest OrderByUpdateTimeDescending()
                 {
-                    _query.OrderBy("update_time", "desc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public PlatformRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public PlatformRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -730,68 +730,68 @@ namespace Generated.Requests
 
                 public PlatformRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public PlatformRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name"); 
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public PlatformRequest GroupByBaseUrl()
                 {
-                    _query.GroupBy("base_url");
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest GroupByBaseUrlAs(string retName)
                 {
-                    _query.GroupBy("base_url"); 
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.BASE_URL_PROPERTY_QUERY);
                     return this;
                 }
                 public PlatformRequest GroupByCreateTime()
                 {
-                    _query.GroupBy("create_time");
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time"); 
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
                 public PlatformRequest GroupByUpdateTime()
                 {
-                    _query.GroupBy("update_time");
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest GroupByUpdateTimeAs(string retName)
                 {
-                    _query.GroupBy("update_time"); 
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
                 public PlatformRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public PlatformRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.Platform.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public PlatformRequest SelectSchoolTypeList()

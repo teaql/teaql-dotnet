@@ -120,36 +120,36 @@ namespace Generated.Requests
 
         public DispatchOrderRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("distribution_center");
-            _query.Project("order_reference");
-            _query.Project("handling_note");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public DispatchOrderRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public DispatchOrderRequest SelectOrderReference()
                 {
-                    _query.Project("order_reference");
+                    _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public DispatchOrderRequest SelectHandlingNote()
                 {
-                    _query.Project("handling_note");
+                    _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public DispatchOrderRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -160,439 +160,439 @@ namespace Generated.Requests
 
                 public DispatchOrderRequest SelectDistributionCenterWith(DistributionCenterRequest related)
                 {
-                    _query.Project("distribution_center");
-                    _query.ForwardRelationQuery("DistributionCenter", "DistributionCenter", "distribution_center", related.GetQuery());
+                    _query.Project(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_MEMBER, "DistributionCenter", global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectDistributionCenterWith", Relation: "DistributionCenter")
+                        Operation = new QueryOperation("relation", "SelectDistributionCenterWith", Relation: global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public DispatchOrderRequest WithDistributionCenterMatching(DistributionCenterRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("distribution_center", GeneratedRuntimeModule.Module.Metadata.GetEntity("DistributionCenter")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("DistributionCenter")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public DispatchOrderRequest WithoutDistributionCenterMatching(DistributionCenterRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("distribution_center", GeneratedRuntimeModule.Module.Metadata.GetEntity("DistributionCenter")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("DistributionCenter")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest FilterByDistributionCenter(object val)
                 {
-                    _query.AndFilter(Expr.Eq("distribution_center", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest FilterByDistributionCenterIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("distribution_center", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public DispatchOrderRequest WithDistributionCenterIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("distribution_center"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest WithDistributionCenterIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("distribution_center"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("order_reference", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("order_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public DispatchOrderRequest WithOrderReferenceIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("order_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("order_reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("order_reference", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("order_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("order_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("order_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("order_reference", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("order_reference", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("order_reference"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("order_reference"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY));
                     return this;
                 }
                 public DispatchOrderRequest WithOrderReferenceNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("order_reference", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("order_reference", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("order_reference", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("order_reference", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("order_reference", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithOrderReferenceSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("order_reference", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("handling_note", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("handling_note", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public DispatchOrderRequest WithHandlingNoteIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("handling_note", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("handling_note", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("handling_note", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("handling_note", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("handling_note", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("handling_note", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("handling_note", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("handling_note", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("handling_note"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("handling_note"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY));
                     return this;
                 }
                 public DispatchOrderRequest WithHandlingNoteNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("handling_note", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("handling_note", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("handling_note", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("handling_note", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("handling_note", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithHandlingNoteSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("handling_note", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public DispatchOrderRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public DispatchOrderRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public DispatchOrderRequest OrderByOrderReferenceAscending()
                 {
-                    _query.OrderBy("order_reference", "asc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public DispatchOrderRequest OrderByOrderReferenceDescending()
                 {
-                    _query.OrderBy("order_reference", "desc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public DispatchOrderRequest OrderByHandlingNoteAscending()
                 {
-                    _query.OrderBy("handling_note", "asc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public DispatchOrderRequest OrderByHandlingNoteDescending()
                 {
-                    _query.OrderBy("handling_note", "desc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public DispatchOrderRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public DispatchOrderRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -612,57 +612,57 @@ namespace Generated.Requests
 
                 public DispatchOrderRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public DispatchOrderRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public DispatchOrderRequest GroupByDistributionCenter()
                 {
-                    _query.GroupBy("distribution_center");
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public DispatchOrderRequest GroupByDistributionCenterAs(string retName)
                 {
-                    _query.GroupBy("distribution_center"); 
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY);
                     return this;
                 }
                 public DispatchOrderRequest GroupByOrderReference()
                 {
-                    _query.GroupBy("order_reference");
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public DispatchOrderRequest GroupByOrderReferenceAs(string retName)
                 {
-                    _query.GroupBy("order_reference"); 
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.ORDER_REFERENCE_PROPERTY_QUERY);
                     return this;
                 }
                 public DispatchOrderRequest GroupByHandlingNote()
                 {
-                    _query.GroupBy("handling_note");
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public DispatchOrderRequest GroupByHandlingNoteAs(string retName)
                 {
-                    _query.GroupBy("handling_note"); 
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.HANDLING_NOTE_PROPERTY_QUERY);
                     return this;
                 }
                 public DispatchOrderRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public DispatchOrderRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.DispatchOrder.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public DispatchOrderRequest FacetByDistributionCenterAs(
@@ -670,8 +670,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "DistributionCenter", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByDistributionCenterAs", name, "distribution_center")
+                        name, global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByDistributionCenterAs", name, global::Generated.Models.DispatchOrder.__TeaqlFields.DISTRIBUTION_CENTER_PROPERTY_QUERY)
                     });
                     return this;
                 }

@@ -9,13 +9,41 @@ namespace Generated.Models
 
     public class SchoolType : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string PLATFORM_PROPERTY_MEMBER = "Platform";
+            internal const string PLATFORM_PROPERTY_QUERY = "platform";
+            internal const string PLATFORM_PROPERTY_STORAGE = "platform";
+            internal const string PLATFORM_PROPERTY_MODEL = "platform";
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string NAME_PROPERTY_MEMBER = "Name";
+            internal const string NAME_PROPERTY_QUERY = "name";
+            internal const string NAME_PROPERTY_STORAGE = "name";
+            internal const string NAME_PROPERTY_MODEL = "name";
+            internal const string CODE_PROPERTY_MEMBER = "Code";
+            internal const string CODE_PROPERTY_QUERY = "code";
+            internal const string CODE_PROPERTY_STORAGE = "code";
+            internal const string CODE_PROPERTY_MODEL = "code";
+            internal const string DISPLAY_ORDER_PROPERTY_MEMBER = "DisplayOrder";
+            internal const string DISPLAY_ORDER_PROPERTY_QUERY = "display_order";
+            internal const string DISPLAY_ORDER_PROPERTY_STORAGE = "display_order";
+            internal const string DISPLAY_ORDER_PROPERTY_MODEL = "display_order";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("SchoolType", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "platform", () => global::Generated.Models.Platform._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("name", global::TeaQL.Runtime.EntityJsonKind.Text, "name"),
-            new global::TeaQL.Runtime.EntityJsonField("code", global::TeaQL.Runtime.EntityJsonKind.Text, "code"),
-            new global::TeaQL.Runtime.EntityJsonField("display_order", global::TeaQL.Runtime.EntityJsonKind.Decimal, "display_order"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, () => global::Generated.Models.Platform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(SchoolType.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, SchoolType.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(SchoolType.__TeaqlFields.NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(SchoolType.__TeaqlFields.CODE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Decimal, SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(SchoolType.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, SchoolType.__TeaqlFields.VERSION_PROPERTY_STORAGE),
             new global::TeaQL.Runtime.EntityJsonField("school_list", global::TeaQL.Runtime.EntityJsonKind.Many, "SchoolList", () => global::Generated.Models.School._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
@@ -30,31 +58,31 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Platform"))
+            if (IsLoaded(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
             {
                 object? jsonPlatform = IsLoaded("PlatformEntity") && PlatformEntity != null && PlatformEntity.Id == Platform
                     ? PlatformEntity : Platform;
-                yield return new KeyValuePair<string, object?>("platform", jsonPlatform);
+                yield return new KeyValuePair<string, object?>(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, jsonPlatform);
             }
-            if (IsLoaded("Id"))
+            if (IsLoaded(SchoolType.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(SchoolType.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Name"))
+            if (IsLoaded(SchoolType.__TeaqlFields.NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("name", Name);
+                yield return new KeyValuePair<string, object?>(SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE, Name);
             }
-            if (IsLoaded("Code"))
+            if (IsLoaded(SchoolType.__TeaqlFields.CODE_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("code", Code);
+                yield return new KeyValuePair<string, object?>(SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE, Code);
             }
-            if (IsLoaded("DisplayOrder"))
+            if (IsLoaded(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("display_order", DisplayOrder);
+                yield return new KeyValuePair<string, object?>(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE, DisplayOrder);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(SchoolType.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(SchoolType.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
             if (SchoolList.IsLoaded || SchoolList.Any(child => child.TeaqlHasPending()))
                 yield return new KeyValuePair<string, object?>("SchoolList", SchoolList);
@@ -210,10 +238,10 @@ namespace Generated.Models
         {
             var entity = new SchoolType().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("Platform", out var platformValue)
-                        || record.TryGetValue("platform", out platformValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, out var platformValue)
+                        || record.TryGetValue(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out platformValue))
                     {
-                        entity.MarkLoaded("Platform");
+                        entity.MarkLoaded(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
                         if (platformValue.Raw is Record platformRow)
                         {
                             entity.PlatformEntity = global::Generated.Models.Platform.FromRecord(platformRow);
@@ -235,33 +263,33 @@ namespace Generated.Models
                         else if (platformValue.Raw != null)
                             entity.Platform = Convert.ToInt64(platformValue.Raw);
                     }
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(SchoolType.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                     {
-                        entity.MarkLoaded("Name");
+                        entity.MarkLoaded(SchoolType.__TeaqlFields.NAME_PROPERTY_MEMBER);
                         if (nameValue.Raw != null)
                             entity.Name = Convert.ToString(nameValue.Raw);
                     }
-                    if (record.TryGetValue("code", out var codeValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE, out var codeValue))
                     {
-                        entity.MarkLoaded("Code");
+                        entity.MarkLoaded(SchoolType.__TeaqlFields.CODE_PROPERTY_MEMBER);
                         if (codeValue.Raw != null)
                             entity.Code = Convert.ToString(codeValue.Raw);
                     }
-                    if (record.TryGetValue("display_order", out var displayOrderValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE, out var displayOrderValue))
                     {
-                        entity.MarkLoaded("DisplayOrder");
+                        entity.MarkLoaded(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MEMBER);
                         if (displayOrderValue.Raw != null)
                             entity.DisplayOrder = Convert.ToDecimal(displayOrderValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(SchoolType.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
@@ -278,8 +306,8 @@ namespace Generated.Models
                             }
                         }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "platform", "id", "name", "code", "display_order", "version",
-                "Platform", "Id", "Name", "Code", "DisplayOrder", "Version",
+                SchoolType.__TeaqlFields.PLATFORM_PROPERTY_QUERY, SchoolType.__TeaqlFields.ID_PROPERTY_QUERY, SchoolType.__TeaqlFields.NAME_PROPERTY_QUERY, SchoolType.__TeaqlFields.CODE_PROPERTY_QUERY, SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_QUERY, SchoolType.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER, SchoolType.__TeaqlFields.ID_PROPERTY_MEMBER, SchoolType.__TeaqlFields.NAME_PROPERTY_MEMBER, SchoolType.__TeaqlFields.CODE_PROPERTY_MEMBER, SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MEMBER, SchoolType.__TeaqlFields.VERSION_PROPERTY_MEMBER,
                 "SchoolList"
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
@@ -342,18 +370,18 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Platform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property("platform"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Code"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property("code"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("DisplayOrder"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property("display_order"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(SchoolType.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property(SchoolType.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(SchoolType.__TeaqlFields.NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property(SchoolType.__TeaqlFields.NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(SchoolType.__TeaqlFields.CODE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property(SchoolType.__TeaqlFields.CODE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(SchoolType.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "SchoolType", Location = ObjectLocation.Property(SchoolType.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -523,12 +551,12 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Platform")) record["platform"] = TeaqlValue(Platform);
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
-                        if (IsLoaded("Code")) record["code"] = TeaqlValue(Code);
-                        if (IsLoaded("DisplayOrder")) record["display_order"] = TeaqlValue(DisplayOrder);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER)) record[SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = TeaqlValue(Platform);
+                        if (IsLoaded(SchoolType.__TeaqlFields.ID_PROPERTY_MEMBER)) record[SchoolType.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(SchoolType.__TeaqlFields.NAME_PROPERTY_MEMBER)) record[SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE] = TeaqlValue(Name);
+                        if (IsLoaded(SchoolType.__TeaqlFields.CODE_PROPERTY_MEMBER)) record[SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE] = TeaqlValue(Code);
+                        if (IsLoaded(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MEMBER)) record[SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE] = TeaqlValue(DisplayOrder);
+                        if (IsLoaded(SchoolType.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[SchoolType.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -536,17 +564,17 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("platform", out var platformValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, out var platformValue))
                         this.Platform = platformValue.Raw == null ? null : Convert.ToInt64(platformValue.Raw);
 
 
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                         this.Name = nameValue.Raw == null ? null : Convert.ToString(nameValue.Raw);
 
-                    if (record.TryGetValue("code", out var codeValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE, out var codeValue))
                         this.Code = codeValue.Raw == null ? null : Convert.ToString(codeValue.Raw);
 
-                    if (record.TryGetValue("display_order", out var displayOrderValue))
+                    if (record.TryGetValue(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE, out var displayOrderValue))
                         this.DisplayOrder = displayOrderValue.Raw == null ? null : Convert.ToDecimal(displayOrderValue.Raw);
 
 
@@ -555,17 +583,17 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[SchoolType.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (Code != null) record["code"] = new Value.TextValue(Code);
+                    if (Code != null) record[SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE] = new Value.TextValue(Code);
 
-                    if (DisplayOrder.HasValue) record["display_order"] = new Value.DecimalValue(DisplayOrder.Value);
+                    if (DisplayOrder.HasValue) record[SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE] = new Value.DecimalValue(DisplayOrder.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[SchoolType.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "SchoolType", Values = record };
         }
@@ -573,16 +601,16 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Platform.HasValue) record["platform"] = new Value.I64Value(Platform.Value);
+                    if (Platform.HasValue) record[SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(Platform.Value);
 
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (Code != null) record["code"] = new Value.TextValue(Code);
+                    if (Code != null) record[SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE] = new Value.TextValue(Code);
 
-                    if (DisplayOrder.HasValue) record["display_order"] = new Value.DecimalValue(DisplayOrder.Value);
+                    if (DisplayOrder.HasValue) record[SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE] = new Value.DecimalValue(DisplayOrder.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[SchoolType.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "SchoolType", 
@@ -612,48 +640,48 @@ namespace Generated.Models
                 {
                     if (this.Platform != value) this.PlatformEntity = null;
                     this.Platform = value;
-                    MarkLoaded("Platform");
-                    _entityRoot.Set(TeaqlEntityKey(), "platform", TeaqlValue(value));
+                    MarkLoaded(SchoolType.__TeaqlFields.PLATFORM_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), SchoolType.__TeaqlFields.PLATFORM_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public SchoolType UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(SchoolType.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), SchoolType.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public SchoolType UpdateName(string value)
                 {
                     this.Name = value;
-                    MarkLoaded("Name");
-                    _entityRoot.Set(TeaqlEntityKey(), "name", TeaqlValue(value));
+                    MarkLoaded(SchoolType.__TeaqlFields.NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), SchoolType.__TeaqlFields.NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public SchoolType UpdateCode(string value)
                 {
                     this.Code = value;
-                    MarkLoaded("Code");
-                    _entityRoot.Set(TeaqlEntityKey(), "code", TeaqlValue(value));
+                    MarkLoaded(SchoolType.__TeaqlFields.CODE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), SchoolType.__TeaqlFields.CODE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public SchoolType UpdateDisplayOrder(decimal? value)
                 {
                     this.DisplayOrder = value;
-                    MarkLoaded("DisplayOrder");
-                    _entityRoot.Set(TeaqlEntityKey(), "display_order", TeaqlValue(value));
+                    MarkLoaded(SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), SchoolType.__TeaqlFields.DISPLAY_ORDER_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public SchoolType UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(SchoolType.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), SchoolType.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public SchoolType UpdatePlatform(Platform value)

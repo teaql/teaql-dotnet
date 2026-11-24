@@ -9,13 +9,41 @@ namespace Generated.Models
 
     public class CustomerOrder : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string MERCHANT_PROPERTY_MEMBER = "Merchant";
+            internal const string MERCHANT_PROPERTY_QUERY = "merchant";
+            internal const string MERCHANT_PROPERTY_STORAGE = "merchant";
+            internal const string MERCHANT_PROPERTY_MODEL = "merchant";
+            internal const string CUSTOMER_PROFILE_PROPERTY_MEMBER = "CustomerProfile";
+            internal const string CUSTOMER_PROFILE_PROPERTY_QUERY = "customer_profile";
+            internal const string CUSTOMER_PROFILE_PROPERTY_STORAGE = "customer_profile";
+            internal const string CUSTOMER_PROFILE_PROPERTY_MODEL = "customer_profile";
+            internal const string ORDER_NUMBER_PROPERTY_MEMBER = "OrderNumber";
+            internal const string ORDER_NUMBER_PROPERTY_QUERY = "order_number";
+            internal const string ORDER_NUMBER_PROPERTY_STORAGE = "order_number";
+            internal const string ORDER_NUMBER_PROPERTY_MODEL = "order_number";
+            internal const string FULFILLMENT_STATUS_PROPERTY_MEMBER = "FulfillmentStatus";
+            internal const string FULFILLMENT_STATUS_PROPERTY_QUERY = "fulfillment_status";
+            internal const string FULFILLMENT_STATUS_PROPERTY_STORAGE = "fulfillment_status";
+            internal const string FULFILLMENT_STATUS_PROPERTY_MODEL = "fulfillment_status";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("CustomerOrder", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("merchant", global::TeaQL.Runtime.EntityJsonKind.Reference, "merchant", () => global::Generated.Models.Merchant._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("customer_profile", global::TeaQL.Runtime.EntityJsonKind.Reference, "customer_profile", () => global::Generated.Models.CustomerProfile._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("order_number", global::TeaQL.Runtime.EntityJsonKind.Text, "order_number"),
-            new global::TeaQL.Runtime.EntityJsonField("fulfillment_status", global::TeaQL.Runtime.EntityJsonKind.Text, "fulfillment_status"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(CustomerOrder.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, CustomerOrder.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE, () => global::Generated.Models.Merchant._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE, () => global::Generated.Models.CustomerProfile._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, CustomerOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -29,33 +57,33 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(CustomerOrder.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(CustomerOrder.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Merchant"))
+            if (IsLoaded(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MEMBER))
             {
                 object? jsonMerchant = IsLoaded("MerchantEntity") && MerchantEntity != null && MerchantEntity.Id == Merchant
                     ? MerchantEntity : Merchant;
-                yield return new KeyValuePair<string, object?>("merchant", jsonMerchant);
+                yield return new KeyValuePair<string, object?>(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE, jsonMerchant);
             }
-            if (IsLoaded("CustomerProfile"))
+            if (IsLoaded(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MEMBER))
             {
                 object? jsonCustomerProfile = IsLoaded("CustomerProfileEntity") && CustomerProfileEntity != null && CustomerProfileEntity.Id == CustomerProfile
                     ? CustomerProfileEntity : CustomerProfile;
-                yield return new KeyValuePair<string, object?>("customer_profile", jsonCustomerProfile);
+                yield return new KeyValuePair<string, object?>(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE, jsonCustomerProfile);
             }
-            if (IsLoaded("OrderNumber"))
+            if (IsLoaded(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("order_number", OrderNumber);
+                yield return new KeyValuePair<string, object?>(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE, OrderNumber);
             }
-            if (IsLoaded("FulfillmentStatus"))
+            if (IsLoaded(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("fulfillment_status", FulfillmentStatus);
+                yield return new KeyValuePair<string, object?>(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE, FulfillmentStatus);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -203,16 +231,16 @@ namespace Generated.Models
         {
             var entity = new CustomerOrder().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(CustomerOrder.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("Merchant", out var merchantValue)
-                        || record.TryGetValue("merchant", out merchantValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MEMBER, out var merchantValue)
+                        || record.TryGetValue(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE, out merchantValue))
                     {
-                        entity.MarkLoaded("Merchant");
+                        entity.MarkLoaded(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MEMBER);
                         if (merchantValue.Raw is Record merchantRow)
                         {
                             entity.MerchantEntity = global::Generated.Models.Merchant.FromRecord(merchantRow);
@@ -234,10 +262,10 @@ namespace Generated.Models
                         else if (merchantValue.Raw != null)
                             entity.Merchant = Convert.ToInt64(merchantValue.Raw);
                     }
-                    if (record.TryGetValue("CustomerProfile", out var customerProfileValue)
-                        || record.TryGetValue("customer_profile", out customerProfileValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MEMBER, out var customerProfileValue)
+                        || record.TryGetValue(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE, out customerProfileValue))
                     {
-                        entity.MarkLoaded("CustomerProfile");
+                        entity.MarkLoaded(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MEMBER);
                         if (customerProfileValue.Raw is Record customerProfileRow)
                         {
                             entity.CustomerProfileEntity = global::Generated.Models.CustomerProfile.FromRecord(customerProfileRow);
@@ -259,27 +287,27 @@ namespace Generated.Models
                         else if (customerProfileValue.Raw != null)
                             entity.CustomerProfile = Convert.ToInt64(customerProfileValue.Raw);
                     }
-                    if (record.TryGetValue("order_number", out var orderNumberValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE, out var orderNumberValue))
                     {
-                        entity.MarkLoaded("OrderNumber");
+                        entity.MarkLoaded(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MEMBER);
                         if (orderNumberValue.Raw != null)
                             entity.OrderNumber = Convert.ToString(orderNumberValue.Raw);
                     }
-                    if (record.TryGetValue("fulfillment_status", out var fulfillmentStatusValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE, out var fulfillmentStatusValue))
                     {
-                        entity.MarkLoaded("FulfillmentStatus");
+                        entity.MarkLoaded(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MEMBER);
                         if (fulfillmentStatusValue.Raw != null)
                             entity.FulfillmentStatus = Convert.ToString(fulfillmentStatusValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "merchant", "customer_profile", "order_number", "fulfillment_status", "version",
-                "Id", "Merchant", "CustomerProfile", "OrderNumber", "FulfillmentStatus", "Version",
+                CustomerOrder.__TeaqlFields.ID_PROPERTY_QUERY, CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_QUERY, CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_QUERY, CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_QUERY, CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_QUERY, CustomerOrder.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                CustomerOrder.__TeaqlFields.ID_PROPERTY_MEMBER, CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MEMBER, CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MEMBER, CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MEMBER, CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MEMBER, CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -338,18 +366,18 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Merchant"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("merchant"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CustomerProfile"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("customer_profile"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("OrderNumber"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("order_number"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("FulfillmentStatus"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("fulfillment_status"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(CustomerOrder.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property(CustomerOrder.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "CustomerOrder", Location = ObjectLocation.Property(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -476,12 +504,12 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Merchant")) record["merchant"] = TeaqlValue(Merchant);
-                        if (IsLoaded("CustomerProfile")) record["customer_profile"] = TeaqlValue(CustomerProfile);
-                        if (IsLoaded("OrderNumber")) record["order_number"] = TeaqlValue(OrderNumber);
-                        if (IsLoaded("FulfillmentStatus")) record["fulfillment_status"] = TeaqlValue(FulfillmentStatus);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(CustomerOrder.__TeaqlFields.ID_PROPERTY_MEMBER)) record[CustomerOrder.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MEMBER)) record[CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE] = TeaqlValue(Merchant);
+                        if (IsLoaded(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MEMBER)) record[CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE] = TeaqlValue(CustomerProfile);
+                        if (IsLoaded(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MEMBER)) record[CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE] = TeaqlValue(OrderNumber);
+                        if (IsLoaded(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MEMBER)) record[CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE] = TeaqlValue(FulfillmentStatus);
+                        if (IsLoaded(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[CustomerOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -489,16 +517,16 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("merchant", out var merchantValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE, out var merchantValue))
                         this.Merchant = merchantValue.Raw == null ? null : Convert.ToInt64(merchantValue.Raw);
 
-                    if (record.TryGetValue("customer_profile", out var customerProfileValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE, out var customerProfileValue))
                         this.CustomerProfile = customerProfileValue.Raw == null ? null : Convert.ToInt64(customerProfileValue.Raw);
 
-                    if (record.TryGetValue("order_number", out var orderNumberValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE, out var orderNumberValue))
                         this.OrderNumber = orderNumberValue.Raw == null ? null : Convert.ToString(orderNumberValue.Raw);
 
-                    if (record.TryGetValue("fulfillment_status", out var fulfillmentStatusValue))
+                    if (record.TryGetValue(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE, out var fulfillmentStatusValue))
                         this.FulfillmentStatus = fulfillmentStatusValue.Raw == null ? null : Convert.ToString(fulfillmentStatusValue.Raw);
 
 
@@ -507,17 +535,17 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[CustomerOrder.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Merchant.HasValue) record["merchant"] = new Value.I64Value(Merchant.Value);
+                    if (Merchant.HasValue) record[CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE] = new Value.I64Value(Merchant.Value);
 
-                    if (CustomerProfile.HasValue) record["customer_profile"] = new Value.I64Value(CustomerProfile.Value);
+                    if (CustomerProfile.HasValue) record[CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE] = new Value.I64Value(CustomerProfile.Value);
 
-                    if (OrderNumber != null) record["order_number"] = new Value.TextValue(OrderNumber);
+                    if (OrderNumber != null) record[CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE] = new Value.TextValue(OrderNumber);
 
-                    if (FulfillmentStatus != null) record["fulfillment_status"] = new Value.TextValue(FulfillmentStatus);
+                    if (FulfillmentStatus != null) record[CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE] = new Value.TextValue(FulfillmentStatus);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[CustomerOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "CustomerOrder", Values = record };
         }
@@ -525,15 +553,15 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Merchant.HasValue) record["merchant"] = new Value.I64Value(Merchant.Value);
+                    if (Merchant.HasValue) record[CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE] = new Value.I64Value(Merchant.Value);
 
-                    if (CustomerProfile.HasValue) record["customer_profile"] = new Value.I64Value(CustomerProfile.Value);
+                    if (CustomerProfile.HasValue) record[CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE] = new Value.I64Value(CustomerProfile.Value);
 
-                    if (OrderNumber != null) record["order_number"] = new Value.TextValue(OrderNumber);
+                    if (OrderNumber != null) record[CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE] = new Value.TextValue(OrderNumber);
 
-                    if (FulfillmentStatus != null) record["fulfillment_status"] = new Value.TextValue(FulfillmentStatus);
+                    if (FulfillmentStatus != null) record[CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE] = new Value.TextValue(FulfillmentStatus);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[CustomerOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "CustomerOrder", 
@@ -562,8 +590,8 @@ namespace Generated.Models
                 public CustomerOrder UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(CustomerOrder.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), CustomerOrder.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -571,8 +599,8 @@ namespace Generated.Models
                 {
                     if (this.Merchant != value) this.MerchantEntity = null;
                     this.Merchant = value;
-                    MarkLoaded("Merchant");
-                    _entityRoot.Set(TeaqlEntityKey(), "merchant", TeaqlValue(value));
+                    MarkLoaded(CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), CustomerOrder.__TeaqlFields.MERCHANT_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -580,32 +608,32 @@ namespace Generated.Models
                 {
                     if (this.CustomerProfile != value) this.CustomerProfileEntity = null;
                     this.CustomerProfile = value;
-                    MarkLoaded("CustomerProfile");
-                    _entityRoot.Set(TeaqlEntityKey(), "customer_profile", TeaqlValue(value));
+                    MarkLoaded(CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), CustomerOrder.__TeaqlFields.CUSTOMER_PROFILE_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public CustomerOrder UpdateOrderNumber(string value)
                 {
                     this.OrderNumber = value;
-                    MarkLoaded("OrderNumber");
-                    _entityRoot.Set(TeaqlEntityKey(), "order_number", TeaqlValue(value));
+                    MarkLoaded(CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), CustomerOrder.__TeaqlFields.ORDER_NUMBER_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public CustomerOrder UpdateFulfillmentStatus(string value)
                 {
                     this.FulfillmentStatus = value;
-                    MarkLoaded("FulfillmentStatus");
-                    _entityRoot.Set(TeaqlEntityKey(), "fulfillment_status", TeaqlValue(value));
+                    MarkLoaded(CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), CustomerOrder.__TeaqlFields.FULFILLMENT_STATUS_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public CustomerOrder UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(CustomerOrder.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), CustomerOrder.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public CustomerOrder UpdateMerchant(Merchant value)

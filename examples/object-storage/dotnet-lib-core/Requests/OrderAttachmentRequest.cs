@@ -120,57 +120,57 @@ namespace Generated.Requests
 
         public OrderAttachmentRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("customer_order");
-            _query.Project("file_name");
-            _query.Project("content_type");
-            _query.Project("content_length");
-            _query.Project("content_sha256");
-            _query.Project("object_key");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public OrderAttachmentRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public OrderAttachmentRequest SelectFileName()
                 {
-                    _query.Project("file_name");
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest SelectContentType()
                 {
-                    _query.Project("content_type");
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest SelectContentLength()
                 {
-                    _query.Project("content_length");
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest SelectContentSha256()
                 {
-                    _query.Project("content_sha256");
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest SelectObjectKey()
                 {
-                    _query.Project("object_key");
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -181,753 +181,753 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest SelectCustomerOrderWith(CustomerOrderRequest related)
                 {
-                    _query.Project("customer_order");
-                    _query.ForwardRelationQuery("CustomerOrder", "CustomerOrder", "customer_order", related.GetQuery());
+                    _query.Project(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, "CustomerOrder", global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCustomerOrderWith", Relation: "CustomerOrder")
+                        Operation = new QueryOperation("relation", "SelectCustomerOrderWith", Relation: global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public OrderAttachmentRequest WithCustomerOrderMatching(CustomerOrderRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("customer_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithoutCustomerOrderMatching(CustomerOrderRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("customer_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest FilterByCustomerOrder(object val)
                 {
-                    _query.AndFilter(Expr.Eq("customer_order", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest FilterByCustomerOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("customer_order", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithCustomerOrderIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("customer_order"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithCustomerOrderIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("customer_order"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("file_name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("file_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderAttachmentRequest WithFileNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("file_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("file_name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("file_name", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("file_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("file_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("file_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("file_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("file_name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("file_name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("file_name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderAttachmentRequest WithFileNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("file_name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("file_name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("file_name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("file_name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("file_name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithFileNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("file_name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("content_type", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("content_type", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderAttachmentRequest WithContentTypeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("content_type", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("content_type", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("content_type", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("content_type", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("content_type", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("content_type", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("content_type", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("content_type", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("content_type"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("content_type"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderAttachmentRequest WithContentTypeNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("content_type", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("content_type", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("content_type", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("content_type", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("content_type", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentTypeSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("content_type", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("content_length", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("content_length", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("content_length", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("content_length", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("content_length", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("content_length", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("content_length", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("content_length", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("content_length", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("content_length"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentLengthIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("content_length"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256Containing(string val)
                 {
-                    _query.AndFilter(Expr.Contain("content_sha256", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256Is(string val)
                 {
-                    _query.AndFilter(Expr.Eq("content_sha256", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderAttachmentRequest WithContentSha256IsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("content_sha256", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256In(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("content_sha256", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256NotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("content_sha256", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256GreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("content_sha256", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256GreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("content_sha256", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256LessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("content_sha256", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256LessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("content_sha256", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256Between(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("content_sha256", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256IsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("content_sha256"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256IsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("content_sha256"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderAttachmentRequest WithContentSha256NotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("content_sha256", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256StartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("content_sha256", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256NotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("content_sha256", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256EndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("content_sha256", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256NotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("content_sha256", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithContentSha256SoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("content_sha256", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("object_key", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("object_key", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public OrderAttachmentRequest WithObjectKeyIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("object_key", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("object_key", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("object_key", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("object_key", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("object_key", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("object_key", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("object_key", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("object_key", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("object_key"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("object_key"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderAttachmentRequest WithObjectKeyNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("object_key", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("object_key", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("object_key", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("object_key", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeyNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("object_key", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithObjectKeySoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("object_key", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public OrderAttachmentRequest OrderByFileNameAscending()
                 {
-                    _query.OrderBy("file_name", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByFileNameDescending()
                 {
-                    _query.OrderBy("file_name", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByContentTypeAscending()
                 {
-                    _query.OrderBy("content_type", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByContentTypeDescending()
                 {
-                    _query.OrderBy("content_type", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByContentLengthAscending()
                 {
-                    _query.OrderBy("content_length", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByContentLengthDescending()
                 {
-                    _query.OrderBy("content_length", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByContentSha256Ascending()
                 {
-                    _query.OrderBy("content_sha256", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByContentSha256Descending()
                 {
-                    _query.OrderBy("content_sha256", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByObjectKeyAscending()
                 {
-                    _query.OrderBy("object_key", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByObjectKeyDescending()
                 {
-                    _query.OrderBy("object_key", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderAttachmentRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -952,7 +952,7 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest MinContentLengthAs(string retName)
                 {
-                    _query.Aggregate("min", "content_length", retName);
+                    _query.Aggregate("min", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest MaxContentLength()
@@ -962,7 +962,7 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest MaxContentLengthAs(string retName)
                 {
-                    _query.Aggregate("max", "content_length", retName);
+                    _query.Aggregate("max", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest SumContentLength()
@@ -972,7 +972,7 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest SumContentLengthAs(string retName)
                 {
-                    _query.Aggregate("sum", "content_length", retName);
+                    _query.Aggregate("sum", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest AvgContentLength()
@@ -982,7 +982,7 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest AvgContentLengthAs(string retName)
                 {
-                    _query.Aggregate("avg", "content_length", retName);
+                    _query.Aggregate("avg", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest StandardDeviationContentLength()
@@ -992,7 +992,7 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest StandardDeviationContentLengthAs(string retName)
                 {
-                    _query.Aggregate("stddev", "content_length", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest SquareRootOfPopulationStandardDeviationContentLength()
@@ -1002,7 +1002,7 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest SquareRootOfPopulationStandardDeviationContentLengthAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "content_length", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest SampleVarianceContentLength()
@@ -1012,7 +1012,7 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest SampleVarianceContentLengthAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "content_length", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest SamplePopulationVarianceContentLength()
@@ -1022,95 +1022,95 @@ namespace Generated.Requests
 
                 public OrderAttachmentRequest SamplePopulationVarianceContentLengthAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "content_length", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderAttachmentRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest GroupByCustomerOrder()
                 {
-                    _query.GroupBy("customer_order");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByCustomerOrderAs(string retName)
                 {
-                    _query.GroupBy("customer_order"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest GroupByFileName()
                 {
-                    _query.GroupBy("file_name");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByFileNameAs(string retName)
                 {
-                    _query.GroupBy("file_name"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.FILE_NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest GroupByContentType()
                 {
-                    _query.GroupBy("content_type");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByContentTypeAs(string retName)
                 {
-                    _query.GroupBy("content_type"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_TYPE_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest GroupByContentLength()
                 {
-                    _query.GroupBy("content_length");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByContentLengthAs(string retName)
                 {
-                    _query.GroupBy("content_length"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_LENGTH_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest GroupByContentSha256()
                 {
-                    _query.GroupBy("content_sha256");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByContentSha256As(string retName)
                 {
-                    _query.GroupBy("content_sha256"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.CONTENT_SHA256_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest GroupByObjectKey()
                 {
-                    _query.GroupBy("object_key");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByObjectKeyAs(string retName)
                 {
-                    _query.GroupBy("object_key"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.OBJECT_KEY_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderAttachmentRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.OrderAttachment.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderAttachmentRequest FacetByCustomerOrderAs(
@@ -1118,8 +1118,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "CustomerOrder", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCustomerOrderAs", name, "customer_order")
+                        name, global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCustomerOrderAs", name, global::Generated.Models.OrderAttachment.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY)
                     });
                     return this;
                 }

@@ -120,36 +120,36 @@ namespace Generated.Requests
 
         public ShippingItemRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("shipping_order");
-            _query.Project("sku");
-            _query.Project("quantity");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public ShippingItemRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public ShippingItemRequest SelectSku()
                 {
-                    _query.Project("sku");
+                    _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingItemRequest SelectQuantity()
                 {
-                    _query.Project("quantity");
+                    _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingItemRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -160,399 +160,399 @@ namespace Generated.Requests
 
                 public ShippingItemRequest SelectShippingOrderWith(ShippingOrderRequest related)
                 {
-                    _query.Project("shipping_order");
-                    _query.ForwardRelationQuery("ShippingOrder", "ShippingOrder", "shipping_order", related.GetQuery());
+                    _query.Project(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER, "ShippingOrder", global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectShippingOrderWith", Relation: "ShippingOrder")
+                        Operation = new QueryOperation("relation", "SelectShippingOrderWith", Relation: global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public ShippingItemRequest WithShippingOrderMatching(ShippingOrderRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("shipping_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("ShippingOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("ShippingOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public ShippingItemRequest WithoutShippingOrderMatching(ShippingOrderRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("shipping_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("ShippingOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("ShippingOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest FilterByShippingOrder(object val)
                 {
-                    _query.AndFilter(Expr.Eq("shipping_order", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest FilterByShippingOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("shipping_order", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public ShippingItemRequest WithShippingOrderIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("shipping_order"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest WithShippingOrderIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("shipping_order"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("sku", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
                 public ShippingItemRequest WithSkuIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("sku", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("sku", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("sku", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("sku"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("sku"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY));
                     return this;
                 }
                 public ShippingItemRequest WithSkuNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("sku", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("sku", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("sku", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("sku", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("sku", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest WithSkuSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("sku", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("quantity", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("quantity", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("quantity", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("quantity"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest WithQuantityIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("quantity"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ShippingItemRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingItemRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public ShippingItemRequest OrderBySkuAscending()
                 {
-                    _query.OrderBy("sku", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingItemRequest OrderBySkuDescending()
                 {
-                    _query.OrderBy("sku", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ShippingItemRequest OrderByQuantityAscending()
                 {
-                    _query.OrderBy("quantity", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingItemRequest OrderByQuantityDescending()
                 {
-                    _query.OrderBy("quantity", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ShippingItemRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ShippingItemRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -577,7 +577,7 @@ namespace Generated.Requests
 
                 public ShippingItemRequest MinQuantityAs(string retName)
                 {
-                    _query.Aggregate("min", "quantity", retName);
+                    _query.Aggregate("min", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest MaxQuantity()
@@ -587,7 +587,7 @@ namespace Generated.Requests
 
                 public ShippingItemRequest MaxQuantityAs(string retName)
                 {
-                    _query.Aggregate("max", "quantity", retName);
+                    _query.Aggregate("max", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest SumQuantity()
@@ -597,7 +597,7 @@ namespace Generated.Requests
 
                 public ShippingItemRequest SumQuantityAs(string retName)
                 {
-                    _query.Aggregate("sum", "quantity", retName);
+                    _query.Aggregate("sum", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest AvgQuantity()
@@ -607,7 +607,7 @@ namespace Generated.Requests
 
                 public ShippingItemRequest AvgQuantityAs(string retName)
                 {
-                    _query.Aggregate("avg", "quantity", retName);
+                    _query.Aggregate("avg", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest StandardDeviationQuantity()
@@ -617,7 +617,7 @@ namespace Generated.Requests
 
                 public ShippingItemRequest StandardDeviationQuantityAs(string retName)
                 {
-                    _query.Aggregate("stddev", "quantity", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest SquareRootOfPopulationStandardDeviationQuantity()
@@ -627,7 +627,7 @@ namespace Generated.Requests
 
                 public ShippingItemRequest SquareRootOfPopulationStandardDeviationQuantityAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "quantity", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest SampleVarianceQuantity()
@@ -637,7 +637,7 @@ namespace Generated.Requests
 
                 public ShippingItemRequest SampleVarianceQuantityAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "quantity", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest SamplePopulationVarianceQuantity()
@@ -647,62 +647,62 @@ namespace Generated.Requests
 
                 public ShippingItemRequest SamplePopulationVarianceQuantityAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "quantity", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public ShippingItemRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingItemRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id"); 
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingItemRequest GroupByShippingOrder()
                 {
-                    _query.GroupBy("shipping_order");
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingItemRequest GroupByShippingOrderAs(string retName)
                 {
-                    _query.GroupBy("shipping_order"); 
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingItemRequest GroupBySku()
                 {
-                    _query.GroupBy("sku");
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingItemRequest GroupBySkuAs(string retName)
                 {
-                    _query.GroupBy("sku"); 
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingItemRequest GroupByQuantity()
                 {
-                    _query.GroupBy("quantity");
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingItemRequest GroupByQuantityAs(string retName)
                 {
-                    _query.GroupBy("quantity"); 
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingItemRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ShippingItemRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version"); 
+                    _query.GroupBy(global::Generated.Models.ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public ShippingItemRequest FacetByShippingOrderAs(
@@ -710,8 +710,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "ShippingOrder", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByShippingOrderAs", name, "shipping_order")
+                        name, global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByShippingOrderAs", name, global::Generated.Models.ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY)
                     });
                     return this;
                 }

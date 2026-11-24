@@ -9,12 +9,36 @@ namespace Generated.Models
 
     public class ShippingItem : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string SHIPPING_ORDER_PROPERTY_MEMBER = "ShippingOrder";
+            internal const string SHIPPING_ORDER_PROPERTY_QUERY = "shipping_order";
+            internal const string SHIPPING_ORDER_PROPERTY_STORAGE = "shipping_order";
+            internal const string SHIPPING_ORDER_PROPERTY_MODEL = "shipping_order";
+            internal const string SKU_PROPERTY_MEMBER = "Sku";
+            internal const string SKU_PROPERTY_QUERY = "sku";
+            internal const string SKU_PROPERTY_STORAGE = "sku";
+            internal const string SKU_PROPERTY_MODEL = "sku";
+            internal const string QUANTITY_PROPERTY_MEMBER = "Quantity";
+            internal const string QUANTITY_PROPERTY_QUERY = "quantity";
+            internal const string QUANTITY_PROPERTY_STORAGE = "quantity";
+            internal const string QUANTITY_PROPERTY_MODEL = "quantity";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("ShippingItem", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("shipping_order", global::TeaQL.Runtime.EntityJsonKind.Reference, "shipping_order", () => global::Generated.Models.ShippingOrder._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("sku", global::TeaQL.Runtime.EntityJsonKind.Text, "sku"),
-            new global::TeaQL.Runtime.EntityJsonField("quantity", global::TeaQL.Runtime.EntityJsonKind.Integer, "quantity"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version")}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
+            new global::TeaQL.Runtime.EntityJsonField(ShippingItem.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, ShippingItem.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE, () => global::Generated.Models.ShippingOrder._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(ShippingItem.__TeaqlFields.SKU_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Integer, ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(ShippingItem.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, ShippingItem.__TeaqlFields.VERSION_PROPERTY_STORAGE)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
@@ -28,27 +52,27 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(ShippingItem.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(ShippingItem.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("ShippingOrder"))
+            if (IsLoaded(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER))
             {
                 object? jsonShippingOrder = IsLoaded("ShippingOrderEntity") && ShippingOrderEntity != null && ShippingOrderEntity.Id == ShippingOrder
                     ? ShippingOrderEntity : ShippingOrder;
-                yield return new KeyValuePair<string, object?>("shipping_order", jsonShippingOrder);
+                yield return new KeyValuePair<string, object?>(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE, jsonShippingOrder);
             }
-            if (IsLoaded("Sku"))
+            if (IsLoaded(ShippingItem.__TeaqlFields.SKU_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("sku", Sku);
+                yield return new KeyValuePair<string, object?>(ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE, Sku);
             }
-            if (IsLoaded("Quantity"))
+            if (IsLoaded(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("quantity", Quantity);
+                yield return new KeyValuePair<string, object?>(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, Quantity);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(ShippingItem.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(ShippingItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
         }
 
@@ -194,16 +218,16 @@ namespace Generated.Models
         {
             var entity = new ShippingItem().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(ShippingItem.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("ShippingOrder", out var shippingOrderValue)
-                        || record.TryGetValue("shipping_order", out shippingOrderValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER, out var shippingOrderValue)
+                        || record.TryGetValue(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE, out shippingOrderValue))
                     {
-                        entity.MarkLoaded("ShippingOrder");
+                        entity.MarkLoaded(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER);
                         if (shippingOrderValue.Raw is Record shippingOrderRow)
                         {
                             entity.ShippingOrderEntity = global::Generated.Models.ShippingOrder.FromRecord(shippingOrderRow);
@@ -225,27 +249,27 @@ namespace Generated.Models
                         else if (shippingOrderValue.Raw != null)
                             entity.ShippingOrder = Convert.ToInt64(shippingOrderValue.Raw);
                     }
-                    if (record.TryGetValue("sku", out var skuValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE, out var skuValue))
                     {
-                        entity.MarkLoaded("Sku");
+                        entity.MarkLoaded(ShippingItem.__TeaqlFields.SKU_PROPERTY_MEMBER);
                         if (skuValue.Raw != null)
                             entity.Sku = Convert.ToString(skuValue.Raw);
                     }
-                    if (record.TryGetValue("quantity", out var quantityValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, out var quantityValue))
                     {
-                        entity.MarkLoaded("Quantity");
+                        entity.MarkLoaded(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER);
                         if (quantityValue.Raw != null)
                             entity.Quantity = Convert.ToInt64(quantityValue.Raw);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(ShippingItem.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "shipping_order", "sku", "quantity", "version",
-                "Id", "ShippingOrder", "Sku", "Quantity", "Version",
+                ShippingItem.__TeaqlFields.ID_PROPERTY_QUERY, ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_QUERY, ShippingItem.__TeaqlFields.SKU_PROPERTY_QUERY, ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_QUERY, ShippingItem.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                ShippingItem.__TeaqlFields.ID_PROPERTY_MEMBER, ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER, ShippingItem.__TeaqlFields.SKU_PROPERTY_MEMBER, ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER, ShippingItem.__TeaqlFields.VERSION_PROPERTY_MEMBER,
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
             entity._entityRoot.MarkAsPersisted(entity.TeaqlEntityKey());
@@ -304,16 +328,16 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ShippingOrder"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property("shipping_order"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Sku"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property("sku"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Quantity"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property("quantity"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(ShippingItem.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property(ShippingItem.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(ShippingItem.__TeaqlFields.SKU_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property(ShippingItem.__TeaqlFields.SKU_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(ShippingItem.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "ShippingItem", Location = ObjectLocation.Property(ShippingItem.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -437,11 +461,11 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("ShippingOrder")) record["shipping_order"] = TeaqlValue(ShippingOrder);
-                        if (IsLoaded("Sku")) record["sku"] = TeaqlValue(Sku);
-                        if (IsLoaded("Quantity")) record["quantity"] = TeaqlValue(Quantity);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(ShippingItem.__TeaqlFields.ID_PROPERTY_MEMBER)) record[ShippingItem.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER)) record[ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE] = TeaqlValue(ShippingOrder);
+                        if (IsLoaded(ShippingItem.__TeaqlFields.SKU_PROPERTY_MEMBER)) record[ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE] = TeaqlValue(Sku);
+                        if (IsLoaded(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER)) record[ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE] = TeaqlValue(Quantity);
+                        if (IsLoaded(ShippingItem.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[ShippingItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
         }
 
@@ -449,13 +473,13 @@ namespace Generated.Models
         // Do not change identity, loading state, or relations through serialization.
         private void TeaqlRestoreFixedValues(Record record)
         {
-                    if (record.TryGetValue("shipping_order", out var shippingOrderValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE, out var shippingOrderValue))
                         this.ShippingOrder = shippingOrderValue.Raw == null ? null : Convert.ToInt64(shippingOrderValue.Raw);
 
-                    if (record.TryGetValue("sku", out var skuValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE, out var skuValue))
                         this.Sku = skuValue.Raw == null ? null : Convert.ToString(skuValue.Raw);
 
-                    if (record.TryGetValue("quantity", out var quantityValue))
+                    if (record.TryGetValue(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, out var quantityValue))
                         this.Quantity = quantityValue.Raw == null ? null : Convert.ToInt64(quantityValue.Raw);
 
 
@@ -464,15 +488,15 @@ namespace Generated.Models
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[ShippingItem.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (ShippingOrder.HasValue) record["shipping_order"] = new Value.I64Value(ShippingOrder.Value);
+                    if (ShippingOrder.HasValue) record[ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE] = new Value.I64Value(ShippingOrder.Value);
 
-                    if (Sku != null) record["sku"] = new Value.TextValue(Sku);
+                    if (Sku != null) record[ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE] = new Value.TextValue(Sku);
 
-                    if (Quantity.HasValue) record["quantity"] = new Value.I64Value(Quantity.Value);
+                    if (Quantity.HasValue) record[ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE] = new Value.I64Value(Quantity.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[ShippingItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "ShippingItem", Values = record };
         }
@@ -480,13 +504,13 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (ShippingOrder.HasValue) record["shipping_order"] = new Value.I64Value(ShippingOrder.Value);
+                    if (ShippingOrder.HasValue) record[ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE] = new Value.I64Value(ShippingOrder.Value);
 
-                    if (Sku != null) record["sku"] = new Value.TextValue(Sku);
+                    if (Sku != null) record[ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE] = new Value.TextValue(Sku);
 
-                    if (Quantity.HasValue) record["quantity"] = new Value.I64Value(Quantity.Value);
+                    if (Quantity.HasValue) record[ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE] = new Value.I64Value(Quantity.Value);
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[ShippingItem.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "ShippingItem", 
@@ -515,8 +539,8 @@ namespace Generated.Models
                 public ShippingItem UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(ShippingItem.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), ShippingItem.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -524,32 +548,32 @@ namespace Generated.Models
                 {
                     if (this.ShippingOrder != value) this.ShippingOrderEntity = null;
                     this.ShippingOrder = value;
-                    MarkLoaded("ShippingOrder");
-                    _entityRoot.Set(TeaqlEntityKey(), "shipping_order", TeaqlValue(value));
+                    MarkLoaded(ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), ShippingItem.__TeaqlFields.SHIPPING_ORDER_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public ShippingItem UpdateSku(string value)
                 {
                     this.Sku = value;
-                    MarkLoaded("Sku");
-                    _entityRoot.Set(TeaqlEntityKey(), "sku", TeaqlValue(value));
+                    MarkLoaded(ShippingItem.__TeaqlFields.SKU_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), ShippingItem.__TeaqlFields.SKU_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public ShippingItem UpdateQuantity(long? value)
                 {
                     this.Quantity = value;
-                    MarkLoaded("Quantity");
-                    _entityRoot.Set(TeaqlEntityKey(), "quantity", TeaqlValue(value));
+                    MarkLoaded(ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), ShippingItem.__TeaqlFields.QUANTITY_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public ShippingItem UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(ShippingItem.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), ShippingItem.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public ShippingItem UpdateShippingOrder(ShippingOrder value)
