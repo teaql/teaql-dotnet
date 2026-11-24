@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-expected=(business-id conformance context-derived expression-profiles facet-trace fix-e-alignment internal-id-customization mutation-policy natural-messages object-storage order-management runtime-logging scalar-type-probe schema-customization school-management security-foundations task_board trace-chain)
+expected=(business-id conformance context-derived expression-profiles facet-trace fix-e-alignment internal-id-customization mutation-policy natural-messages object-storage order-management runtime-logging scalar-type-probe schema-customization school-management security-foundations supplier-onboarding-i18n task_board trace-chain)
 mapfile -t actual < <(find "$repo/examples" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n' | sort)
 if [[ "${actual[*]}" != "${expected[*]}" ]]; then
   echo "example inventory changed; update scripts/verify-examples.sh: ${actual[*]}" >&2
@@ -60,6 +60,7 @@ bash "$repo/examples/trace-chain/verify-standard-order.sh"
 node "$repo/scripts/verify-generated-fixtures.cjs"
 bash "$repo/examples/trace-chain/verify-standard-graph.sh"
 bash "$repo/examples/trace-chain/verify-standard-stream.sh"
+TeaQLRuntimeSourceRoot="$runtime_source_root" bash "$repo/examples/supplier-onboarding-i18n/run.sh" --verify > "$inventory_evidence/supplier-i18n.jsonl"
 echo "PASS: all .NET examples"
 python3 -B "example/TeaQL.ExampleApi/verify-federation.py" --runtime dotnet --output "$inventory_evidence/order-federation"
 echo "Retained compact example evidence: $inventory_evidence"

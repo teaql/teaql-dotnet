@@ -1,0 +1,43 @@
+{
+  "library": {
+    "scope": "dotnet-lib-core",
+    "sha256": {
+      "E.cs": "062006ad70712bdb453e3e03eaa2181251ea3e028c451e4f1c6cd9a7b63b6480",
+      "GeneratedRuntimeModule.cs": "6d338052c78c0a1b626e94e153570445239fb5cb1f51c92c600935ee4c6cf6e4",
+      "GeneratedSearchModels.cs": "7b4f3dc482079cec6e8599ebd8d1e4dada26d75d4d8a23d8c88ee6b93df9ddf5",
+      "Models/Supplier.cs": "5de725204a9435469ebbaf10722a48e57db659f75b24102938ed5926facee006",
+      "Models/Warehouse.cs": "efcf2b43f46823e0677a553de3dd9eae5be6f5f06a672725ea0a7e838ba2958f",
+      "Q.cs": "a516128e891baefde1b1a693b8aa26bbbc23922758f3f1cf318f285d330aef42",
+      "Requests/SupplierRequest.cs": "0d1728c74634e8e5fbc7de610af6218b8bb0c1ae1894272b7f550b401eee9d40",
+      "Requests/WarehouseRequest.cs": "933928462d521e18c0de47d7946afa47a5a83d4a84d1a9f9ec21ea62df7a32ae",
+      "supplier-onboarding-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+      "teaql-i18n.json": "f848093c0785f2730eaa74f8a9e175e1f90943f056d84666bc964d56668e298c",
+      "teaql/checker-model.json": "0c70836b868047e6bbf8c5a4b167343ef9425e5c535c59ee388b634a79f2b144",
+      "teaql/model-provenance.json": "94ae1b99943275455fce8de247c97f10a81cdb09fef91ada0ae924b26e572759"
+    }
+  },
+  "schema": "teaql.i18n-showcase-generation/v1",
+  "workspace": {
+    "applicationEntry": "Program.cs",
+    "domainSourcesFromSibling": true,
+    "scope": "dotnet-app-console",
+    "sha256": {
+      "AGENTS.md": "d104ff23672b7d8037883fddc26624c150173b3132d3a36a359b409d0231424c",
+      "E.cs": "062006ad70712bdb453e3e03eaa2181251ea3e028c451e4f1c6cd9a7b63b6480",
+      "GeneratedRuntimeModule.cs": "6d338052c78c0a1b626e94e153570445239fb5cb1f51c92c600935ee4c6cf6e4",
+      "GeneratedSearchModels.cs": "7b4f3dc482079cec6e8599ebd8d1e4dada26d75d4d8a23d8c88ee6b93df9ddf5",
+      "Models/Supplier.cs": "5de725204a9435469ebbaf10722a48e57db659f75b24102938ed5926facee006",
+      "Models/Warehouse.cs": "efcf2b43f46823e0677a553de3dd9eae5be6f5f06a672725ea0a7e838ba2958f",
+      "Program.cs": "1184274ee7033c5f65ee08678d7d994ab3874b787cbb869c86783bec669d23f2",
+      "Q.cs": "a516128e891baefde1b1a693b8aa26bbbc23922758f3f1cf318f285d330aef42",
+      "README.md": "34a023d6f363489de37ce62cc69b30a4dad69e2233797ebf27beb5536286cd51",
+      "Requests/SupplierRequest.cs": "0d1728c74634e8e5fbc7de610af6218b8bb0c1ae1894272b7f550b401eee9d40",
+      "Requests/WarehouseRequest.cs": "933928462d521e18c0de47d7946afa47a5a83d4a84d1a9f9ec21ea62df7a32ae",
+      "STANDARD_TELEMETRY.md": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+      "supplier-onboarding-service-console.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+      "teaql-i18n.json": "f848093c0785f2730eaa74f8a9e175e1f90943f056d84666bc964d56668e298c",
+      "teaql/checker-model.json": "0c70836b868047e6bbf8c5a4b167343ef9425e5c535c59ee388b634a79f2b144",
+      "teaql/model-provenance.json": "94ae1b99943275455fce8de247c97f10a81cdb09fef91ada0ae924b26e572759"
+    }
+  }
+}
