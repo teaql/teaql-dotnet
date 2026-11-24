@@ -192,10 +192,11 @@ sealed class Audits : IAppAuditEventSink {
         Events.Add(entry); return Task.CompletedTask;
     }
 }
-sealed class Observed(IDataService inner) : IDataService {
+sealed class Observed(ITransactionExecutor inner) : ITransactionExecutor {
     public List<ExecutionMetadata> Statements { get; } = new();
     public int Mutations { get; private set; }
     public DataServiceCapabilities Capabilities => inner.Capabilities;
+    public Task<ITransaction> BeginTransactionAsync() => inner.BeginTransactionAsync();
     public Task<MutationResult> MutateAsync(MutationRequest request) { Mutations++; return inner.MutateAsync(request); }
     public async Task<QueryResult> QueryAsync(QueryRequest request) {
         var result = await inner.QueryAsync(request); Statements.Add(result.Metadata); return result;
