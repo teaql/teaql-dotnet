@@ -1,11 +1,14 @@
 using TeaQL.Core;
 using TeaQL.DataService;
+using System.Runtime.CompilerServices;
 
 namespace TeaQL.Runtime;
 
 // Invocation-owned generated adapter state, never a Context or entity field.
 public sealed partial class GraphMutationSession
 {
+    private sealed class UnconfirmedTransaction { }
+    private static readonly ConditionalWeakTable<object, UnconfirmedTransaction> UnconfirmedEntities = new();
     internal sealed class PreparedMutation(MutationRequest input)
     {
         internal MutationRequest Input { get; } = input;
@@ -19,6 +22,8 @@ public sealed partial class GraphMutationSession
         internal bool LedgerDeleted { get; } = input.LedgerRoot!.IsDeleted(input.LedgerKey!);
     }
     private readonly Dictionary<object, PreparedMutation> _prepared = new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<object> _attemptedEntities = new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<EntityRoot> _attemptedLedgers = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<EntityKey, Value> _assignedIds = new();
     private readonly Dictionary<MutationRequest, PreparedMutation> _preparedDispatch = new(ReferenceEqualityComparer.Instance);
     private bool _preparedWriteAdmitted;
@@ -55,6 +60,7 @@ public sealed partial class GraphMutationSession
         if (_prepared.ContainsKey(entity)) throw new InvalidOperationException("GRAPH_ENTITY_ALREADY_PREPARED");
         if (request.LedgerKey == null || request.LedgerRoot == null)
             throw new InvalidOperationException("GRAPH_PREPARATION_REQUIRES_LEDGER");
+        RequireKnownOutcome(entity, request.LedgerRoot);
         var entityType = request switch {
             InsertMutationRequest insert => insert.Command.Entity, UpdateMutationRequest update => update.Command.Entity,
             DeleteMutationRequest delete => delete.Command.Entity, RecoverMutationRequest recover => recover.Command.Entity,
@@ -80,6 +86,17 @@ public sealed partial class GraphMutationSession
             normalizedUpdate.Command.Values = captured.LedgerRoot.Change(captured.LedgerKey!);
         }
         _prepared.Add(entity, new PreparedMutation(CopyRequest(captured)));
+    }
+
+    /// <summary>Check replay before considering a generated entity's pending changes.</summary>
+    public void RequireKnownOutcome(object entity, EntityRoot ledger)
+    {
+        RequireActive();
+        if (ledger.TransactionOutcomeUnknown || UnconfirmedEntities.TryGetValue(entity, out _))
+            throw new TransactionOutcomeUnknownException();
+        if (!HasOuterTransaction) return;
+        _attemptedEntities.Add(entity);
+        _attemptedLedgers.Add(ledger);
     }
 
     /// <summary>Register an identity already reserved by the Context creation boundary.
@@ -249,6 +266,16 @@ public sealed partial class GraphMutationSession
     private void ClearPreparedMutations()
     {
         _prepared.Clear(); _assignedIds.Clear(); _preparedDispatch.Clear(); _traversal.Clear(); _preparedWriteAdmitted = false;
+        _attemptedEntities.Clear();
+        _attemptedLedgers.Clear();
+    }
+
+    internal void FenceTransactionOutcome()
+    {
+        foreach (var ledger in _attemptedLedgers)
+            ledger.FenceTransactionOutcome();
+        foreach (var entity in _attemptedEntities)
+            UnconfirmedEntities.GetValue(entity, _ => new UnconfirmedTransaction());
     }
 
     private static Record CopyValues(Record values) => new LoadedScalarSnapshot(values).CopyValues();

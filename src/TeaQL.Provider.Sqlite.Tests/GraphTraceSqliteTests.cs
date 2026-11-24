@@ -19,7 +19,8 @@ public class GraphTraceSqliteTests
         { Audit.Add(item); return Task.CompletedTask; }
     }
 
-    private static async Task<(SqliteConnection Db, UserContext Context, Sink Sink)> Fixture()
+    private static async Task<(SqliteConnection Db, UserContext Context, Sink Sink)> Fixture(
+        Func<SqliteTransport, ISqlTransport>? instrument = null)
     {
         var db = new SqliteConnection("Data Source=:memory:"); await db.OpenAsync();
         var descriptors = new[] { "CustomerOrder", "OrderItem", "Payment", "PaymentAttempt", "Shipment" }
@@ -29,7 +30,8 @@ public class GraphTraceSqliteTests
                 .Property(PropertyDescriptor.New("name", DataType.Text))).ToArray();
         var module = new RuntimeModule(); foreach (var descriptor in descriptors) module.Entity(descriptor);
         var schema = new MetadataSchemaProvider(name => descriptors.FirstOrDefault(item => item.Name == name));
-        var provider = new SqlDataServiceExecutor(new SqliteDialect(), new SqliteTransport(db), schema);
+        var transport = new SqliteTransport(db);
+        var provider = new SqlDataServiceExecutor(new SqliteDialect(), instrument?.Invoke(transport) ?? transport, schema);
         var sink = new Sink();
         var context = module.IntoContext().WithDataService(provider)
             .WithDiagnosticSqlLogSink(sink).WithAppAuditEventSink(sink);
@@ -44,6 +46,164 @@ public class GraphTraceSqliteTests
 
     private static string Shape(IEnumerable<TraceNode> nodes) => string.Join(" -> ",
         nodes.Select(node => $"{node.Name}#{node.EntityId}:{node.Detail}"));
+
+    private static Task<MutationResult> InsertGraph(UserContext context, string entity, ulong id) =>
+        context.ExecuteGraphSaveAsync("persist " + entity, graph => graph.MutateAsync(Insert(entity, id)));
+
+    private static async Task<int> ReadRows(UserContext context, string entity, long id)
+    {
+        var query = new SelectQuery(entity).Filter(Expr.Eq("id", id)).Limit(1)
+            .Comment("read transaction row").Purpose("verify persistence");
+        return (await context.RequireResource<IDataService>().QueryAsync(new QueryRequest(query))).Rows.Count;
+    }
+
+    [Theory]
+    [InlineData("commit")]
+    [InlineData("propagated")]
+    [InlineData("caught")]
+    [InlineData("admission")]
+    public async Task UserContextTransactionComposesIndependentSaves(string mode)
+    {
+        var fixture = await Fixture();
+        await using var db = fixture.Db;
+        var context = fixture.Context;
+        await InsertGraph(context, "Payment", 1);
+        fixture.Sink.Audit.Clear();
+        context.InsertNamedResource("approval-policy", "purchasing");
+        Exception? firstError = null;
+        UserContext? escaped = null;
+        var call = context.TransactionAsync(async tx =>
+        {
+            escaped = tx;
+            Assert.NotSame(context, tx);
+            Assert.Equal("purchasing", tx.GetNamedResource<string>("approval-policy"));
+            await InsertGraph(tx, "CustomerOrder", 20);
+            Assert.Equal(1, await ReadRows(tx, "CustomerOrder", 20));
+            Assert.Empty(fixture.Sink.Audit);
+            try
+            {
+                if (mode == "admission")
+                    await tx.ExecuteGraphSaveAsync("", graph => graph.MutateAsync(Insert("Payment", 20)));
+                else
+                    await InsertGraph(tx, "Payment", mode == "commit" ? 20UL : 1UL);
+            }
+            catch (Exception failure) when (mode != "commit")
+            {
+                firstError = failure;
+                if (mode == "propagated") throw;
+                var later = await Assert.ThrowsAsync<InvalidOperationException>(() => InsertGraph(tx, "Payment", 21));
+                Assert.Same(failure, later.InnerException);
+            }
+            return 20;
+        });
+
+        var commit = mode == "commit";
+        if (commit)
+            Assert.Equal(20, await call);
+        else
+        {
+            var returned = await Xunit.Record.ExceptionAsync(async () => { await call; });
+            Assert.NotNull(firstError);
+            Assert.Same(firstError, returned);
+        }
+
+        Assert.Equal(commit ? 1 : 0, await ReadRows(context, "CustomerOrder", 20));
+        Assert.Equal(commit ? 1 : 0, await ReadRows(context, "Payment", 20));
+        Assert.Equal(0, await ReadRows(context, "Payment", 21));
+        Assert.Equal(commit ? 2 : 0, fixture.Sink.Audit.Count);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => ReadRows(escaped!, "CustomerOrder", 20));
+    }
+
+    [Fact]
+    public async Task UserContextTransactionLeasesSqliteUntilRollback()
+    {
+        var fixture = await Fixture();
+        await using var db = fixture.Db;
+        var context = fixture.Context;
+        var written = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var returnFirst = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var failure = new InvalidOperationException("reject purchase approval");
+        var first = context.TransactionAsync<int>(async tx =>
+        {
+            await InsertGraph(tx, "CustomerOrder", 20);
+            written.SetResult();
+            await returnFirst.Task;
+            throw failure;
+        });
+        await written.Task.WaitAsync(TimeSpan.FromSeconds(10));
+
+        var unrelatedQuery = ReadRows(context, "CustomerOrder", 20);
+        var second = context.TransactionAsync(async tx =>
+        {
+            Assert.Equal(0, await ReadRows(tx, "CustomerOrder", 20));
+            await InsertGraph(tx, "Payment", 21);
+            return 21;
+        });
+        try
+        {
+            Assert.False(unrelatedQuery.IsCompleted);
+            Assert.False(second.IsCompleted);
+        }
+        finally { returnFirst.SetResult(); }
+
+        Assert.Same(failure, await Assert.ThrowsAsync<InvalidOperationException>(() => first));
+        Assert.Equal(0, await unrelatedQuery.WaitAsync(TimeSpan.FromSeconds(10)));
+        Assert.Equal(21, await second.WaitAsync(TimeSpan.FromSeconds(10)));
+        Assert.Equal(1, await ReadRows(context, "Payment", 21));
+        Assert.Single(fixture.Sink.Audit);
+    }
+
+    private sealed class LostCommitTransport(SqliteTransport inner) : ISqlTransactionTransport
+    {
+        public Task<List<TeaQL.Core.Record>> FetchAllSqlAsync(CompiledQuery query) => inner.FetchAllSqlAsync(query);
+        public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => inner.ExecuteSqlAsync(query);
+        public async Task<ISqlTransaction> BeginSqlAsync() => new LostCommit(await inner.BeginSqlAsync());
+
+        private sealed class LostCommit(ISqlTransaction transaction) : ISqlTransaction
+        {
+            public Task<List<TeaQL.Core.Record>> FetchAllSqlAsync(CompiledQuery query) => transaction.FetchAllSqlAsync(query);
+            public Task<ulong> ExecuteSqlAsync(CompiledQuery query) => transaction.ExecuteSqlAsync(query);
+            public Task RollbackSqlAsync() => transaction.RollbackSqlAsync();
+            public void Dispose() => transaction.Dispose();
+            public async Task CommitSqlAsync()
+            {
+                await transaction.CommitSqlAsync();
+                throw new InvalidOperationException("private acknowledgement diagnostic");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task UserContextTransactionFencesPreparedGraphsAfterLostCommitAcknowledgement()
+    {
+        var fixture = await Fixture(transport => new LostCommitTransport(transport));
+        await using var db = fixture.Db;
+        var context = fixture.Context;
+        var carrier = new object();
+        var ledger = new EntityRoot();
+        Task<MutationResult> Save(UserContext ctx, EntityRoot root) => ctx.ExecuteGraphSaveAsync(
+            "approve purchase order",
+            graph =>
+            {
+                graph.DeclareRootEntity("CustomerOrder");
+                graph.PrepareInput(carrier, Insert("CustomerOrder", 20, root));
+                graph.SealPreparedGraph();
+                return Task.CompletedTask;
+            },
+            async graph =>
+            {
+                await graph.ReservePreparedIdAsync(carrier);
+                graph.PreflightPrepared(carrier);
+                return await graph.MutatePreparedAsync(carrier);
+            });
+
+        var outcome = await Assert.ThrowsAsync<TransactionOutcomeUnknownException>(
+            () => context.TransactionAsync(tx => Save(tx, ledger)));
+        Assert.DoesNotContain("private acknowledgement", outcome.Message);
+        Assert.Empty(fixture.Sink.Audit);
+        Assert.Equal(1, await ReadRows(context, "CustomerOrder", 20));
+        await Assert.ThrowsAsync<TransactionOutcomeUnknownException>(() => Save(context, new EntityRoot()));
+    }
 
     private sealed class AuditProbe : IEntity
     {

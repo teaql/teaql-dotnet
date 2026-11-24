@@ -10,7 +10,7 @@ using TeaQL.DataService;
 
 namespace TeaQL.Runtime;
 
-public class UserContext
+public partial class UserContext
 {
     private static readonly IIdSetStore DefaultIdSetStore = new InMemoryIdSetStore();
     private const string ActiveRootResource = "teaql.activeRoot";
@@ -22,22 +22,22 @@ public class UserContext
     public IMetadataStore? Metadata { get; set; }
     public IEntityRegistry? EntityRegistry { get; set; }
     
-    private readonly ConcurrentDictionary<Type, object> _typedResources = new();
-    private readonly ConcurrentDictionary<string, object> _namedResources = new();
-    private readonly ConcurrentDictionary<string, Value> _locals = new();
-    private readonly ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
-    private readonly ConcurrentBag<object> _managedEntities = new();
-    private readonly ConcurrentDictionary<string, IEntityChecker> _checkers = new();
+    private ConcurrentDictionary<Type, object> _typedResources = new();
+    private ConcurrentDictionary<string, object> _namedResources = new();
+    private ConcurrentDictionary<string, Value> _locals = new();
+    private ConcurrentDictionary<string, List<Action<UserContext, object>>> _entityInitializers = new();
+    private ConcurrentBag<object> _managedEntities = new();
+    private ConcurrentDictionary<string, IEntityChecker> _checkers = new();
     internal IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> ContextRootFields { get; private set; }
         = new Dictionary<string, IReadOnlyDictionary<string, string>>();
-    private readonly MutationPolicyRuntimeState _mutationPolicy = new();
-    private readonly SemaphoreSlim _graphSaveGate = new(1, 1);
+    private MutationPolicyRuntimeState _mutationPolicy = new();
+    private SemaphoreSlim _graphSaveGate = new(1, 1);
     // An execution-flow marker distinguishes a nested root Save (which would
     // wait on its own gate) from an independent caller that must still queue.
     // Child flows retain the token, not a permanent flag: once the owner exits,
     // those flows may start a new root Save normally.
     private sealed class GraphSaveInvocation { internal volatile bool Active = true; }
-    private readonly AsyncLocal<GraphSaveInvocation?> _graphSaveInvocation = new();
+    private AsyncLocal<GraphSaveInvocation?> _graphSaveInvocation = new();
     private GraphMutationSession? _activeGraphSave;
     private DateTimeOffset? _graphFixTime;
     private IBusinessClock _businessClock = SystemBusinessClock.Instance;
@@ -213,6 +213,8 @@ public class UserContext
         InsertResource<IDataService>(new RuntimeDataService(provider, this));
         if (provider is ITransactionExecutor transactionExecutor)
             InsertResource<ITransactionExecutor>(transactionExecutor);
+        else
+            _typedResources.TryRemove(typeof(ITransactionExecutor), out _);
         _dataServiceSchemaExecutor = provider as ISchemaExecutor;
         return this;
     }
@@ -242,6 +244,7 @@ public class UserContext
         }
         if (allocator == null)
             throw new NotSupportedException("Configured data service requires internal ID allocation support");
+        using var command = await EnterTransactionCommandAsync().ConfigureAwait(false);
         var identity = await allocator.NextIdAsync(entity).ConfigureAwait(false);
         if (identity == 0)
             throw new InvalidOperationException($"Internal ID allocator returned zero for {entity}");
@@ -287,13 +290,8 @@ public class UserContext
         return claims;
     }
 
-    public async Task<T> ExecuteGraphSaveAsync<T>(string comment, Func<GraphMutationSession, Task<T>> work)
-    {
-        var intent = new MutationIntent(comment); // Must precede callbacks and transaction allocation.
-        EnsureGraphSaveCanEnter();
-        return await OperationTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
-            () => ExecuteGraphSaveCoreAsync(intent, null, work)).ConfigureAwait(false);
-    }
+    public Task<T> ExecuteGraphSaveAsync<T>(string comment, Func<GraphMutationSession, Task<T>> work)
+        => ExecuteGraphSaveBoundaryAsync(comment, null, work);
 
     /// <summary>Generated bridge: validate/fix the complete graph before opening its transaction.</summary>
     public async Task<T> ExecuteGraphSaveAsync<T>(string comment,
@@ -301,10 +299,25 @@ public class UserContext
     {
         ArgumentNullException.ThrowIfNull(prepare);
         ArgumentNullException.ThrowIfNull(work);
-        var intent = new MutationIntent(comment);
-        EnsureGraphSaveCanEnter();
-        return await OperationTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
-            () => ExecuteGraphSaveCoreAsync(intent, prepare, work)).ConfigureAwait(false);
+        return await ExecuteGraphSaveBoundaryAsync(comment, prepare, work).ConfigureAwait(false);
+    }
+
+    private async Task<T> ExecuteGraphSaveBoundaryAsync<T>(string comment,
+        Func<GraphMutationSession, Task>? prepare, Func<GraphMutationSession, Task<T>> work)
+    {
+        try
+        {
+            _contextTransaction?.RequireWritable();
+            var intent = new MutationIntent(comment);
+            EnsureGraphSaveCanEnter();
+            return await OperationTelemetry.ObserveAsync(RuntimeOperation.Create("mutation", "graph.save"),
+                () => ExecuteGraphSaveCoreAsync(intent, prepare, work)).ConfigureAwait(false);
+        }
+        catch (Exception failure)
+        {
+            _contextTransaction?.Fail(failure);
+            throw;
+        }
     }
 
     private void EnsureGraphSaveCanEnter()
@@ -324,7 +337,9 @@ public class UserContext
         GraphMutationSession? session = null;
         try
         {
+            _contextTransaction?.RequireWritable();
             session = new GraphMutationSession(this, intent);
+            _contextTransaction?.Enlist(session);
             _activeGraphSave = session;
             _mutationPolicy.BeginGraph(intent.Comment);
             _graphFixTime = BusinessTime;
@@ -335,12 +350,18 @@ public class UserContext
                 if (prepare != null) await prepare(session).ConfigureAwait(false);
                 if (!session.IsSealedEmpty)
                 {
-                    transaction = await RequireResource<ITransactionExecutor>()
-                        .BeginTransactionAsync().ConfigureAwait(false);
-                    session.AttachTransaction(transaction);
+                    var graphProvider = _contextTransaction?.Provider;
+                    if (graphProvider == null)
+                    {
+                        transaction = await RequireResource<ITransactionExecutor>()
+                            .BeginTransactionAsync().ConfigureAwait(false);
+                        graphProvider = transaction;
+                    }
+                    session.AttachTransaction(graphProvider);
                 }
                 result = await work(session).ConfigureAwait(false);
                 session.ValidatePreparedGraphBeforeCommit();
+                if (_contextTransaction != null) session.StageSavedState();
                 if (transaction != null) await transaction.CommitAsync().ConfigureAwait(false);
             }
             catch (Exception failure)
@@ -352,11 +373,14 @@ public class UserContext
                     CheckerPrivacy.Translate(errors, config.Legacy, config.Locale, this, natural: config, origin: new(config.Model, session.CheckerOrigin));
                     check.RefreshPresentation(errors);
                 }
-                try { if (transaction != null) await transaction.RollbackAsync().ConfigureAwait(false); }
-                finally { session.Restore(); }
+                if (_contextTransaction == null)
+                {
+                    try { if (transaction != null) await transaction.RollbackAsync().ConfigureAwait(false); }
+                    finally { session.Restore(); }
+                }
                 throw;
             }
-            await session.CompleteAsync().ConfigureAwait(false);
+            if (_contextTransaction == null) await session.CompleteAsync().ConfigureAwait(false);
             return result;
         }
         finally
@@ -367,7 +391,7 @@ public class UserContext
                 // a later standalone Fix must never append to an older result.
                 _lastFixEvidence = Array.AsReadOnly(_currentFixEvidence.ToArray());
                 _currentFixEvidence = new List<FixEvidence>();
-                session?.Close();
+                if (_contextTransaction == null) session?.Close();
                 _activeGraphSave = null;
                 _mutationPolicy.EndGraph();
                 _graphFixTime = null;
@@ -616,6 +640,8 @@ public class UserContext
 
     public async Task EnsureSchemaAsync()
     {
+        if (_contextTransaction != null)
+            throw new InvalidOperationException("Schema initialization requires the original UserContext");
         var provider = _schemaExecutorOverride ?? _dataServiceSchemaExecutor
             ?? GetResource<ISchemaExecutor>()
             ?? throw new InvalidOperationException("Missing resource of type ISchemaExecutor");
@@ -803,11 +829,19 @@ public class UserContext
 
     public void InsertResource<T>(T resource) where T : class
     {
+        if (_contextTransaction != null && (typeof(T) == typeof(IDataService) || typeof(T) == typeof(ITransactionExecutor)))
+            throw new InvalidOperationException("Cannot replace the data service of a transaction UserContext");
         _typedResources[typeof(T)] = resource;
     }
 
     public T? GetResource<T>() where T : class
     {
+        if (_contextTransaction is { } scope)
+        {
+            if (typeof(T) == typeof(IDataService)) scope.RequireAccess();
+            if (typeof(T) == typeof(ITransactionExecutor))
+                throw new InvalidOperationException("The outer transaction owns the provider");
+        }
         if (_typedResources.TryGetValue(typeof(T), out var resource))
         {
             return (T)resource;

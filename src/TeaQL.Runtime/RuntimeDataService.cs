@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -100,15 +101,17 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         => RuntimeStream.Chunks(_context.OperationTelemetry, request.WithQuery(request.Query),
             (captured, token) => QueryStreamCoreAsync(captured, chunkSize, token), cancellationToken);
 
-    private IAsyncEnumerable<StreamChunk> QueryStreamCoreAsync(QueryRequest request, int chunkSize,
-        System.Threading.CancellationToken cancellationToken)
+    private async IAsyncEnumerable<StreamChunk> QueryStreamCoreAsync(QueryRequest request, int chunkSize,
+        [EnumeratorCancellation] System.Threading.CancellationToken cancellationToken)
     {
         if (_provider is not IStreamQueryExecutor streaming)
             throw new NotSupportedException("The installed provider does not support streaming queries");
         var execution = CopyRequest(request, request.Query.CloneForExecution());
         execution.DiagnosticObserver = _context.RecordExecutionMetadata;
         execution.StatementObserver = _context.RuntimeTelemetry is IRuntimeSqlTelemetry telemetry ? telemetry.StartStatement : null;
-        return streaming.QueryStreamAsync(execution, chunkSize, cancellationToken);
+        using var command = await _context.EnterTransactionCommandAsync(cancellationToken).ConfigureAwait(false);
+        await foreach (var chunk in streaming.QueryStreamAsync(execution, chunkSize, cancellationToken).ConfigureAwait(false))
+            yield return chunk;
     }
 
     /// <summary>Generated-library bridge: capture a typed stream now, execute
@@ -141,6 +144,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     private Task<QueryResult> ExecuteOwnedQueryAsync(QueryRequest request)
     {
+        _context.RequireTransactionAccess();
         request.RelationLoadObserver = new RuntimeRelationLoadObserver(_context.OperationTelemetry);
         return ExecuteQueryAsync(request);
     }
@@ -274,6 +278,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
 
     public async Task<MutationResult> MutateAsync(MutationRequest request)
     {
+        _context.RequireTransactionAccess();
         _context.ValidateGraphMutation(request, _graph);
         MutationVersionAdmission.Validate(_context, request);
         var prepared = _graph?.ConsumePreparedMutation(request);
@@ -285,6 +290,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
         if (prepared != null) _graph!.ValidatePreparedMutationForWrite(prepared);
         MutationVersionAdmission.Validate(_context, request);
         var entity = EntityName(request);
+        using var command = await _context.EnterTransactionCommandAsync().ConfigureAwait(false);
         var result = await _context.OperationTelemetry.ObserveAsync(
             RuntimeOperation.Create("mutation", $"{entity}.mutate",
                 new Dictionary<string, object>
@@ -310,6 +316,7 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
             foreach (var publish in deliveries) _graph.AfterCommit(publish);
             return;
         }
+        if (_context.DeferTransactionAudits(deliveries)) return;
         // Project EVERY leaf before the first callback can mutate caller-owned
         // commands/ledgers, including leaves in later nested batch containers.
         var failures = new List<Exception>();
@@ -470,7 +477,11 @@ public sealed class RuntimeDataService : IStreamQueryExecutor
                     ["teaql.provider.kind"] = _provider.GetType().Name,
                     ["teaql.provider.operation"] = "query"
                 }),
-            () => _provider.QueryAsync(request),
+            async () =>
+            {
+                using var command = await _context.EnterTransactionCommandAsync().ConfigureAwait(false);
+                return await _provider.QueryAsync(request).ConfigureAwait(false);
+            },
             result => new Dictionary<string, object>
             {
                 ["teaql.result.cardinality"] = result.Rows.Count

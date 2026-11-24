@@ -174,7 +174,7 @@ public sealed class MutationPolicyException(string message) : Exception(message)
 public sealed class MutationPolicyRuntimeState
 {
     private static long _executionSequence;
-    private readonly ConcurrentDictionary<string, byte> _emittedWarnings = new(StringComparer.Ordinal);
+    private ConcurrentDictionary<string, byte> _emittedWarnings = new(StringComparer.Ordinal);
     private readonly AsyncLocal<MutationGovernanceSnapshot?> _active = new();
     private readonly List<MutationOperation> _preflight = new();
     private string? _preflightRootEntity;
@@ -186,6 +186,14 @@ public sealed class MutationPolicyRuntimeState
     internal IMutationPolicyApprovalProvider? ApprovalProvider { get; set; }
     internal IMutationGovernanceSink WarningSink { get; set; } = new TextMutationGovernanceSink();
     internal MutationGovernanceSnapshot? Current => _active.Value;
+
+    internal MutationPolicyRuntimeState ForInvocation() => new()
+    {
+        Registry = Registry,
+        ApprovalProvider = ApprovalProvider,
+        WarningSink = WarningSink,
+        _emittedWarnings = _emittedWarnings
+    };
 
     internal void BeginGraph(string comment)
     {
