@@ -12,6 +12,30 @@ namespace TeaQL.Provider.Sqlite.Tests;
 
 public class StreamIntentTests
 {
+    [Fact]
+    public async Task LiveCursorsShareTheConnectionAndReleaseItBeforeATransaction()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var transport = new SqliteTransport(connection);
+        var otherTransport = new SqliteTransport(connection);
+        var query = new CompiledQuery("SELECT 1 AS id UNION ALL SELECT 2 AS id", []);
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+
+        await using (var first = transport.StreamSqlAsync(query, deadline.Token).GetAsyncEnumerator())
+        await using (var second = otherTransport.StreamSqlAsync(query, deadline.Token).GetAsyncEnumerator())
+        {
+            Assert.True(await first.MoveNextAsync());
+            Assert.True(await second.MoveNextAsync());
+            await Assert.ThrowsAsync<InvalidOperationException>(() => transport.BeginSqlAsync());
+            Assert.True(await first.MoveNextAsync());
+            Assert.True(await second.MoveNextAsync());
+        }
+
+        using var transaction = await transport.BeginSqlAsync();
+        await transaction.RollbackSqlAsync();
+    }
+
     private sealed class Sink : IDiagnosticSqlLogSink
     {
         public readonly List<ExecutionMetadata> Entries = new();
