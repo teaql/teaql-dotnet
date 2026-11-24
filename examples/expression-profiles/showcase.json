@@ -1,0 +1,62 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/expression-profiles",
+  "library": {
+    "generatedFilesManifestSHA256": "f59f640db640bf6970927fff46d12ea250242ccff61f7c931cbef8cdacd0833f",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "80efe091edc3c7e43fa0b654cc1fecf65fda6664434b3a3ee8d8676027e70ede"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build",
+      "jarSHA256": "029f602cf0e2de4ec0910495c340fbeb41f11772b6aca875569f498811158e7d",
+      "qualificationReceiptSHA256": "1012520de60d49cfc1e45c7e08fcf204dd2db36a163909e1e36752065a31047a",
+      "sourceCommit": "99d6bde2351d79b7d8b1b1c5cbc78c5dc777b6f2",
+      "tag": "unreleased-source-99d6bde2"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dispatch-document-profiles-generation/receipt.json",
+    "receiptSHA256": "11b1084da4040d1a68378b9ee879d98dd18d61b7eace2700c2e3dc207276c1b3"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-dispatch-profiles-native/runtime/expression-profiles/receipt.json",
+    "businessReceiptSHA256": "05677353954be6fffbad40831b57387ee1aaca3b2a173707dfdb32f70f94be25",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-dispatch-profiles-native/receipt.json",
+    "nativeReceiptSHA256": "b40e5580ecc8ab5b99697ad360a134a21a98f7f3e3a5980b1fa66c77437aed22",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "dafff478a2b9db06473d7a60cdc3a636c420b891"
+  },
+  "relatedShowcases": [
+    "profiles/snake_case/showcase.json",
+    "profiles/PascalCase/showcase.json"
+  ],
+  "scene": "Read a dispatch order in camelCase",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "examples/expression-profiles/verify-dispatch.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "dispatch-document-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/DispatchOrder.cs",
+      "Models/DistributionCenter.cs",
+      "Q.cs",
+      "Requests/DispatchOrderRequest.cs",
+      "Requests/DistributionCenterRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "225af2f5e439541a56d867f9dccb6206f89dc4a77a5edf4a1aab43a5ef3a0a33",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

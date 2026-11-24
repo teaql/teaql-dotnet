@@ -1,5 +1,8 @@
 # Generated Q/E, Checker and graph-save regression
 
+`model.xml` owns `dotnet-lib-core` and `dotnet-app-console`. All original business probes now live under `dotnet-app-console/showcase`. The native console project compiles those application-owned files and consumes the sibling generated library. The verifier materializes those same scopes in owned scratch, runs every original assertion twice on retained stores, checks the actual built assembly and runtime origins, and removes its build tree. See `showcase.json` for current qualification state.
+
+
 Run against the runtime source in this repository:
 
 ```sh
@@ -121,3 +124,24 @@ while retaining their canonical paths, wire profiles and source aliases.
 Creation uses `await request.NewEntityAsync(context)` and reserves a positive
 identity before returning. Graph traversal visits a repeated object once per
 phase; cancellation, rollback and retry assertions remain part of this example.
+
+## Model and workspace
+
+This showcase uses `model.xml`: Tenant owns PurchaseOrder and OrderItem.
+The generated domain library is read-only in `dotnet-lib-core/`; application code is
+in `dotnet-app-console/showcase`. The workspace hosts the original scenario checks and
+trusted Context/runtime setup.
+
+From the SDK repository root, run:
+
+```bash
+node examples/fix-e-alignment/verify-local.cjs
+```
+
+The verifier checks the model and exact generated-library hashes, builds the
+native workspace with the local SDK, then runs the original business cases
+twice on retained stores. Assertions cover real generated Q/E and audited
+saves, precise loaded state, rejected writes and transaction outcomes. It
+keeps compact receipts and result data and removes owned build output.
+`showcase.json` binds this model, both generation scopes and the focused result;
+the final full SDK example inventory remains a separate gate.

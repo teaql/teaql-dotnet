@@ -3,7 +3,7 @@
 Run `node scripts/verify-natural-messages.cjs --full --output /new/evidence`
 from the repository root. Use `DOTNET_EXE` for an installed .NET 8 SDK.
 
-Discover APIs through only the required `automatic-fixture/assist/` object,
+Discover APIs through only the required `dotnet-lib-core/assist/` object,
 action and field help. Do not inspect generated implementation to discover
 APIs or edit it to make a test pass. The current fixture comes from
 `DotnetNaturalMessagesGenerationTest`; its hashes and source provenance are

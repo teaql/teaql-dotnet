@@ -180,7 +180,7 @@ public sealed class MutationPolicyRuntimeState
     private string? _preflightRootEntity;
     private string? _preflightAuditReason;
     private bool _graphActive;
-    private bool _graphReviewed;
+    private MutationGovernanceSnapshot? _graphSnapshot;
 
     internal IMutationPolicyRegistry? Registry { get; set; }
     internal IMutationPolicyApprovalProvider? ApprovalProvider { get; set; }
@@ -193,7 +193,7 @@ public sealed class MutationPolicyRuntimeState
         _preflightRootEntity = null;
         _preflightAuditReason = new MutationIntent(comment).Comment;
         _graphActive = true;
-        _graphReviewed = false;
+        _graphSnapshot = null;
         _active.Value = null;
     }
 
@@ -203,13 +203,13 @@ public sealed class MutationPolicyRuntimeState
         _preflightRootEntity = null;
         _preflightAuditReason = null;
         _graphActive = false;
-        _graphReviewed = false;
+        _graphSnapshot = null;
         _active.Value = null;
     }
 
     internal void DeclareGraphRoot(string entityType)
     {
-        if (!_graphActive || _graphReviewed || _preflight.Count != 0 || string.IsNullOrWhiteSpace(entityType))
+        if (!_graphActive || _graphSnapshot != null || _preflight.Count != 0 || string.IsNullOrWhiteSpace(entityType))
             throw new MutationPolicyException("Graph root must be declared before operation preflight");
         if (_preflightRootEntity != null && _preflightRootEntity != entityType)
             throw new MutationPolicyException("Graph root cannot change during a save");
@@ -219,7 +219,7 @@ public sealed class MutationPolicyRuntimeState
     internal void RecordPreflight(MutationRequest request)
     {
         if (!_graphActive) return;
-        if (_graphReviewed && Registry != null)
+        if (_graphSnapshot != null && Registry != null)
             throw new MutationPolicyException("Mutation preflight cannot add operations after customer policy review");
         _preflightRootEntity ??= RootEntityName(request);
         _preflightAuditReason ??= FirstComment(request);
@@ -230,9 +230,13 @@ public sealed class MutationPolicyRuntimeState
 
     internal IDisposable EnterMutation(UserContext context, MutationRequest request)
     {
+        var previous = _active.Value;
         if (_graphActive)
         {
-            if (!_graphReviewed)
+            // AsyncLocal changes in one awaited mutation do not flow back to
+            // the caller. Keep the reviewed plan on the graph and reactivate
+            // its snapshot in each mutation's execution context.
+            if (_graphSnapshot == null)
             {
                 if (Registry != null && _preflight.Count == 0)
                     throw new MutationPolicyException(
@@ -240,18 +244,19 @@ public sealed class MutationPolicyRuntimeState
                 var plan = _preflight.Count == 0
                     ? BuildPlan(context, ToOperations(request), RootEntityName(request), FirstComment(request))
                     : BuildPlan(context, _preflight.ToArray(), _preflightRootEntity!, _preflightAuditReason);
-                _active.Value = Review(context, plan);
-                _graphReviewed = true;
+                _graphSnapshot = Review(context, plan);
             }
-            return EmptyDisposable.Instance;
+            _active.Value = _graphSnapshot;
         }
-
-        _active.Value = Review(context, BuildPlan(
-            context,
-            ToOperations(request),
-            RootEntityName(request),
-            FirstComment(request)));
-        return new DelegateDisposable(() => _active.Value = null);
+        else
+        {
+            _active.Value = Review(context, BuildPlan(
+                context,
+                ToOperations(request),
+                RootEntityName(request),
+                FirstComment(request)));
+        }
+        return new DelegateDisposable(() => _active.Value = previous);
     }
 
     internal MutationGovernanceSnapshot Review(UserContext context, MutationPlan plan)
@@ -430,11 +435,5 @@ public sealed class MutationPolicyRuntimeState
     {
         private Action? _dispose = dispose;
         public void Dispose() => Interlocked.Exchange(ref _dispose, null)?.Invoke();
-    }
-
-    private sealed class EmptyDisposable : IDisposable
-    {
-        public static readonly EmptyDisposable Instance = new();
-        public void Dispose() { }
     }
 }

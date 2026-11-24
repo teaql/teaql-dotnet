@@ -9,19 +9,57 @@ namespace Generated.Models
 
     public class Product : global::TeaQL.Runtime.IEntityJsonDocument
     {
+        internal static class __TeaqlFields
+        {
+            internal const string ID_PROPERTY_MEMBER = "Id";
+            internal const string ID_PROPERTY_QUERY = "id";
+            internal const string ID_PROPERTY_STORAGE = "id";
+            internal const string ID_PROPERTY_MODEL = "id";
+            internal const string NAME_PROPERTY_MEMBER = "Name";
+            internal const string NAME_PROPERTY_QUERY = "name";
+            internal const string NAME_PROPERTY_STORAGE = "name";
+            internal const string NAME_PROPERTY_MODEL = "name";
+            internal const string SKU_PROPERTY_MEMBER = "Sku";
+            internal const string SKU_PROPERTY_QUERY = "sku";
+            internal const string SKU_PROPERTY_STORAGE = "sku";
+            internal const string SKU_PROPERTY_MODEL = "sku";
+            internal const string IMAGE_URL_PROPERTY_MEMBER = "ImageUrl";
+            internal const string IMAGE_URL_PROPERTY_QUERY = "image_url";
+            internal const string IMAGE_URL_PROPERTY_STORAGE = "image_url";
+            internal const string IMAGE_URL_PROPERTY_MODEL = "image_url";
+            internal const string COMMERCE_PLATFORM_PROPERTY_MEMBER = "CommercePlatform";
+            internal const string COMMERCE_PLATFORM_PROPERTY_QUERY = "commerce_platform";
+            internal const string COMMERCE_PLATFORM_PROPERTY_STORAGE = "commerce_platform";
+            internal const string COMMERCE_PLATFORM_PROPERTY_MODEL = "commerce_platform";
+            internal const string CREATE_TIME_PROPERTY_MEMBER = "CreateTime";
+            internal const string CREATE_TIME_PROPERTY_QUERY = "create_time";
+            internal const string CREATE_TIME_PROPERTY_STORAGE = "create_time";
+            internal const string CREATE_TIME_PROPERTY_MODEL = "create_time";
+            internal const string UPDATE_TIME_PROPERTY_MEMBER = "UpdateTime";
+            internal const string UPDATE_TIME_PROPERTY_QUERY = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_STORAGE = "update_time";
+            internal const string UPDATE_TIME_PROPERTY_MODEL = "update_time";
+            internal const string VERSION_PROPERTY_MEMBER = "Version";
+            internal const string VERSION_PROPERTY_QUERY = "version";
+            internal const string VERSION_PROPERTY_STORAGE = "version";
+            internal const string VERSION_PROPERTY_MODEL = "version";
+        }
+
         internal static global::TeaQL.Runtime.EntityJsonSchema _teaqlJsonSchema { get; } = new global::TeaQL.Runtime.EntityJsonSchema("Product", new global::TeaQL.Runtime.EntityJsonField[] {
-            new global::TeaQL.Runtime.EntityJsonField("id", global::TeaQL.Runtime.EntityJsonKind.Id, "id"),
-            new global::TeaQL.Runtime.EntityJsonField("name", global::TeaQL.Runtime.EntityJsonKind.Text, "name"),
-            new global::TeaQL.Runtime.EntityJsonField("sku", global::TeaQL.Runtime.EntityJsonKind.Text, "sku"),
-            new global::TeaQL.Runtime.EntityJsonField("image_url", global::TeaQL.Runtime.EntityJsonKind.Text, "image_url"),
-            new global::TeaQL.Runtime.EntityJsonField("commerce_platform", global::TeaQL.Runtime.EntityJsonKind.Reference, "commerce_platform", () => global::Generated.Models.CommercePlatform._teaqlJsonSchema),
-            new global::TeaQL.Runtime.EntityJsonField("create_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "create_time"),
-            new global::TeaQL.Runtime.EntityJsonField("update_time", global::TeaQL.Runtime.EntityJsonKind.DateTime, "update_time"),
-            new global::TeaQL.Runtime.EntityJsonField("version", global::TeaQL.Runtime.EntityJsonKind.Version, "version"),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.ID_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Id, Product.__TeaqlFields.ID_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.NAME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Product.__TeaqlFields.NAME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.SKU_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Product.__TeaqlFields.SKU_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.IMAGE_URL_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Text, Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Reference, Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE, () => global::Generated.Models.CommercePlatform._teaqlJsonSchema),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.DateTime, Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE),
+            new global::TeaQL.Runtime.EntityJsonField(Product.__TeaqlFields.VERSION_PROPERTY_MODEL, global::TeaQL.Runtime.EntityJsonKind.Version, Product.__TeaqlFields.VERSION_PROPERTY_STORAGE),
             new global::TeaQL.Runtime.EntityJsonField("order_line_list", global::TeaQL.Runtime.EntityJsonKind.Many, "OrderLineList", () => global::Generated.Models.OrderLine._teaqlJsonSchema)}, global::TeaQL.Runtime.JsonFieldNamingProfiles.Parse("camelCase"));
 
         global::TeaQL.Runtime.EntityJsonSchema global::TeaQL.Runtime.IEntityJsonDocument.EntityJsonSchema => _teaqlJsonSchema;
         DynamicPropertySnapshot global::TeaQL.Runtime.IEntityJsonDocument.QueryProperties => DynamicProperties;
+
+        internal bool TeaqlHasPending() => _entityRoot.HasPending(TeaqlEntityKey());
 
         public string ToJson(global::TeaQL.Runtime.JsonFieldNamingProfile? profile = null) => _teaqlJsonSchema.Serialize(this, profile);
 
@@ -30,41 +68,41 @@ namespace Generated.Models
 
         IEnumerable<KeyValuePair<string, object?>> global::TeaQL.Runtime.IEntityJsonDocument.LoadedJsonFields()
         {
-            if (IsLoaded("Id"))
+            if (IsLoaded(Product.__TeaqlFields.ID_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("id", Id);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.ID_PROPERTY_STORAGE, Id);
             }
-            if (IsLoaded("Name"))
+            if (IsLoaded(Product.__TeaqlFields.NAME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("name", Name);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.NAME_PROPERTY_STORAGE, Name);
             }
-            if (IsLoaded("Sku"))
+            if (IsLoaded(Product.__TeaqlFields.SKU_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("sku", Sku);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.SKU_PROPERTY_STORAGE, Sku);
             }
-            if (IsLoaded("ImageUrl"))
+            if (IsLoaded(Product.__TeaqlFields.IMAGE_URL_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("image_url", ImageUrl);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE, ImageUrl);
             }
-            if (IsLoaded("CommercePlatform"))
+            if (IsLoaded(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER))
             {
                 object? jsonCommercePlatform = IsLoaded("CommercePlatformEntity") && CommercePlatformEntity != null && CommercePlatformEntity.Id == CommercePlatform
                     ? CommercePlatformEntity : CommercePlatform;
-                yield return new KeyValuePair<string, object?>("commerce_platform", jsonCommercePlatform);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE, jsonCommercePlatform);
             }
-            if (IsLoaded("CreateTime"))
+            if (IsLoaded(Product.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("create_time", CreateTime);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, CreateTime);
             }
-            if (IsLoaded("UpdateTime"))
+            if (IsLoaded(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("update_time", UpdateTime);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, UpdateTime);
             }
-            if (IsLoaded("Version"))
+            if (IsLoaded(Product.__TeaqlFields.VERSION_PROPERTY_MEMBER))
             {
-                yield return new KeyValuePair<string, object?>("version", Version);
+                yield return new KeyValuePair<string, object?>(Product.__TeaqlFields.VERSION_PROPERTY_STORAGE, Version);
             }
-            if (IsLoaded("OrderLineList"))
+            if (OrderLineList.IsLoaded || OrderLineList.Any(child => child.TeaqlHasPending()))
                 yield return new KeyValuePair<string, object?>("OrderLineList", OrderLineList);
         }
 
@@ -78,8 +116,31 @@ namespace Generated.Models
         private EntityKey TeaqlEntityKey() => new EntityKey("Product", Id ?? _ledgerId);
         internal EntityRoot TeaqlMutationLedger => _entityRoot;
         internal bool TeaqlCreationIntent => _teaqlForceCreate || _entityRoot.IsNew(TeaqlEntityKey());
+        internal bool TeaqlHasPendingGraph(HashSet<object> visited)
+        {
+            if (!visited.Add(this)) return false;
+            if (TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey())) return true;
+            foreach (var child in OrderLineList)
+                if (child.TeaqlHasPendingGraph(visited)) return true;
+            return false;
+        }
+        internal bool TeaqlIsCancelledNew()
+        {
+            if (!_markedForDeletion || !TeaqlCreationIntent) return false;
+            var key = TeaqlEntityKey();
+            EntityCreation.RequireMutation(_creationState, Id, true, true, _loadedSnapshot);
+            if (!_entityRoot.IsNew(key) || !_entityRoot.IsDeleted(key)
+                || !_loadedSnapshot.CopyValues().TryGetValue("id", out var reservedId) || reservedId.TryI64() != Id)
+                throw new EntityCreationException();
+            var visited = new HashSet<object>(ReferenceEqualityComparer.Instance) { this };
+            foreach (var child in OrderLineList)
+                if (child.TeaqlHasPendingGraph(visited))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_deletion_state", EntityType = "Product", Location = ObjectLocation.Property("id"), Message = "Cancelled new entity has pending descendants; explicit resolution is required" } });
+            return true;
+        }
         internal void AttachRoot(EntityRoot root, bool hydration = false)
         {
+            if (!hydration && TeaqlIsCancelledNew()) return;
             var key = TeaqlEntityKey();
             if (!ReferenceEquals(root, _entityRoot) && (hydration || _entityRoot.HasPending(key)))
             {
@@ -101,9 +162,7 @@ namespace Generated.Models
             Value.DateValue v => v.Value,
             _ => Convert.ToDateTime(value.Raw)
         };
-        // Hydration is private and cannot acquire insert intent from absent fields.
         private Product() { _creationState = EntityCreationState.Hydrated; }
-
         internal static Product TeaqlNewWithReservedId(long value)
         {
             EntityCreation.RequireReserved(EntityCreationState.Reserved, value);
@@ -112,7 +171,6 @@ namespace Generated.Models
             entity.TeaqlInitializeNewId(value);
             return entity;
         }
-
         internal void TeaqlValidateReservedIdentity(long expected)
         {
             EntityCreation.RequireReserved(_creationState, Id);
@@ -139,9 +197,13 @@ namespace Generated.Models
             return _fullyLoaded || _loadedFields.Contains(field);
         }
 
-        private void TeaqlInitializeNewId(long value)
+        internal void TeaqlInitializeGeneratedBootstrapId(long value)
+            => TeaqlInitializeNewId(value);
+
+        internal void TeaqlInitializeNewId(long value)
         {
             EntityCreation.RequireReserved(_creationState, value);
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "A positive identity is required");
             var oldKey = TeaqlEntityKey();
             Id = value;
             MarkLoaded("Id");
@@ -152,8 +214,7 @@ namespace Generated.Models
             _loadedSnapshot = TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin.CreationBaseline);
         }
 
-        // Trusted generated bootstrap owns the model-declared identity. It must
-        // not consume an unrelated allocator value and replace it with a seed ID.
+        // Fixed model seeds do not consume an unrelated allocator value.
         internal static Product TeaqlNewWithFixedId(long value)
         {
             return TeaqlNewWithReservedId(value);
@@ -197,34 +258,34 @@ namespace Generated.Models
         {
             var entity = new Product().MarkLoadedOnly();
             entity._entityRoot.ClearEntity(entity.TeaqlEntityKey());
-                    if (record.TryGetValue("id", out var idValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.ID_PROPERTY_STORAGE, out var idValue))
                     {
-                        entity.MarkLoaded("Id");
+                        entity.MarkLoaded(Product.__TeaqlFields.ID_PROPERTY_MEMBER);
                         if (idValue.Raw != null)
                             entity.Id = Convert.ToInt64(idValue.Raw);
                     }
-                    if (record.TryGetValue("name", out var nameValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
                     {
-                        entity.MarkLoaded("Name");
+                        entity.MarkLoaded(Product.__TeaqlFields.NAME_PROPERTY_MEMBER);
                         if (nameValue.Raw != null)
                             entity.Name = Convert.ToString(nameValue.Raw);
                     }
-                    if (record.TryGetValue("sku", out var skuValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.SKU_PROPERTY_STORAGE, out var skuValue))
                     {
-                        entity.MarkLoaded("Sku");
+                        entity.MarkLoaded(Product.__TeaqlFields.SKU_PROPERTY_MEMBER);
                         if (skuValue.Raw != null)
                             entity.Sku = Convert.ToString(skuValue.Raw);
                     }
-                    if (record.TryGetValue("image_url", out var imageUrlValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE, out var imageUrlValue))
                     {
-                        entity.MarkLoaded("ImageUrl");
+                        entity.MarkLoaded(Product.__TeaqlFields.IMAGE_URL_PROPERTY_MEMBER);
                         if (imageUrlValue.Raw != null)
                             entity.ImageUrl = Convert.ToString(imageUrlValue.Raw);
                     }
-                    if (record.TryGetValue("CommercePlatform", out var commercePlatformValue)
-                        || record.TryGetValue("commerce_platform", out commercePlatformValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, out var commercePlatformValue)
+                        || record.TryGetValue(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE, out commercePlatformValue))
                     {
-                        entity.MarkLoaded("CommercePlatform");
+                        entity.MarkLoaded(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER);
                         if (commercePlatformValue.Raw is Record commercePlatformRow)
                         {
                             entity.CommercePlatformEntity = global::Generated.Models.CommercePlatform.FromRecord(commercePlatformRow);
@@ -246,21 +307,21 @@ namespace Generated.Models
                         else if (commercePlatformValue.Raw != null)
                             entity.CommercePlatform = Convert.ToInt64(commercePlatformValue.Raw);
                     }
-                    if (record.TryGetValue("create_time", out var createTimeValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
                     {
-                        entity.MarkLoaded("CreateTime");
+                        entity.MarkLoaded(Product.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
                         if (createTimeValue.Raw != null)
                             entity.CreateTime = TeaqlDateTime(createTimeValue);
                     }
-                    if (record.TryGetValue("update_time", out var updateTimeValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
                     {
-                        entity.MarkLoaded("UpdateTime");
+                        entity.MarkLoaded(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
                         if (updateTimeValue.Raw != null)
                             entity.UpdateTime = TeaqlDateTime(updateTimeValue);
                     }
-                    if (record.TryGetValue("version", out var versionValue))
+                    if (record.TryGetValue(Product.__TeaqlFields.VERSION_PROPERTY_STORAGE, out var versionValue))
                     {
-                        entity.MarkLoaded("Version");
+                        entity.MarkLoaded(Product.__TeaqlFields.VERSION_PROPERTY_MEMBER);
                         if (versionValue.Raw != null)
                             entity.Version = Convert.ToInt64(versionValue.Raw);
                     }
@@ -277,8 +338,8 @@ namespace Generated.Models
                             }
                         }
             entity.DynamicProperties = DynamicPropertySnapshot.Capture(record, new[] {
-                "id", "name", "sku", "image_url", "commerce_platform", "create_time", "update_time", "version",
-                "Id", "Name", "Sku", "ImageUrl", "CommercePlatform", "CreateTime", "UpdateTime", "Version",
+                Product.__TeaqlFields.ID_PROPERTY_QUERY, Product.__TeaqlFields.NAME_PROPERTY_QUERY, Product.__TeaqlFields.SKU_PROPERTY_QUERY, Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, Product.__TeaqlFields.VERSION_PROPERTY_QUERY,
+                Product.__TeaqlFields.ID_PROPERTY_MEMBER, Product.__TeaqlFields.NAME_PROPERTY_MEMBER, Product.__TeaqlFields.SKU_PROPERTY_MEMBER, Product.__TeaqlFields.IMAGE_URL_PROPERTY_MEMBER, Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, Product.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER, Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER, Product.__TeaqlFields.VERSION_PROPERTY_MEMBER,
                 "OrderLineList"
             });
             entity._ledgerId = entity.Id ?? entity._ledgerId;
@@ -298,11 +359,12 @@ namespace Generated.Models
         public async global::System.Threading.Tasks.Task<Product> SaveAsync(UserContext context)
         {
             var intent = new MutationIntent(_comment);
+            if (TeaqlIsCancelledNew()) throw new InvalidOperationException("Cannot save a cancelled new root");
             TeaqlValidateCreationGraph(new HashSet<object>(ReferenceEqualityComparer.Instance));
             return await context.ExecuteGraphSaveAsync(intent.Comment, async graph =>
             {
                 graph.DeclareRootEntity("Product");
-                if (TeaqlCreationIntent)
+                if (!Id.HasValue || _teaqlForceCreate)
                 {
                 }
                 TeaqlPrepareInputGraph(context, graph);
@@ -310,7 +372,7 @@ namespace Generated.Models
                 await global::System.Threading.Tasks.Task.CompletedTask;
             }, async graph =>
             {
-                await TeaqlCaptureGraphStateAsync(graph);
+                await TeaqlReserveGraphIdentitiesAsync(graph);
                 TeaqlPreflightGraph(context, graph);
                 return await TeaqlSaveWithinGraphAsync(context, graph);
             });
@@ -319,6 +381,7 @@ namespace Generated.Models
         internal void TeaqlValidateCreationGraph(HashSet<object> visited, bool relationWillChange = false)
         {
             if (!visited.Add(this)) return;
+            if (TeaqlIsCancelledNew()) return;
             EntityCreation.RequireMutation(_creationState, Id, TeaqlCreationIntent,
                 TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()) || relationWillChange,
                 _loadedSnapshot);
@@ -330,6 +393,7 @@ namespace Generated.Models
         internal void TeaqlPrepareInputGraph(UserContext context, GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Prepare)) return;
+            if (TeaqlIsCancelledNew()) return;
             graph.DiscardRestoredFields("Product", _entityRoot, TeaqlEntityKey(), _loadedSnapshot);
             var creating = TeaqlCreationIntent;
             var changed = creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey());
@@ -338,22 +402,22 @@ namespace Generated.Models
             {
             if (!creating && !_markedForDeletion)
             {
-                if (!IsLoaded("Id"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("id"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Name"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("name"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Sku"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("sku"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("ImageUrl"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("image_url"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CommercePlatform"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("commerce_platform"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("CreateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("create_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("UpdateTime"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("update_time"), Message = "Mutation requires a fully loaded entity" } });
-                if (!IsLoaded("Version"))
-                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property("version"), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.ID_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.ID_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.NAME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.NAME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.SKU_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.SKU_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.IMAGE_URL_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.IMAGE_URL_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.CREATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
+                if (!IsLoaded(Product.__TeaqlFields.VERSION_PROPERTY_MEMBER))
+                    throw new CheckException(new[] { new CheckResult { RuleId = "invalid_type", EntityType = "Product", Location = ObjectLocation.Property(Product.__TeaqlFields.VERSION_PROPERTY_MODEL), Message = "Mutation requires a fully loaded entity" } });
             }
             var command = _markedForDeletion ? (object)ToDeleteCommand()
                 : creating ? (object)ToInsertCommand() : (object)ToUpdateCommand();
@@ -363,20 +427,24 @@ namespace Generated.Models
                 var originalVersion = _entityRoot.OriginalVersion(TeaqlEntityKey()) ?? Version;
                 if (originalVersion.HasValue) ((UpdateCommand)command).Values["version"] = new Value.I64Value(originalVersion.Value);
             }
-            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment));
+            graph.PrepareInput(this, TeaqlMutationRequest(command, graph.Intent.Comment), TeaqlRestoreFixedValues);
             }
             for (var index = 0; index < OrderLineList.Count; index++)
             {
                 var child = OrderLineList[index];
+                if (child.TeaqlIsCancelledNew())
+                {
+                    child.TeaqlPrepareInputGraph(context, graph);
+                    continue;
+                }
                 child.AttachRoot(_entityRoot);
-                if ((child.TeaqlCreationIntent || child.IsLoaded("Product")) && child.Product != Id)
-                    child.UpdateProductId(Id);
+                if ((child.TeaqlCreationIntent || child.IsLoaded("Product")) && child.Product != Id) child.UpdateProductId(Id);
                 try { child.TeaqlPrepareInputGraph(context, graph); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("order_line_list").Index(index);
                     throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
+                        violation.PrefixedBy(prefix)).ToArray()));
                 }
             }
         }
@@ -384,7 +452,8 @@ namespace Generated.Models
         internal void TeaqlPreflightGraph(UserContext context, GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Preflight)) return;
-            if (TeaqlCreationIntent || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
+            if (TeaqlIsCancelledNew()) return;
+            if (!Id.HasValue || _teaqlForceCreate || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
                 graph.PreflightPrepared(this);
             for (var index = 0; index < OrderLineList.Count; index++)
             {
@@ -393,14 +462,15 @@ namespace Generated.Models
                 {
                     var prefix = ObjectLocation.Property("order_line_list").Index(index);
                     throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
+                        violation.PrefixedBy(prefix)).ToArray()));
                 }
             }
         }
 
-        internal async global::System.Threading.Tasks.Task TeaqlCaptureGraphStateAsync(GraphMutationSession graph)
+        internal async global::System.Threading.Tasks.Task TeaqlReserveGraphIdentitiesAsync(GraphMutationSession graph)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Reserve)) return;
+            if (TeaqlIsCancelledNew()) return;
             var creating = TeaqlCreationIntent;
             if (creating || _markedForDeletion || _entityRoot.HasPending(TeaqlEntityKey()))
             {
@@ -451,7 +521,7 @@ namespace Generated.Models
                 graph.BindPreparedId(this, Id!.Value);
             }
             }
-            foreach (var child in OrderLineList) await child.TeaqlCaptureGraphStateAsync(graph);
+            foreach (var child in OrderLineList) await child.TeaqlReserveGraphIdentitiesAsync(graph);
             await global::System.Threading.Tasks.Task.CompletedTask;
         }
 
@@ -459,6 +529,7 @@ namespace Generated.Models
             GraphMutationSession graph, MutationTraceScope? parentScope = null)
         {
             if (!graph.VisitEntity(this, global::TeaQL.Runtime.GraphMutationTraversal.Write)) return this;
+            if (TeaqlIsCancelledNew()) return this;
             var creating = TeaqlCreationIntent;
             if (!creating && !_markedForDeletion && !_entityRoot.HasPending(TeaqlEntityKey()))
             {
@@ -497,15 +568,15 @@ namespace Generated.Models
             for (var index = 0; index < OrderLineList.Count; index++)
             {
                 var child = OrderLineList[index];
+                if (child.TeaqlIsCancelledNew()) continue;
                 child.AttachRoot(_entityRoot);
-                if ((child.TeaqlCreationIntent || child.IsLoaded("Product")) && child.Product != Id)
-                    child.UpdateProductId(Id);
+                if ((child.TeaqlCreationIntent || child.IsLoaded("Product")) && child.Product != Id) child.UpdateProductId(Id);
                 try { await child.TeaqlSaveWithinGraphAsync(context, graph, scope); }
                 catch (CheckException error)
                 {
                     var prefix = ObjectLocation.Property("order_line_list").Index(index);
                     throw new CheckException(context.TranslateCheckResults(error.Violations.Select(violation =>
-                        new CheckResult { RuleId = violation.RuleId, Location = violation.Location.PrefixedBy(prefix), EntityType = violation.EntityType, SourceInstancePath = violation.SourceInstancePath, InputValue = violation.InputValue, SystemValue = violation.SystemValue, Message = violation.Message }).ToArray()));
+                        violation.PrefixedBy(prefix)).ToArray()));
                 }
             }
             await global::System.Threading.Tasks.Task.CompletedTask;
@@ -522,35 +593,60 @@ namespace Generated.Models
         private LoadedScalarSnapshot TeaqlScalarSnapshot(LoadedScalarSnapshotOrigin origin = LoadedScalarSnapshotOrigin.Hydrated)
         {
             var record = new Record();
-                        if (IsLoaded("Id")) record["id"] = TeaqlValue(Id);
-                        if (IsLoaded("Name")) record["name"] = TeaqlValue(Name);
-                        if (IsLoaded("Sku")) record["sku"] = TeaqlValue(Sku);
-                        if (IsLoaded("ImageUrl")) record["image_url"] = TeaqlValue(ImageUrl);
-                        if (IsLoaded("CommercePlatform")) record["commerce_platform"] = TeaqlValue(CommercePlatform);
-                        if (IsLoaded("CreateTime")) record["create_time"] = TeaqlValue(CreateTime);
-                        if (IsLoaded("UpdateTime")) record["update_time"] = TeaqlValue(UpdateTime);
-                        if (IsLoaded("Version")) record["version"] = TeaqlValue(Version);
+                        if (IsLoaded(Product.__TeaqlFields.ID_PROPERTY_MEMBER)) record[Product.__TeaqlFields.ID_PROPERTY_STORAGE] = TeaqlValue(Id);
+                        if (IsLoaded(Product.__TeaqlFields.NAME_PROPERTY_MEMBER)) record[Product.__TeaqlFields.NAME_PROPERTY_STORAGE] = TeaqlValue(Name);
+                        if (IsLoaded(Product.__TeaqlFields.SKU_PROPERTY_MEMBER)) record[Product.__TeaqlFields.SKU_PROPERTY_STORAGE] = TeaqlValue(Sku);
+                        if (IsLoaded(Product.__TeaqlFields.IMAGE_URL_PROPERTY_MEMBER)) record[Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE] = TeaqlValue(ImageUrl);
+                        if (IsLoaded(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER)) record[Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE] = TeaqlValue(CommercePlatform);
+                        if (IsLoaded(Product.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER)) record[Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = TeaqlValue(CreateTime);
+                        if (IsLoaded(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER)) record[Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = TeaqlValue(UpdateTime);
+                        if (IsLoaded(Product.__TeaqlFields.VERSION_PROPERTY_MEMBER)) record[Product.__TeaqlFields.VERSION_PROPERTY_STORAGE] = TeaqlValue(Version);
             return new LoadedScalarSnapshot(TeaqlEntityKey(), record, origin);
+        }
+
+        // Repair native scalar values cancelled against an owner/version-qualified baseline.
+        // Do not change identity, loading state, or relations through serialization.
+        private void TeaqlRestoreFixedValues(Record record)
+        {
+                    if (record.TryGetValue(Product.__TeaqlFields.NAME_PROPERTY_STORAGE, out var nameValue))
+                        this.Name = nameValue.Raw == null ? null : Convert.ToString(nameValue.Raw);
+
+                    if (record.TryGetValue(Product.__TeaqlFields.SKU_PROPERTY_STORAGE, out var skuValue))
+                        this.Sku = skuValue.Raw == null ? null : Convert.ToString(skuValue.Raw);
+
+                    if (record.TryGetValue(Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE, out var imageUrlValue))
+                        this.ImageUrl = imageUrlValue.Raw == null ? null : Convert.ToString(imageUrlValue.Raw);
+
+                    if (record.TryGetValue(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE, out var commercePlatformValue))
+                        this.CommercePlatform = commercePlatformValue.Raw == null ? null : Convert.ToInt64(commercePlatformValue.Raw);
+
+                    if (record.TryGetValue(Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, out var createTimeValue))
+                        this.CreateTime = createTimeValue.Raw == null ? null : TeaqlDateTime(createTimeValue);
+
+                    if (record.TryGetValue(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, out var updateTimeValue))
+                        this.UpdateTime = updateTimeValue.Raw == null ? null : TeaqlDateTime(updateTimeValue);
+
+
         }
 
         public InsertCommand ToInsertCommand()
         {
             var record = new Record();
-                    if (Id.HasValue) record["id"] = new Value.I64Value(Id.Value);
+                    if (Id.HasValue) record[Product.__TeaqlFields.ID_PROPERTY_STORAGE] = new Value.I64Value(Id.Value);
 
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[Product.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (Sku != null) record["sku"] = new Value.TextValue(Sku);
+                    if (Sku != null) record[Product.__TeaqlFields.SKU_PROPERTY_STORAGE] = new Value.TextValue(Sku);
 
-                    if (ImageUrl != null) record["image_url"] = new Value.TextValue(ImageUrl);
+                    if (ImageUrl != null) record[Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE] = new Value.TextValue(ImageUrl);
 
-                    if (CommercePlatform.HasValue) record["commerce_platform"] = new Value.I64Value(CommercePlatform.Value);
+                    if (CommercePlatform.HasValue) record[Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(CommercePlatform.Value);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[Product.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new InsertCommand { Entity = "Product", Values = record };
         }
@@ -558,19 +654,19 @@ namespace Generated.Models
         public UpdateCommand ToUpdateCommand()
         {
             var record = new Record();
-                    if (Name != null) record["name"] = new Value.TextValue(Name);
+                    if (Name != null) record[Product.__TeaqlFields.NAME_PROPERTY_STORAGE] = new Value.TextValue(Name);
 
-                    if (Sku != null) record["sku"] = new Value.TextValue(Sku);
+                    if (Sku != null) record[Product.__TeaqlFields.SKU_PROPERTY_STORAGE] = new Value.TextValue(Sku);
 
-                    if (ImageUrl != null) record["image_url"] = new Value.TextValue(ImageUrl);
+                    if (ImageUrl != null) record[Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE] = new Value.TextValue(ImageUrl);
 
-                    if (CommercePlatform.HasValue) record["commerce_platform"] = new Value.I64Value(CommercePlatform.Value);
+                    if (CommercePlatform.HasValue) record[Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE] = new Value.I64Value(CommercePlatform.Value);
 
-                    if (CreateTime.HasValue) record["create_time"] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
+                    if (CreateTime.HasValue) record[Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(CreateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (UpdateTime.HasValue) record["update_time"] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
+                    if (UpdateTime.HasValue) record[Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE] = new Value.TimestampValue(new DateTimeOffset(UpdateTime.Value).ToUnixTimeMilliseconds());
 
-                    if (Version.HasValue) record["version"] = new Value.I64Value(Version.Value);
+                    if (Version.HasValue) record[Product.__TeaqlFields.VERSION_PROPERTY_STORAGE] = new Value.I64Value(Version.Value);
 
             return new UpdateCommand { 
                 Entity = "Product", 
@@ -599,32 +695,32 @@ namespace Generated.Models
                 public Product UpdateId(long? value)
                 {
                     this.Id = value;
-                    MarkLoaded("Id");
-                    _entityRoot.Set(TeaqlEntityKey(), "id", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.ID_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.ID_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Product UpdateName(string value)
                 {
                     this.Name = value;
-                    MarkLoaded("Name");
-                    _entityRoot.Set(TeaqlEntityKey(), "name", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.NAME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.NAME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Product UpdateSku(string value)
                 {
                     this.Sku = value;
-                    MarkLoaded("Sku");
-                    _entityRoot.Set(TeaqlEntityKey(), "sku", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.SKU_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.SKU_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Product UpdateImageUrl(string value)
                 {
                     this.ImageUrl = value;
-                    MarkLoaded("ImageUrl");
-                    _entityRoot.Set(TeaqlEntityKey(), "image_url", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.IMAGE_URL_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.IMAGE_URL_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
@@ -632,32 +728,32 @@ namespace Generated.Models
                 {
                     if (this.CommercePlatform != value) this.CommercePlatformEntity = null;
                     this.CommercePlatform = value;
-                    MarkLoaded("CommercePlatform");
-                    _entityRoot.Set(TeaqlEntityKey(), "commerce_platform", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Product UpdateCreateTime(DateTime? value)
                 {
                     this.CreateTime = value;
-                    MarkLoaded("CreateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "create_time", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.CREATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.CREATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Product UpdateUpdateTime(DateTime? value)
                 {
                     this.UpdateTime = value;
-                    MarkLoaded("UpdateTime");
-                    _entityRoot.Set(TeaqlEntityKey(), "update_time", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.UPDATE_TIME_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.UPDATE_TIME_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
 
                 public Product UpdateVersion(long? value)
                 {
                     this.Version = value;
-                    MarkLoaded("Version");
-                    _entityRoot.Set(TeaqlEntityKey(), "version", TeaqlValue(value));
+                    MarkLoaded(Product.__TeaqlFields.VERSION_PROPERTY_MEMBER);
+                    _entityRoot.Set(TeaqlEntityKey(), Product.__TeaqlFields.VERSION_PROPERTY_STORAGE, TeaqlValue(value));
                     return this;
                 }
                 public Product UpdateCommercePlatform(CommercePlatform value)

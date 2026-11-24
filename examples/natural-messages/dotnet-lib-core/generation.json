@@ -1,0 +1,20 @@
+{
+  "artifactKind": "published generator release",
+  "generationReceipt": "../../generator-v5.0.2.json",
+  "generator": {
+    "jarSHA256": "107fb340c0534fb2548dc0b7228554ce3fc080524353df6a9f6d7ad9388471bb",
+    "kind": "published generator release",
+    "release": "v5.0.2",
+    "sourceCommit": "80fe610d358e923724ddccac84a48d6e4ec5c806",
+    "url": "https://github.com/teaql/teaql-code-gen/releases/tag/v5.0.2"
+  },
+  "implementationHandEdited": false,
+  "modelSha256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
+  "previousOrigin": {
+    "commit": "e62edea17a950c837e6be2cab2db10f703ec72bd",
+    "path": "examples/natural-messages/dotnet-lib-core/generation.json",
+    "sha256": "23d94774894572d5424eaad9555ffc8ea8395f56fe829852385885aecbd9fb57"
+  },
+  "publicPublication": false,
+  "schema": "teaql.native-natural-message-generation/v1"
+}

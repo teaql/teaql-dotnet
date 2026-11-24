@@ -1,0 +1,59 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/conformance",
+  "library": {
+    "generatedFilesManifestSHA256": "35a57fb9d0012373b997870a1e7afccf7448338f077461049c158a487998cbb4",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build; not a public release",
+      "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
+      "qualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
+      "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+      "tag": "unreleased-source-021b1ed8"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/work-item-generation/receipt.json",
+    "receiptSHA256": "99afd2b0806d9aec86d271cd5154f9447b895e9f3a5e69f2e95468bcd8a1644a"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-work-item/runtime/conformance/business-receipt.json",
+    "businessReceiptSHA256": "539623552ba2bc7d990caddbff00b8037a7ea8ec723804b9cc551ff7c562cdf5",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-work-item/receipt.json",
+    "nativeReceiptSHA256": "e8f50b0a985be28a3fbd0641bae17feeaf48c1f0f352cff07f1cf87ce31a32ba",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
+  },
+  "scene": "Work item creation, governed validation, typed queries and lifecycle",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "verify.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "ManagedConstructionChecks.cs",
+      "runtime-example-conformance-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/WorkItem.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/WorkItemRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "6295c108e68044e25da63f6f132661c0c56761effa9948402cf3ce71113ad3fb",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

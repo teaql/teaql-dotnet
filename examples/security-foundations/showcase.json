@@ -1,0 +1,60 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/security-foundations",
+  "library": {
+    "generatedFilesManifestSHA256": "f0db951331050139a577d717c9590af802d91b1498aa9a4d4c963dcd17b46d47",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "4bd3524659417a530665b6bcbfec928ee3e5845f2e96570346193fd64981551a"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build",
+      "jarSHA256": "029f602cf0e2de4ec0910495c340fbeb41f11772b6aca875569f498811158e7d",
+      "qualificationReceiptSHA256": "1012520de60d49cfc1e45c7e08fcf204dd2db36a163909e1e36752065a31047a",
+      "sourceCommit": "99d6bde2351d79b7d8b1b1c5cbc78c5dc777b6f2",
+      "tag": "unreleased-source-99d6bde2"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/order-privacy-and-federation-generation/receipt.json",
+    "receiptSHA256": "0ae62ffb613692c2d0922b4da1b1dbb9ca6081e8a36a5786a27029a614b711d1"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-merchant-order-privacy-native-with-profile/business-receipt.json",
+    "businessReceiptSHA256": "35b9ce0be059714e498ba61afeeeabe8e02f710f139131c179279918de6d80a9",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-merchant-order-privacy-native-with-profile/receipt.json",
+    "nativeReceiptSHA256": "eab1631bf6c5d9c22a9817ce504fdaa53dec75fd4c803b789bdd2f4cd88a5f61",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "6b0584ac166ccae6d530ceb26536e5efac481aee"
+  },
+  "scene": "View one authorized merchant order while protecting customer data in SQL diagnostics",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "examples/security-foundations/verify-privacy.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "merchant-order-privacy-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/CustomerOrder.cs",
+      "Models/CustomerProfile.cs",
+      "Models/Merchant.cs",
+      "Q.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/CustomerProfileRequest.cs",
+      "Requests/MerchantRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "278c3ad5976b87ce85e004e2baa1a7bceec158c0186d139d782d94b9f11514f3",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

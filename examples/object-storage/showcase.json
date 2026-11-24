@@ -1,0 +1,60 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/object-storage",
+  "library": {
+    "generatedFilesManifestSHA256": "283149d802e73c7b0f22c438fe18aa07d025eff962e34f438cbe8eebb78c1c7b",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "1e35ffb88509f292b75620d82996bbc50868c61fd34716f8be010dff7280eafc"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build",
+      "jarSHA256": "029f602cf0e2de4ec0910495c340fbeb41f11772b6aca875569f498811158e7d",
+      "qualificationReceiptSHA256": "1012520de60d49cfc1e45c7e08fcf204dd2db36a163909e1e36752065a31047a",
+      "sourceCommit": "99d6bde2351d79b7d8b1b1c5cbc78c5dc777b6f2",
+      "tag": "unreleased-source-99d6bde2"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/order-attachment-generation/receipt.json",
+    "receiptSHA256": "715bd8f8f61f6ecd96611db1121cb54ce40d72f533b23289c5919e92de0cd95e"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-order-attachment-schema-provider/runtime/object-storage/receipt.json",
+    "businessReceiptSHA256": "4c58987f3d3448d76af8ee5aa200c7ec78f7edd11139c066e924f9213d22de97",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-order-attachment-schema-provider/receipt.json",
+    "nativeReceiptSHA256": "537ca7e970bf44eb7d4af493151922a98092b5b918640c12bf1c69f98f60141a",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "ff3ecac650129d60f75cf214cedce7f3edf3639e"
+  },
+  "scene": "Store and retrieve an order receipt through a trusted provider",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "examples/object-storage/verify.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "order-attachment-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/CommercePlatform.cs",
+      "Models/CustomerOrder.cs",
+      "Models/OrderAttachment.cs",
+      "Q.cs",
+      "Requests/CommercePlatformRequest.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/OrderAttachmentRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "9cfd6f6ce1242172d8a4754cfef5d8b8c9f7886943772590f547c286ac6aa9cf",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

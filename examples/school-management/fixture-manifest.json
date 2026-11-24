@@ -1,33 +1,32 @@
 {
-  "schema": "teaql.retained-example-fixture/v1",
-  "modelSource": "examples/school-management/models/school-model.xml",
-  "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
   "evaluatedScope": "dotnet-lib-core",
   "evaluationErrors": 0,
-  "evaluationWarnings": 0,
-  "producerSource": {
-    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
-  },
-  "producerReceiptSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "generatedManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
   "files": {
     "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
-    "Requests/PlatformRequest.cs": "21edae3feb1be558018545dad2c0a99d5ba94cf959933413334a649b3d8c5797",
-    "Requests/SchoolTypeRequest.cs": "78b4cad538deb71970dae0c068feb0949285a9e53d1826e6784a4b1a9c217dea",
-    "Requests/SchoolRequest.cs": "9e404d008524c1fb9c08cfdf893b4248ef0edd587f9cf38c65185ec8ed03ed64",
+    "GeneratedRuntimeModule.cs": "5331337c0dcd075e4db592f5cbae009fbf194ef5bf2701ac37ff3219c84fd674",
     "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
-    "school-management-service-lib.csproj": "217446dca3cae69ba86062b198369049409db28917400425842ee070a2104d5d",
-    "GeneratedRuntimeModule.cs": "8fa82e014d85f09cb4a6187ea0a9ed5cebaa3ced5a4a238c13d7404d02c30edf",
-    "Models/Platform.cs": "e3091fadceae37f315f8c06bd454f8f77a24c314b8001ab529da86dc6c92092a",
-    "Models/SchoolType.cs": "c5987f376e275b02f4d7ba1f4c241a98218b61763065c7d7baab84ebfaf33f27",
-    "Models/School.cs": "65a050216ccbdb9ceb31f95c4b8a27c57764af2654343e1e3a15529b4a83763d",
+    "Models/Platform.cs": "accb001ee51834de0f37087ad7ca0d60083921eefb61b0ceacde48c39f34cfc2",
+    "Models/School.cs": "70bdd57d477ce3b1581270bfd8662c410cf08858494312e2c60afa26cba85b7a",
+    "Models/SchoolType.cs": "da9ed1aed679b8b5c655293d3007241928d844c6b0267d3f8f3a3e38537c7d1e",
+    "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97",
+    "Requests/PlatformRequest.cs": "43040fc9844dd0d04dc8e0af86965b6b7a3392a939143fb0d8e755dd49e40c55",
+    "Requests/SchoolRequest.cs": "65fe52f792b95687fdf4bcffaf929b60a90d75a0765af8be142e6e54ac101236",
+    "Requests/SchoolTypeRequest.cs": "809bfb54e9d49be334150cfbfd89842fbd5f316f64bb2086919648b764fee598",
+    "school-management-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
     "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
-    "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97"
+    "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
+    "teaql/model-provenance.json": "64afef3716a34e89207c9b6d182a9bce8965325a2994d41e763f77b917842a2f"
   },
-  "previousFixtureManifestSha256": "fc59b60915aea9ffe3d4bb1f1b937bfab9543674df7bdeed5c1b9b828c838d69",
-  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
-  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9"
+  "generationReceipt": "../generator-v5.0.2.json",
+  "generatorCommit": "80fe610d358e923724ddccac84a48d6e4ec5c806",
+  "generatorJarSHA256": "107fb340c0534fb2548dc0b7228554ce3fc080524353df6a9f6d7ad9388471bb",
+  "generatorRelease": "v5.0.2",
+  "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
+  "modelSource": "examples/school-management/models/school-model.xml",
+  "previousOrigin": {
+    "commit": "e62edea17a950c837e6be2cab2db10f703ec72bd",
+    "path": "examples/school-management/fixture-manifest.json",
+    "sha256": "98540061644407770a95d3dac0721e45c6125b1bd87464772e287d14dc7b79f6"
+  },
+  "schema": "teaql.retained-example-fixture/v1"
 }

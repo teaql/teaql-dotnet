@@ -388,7 +388,7 @@ cleanup. Four 1,500-query pressure replays verify recovered capacity, about
 active HTTP after all three transports close. Typed Q/E and audited saves still
 work after shutdown. Advanced graph/stream and internal artifacts remain open.
 
-The [complete Order example](examples/trace-chain/standard-order/Program.cs) uses
+The [complete Order example](examples/trace-chain/standard-order/dotnet-app-console/Program.cs) uses
 generated Q/E, `Offset/Limit + ExecuteForListAsync`, explicit count, relationship
 previews and facets. Count and data statements share one list-operation root.
 Its source gate uses the checked-in generated library and runs twice on one
@@ -403,7 +403,7 @@ These are local source-module gates, not a claim that a new public package has
 been released. Collector failures cannot substitute for or disable durable
 business audit delivery.
 
-The [standard graph example](examples/trace-chain/standard-graph/Program.cs)
+The [standard graph example](examples/trace-chain/standard-graph/dotnet-app-console/Program.cs)
 also verifies inherited and explicit per-entity reasons, mixed create/update/
 version-backed delete, independent same-ID entity versions and four-level E
 traversal. Its generated library is checked in, with runtime dependencies bound
@@ -418,7 +418,7 @@ If provider cleanup fails, telemetry records failure and the Context save gate
 is released so later saves can proceed; no already committed transaction is
 rolled back by telemetry.
 
-The [standard scalar-stream example](examples/trace-chain/standard-stream/Program.cs)
+The [standard scalar-stream example](examples/trace-chain/standard-graph/dotnet-app-console/standard-stream/Program.cs)
 uses the same checked-in graph library. It verifies lazy enumeration, immutable
 request capture, three-row completion, one-row early close and cancellation
 inside a prefetched two-row chunk. Only entities delivered to the caller count

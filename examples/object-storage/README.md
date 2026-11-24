@@ -1,5 +1,23 @@
 # Context owned object storage
 
+## File an order receipt
+
+`model.xml` defines the commerce platform, order and attachment. The
+`dotnet-app-console` consumes the generated domain library and installs the S3
+provider in trusted Context setup. It uploads a receipt, saves its order
+association through the generated mutation API, then uses generated Q and E
+to recover the reference and verify the downloaded content.
+
+Run `bash examples/object-storage/verify.sh` with the dedicated test fixture.
+The verifier preserves the original S3 tests and runs the business scenario
+twice on one SQLite database. A create-only conflict and an undersized read
+leave the downloaded content intact. The workspace deletes its own test object
+and confirms a fresh read reports missing while the association remains.
+Set `TEAQL_ORDER_ATTACHMENT_EVIDENCE_DIR` to retain the fresh logs, database and
+downloaded fixture bytes in a chosen directory.
+
+## Provider setup
+
 Tracking: [.NET #52](https://github.com/teaql/teaql-dotnet/issues/52),
 [shared contract #122](https://github.com/teaql/teaql-conformance/issues/122).
 

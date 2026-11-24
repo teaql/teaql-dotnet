@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public ProductRequest()
@@ -120,57 +120,57 @@ namespace Generated.Requests
 
         public ProductRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("name");
-            _query.Project("sku");
-            _query.Project("image_url");
-            _query.Project("commerce_platform");
-            _query.Project("create_time");
-            _query.Project("update_time");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public ProductRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest SelectName()
                 {
-                    _query.Project("name");
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest SelectSku()
                 {
-                    _query.Project("sku");
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest SelectImageUrl()
                 {
-                    _query.Project("image_url");
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public ProductRequest SelectCreateTime()
                 {
-                    _query.Project("create_time");
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest SelectUpdateTime()
                 {
-                    _query.Project("update_time");
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -181,713 +181,713 @@ namespace Generated.Requests
 
                 public ProductRequest SelectCommercePlatformWith(CommercePlatformRequest related)
                 {
-                    _query.Project("commerce_platform");
-                    _query.ForwardRelationQuery("CommercePlatform", "CommercePlatform", "commerce_platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, "CommercePlatform", global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCommercePlatformWith", Relation: "CommercePlatform")
+                        Operation = new QueryOperation("relation", "SelectCommercePlatformWith", Relation: global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public ProductRequest WithCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public ProductRequest WithoutCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
-                public ProductRequest WithIdIs(long val)
+                public ProductRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdIsNot(long val)
+                public ProductRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdIn(params long[] vals)
+                public ProductRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithIdNotIn(params long[] vals)
+                public ProductRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithIdGreaterThan(long val)
+                public ProductRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdGreaterThanOrEqualTo(long val)
+                public ProductRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdLessThan(long val)
+                public ProductRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdLessThanOrEqualTo(long val)
+                public ProductRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithIdBetween(long lower, long upper)
+                public ProductRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ProductRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
-                public ProductRequest WithNameIsNot(string val)
+                public ProductRequest WithNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("name", TeaqlQueryValue(val)));
-                    return this;
-                }
-
-                public ProductRequest WithNameIn(params string[] vals)
-                {
-                    _query.AndFilter(Expr.In("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameNotIn(params string[] vals)
+                public ProductRequest WithNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithNameGreaterThan(string val)
+                public ProductRequest WithNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.Gt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithNameGreaterThanOrEqualTo(string val)
+                public ProductRequest WithNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameLessThan(string val)
+                public ProductRequest WithNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lt("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameLessThanOrEqualTo(string val)
+                public ProductRequest WithNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lte("name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithNameBetween(string lower, string upper)
+                public ProductRequest WithNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Between("name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public ProductRequest WithNameBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ProductRequest WithNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public ProductRequest WithNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithSkuContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("sku", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithSkuIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
-                public ProductRequest WithSkuIsNot(string val)
+                public ProductRequest WithSkuIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("sku", TeaqlQueryValue(val)));
-                    return this;
-                }
-
-                public ProductRequest WithSkuIn(params string[] vals)
-                {
-                    _query.AndFilter(Expr.In("sku", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuNotIn(params string[] vals)
+                public ProductRequest WithSkuIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("sku", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithSkuGreaterThan(string val)
+                public ProductRequest WithSkuNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.Gt("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithSkuGreaterThanOrEqualTo(string val)
+                public ProductRequest WithSkuGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gte("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuLessThan(string val)
+                public ProductRequest WithSkuGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lt("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuLessThanOrEqualTo(string val)
+                public ProductRequest WithSkuLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lte("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithSkuBetween(string lower, string upper)
+                public ProductRequest WithSkuLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Between("sku", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public ProductRequest WithSkuBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ProductRequest WithSkuIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("sku"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithSkuIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("sku"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY));
                     return this;
                 }
                 public ProductRequest WithSkuNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("sku", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithSkuStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("sku", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithSkuNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("sku", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithSkuEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("sku", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithSkuNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("sku", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithSkuSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("sku", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("image_url", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("image_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
-                public ProductRequest WithImageUrlIsNot(string val)
+                public ProductRequest WithImageUrlIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("image_url", TeaqlQueryValue(val)));
-                    return this;
-                }
-
-                public ProductRequest WithImageUrlIn(params string[] vals)
-                {
-                    _query.AndFilter(Expr.In("image_url", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlNotIn(params string[] vals)
+                public ProductRequest WithImageUrlIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("image_url", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlGreaterThan(string val)
+                public ProductRequest WithImageUrlNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.Gt("image_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlGreaterThanOrEqualTo(string val)
+                public ProductRequest WithImageUrlGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gte("image_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlLessThan(string val)
+                public ProductRequest WithImageUrlGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lt("image_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlLessThanOrEqualTo(string val)
+                public ProductRequest WithImageUrlLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lte("image_url", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithImageUrlBetween(string lower, string upper)
+                public ProductRequest WithImageUrlLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Between("image_url", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public ProductRequest WithImageUrlBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("image_url"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("image_url"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY));
                     return this;
                 }
                 public ProductRequest WithImageUrlNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("image_url", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("image_url", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("image_url", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("image_url", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("image_url", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest WithImageUrlSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("image_url", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest FilterByCommercePlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("commerce_platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public ProductRequest FilterByCommercePlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("commerce_platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public ProductRequest WithCommercePlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("commerce_platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithCommercePlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("commerce_platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeIs(long val)
+                public ProductRequest WithCreateTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeIsNot(long val)
+                public ProductRequest WithCreateTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeIn(params long[] vals)
+                public ProductRequest WithCreateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeNotIn(params long[] vals)
+                public ProductRequest WithCreateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeGreaterThan(long val)
+                public ProductRequest WithCreateTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeGreaterThanOrEqualTo(long val)
+                public ProductRequest WithCreateTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeLessThan(long val)
+                public ProductRequest WithCreateTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeLessThanOrEqualTo(long val)
+                public ProductRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithCreateTimeBetween(long lower, long upper)
+                public ProductRequest WithCreateTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ProductRequest WithCreateTimeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("create_time"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithCreateTimeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("create_time"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeIs(long val)
+                public ProductRequest WithUpdateTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeIsNot(long val)
+                public ProductRequest WithUpdateTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeIn(params long[] vals)
+                public ProductRequest WithUpdateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeNotIn(params long[] vals)
+                public ProductRequest WithUpdateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeGreaterThan(long val)
+                public ProductRequest WithUpdateTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeGreaterThanOrEqualTo(long val)
+                public ProductRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeLessThan(long val)
+                public ProductRequest WithUpdateTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeLessThanOrEqualTo(long val)
+                public ProductRequest WithUpdateTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithUpdateTimeBetween(long lower, long upper)
+                public ProductRequest WithUpdateTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ProductRequest WithUpdateTimeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("update_time"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithUpdateTimeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("update_time"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
-                public ProductRequest WithVersionIs(long val)
+                public ProductRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionIsNot(long val)
+                public ProductRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionIn(params long[] vals)
+                public ProductRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithVersionNotIn(params long[] vals)
+                public ProductRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ProductRequest WithVersionGreaterThan(long val)
+                public ProductRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionGreaterThanOrEqualTo(long val)
+                public ProductRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionLessThan(long val)
+                public ProductRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionLessThanOrEqualTo(long val)
+                public ProductRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ProductRequest WithVersionBetween(long lower, long upper)
+                public ProductRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public ProductRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public ProductRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ProductRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ProductRequest OrderByNameAscending()
                 {
-                    _query.OrderBy("name", "asc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ProductRequest OrderByNameDescending()
                 {
-                    _query.OrderBy("name", "desc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ProductRequest OrderBySkuAscending()
                 {
-                    _query.OrderBy("sku", "asc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ProductRequest OrderBySkuDescending()
                 {
-                    _query.OrderBy("sku", "desc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ProductRequest OrderByImageUrlAscending()
                 {
-                    _query.OrderBy("image_url", "asc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ProductRequest OrderByImageUrlDescending()
                 {
-                    _query.OrderBy("image_url", "desc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public ProductRequest OrderByCreateTimeAscending()
                 {
-                    _query.OrderBy("create_time", "asc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ProductRequest OrderByCreateTimeDescending()
                 {
-                    _query.OrderBy("create_time", "desc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ProductRequest OrderByUpdateTimeAscending()
                 {
-                    _query.OrderBy("update_time", "asc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ProductRequest OrderByUpdateTimeDescending()
                 {
-                    _query.OrderBy("update_time", "desc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public ProductRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public ProductRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -907,98 +907,90 @@ namespace Generated.Requests
 
                 public ProductRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest GroupByName()
                 {
-                    _query.GroupBy("name");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupByNameAs(string retName)
                 {
-                    _query.GroupBy("name");
-                    _query.ProjectExpr(retName, Expr.Column("name"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest GroupBySku()
                 {
-                    _query.GroupBy("sku");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupBySkuAs(string retName)
                 {
-                    _query.GroupBy("sku");
-                    _query.ProjectExpr(retName, Expr.Column("sku"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest GroupByImageUrl()
                 {
-                    _query.GroupBy("image_url");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupByImageUrlAs(string retName)
                 {
-                    _query.GroupBy("image_url");
-                    _query.ProjectExpr(retName, Expr.Column("image_url"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.IMAGE_URL_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest GroupByCommercePlatform()
                 {
-                    _query.GroupBy("commerce_platform");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupByCommercePlatformAs(string retName)
                 {
-                    _query.GroupBy("commerce_platform");
-                    _query.ProjectExpr(retName, Expr.Column("commerce_platform"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest GroupByCreateTime()
                 {
-                    _query.GroupBy("create_time");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time");
-                    _query.ProjectExpr(retName, Expr.Column("create_time"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest GroupByUpdateTime()
                 {
-                    _query.GroupBy("update_time");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupByUpdateTimeAs(string retName)
                 {
-                    _query.GroupBy("update_time");
-                    _query.ProjectExpr(retName, Expr.Column("update_time"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.UPDATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public ProductRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy(global::Generated.Models.Product.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public ProductRequest SelectOrderLineList()
@@ -1163,8 +1155,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "CommercePlatform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCommercePlatformAs", name, "commerce_platform")
+                        name, global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCommercePlatformAs", name, global::Generated.Models.Product.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }
@@ -1181,29 +1173,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.Product?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.Product.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.Product>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.Product>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.Product>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.Product>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -1225,6 +1222,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.Product.FromRecord(row, new EntityRoot()), request.Query),
@@ -1274,11 +1273,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("Product").ConfigureAwait(false));
-            var entity = Generated.Models.Product.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("Product", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("Product", Generated.Models.Product.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

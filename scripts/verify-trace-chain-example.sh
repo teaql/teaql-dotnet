@@ -2,18 +2,20 @@
 set -euo pipefail
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 example="$repo/examples/trace-chain"
-database="${TEAQL_TRACE_CHAIN_DB:-$repo/examples/.local/trace-chain.sqlite}"
+evidence="${TEAQL_TRACE_CHAIN_EVIDENCE_DIRECTORY:-$(mktemp -d -t teaql-dotnet-trace.XXXXXXXX)}"
+mkdir -p "$evidence"
+database="${TEAQL_TRACE_CHAIN_DB:-$evidence/trace-chain.sqlite}"
 source_root="${TeaQLRuntimeSourceRoot:-$repo}"
 fingerprint() {
-  rg --files "$example/lib" -g '*.cs' -g '*.csproj' -g '!**/obj/**' -g '!**/bin/**' |
+  rg --files "$example/dotnet-lib-core" -g '*.cs' -g '*.csproj' -g '!**/obj/**' -g '!**/bin/**' |
     LC_ALL=C sort | xargs -d '\n' sha256sum
 }
 before="$(fingerprint)"
 for round in 1 2; do
   echo "TRACE CHAIN round $round on the same retained database $database"
-  run_log="$(mktemp -t teaql-dotnet-trace-chain.XXXXXX.log)"
+  run_log="$evidence/run-$round.log"
   env -u TEAQL_TRACE_CHAIN_SCENARIO dotnet run --property:TeaQLRuntimeSourceRoot="$source_root" \
-    --project "$example/trace-chain.csproj" -- --database "$database" | tee "$run_log"
+    --project "$example/dotnet-app-console/trace-chain-service-console.csproj" -- --database "$database" | tee "$run_log"
   rg -Fq 'PASS: .NET generated trace-chain 6 scenarios' "$run_log"
   for logging in false true; do
     rg -q "TC-REQ-09 DOTNET GENERATED BOOTSTRAP PASSED logging=$logging first_writes=[01] repeat_writes=0" "$run_log"

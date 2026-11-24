@@ -1,0 +1,1666 @@
+{
+  "jarSHA256": "107fb340c0534fb2548dc0b7228554ce3fc080524353df6a9f6d7ad9388471bb",
+  "release": "v5.0.2",
+  "schema": "teaql.runtime-example-regeneration/v1",
+  "scopes": {
+    "examples/business-id/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "9df3b08c07b9a38e5e0950e53c7a36835566ecf687bd87b66c67bb78abe63fdc",
+        "teaql/model-provenance.json": "ab2e99dd98c6c94990fc1d39887df6db092495eb27a1ed8b363b04893a50e245"
+      },
+      "model": "examples/business-id/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "04eb9dcc3062ceae19a3de676d89d9ad8647fb0d691f3ad653b6ba4462904c71",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:ae5ea6f908693b88007259e6347336dc7d1a5469b4c3db8e554eec0c27e4e30f",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "8d5f245b45a8812e2a5910f396a2aa95a9f2d81b32b1fb8c345000ac0e1d3920",
+          "sourceSHA256": "8d5f245b45a8812e2a5910f396a2aa95a9f2d81b32b1fb8c345000ac0e1d3920"
+        },
+        "Program.cs": {
+          "emittedSHA256": "d78b6aead3bbf736deb2770821d86a15fd6674a28223f4cc6c9be33ab9bf76de",
+          "sourceSHA256": "f3573062e633064b8304441d0427a4263c8ff2358b448c411626d5cebe4f6599"
+        },
+        "README.md": {
+          "emittedSHA256": "7d5939b63501f840edd9222a9ecd08d67d8b1df159134294f30f87466465a1a9",
+          "sourceSHA256": "7d5939b63501f840edd9222a9ecd08d67d8b1df159134294f30f87466465a1a9"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "purchase-order-numbering-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "ed62fc437d2bc1b7511940cab361777fc387352723a46ff6eeb757859d1ea072"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "6c1af4fb7d421f2a554c1b52077f9fbc736d5e17623c3305b20a0d030672937f",
+          "sourceSHA256": "6c1af4fb7d421f2a554c1b52077f9fbc736d5e17623c3305b20a0d030672937f"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/business-id/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "09ae91db6c3ae16ce76924ae34a3f2d2ef751e8959fefb8bf375bce4d11095b6",
+        "GeneratedRuntimeModule.cs": "448ba2a2960d46af22504562286919e21d2411f042f2a20f8b079e7dc94d5dc6",
+        "GeneratedSearchModels.cs": "1379edd9fbe6c6e2584a560a6e3519c0182e27c2094ed9063c8116bc01b5f126",
+        "Models/Platform.cs": "bde06016a2970917d6dbbdc5de304347625582e7312d43695735c77a9766ff93",
+        "Models/PurchaseOrder.cs": "82cc9584975bc5c441862165b15797ed77f7ae3a96bb003535cf5395e68f5c67",
+        "Q.cs": "12b85f56240c84dee16d77b88902076c0d841969b4ed70d275cca3a16a1fc77d",
+        "Requests/PlatformRequest.cs": "9ca2d3b29119c5cbd7c8042cd9c45e807f0798ff7a1e2257609c70a88a047693",
+        "Requests/PurchaseOrderRequest.cs": "50e332be144422468610f4ba3d2af1bc451199e6e1a43140f8983283b090ce4c",
+        "teaql-i18n.json": "6c1af4fb7d421f2a554c1b52077f9fbc736d5e17623c3305b20a0d030672937f",
+        "teaql/checker-model.json": "9df3b08c07b9a38e5e0950e53c7a36835566ecf687bd87b66c67bb78abe63fdc",
+        "teaql/model-provenance.json": "ab2e99dd98c6c94990fc1d39887df6db092495eb27a1ed8b363b04893a50e245"
+      },
+      "model": "examples/business-id/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "04eb9dcc3062ceae19a3de676d89d9ad8647fb0d691f3ad653b6ba4462904c71",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:ae5ea6f908693b88007259e6347336dc7d1a5469b4c3db8e554eec0c27e4e30f",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "purchase-order-numbering-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/conformance/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "4824e2986933569c4d827ca44cae7e3a028012aec1e7dbacd245fff5fd5ffe1b",
+        "teaql/model-provenance.json": "e11f1cfa5d498cfa7b6e3214e1656c3dcccb35219b1795315f3add6f270e5775"
+      },
+      "model": "examples/conformance/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:15e3876863021b944cb4a7d74ae399afca20e12d724328cf21ae9805289b83d5",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "4e2afb881031a28d260241a45f069cec5847d72e126079afa5fd7ac432be0524",
+          "sourceSHA256": "4e2afb881031a28d260241a45f069cec5847d72e126079afa5fd7ac432be0524"
+        },
+        "Program.cs": {
+          "emittedSHA256": "b34f9d6d63e627184fca216a5ce9c1ef34b0d4ed44b8ea34f00dfe700854b280",
+          "sourceSHA256": "2a3bbab93217e16e7bdc81f51e965dc70702b6c1f4539d9355f735698a0d4407"
+        },
+        "README.md": {
+          "emittedSHA256": "c1c8accee416cc753e03a29a425671df423c1daeaae39b1b0bfb436198632cec",
+          "sourceSHA256": "c1c8accee416cc753e03a29a425671df423c1daeaae39b1b0bfb436198632cec"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "runtime-example-conformance-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "bbfbd71d1f89d881ec5ba9540ef929d24d91b0613d2856ac3c5565142ed2a78c"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "fa0ea9576dccfb6ef4e940b00b53abb843ee492741e98da5001e6ea2ad79b2cb",
+          "sourceSHA256": "fa0ea9576dccfb6ef4e940b00b53abb843ee492741e98da5001e6ea2ad79b2cb"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/conformance/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "c5abf3e9959ef6903572930409db4ff066847c624307d65f517628a6b9dd76a5",
+        "GeneratedRuntimeModule.cs": "714e1c2b0bea2fbf9e9e60b7599d5f5d5446e0513010c82b892e97be7f756d7b",
+        "GeneratedSearchModels.cs": "3f4e30fe802c4cb71fa5c35333336ca4b4439db3c3e358ec9ae760f3c879c53f",
+        "Models/Platform.cs": "8b8ad62f8c8721c91a28e9d8d449bf528fa64211743c575ae757cc8b2971c780",
+        "Models/WorkItem.cs": "723b2995466036bfeae1acf0f5cd6f31898028cafaf0944963ed00ad0b9f0a86",
+        "Q.cs": "df7f8f1301551068b1d95ab39f8bd9a6a25aaaa3af54d4871097ea4e4117ed92",
+        "Requests/PlatformRequest.cs": "4b57c8c191f5829f3bcbd61a3445061a07d7ebb0472f1ce78a0211f23656432a",
+        "Requests/WorkItemRequest.cs": "fdd205668b36e5858cb4cc7545944826ddd3131f9967a41313c4e1f7a1fa4121",
+        "teaql-i18n.json": "fa0ea9576dccfb6ef4e940b00b53abb843ee492741e98da5001e6ea2ad79b2cb",
+        "teaql/checker-model.json": "4824e2986933569c4d827ca44cae7e3a028012aec1e7dbacd245fff5fd5ffe1b",
+        "teaql/model-provenance.json": "e11f1cfa5d498cfa7b6e3214e1656c3dcccb35219b1795315f3add6f270e5775"
+      },
+      "model": "examples/conformance/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "0a59f66db2487fdd0430087dd5985ae780225c088ad800679cb57c593c6bcee7",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:15e3876863021b944cb4a7d74ae399afca20e12d724328cf21ae9805289b83d5",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "runtime-example-conformance-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/context-derived/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "b0cce8e03720ef6aefdf8ed8386c79d1270268dc6e41f762033d32516da2cbfd",
+        "teaql/model-provenance.json": "9f174126167aff9b4230221790d4a6ca525dd4cde29d122a7ff27e34e1c5947c"
+      },
+      "model": "examples/context-derived/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "c999381a5e3051e5b6ab9e5b027a2f1f5b568adf32d97c2accec5a4fb4472c0a",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:23179a63acf0e740453c8dba118e0a9593c27d250c24df75183d60f4793f8625",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "265027563efd5ad186c14961e4a684c5bfccf4a673d60a6e47f77fa88efd1592",
+          "sourceSHA256": "265027563efd5ad186c14961e4a684c5bfccf4a673d60a6e47f77fa88efd1592"
+        },
+        "Program.cs": {
+          "emittedSHA256": "91509e0a8592862fa3be9ea7e82b8e5214eadf30e57f3d9adc233f56921c0318",
+          "sourceSHA256": "91509e0a8592862fa3be9ea7e82b8e5214eadf30e57f3d9adc233f56921c0318"
+        },
+        "README.md": {
+          "emittedSHA256": "d30ce428e85a384449ed11a9ec2377cf089ac7244ef8c2fe97a54f5769e6cbac",
+          "sourceSHA256": "d30ce428e85a384449ed11a9ec2377cf089ac7244ef8c2fe97a54f5769e6cbac"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "context-fix-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "bf5d2156267a6c0b7e9f7097a119d8e75c430873c7fa04f8d7619b86de9b8fa5"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "872f2be4fb4df7d76c732d627ae016b07cb39591ef833169277c67db4ec726e8",
+          "sourceSHA256": "872f2be4fb4df7d76c732d627ae016b07cb39591ef833169277c67db4ec726e8"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/context-derived/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "a4839677213d1943c84e5765fc0976b75172759f790a3d5d2ba4ec8d96284ef9",
+        "GeneratedRuntimeModule.cs": "c0fc45c2108f82ea60e0843125b3eb56c4b9f64962205bbacd4277243bf97163",
+        "GeneratedSearchModels.cs": "398cc6b278a3f4d9c891f8f2fa36e7e5fb18a5abcb8b6206eed67dd8577fa94d",
+        "Models/Catalog.cs": "be9f929dcd7b01184105d5ca953f771ae83dd3212f10c6339decea7eabe48308",
+        "Models/Entry.cs": "2d7166c933be00f3bf5c4c0ef9d2e031c4bb3c074c02b372d1b06259e1da7223",
+        "Q.cs": "c5ed8382ab2236c771413964ee54f9013fd122d72adf6b3be0b69e4e79ac9c2e",
+        "Requests/CatalogRequest.cs": "3f34ba15b1d2ee9bd2c53507835646e0fa7142d7024dc94d57972d332e066b81",
+        "Requests/EntryRequest.cs": "47ed2c55e9fb5f4a186494fc2e3adbea3a30880b7d9d40e981e699925ea61e0d",
+        "teaql-i18n.json": "872f2be4fb4df7d76c732d627ae016b07cb39591ef833169277c67db4ec726e8",
+        "teaql/checker-model.json": "b0cce8e03720ef6aefdf8ed8386c79d1270268dc6e41f762033d32516da2cbfd",
+        "teaql/model-provenance.json": "9f174126167aff9b4230221790d4a6ca525dd4cde29d122a7ff27e34e1c5947c"
+      },
+      "model": "examples/context-derived/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "c999381a5e3051e5b6ab9e5b027a2f1f5b568adf32d97c2accec5a4fb4472c0a",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:23179a63acf0e740453c8dba118e0a9593c27d250c24df75183d60f4793f8625",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "context-fix-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/expression-profiles/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "05baf453f49fd71c73a6499a9f2e3600546a8f13f9ae6b707d700e2a8c589f5e",
+        "teaql/model-provenance.json": "f25e7db53d5686e2879959db5e52a46f774474109e2c6da35d618464acb2f3c3"
+      },
+      "model": "examples/expression-profiles/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "80efe091edc3c7e43fa0b654cc1fecf65fda6664434b3a3ee8d8676027e70ede",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:82928fecf7bfba6e8b5a07dd27bb007e24489b0f739d9e9ceb5dbfcb9bb56357",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "663f26eac4334e5663482d9510737d769f6e10b5abe9d65d88f562f36bb85624",
+          "sourceSHA256": "663f26eac4334e5663482d9510737d769f6e10b5abe9d65d88f562f36bb85624"
+        },
+        "Program.cs": {
+          "emittedSHA256": "d61d2f46930b2496f1bbf41651e1514c83661db3524dd3f434ba4638f9dc3b09",
+          "sourceSHA256": "4d97085bbc357eee2bd9f42e2a5f3c6769e3d01e0a3150024bf6fcc8360efea0"
+        },
+        "README.md": {
+          "emittedSHA256": "3a50d0dab3123194c8eebe40aa2cc8262907e83a1d73af30cafe13a5b3be8d4e",
+          "sourceSHA256": "3a50d0dab3123194c8eebe40aa2cc8262907e83a1d73af30cafe13a5b3be8d4e"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "dispatch-document-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "4fb7c20d9a771ae8ae686f478635ddc78da47f6794f0876b21d770446a1c982b"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9",
+          "sourceSHA256": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/expression-profiles/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "fd7f943dea802ff67bb30318c95c7ee46936489794d538d961788da7ebdea396",
+        "GeneratedRuntimeModule.cs": "483abda286471bb48505d848cbd2141ac766a4d78735e084eb2cab256e4f7728",
+        "GeneratedSearchModels.cs": "869bc6a1692d0bc61ed8540f7278c45975144b41ba0027af549bbea0881ed4c3",
+        "Models/DispatchOrder.cs": "fe74233847263cb2f09ab80c2200708f5f1cad2138f094e1aae2881064f1724a",
+        "Models/DistributionCenter.cs": "ecb0f38ebe93bd0b33a9ef9d61e0798d45537112adeb9058eab967a9e9ac38c0",
+        "Q.cs": "75b54fe85baac895bb1dfb899ec35bd153a526d625d4601367847c517ec068ae",
+        "Requests/DispatchOrderRequest.cs": "5b2055d610711b377cac5a3c1032796511ec8bf0d1d05f26110f88eb5148868e",
+        "Requests/DistributionCenterRequest.cs": "0aab35600a62817419e0c0726e78991be4efc1ee1a5a8d7b873417a22ffc1822",
+        "teaql-i18n.json": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9",
+        "teaql/checker-model.json": "05baf453f49fd71c73a6499a9f2e3600546a8f13f9ae6b707d700e2a8c589f5e",
+        "teaql/model-provenance.json": "f25e7db53d5686e2879959db5e52a46f774474109e2c6da35d618464acb2f3c3"
+      },
+      "model": "examples/expression-profiles/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "80efe091edc3c7e43fa0b654cc1fecf65fda6664434b3a3ee8d8676027e70ede",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:82928fecf7bfba6e8b5a07dd27bb007e24489b0f739d9e9ceb5dbfcb9bb56357",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "dispatch-document-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/expression-profiles/profiles/PascalCase/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "05baf453f49fd71c73a6499a9f2e3600546a8f13f9ae6b707d700e2a8c589f5e",
+        "teaql/model-provenance.json": "f6b16c794f7cd818d4c3660e52ca7806f03fdaecc8e5805fefee25a0b21f5d7f"
+      },
+      "model": "examples/expression-profiles/profiles/PascalCase/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "0b74f30c25123ae9e3a65799cfb5a67f46b96f985b4a0dad1a1daa9ed52d80be",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:c81061a7486ddff695193e6b0e4922a72da08c3b8d83a49adaf116da8a60eea3",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "663f26eac4334e5663482d9510737d769f6e10b5abe9d65d88f562f36bb85624",
+          "sourceSHA256": "663f26eac4334e5663482d9510737d769f6e10b5abe9d65d88f562f36bb85624"
+        },
+        "Program.cs": {
+          "emittedSHA256": "d61d2f46930b2496f1bbf41651e1514c83661db3524dd3f434ba4638f9dc3b09",
+          "sourceSHA256": "4d97085bbc357eee2bd9f42e2a5f3c6769e3d01e0a3150024bf6fcc8360efea0"
+        },
+        "README.md": {
+          "emittedSHA256": "3a50d0dab3123194c8eebe40aa2cc8262907e83a1d73af30cafe13a5b3be8d4e",
+          "sourceSHA256": "3a50d0dab3123194c8eebe40aa2cc8262907e83a1d73af30cafe13a5b3be8d4e"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "dispatch-document-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "4fb7c20d9a771ae8ae686f478635ddc78da47f6794f0876b21d770446a1c982b"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9",
+          "sourceSHA256": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/expression-profiles/profiles/PascalCase/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "474ef1f9b456390bd2262db5b554ace9f0cc71cbe40fb18db4dd58929ca4451b",
+        "GeneratedRuntimeModule.cs": "d5e8547001839810747823db537818b2965652b297efce51bf2e7dd732360891",
+        "GeneratedSearchModels.cs": "494b03545b82480e7ef868a27cf97960f5a736846f83547a061ea8f1f18ba8e8",
+        "Models/DispatchOrder.cs": "35b5c747373d1ff4462a78f7828a6af33d26f10411fabcdf49cbb5d6d556b1b1",
+        "Models/DistributionCenter.cs": "bd295b480e6c9791f74b9942866185cc6996264a639af149725ca01ce4ba0750",
+        "Q.cs": "75b54fe85baac895bb1dfb899ec35bd153a526d625d4601367847c517ec068ae",
+        "Requests/DispatchOrderRequest.cs": "5b2055d610711b377cac5a3c1032796511ec8bf0d1d05f26110f88eb5148868e",
+        "Requests/DistributionCenterRequest.cs": "0aab35600a62817419e0c0726e78991be4efc1ee1a5a8d7b873417a22ffc1822",
+        "teaql-i18n.json": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9",
+        "teaql/checker-model.json": "05baf453f49fd71c73a6499a9f2e3600546a8f13f9ae6b707d700e2a8c589f5e",
+        "teaql/model-provenance.json": "f6b16c794f7cd818d4c3660e52ca7806f03fdaecc8e5805fefee25a0b21f5d7f"
+      },
+      "model": "examples/expression-profiles/profiles/PascalCase/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "0b74f30c25123ae9e3a65799cfb5a67f46b96f985b4a0dad1a1daa9ed52d80be",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:c81061a7486ddff695193e6b0e4922a72da08c3b8d83a49adaf116da8a60eea3",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "dispatch-document-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/expression-profiles/profiles/snake_case/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "05baf453f49fd71c73a6499a9f2e3600546a8f13f9ae6b707d700e2a8c589f5e",
+        "teaql/model-provenance.json": "40c3014d858c5ff9dab023930395d4afd82472b45b102d5d01bde8125d9ee92f"
+      },
+      "model": "examples/expression-profiles/profiles/snake_case/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "9ef6fdfe684a40e0d027e70c4a819a96a2ea9a8bb5d8ccb9132ac783414ecb48",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:0bc2e816eee3aa4ef14d859ad86a99481dee20b1f0a20e36105acd0d4bf2f2a4",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "663f26eac4334e5663482d9510737d769f6e10b5abe9d65d88f562f36bb85624",
+          "sourceSHA256": "663f26eac4334e5663482d9510737d769f6e10b5abe9d65d88f562f36bb85624"
+        },
+        "Program.cs": {
+          "emittedSHA256": "d61d2f46930b2496f1bbf41651e1514c83661db3524dd3f434ba4638f9dc3b09",
+          "sourceSHA256": "4d97085bbc357eee2bd9f42e2a5f3c6769e3d01e0a3150024bf6fcc8360efea0"
+        },
+        "README.md": {
+          "emittedSHA256": "3a50d0dab3123194c8eebe40aa2cc8262907e83a1d73af30cafe13a5b3be8d4e",
+          "sourceSHA256": "3a50d0dab3123194c8eebe40aa2cc8262907e83a1d73af30cafe13a5b3be8d4e"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "dispatch-document-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "4fb7c20d9a771ae8ae686f478635ddc78da47f6794f0876b21d770446a1c982b"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9",
+          "sourceSHA256": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/expression-profiles/profiles/snake_case/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "5b9db69fc3dba06fff346585ba4b078fe907db7a23592b4f26ae747e06120ef8",
+        "GeneratedRuntimeModule.cs": "1c12decdb9d891b69f142063374b368074e830387a65e8dc5ee939f4343344c5",
+        "GeneratedSearchModels.cs": "869bc6a1692d0bc61ed8540f7278c45975144b41ba0027af549bbea0881ed4c3",
+        "Models/DispatchOrder.cs": "cf5455a2c1a49754add0512eba1daa1be19fda811353d654e83bd23e986c5a8f",
+        "Models/DistributionCenter.cs": "65c6cbf3d300e33f882784b2eb12dba8a17520caadc5a7999016d3a1968ab126",
+        "Q.cs": "75b54fe85baac895bb1dfb899ec35bd153a526d625d4601367847c517ec068ae",
+        "Requests/DispatchOrderRequest.cs": "5b2055d610711b377cac5a3c1032796511ec8bf0d1d05f26110f88eb5148868e",
+        "Requests/DistributionCenterRequest.cs": "0aab35600a62817419e0c0726e78991be4efc1ee1a5a8d7b873417a22ffc1822",
+        "teaql-i18n.json": "f8ee2997dfc1784293d9090d19774c7b5ea8335f6cbd8aa05a1bc7d88ae817f9",
+        "teaql/checker-model.json": "05baf453f49fd71c73a6499a9f2e3600546a8f13f9ae6b707d700e2a8c589f5e",
+        "teaql/model-provenance.json": "40c3014d858c5ff9dab023930395d4afd82472b45b102d5d01bde8125d9ee92f"
+      },
+      "model": "examples/expression-profiles/profiles/snake_case/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "9ef6fdfe684a40e0d027e70c4a819a96a2ea9a8bb5d8ccb9132ac783414ecb48",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:0bc2e816eee3aa4ef14d859ad86a99481dee20b1f0a20e36105acd0d4bf2f2a4",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "dispatch-document-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/facet-trace/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
+        "teaql/model-provenance.json": "87ea51dd53e47b062aec333e330f09a8b0f9cf59a8a6db18579f606ff166ac80"
+      },
+      "model": "examples/facet-trace/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:1aee43620b549fb1ac26f578030a65808e43580078f636e0c58807c623cf784f",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "fd0327f87fe845a37b8d06f897202b1febc24d12ee50b278dbd6ea7becef5a1b",
+          "sourceSHA256": "fd0327f87fe845a37b8d06f897202b1febc24d12ee50b278dbd6ea7becef5a1b"
+        },
+        "Program.cs": {
+          "emittedSHA256": "334ff406e24363acc70b54e0513c151c9c7b1166a3b042f59f17d093745bf39a",
+          "sourceSHA256": "44caa9db5c4accc7049de6eab88203c99389fa1a181f0b6ea82f01881761dbef"
+        },
+        "README.md": {
+          "emittedSHA256": "7f67448b64cec615986aa2cf9e25e6a10c59fd90d413108356978f1d2d8c5198",
+          "sourceSHA256": "7f67448b64cec615986aa2cf9e25e6a10c59fd90d413108356978f1d2d8c5198"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "school-management-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "493b82b1c5537c3c270ba72dd356af91c2b31ccfd3f0f0d8e35f2126d377cec7"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
+          "sourceSHA256": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/facet-trace/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
+        "GeneratedRuntimeModule.cs": "d7a27a000e44725f7a4789a586ec54a4f721b4c38ccf5cbf25aa1e201b882d92",
+        "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
+        "Models/Platform.cs": "accb001ee51834de0f37087ad7ca0d60083921eefb61b0ceacde48c39f34cfc2",
+        "Models/School.cs": "70bdd57d477ce3b1581270bfd8662c410cf08858494312e2c60afa26cba85b7a",
+        "Models/SchoolType.cs": "da9ed1aed679b8b5c655293d3007241928d844c6b0267d3f8f3a3e38537c7d1e",
+        "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97",
+        "Requests/PlatformRequest.cs": "43040fc9844dd0d04dc8e0af86965b6b7a3392a939143fb0d8e755dd49e40c55",
+        "Requests/SchoolRequest.cs": "65fe52f792b95687fdf4bcffaf929b60a90d75a0765af8be142e6e54ac101236",
+        "Requests/SchoolTypeRequest.cs": "809bfb54e9d49be334150cfbfd89842fbd5f316f64bb2086919648b764fee598",
+        "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
+        "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
+        "teaql/model-provenance.json": "87ea51dd53e47b062aec333e330f09a8b0f9cf59a8a6db18579f606ff166ac80"
+      },
+      "model": "examples/facet-trace/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:1aee43620b549fb1ac26f578030a65808e43580078f636e0c58807c623cf784f",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "school-management-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/fix-e-alignment/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "92144f0d6092e143784685a82a9dd67c1672665bbe50fa6ca57b9ad441325b45",
+        "teaql/model-provenance.json": "f2773aa2727ad73c6d589a27ddc7b033c5014582038f913d4a954b961f8b49dd"
+      },
+      "model": "examples/fix-e-alignment/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:96fba0f3e785fef2792149fa1b226f4ea09863f94d4aff4b31427d4875bf612c",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "ed31465c247ab633e2956c62581f108ec4c8f5ceb7da046c3760b8a5dec0dc17",
+          "sourceSHA256": "ed31465c247ab633e2956c62581f108ec4c8f5ceb7da046c3760b8a5dec0dc17"
+        },
+        "Program.cs": {
+          "emittedSHA256": "b92def2315098607652ebe9aabe758750e3a29d5835b660221d7eb72aa273dea",
+          "sourceSHA256": "b92def2315098607652ebe9aabe758750e3a29d5835b660221d7eb72aa273dea"
+        },
+        "README.md": {
+          "emittedSHA256": "390448b02b21f4b13d464a51b355ca40b7dbce350dd9bb830a7a507056ccf353",
+          "sourceSHA256": "390448b02b21f4b13d464a51b355ca40b7dbce350dd9bb830a7a507056ccf353"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "checker-fix-advanced-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "9a62fd67980bc637811aabd2239be0bdba15a8da87be16e558335686121d7e5a"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014",
+          "sourceSHA256": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/fix-e-alignment/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "8260775859cc9cd523543f8822a529a94f7c9841d6bcff72ebced453c41f9078",
+        "GeneratedRuntimeModule.cs": "e3a4b66a0dc85a1c331c5f5fa317ae0394ec6eccafa7e6ce039316f1d1687794",
+        "GeneratedSearchModels.cs": "e94d95ccc51b95e06097df024af65f04264c065bf51752d05bf01a892a09410c",
+        "Models/OrderItem.cs": "1564e33fe63bc2214c1c35d0de999ce2c8f8cf5623d8eedffff5fd3c87c6e8ce",
+        "Models/PurchaseOrder.cs": "ad13a716a2f930e93f82ec4ad51f1918824d4a6eeaa7e648a44ba1dbcc62a525",
+        "Models/Tenant.cs": "4d542323d1aa3dac9a565691f3ae849c59c189160b6b446610b31b25679cdc05",
+        "Q.cs": "dcec9f1f02a08e55e2e9177ba44a16c10ada4b2a7fbd05c592f289efffaeb62e",
+        "Requests/OrderItemRequest.cs": "f9d527850fecb049ac65d508706cc25097f61b3c3426df27368729c92f5f3b53",
+        "Requests/PurchaseOrderRequest.cs": "79f3ed38e1e6cc70015e94e77f2afa50dd00fd0d8a018d38f9b4b5dc79a7cfff",
+        "Requests/TenantRequest.cs": "38e086be059d79f9af297a2388c3646c59bd79209e04a63c94ea1d512d9108e9",
+        "teaql-i18n.json": "c8229ce36ed92393409dd95a5e6a6bd72c9818c95520d5d2e3656ac6f7c0f014",
+        "teaql/checker-model.json": "92144f0d6092e143784685a82a9dd67c1672665bbe50fa6ca57b9ad441325b45",
+        "teaql/model-provenance.json": "f2773aa2727ad73c6d589a27ddc7b033c5014582038f913d4a954b961f8b49dd"
+      },
+      "model": "examples/fix-e-alignment/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:96fba0f3e785fef2792149fa1b226f4ea09863f94d4aff4b31427d4875bf612c",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "checker-fix-advanced-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/internal-id-customization/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "8a3da160cb2e56bb56f0c41ddbd116dd335403b00a96e36607f721c434c46b39",
+        "teaql/model-provenance.json": "edf2559c7fd6fdccf6525cfeb603a614cc5dbf0ab30cf2559f935e7fd05da50b"
+      },
+      "model": "examples/internal-id-customization/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "456cab22875cc5756c8461f0ceefab4d291d4a0c04c50a0fa3b56d8ac68434da",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:375322c3f46a27ef8ae50b39702422eaee2206318aa821e41dc91657c47f6071",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "48f57d3c704810aead8b2e514521f7a092bcd317e02ac8b72ad5b889998525fe",
+          "sourceSHA256": "48f57d3c704810aead8b2e514521f7a092bcd317e02ac8b72ad5b889998525fe"
+        },
+        "Program.cs": {
+          "emittedSHA256": "22e7e307f5b530d77e44a4b62c135bcb8abed2d5bcfaabe943fc7053aec73de1",
+          "sourceSHA256": "2f5d7d3aa20e8fdabd059b04519694c2207200d56f6e9a30c43940501e942ebb"
+        },
+        "README.md": {
+          "emittedSHA256": "60b35c5674607ac53475c518fb99c07c85e41149af870d55a46bc0ce2407f0e7",
+          "sourceSHA256": "60b35c5674607ac53475c518fb99c07c85e41149af870d55a46bc0ce2407f0e7"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "fa9337fd403e3bb1fd2ada597ec6462f2fbdd5006d5af0477cf745169b6c56d9",
+          "sourceSHA256": "fa9337fd403e3bb1fd2ada597ec6462f2fbdd5006d5af0477cf745169b6c56d9"
+        },
+        "warehouse-order-allocation-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "9d725a303a2d76f1c5718f5a9d93f34c513ed81492fe14f6a4d656c138c65237"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/internal-id-customization/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "986fc27d3016e00e993bc207bb50a39e8558d78b794ea29f8f5a268b8332c8bc",
+        "GeneratedRuntimeModule.cs": "f164e8e8380a5353f81a32ca1bd0f54a35d19cccac7fcc88e99f53472de7a2cc",
+        "GeneratedSearchModels.cs": "98f5bdd8eb19717f0b55dd6d4ce9176a0479dd488c5f63fa3cd804a423fe13e3",
+        "Models/OrderItem.cs": "c2b0f0852130965529c9e9a3105335f5f0ea986807b15257b09eccda75685360",
+        "Models/PurchaseOrder.cs": "52f99030cea326a2e0f55a30ec3c54205007b6153264ac61ab180f5598c14eb1",
+        "Models/Warehouse.cs": "e31dbafb3188fb2be87995de3104b4e3ad49b5ae74137b123968e28c62ca4ab5",
+        "Q.cs": "5c9f7136a6357f0703ffda21caa79fda0ace33e6ac2f529fae75cb43cf7a4ea3",
+        "Requests/OrderItemRequest.cs": "8e21c45cd3874a04a907e279bb5c703f0c0125108a50cdccc14ad9eb8bc0e339",
+        "Requests/PurchaseOrderRequest.cs": "4963c7dc76f1e764ad41f1f22e0b3f89f58cca5d99954e255ae85e777b441373",
+        "Requests/WarehouseRequest.cs": "eeb31281b2a177c3407a5d0c863131387fb216c2327a3167370dd11ca2b27ae6",
+        "teaql-i18n.json": "fa9337fd403e3bb1fd2ada597ec6462f2fbdd5006d5af0477cf745169b6c56d9",
+        "teaql/checker-model.json": "8a3da160cb2e56bb56f0c41ddbd116dd335403b00a96e36607f721c434c46b39",
+        "teaql/model-provenance.json": "edf2559c7fd6fdccf6525cfeb603a614cc5dbf0ab30cf2559f935e7fd05da50b"
+      },
+      "model": "examples/internal-id-customization/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "456cab22875cc5756c8461f0ceefab4d291d4a0c04c50a0fa3b56d8ac68434da",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:375322c3f46a27ef8ae50b39702422eaee2206318aa821e41dc91657c47f6071",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "warehouse-order-allocation-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/mutation-policy/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "a5097202b16fd99e2cd34705d0a094a9429d50674a339fe4a31fbb9b133efeda",
+        "teaql/model-provenance.json": "09a5d0cb2d0fe4e3cdb5432f659b07c0a131ae7da8dd8eb63dc72c62fde294d4"
+      },
+      "model": "examples/mutation-policy/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "55d87208e2f03d597c194ec4c976a446807f2a004547fec55b5916608a135628",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:cb3ade5d48349f16a9173cc89ef043f057b63493bd1876e5a68b91b8871c99a4",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "29c271bea0a379b4a412a9e151b22a3d974d9b6457e5ac06f89b70d01c0fc186",
+          "sourceSHA256": "29c271bea0a379b4a412a9e151b22a3d974d9b6457e5ac06f89b70d01c0fc186"
+        },
+        "Program.cs": {
+          "emittedSHA256": "7e1709c3397c095a5c42a19df13cd619d408a196cf250ac89d84d56b076a1336",
+          "sourceSHA256": "321b13b855bc51c2b72b3983406d66cd853a2b4c02335141e3acfa3413bb9e8a"
+        },
+        "README.md": {
+          "emittedSHA256": "7c5a63391ac5b7b407607912c91a4016b5ab4c7e22944c0c972242151198f257",
+          "sourceSHA256": "7c5a63391ac5b7b407607912c91a4016b5ab4c7e22944c0c972242151198f257"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "customer-onboarding-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "177e43506470f7026296c39073d084fb3f6a56cb2468b0afe39d33f2793c2fd2"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "b4acee7d90d29cc295800609f9fb64076667d9bd672aea4dd507f5afad7dcb2c",
+          "sourceSHA256": "b4acee7d90d29cc295800609f9fb64076667d9bd672aea4dd507f5afad7dcb2c"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/mutation-policy/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "1d42b75f7ebcc9e4b68ced701df396f3590f943f9e01bfd835698dc2824c81ce",
+        "GeneratedRuntimeModule.cs": "80fd939e67de1c77a3c2f2c8cbc16be4af8b9699d3008467fb547255f31309fe",
+        "GeneratedSearchModels.cs": "62bb989984d4fe9573cd5c727cca880247e98179cfc3dcb6ffba7ec2c7ed7b65",
+        "Models/Customer.cs": "def2fb6c303a183fe9e96d6fce0417088e5bb23f805ce8c738c0cc88ff440ee9",
+        "Models/CustomerContact.cs": "2a2a04aecf83dfd45eda1d439b239a0f079bf0b84fe162d75337ea273fbf3f15",
+        "Models/Platform.cs": "2a6fa2e6d6254ac57a38403ab1be800796917401cd8a78d203e8dbd7be249755",
+        "Q.cs": "8126d9d3e78b4ed1700b35fde1ab02a5dc4cf54550e741346ffba529c5cc5a69",
+        "Requests/CustomerContactRequest.cs": "ea1869207b544d80e3568bf28464eae68a051feaf4036b16c5d5ba0d6242d1ff",
+        "Requests/CustomerRequest.cs": "c144cf5f24e1edb31ceaaf285a29570a5eef7bf213a1c2dc46ddcb9585742ccb",
+        "Requests/PlatformRequest.cs": "5ac04c965f5305f6d6664ed218dd0784ed99daba06880da27bbb12db5e381278",
+        "teaql-i18n.json": "b4acee7d90d29cc295800609f9fb64076667d9bd672aea4dd507f5afad7dcb2c",
+        "teaql/checker-model.json": "a5097202b16fd99e2cd34705d0a094a9429d50674a339fe4a31fbb9b133efeda",
+        "teaql/model-provenance.json": "09a5d0cb2d0fe4e3cdb5432f659b07c0a131ae7da8dd8eb63dc72c62fde294d4"
+      },
+      "model": "examples/mutation-policy/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "55d87208e2f03d597c194ec4c976a446807f2a004547fec55b5916608a135628",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:cb3ade5d48349f16a9173cc89ef043f057b63493bd1876e5a68b91b8871c99a4",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "customer-onboarding-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/natural-messages/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "dbac03cd54b294e3e60a62752aeb170ad1ad722a7dfb8feb639c569ff3e73b1a",
+        "teaql/model-provenance.json": "edb7fa28f20a4e9d48a4321602189e733ed4f2db69f3a3e76a20effb6f352f87"
+      },
+      "model": "examples/natural-messages/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:0a1b334773c70c84328c0733efa29e0d7fe5cb65d53bd33bb5cf2da3456c64ff",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "5478293b9bf3aecff4f73aa8e1cbf5aa1121a2cb39a3d31a3a93e3171cc7ee35",
+          "sourceSHA256": "5478293b9bf3aecff4f73aa8e1cbf5aa1121a2cb39a3d31a3a93e3171cc7ee35"
+        },
+        "Program.cs": {
+          "emittedSHA256": "0985f72fced55b9e17b6b894c514109dd5f1aaea7faaafa1370bd41b9a1a747c",
+          "sourceSHA256": "0985f72fced55b9e17b6b894c514109dd5f1aaea7faaafa1370bd41b9a1a747c"
+        },
+        "README.md": {
+          "emittedSHA256": "c6d87c776ad2b27367a493c29392041ac3352b2c2a8aaab71eb7438555f428ab",
+          "sourceSHA256": "c6d87c776ad2b27367a493c29392041ac3352b2c2a8aaab71eb7438555f428ab"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "checker-natural-message-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "4d59e59c637af59efc65a482d7dd46fd65a3114806851f659926dd09e0221dac"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "8bbd8285869941b68b39a8c9ebe58965619fe00f8f5f0a34f9e4366a5b438ce5",
+          "sourceSHA256": "8bbd8285869941b68b39a8c9ebe58965619fe00f8f5f0a34f9e4366a5b438ce5"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/natural-messages/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "29ae7bb7d1ffd2eeef5a98d966194c9874d5b287056c314c9db28805115bb5c3",
+        "GeneratedRuntimeModule.cs": "0103cc56de1538aa2e2c57fb4990cfce6a0519a49a80bd10c1ad18058e3661af",
+        "GeneratedSearchModels.cs": "4af57adc7c35cfbf42a817b2283dc4245b8fce23369dc00bda90db381199b43b",
+        "Models/Catalog.cs": "be9f929dcd7b01184105d5ca953f771ae83dd3212f10c6339decea7eabe48308",
+        "Models/Entry.cs": "548680bd796f633d3809896e39af1f522c99fe5cd51b6b2d88e68e7739337493",
+        "Q.cs": "c5ed8382ab2236c771413964ee54f9013fd122d72adf6b3be0b69e4e79ac9c2e",
+        "Requests/CatalogRequest.cs": "3f34ba15b1d2ee9bd2c53507835646e0fa7142d7024dc94d57972d332e066b81",
+        "Requests/EntryRequest.cs": "52b0b918ca6346e685fa271605d070f207a57430c9a4fd1141e833ba9ddefe93",
+        "teaql-i18n.json": "8bbd8285869941b68b39a8c9ebe58965619fe00f8f5f0a34f9e4366a5b438ce5",
+        "teaql/checker-model.json": "dbac03cd54b294e3e60a62752aeb170ad1ad722a7dfb8feb639c569ff3e73b1a",
+        "teaql/model-provenance.json": "edb7fa28f20a4e9d48a4321602189e733ed4f2db69f3a3e76a20effb6f352f87"
+      },
+      "model": "examples/natural-messages/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "4c69fcaa275d1f7d255f325305cc0c6c5071154d278f9f4af7775ae0758144a6",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:0a1b334773c70c84328c0733efa29e0d7fe5cb65d53bd33bb5cf2da3456c64ff",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "checker-natural-message-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/object-storage/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "df32a45460acd902f21cd94af108f91fb0063d9f568418eb7195f36ff5edf278",
+        "teaql/model-provenance.json": "3a9f9bcdd5e32178ff4523ba0590155d1e815ec8ff0b2ca9ede6e2f27c2b106c"
+      },
+      "model": "examples/object-storage/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "1e35ffb88509f292b75620d82996bbc50868c61fd34716f8be010dff7280eafc",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:08f94683ccf143a5f5b1e9d39d647b338b410f1ebf18918b9832ca7a75ebbc12",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "8a5a1d77871af399819685de02ca1c221585016b320756ae31be5c9f06717039",
+          "sourceSHA256": "8a5a1d77871af399819685de02ca1c221585016b320756ae31be5c9f06717039"
+        },
+        "Program.cs": {
+          "emittedSHA256": "70feefb40301a38b1fbe91792c9159f0a26c1d9d2e08088cefd721be28b90329",
+          "sourceSHA256": "544c6d7637376d1ceb0fe3eae252377169ef481cd3aa49ed5b68bf6346d83658"
+        },
+        "README.md": {
+          "emittedSHA256": "dd3bca21c410c603032b599f62a3d6e1291284dab8c00b544cea2f9a3b3a424a",
+          "sourceSHA256": "dd3bca21c410c603032b599f62a3d6e1291284dab8c00b544cea2f9a3b3a424a"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "order-attachment-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "6a7eafc648af0049a96143fb2a2516b4d09c0e5a467231bb2d9ed72b70456d9e"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "eeb37cccbb0d33b8881143eae771aa0eff562809ab979e8f3f683f2bb1adea43",
+          "sourceSHA256": "eeb37cccbb0d33b8881143eae771aa0eff562809ab979e8f3f683f2bb1adea43"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/object-storage/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "ee90478cbb42798c7e3a2ec3b0f6b069264adfb4b177aed66e1cbf829bce401f",
+        "GeneratedRuntimeModule.cs": "d6ae8d4e81d77b283c973c9f48425f1b53aeb32ffdce4c33c8ed79940a6d72c0",
+        "GeneratedSearchModels.cs": "67885ab2016d22618c849e193ec3ef87a1c26c0a0d0bb14009e00d1888f14001",
+        "Models/CommercePlatform.cs": "877302f3388e015470a6b7e5c64a750f8b89f913a525d3a424e3b715a2160d60",
+        "Models/CustomerOrder.cs": "1e3cd24ba6dbe62786198ba86b92f6825facacb7c77c76505d6dc700ce40a7b9",
+        "Models/OrderAttachment.cs": "f27ea0ef1be615c07c0d83a9a063575ee9c74985dcecc67ec49d9a8773177a4b",
+        "Q.cs": "fc73824b34a28a546fa46cb1a5faca90c819dbef10ee9838e4b91fd8b18d3e0a",
+        "Requests/CommercePlatformRequest.cs": "cab420a6679c1a5da2cba1de75402f8d9c23370c455120b2fca3761147cbbdba",
+        "Requests/CustomerOrderRequest.cs": "81358d6f3ab0c60972a2e3e2f211035fb52d6a25a2314f17db03e75b2a0c263d",
+        "Requests/OrderAttachmentRequest.cs": "04606cb5108bcfc84c6a0f218aad36fdc695b58e4b39d784fc076a0d360090f1",
+        "teaql-i18n.json": "eeb37cccbb0d33b8881143eae771aa0eff562809ab979e8f3f683f2bb1adea43",
+        "teaql/checker-model.json": "df32a45460acd902f21cd94af108f91fb0063d9f568418eb7195f36ff5edf278",
+        "teaql/model-provenance.json": "3a9f9bcdd5e32178ff4523ba0590155d1e815ec8ff0b2ca9ede6e2f27c2b106c"
+      },
+      "model": "examples/object-storage/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "1e35ffb88509f292b75620d82996bbc50868c61fd34716f8be010dff7280eafc",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:08f94683ccf143a5f5b1e9d39d647b338b410f1ebf18918b9832ca7a75ebbc12",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "order-attachment-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/order-management/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "82f1556c56fd3ed10f2e947da68d0defb73215bf2192ccd213cc9c7e8eae9b95",
+        "teaql/model-provenance.json": "f29c7478568182497378478006389b59ff066e2f50aefedbf6a5d362b4b1bea7"
+      },
+      "model": "examples/order-management/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "8b11ee844c2be184e194d8116994fb5fe95299dd593bfed83ec06d71ada0411d",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:435fe8c41af71e1697114bc69ad7a8162f46bda3fb2cd0eacf4a286c06c2922e",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "c21b0825bdcfc1820e5ab64487fb7495c6ca598bfbec00c92fd661608f61264f",
+          "sourceSHA256": "c21b0825bdcfc1820e5ab64487fb7495c6ca598bfbec00c92fd661608f61264f"
+        },
+        "Program.cs": {
+          "emittedSHA256": "a4545274d36fc91410ebde42c6a764a541863f45c4552fdd88986c11ae198b86",
+          "sourceSHA256": "4326f82d8c0549a4265b6af3df06ca9f23e7dfcb9993041cb5fd53e265f03352"
+        },
+        "README.md": {
+          "emittedSHA256": "9734034310ea99f7350f37e1e868d527e7fa624bdfef77b872763cabee1e1750",
+          "sourceSHA256": "9734034310ea99f7350f37e1e868d527e7fa624bdfef77b872763cabee1e1750"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "order-management-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "b4e364ac2ccba8a227f1e3467c7f3c97baa8902c523226fed64a381a2629b8e9"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135",
+          "sourceSHA256": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/order-management/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "a1663576e91a2b3333985a1e2c8daa9129049ceb1908f621e21e317bc18bcb7a",
+        "GeneratedRuntimeModule.cs": "7d2e24a55a5a3833d91b0a2788d2fd8c6efa3489b3f369413f4ee36f6a06364d",
+        "GeneratedSearchModels.cs": "35c79fed4eeaae2d087c9525711a811dd37621df56836850eabae3450d681687",
+        "Models/CommercePlatform.cs": "b5ae9ef46b9995908ca6fe65b04e00c57d5d0ea4128f8239a99036d46692bc06",
+        "Models/Customer.cs": "21be0868725ccdd733a2ce8b17b17405635a423f19a320fdf4f5eff28bacdf01",
+        "Models/CustomerOrder.cs": "369ff5c95f316d652a7880430665414d6b5dccedd07f7c4b581d4c4afd8e6185",
+        "Models/OrderLine.cs": "2643762a5c25e900b292d2cacbe8fea45ee4f8f5eed76f05c707ffedcd807e6b",
+        "Models/OrderSearchPreset.cs": "163386ac511027555df7284a401b1b702ccf3db87e475ef6e3a82911189e99e7",
+        "Models/OrderStatus.cs": "9d3683b629b93dbeb514a50c3e9ecab7549c6bd34b06dce327d14677af062242",
+        "Models/Product.cs": "8fd00bb87fb1ed5abf0ac0d5b51c96ac07d3dbd70bea00b47c48bed456059fcf",
+        "Q.cs": "a8b1d8a5250a7d326bc4ba30f8a0e1e7f1c0278097b81d0c0b2321e33604a7c7",
+        "Requests/CommercePlatformRequest.cs": "1a02bccb1ca7883e665490cf65e30ce4c43b384230788952f1b41a1bb7565538",
+        "Requests/CustomerOrderRequest.cs": "14974cfda6d0751c41373c463472ef9cd0ff8e30d853328ea6944cf36c06eb4e",
+        "Requests/CustomerRequest.cs": "995d03b3a56437fa2c9918f880fe69c2c9669f4e761f5e232278d36fb2543052",
+        "Requests/OrderLineRequest.cs": "45b7d5c31d8abb8f7cb4a2399df12e82bcbaee6d73e26beb95397e361f55d94a",
+        "Requests/OrderSearchPresetRequest.cs": "ef9c3125bd646dd9676b3f93949ec3e5995d40b98de4e82289a2be77d453c2f6",
+        "Requests/OrderStatusRequest.cs": "c37e2b5416eeb9db78449335841156671d25ac2b37d2589f982f98993838e293",
+        "Requests/ProductRequest.cs": "7a383a3246dac9f96a5d8d26ff6961ddd0b063b2ecdd51351c859efb98a4bd08",
+        "teaql-i18n.json": "4ae750ac80a6d6ccf296d8fe61d4db0f3cc4b66a285f8926720dfb87d4a42135",
+        "teaql/checker-model.json": "82f1556c56fd3ed10f2e947da68d0defb73215bf2192ccd213cc9c7e8eae9b95",
+        "teaql/model-provenance.json": "f29c7478568182497378478006389b59ff066e2f50aefedbf6a5d362b4b1bea7"
+      },
+      "model": "examples/order-management/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "8b11ee844c2be184e194d8116994fb5fe95299dd593bfed83ec06d71ada0411d",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:435fe8c41af71e1697114bc69ad7a8162f46bda3fb2cd0eacf4a286c06c2922e",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "order-management-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/runtime-logging/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "aa0d292b0463327e2914084844700ac734ee9ae717b17ac7ff180ab9d9895ae7",
+        "teaql/model-provenance.json": "4df9515d9f6f86364b587f1201d6ab7781441d2d8da7e2666a1a0e0cf53895d4"
+      },
+      "model": "examples/runtime-logging/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "c1674bffb58f7cce2fa9f15eabf8e32e75ec73e00ab1bcfa1248bf4d9327c12e",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:3d4a6010b6a9799f26379b6db0c94195d53613b51a65fd1812a3284511f51669",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "80bd1dece89b3cb6b0a17a0e7c4af300e08d73fa9a53bafa59db9120c2e7a9d6",
+          "sourceSHA256": "80bd1dece89b3cb6b0a17a0e7c4af300e08d73fa9a53bafa59db9120c2e7a9d6"
+        },
+        "Program.cs": {
+          "emittedSHA256": "cb564ec0ab53cb73a7e975530791ecfdfc772577a948c1e87da8bb5fefebfcf4",
+          "sourceSHA256": "b266752497d9db66e1068ac77ef6dec3869abae76a1aa33641ea998768383aa7"
+        },
+        "README.md": {
+          "emittedSHA256": "885eb1deb1c5a88407c7acf94ecfc14431d2982096cd3a1694939e7420546842",
+          "sourceSHA256": "885eb1deb1c5a88407c7acf94ecfc14431d2982096cd3a1694939e7420546842"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "shipping-order-logging-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "3eb3f5241e1b9ec2374e2bc0d46342233c26c9668e91e4c550678c05e102b387"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "265b09a09700921bd6d7ce1ea7829868f7988f1ed57d3cc95e38f09d2bd2d104",
+          "sourceSHA256": "265b09a09700921bd6d7ce1ea7829868f7988f1ed57d3cc95e38f09d2bd2d104"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/runtime-logging/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "d315b80c38278ffd17a50e62597d2a1c7b39753c8198cf1c547e9445a4a0bd99",
+        "GeneratedRuntimeModule.cs": "aa3b0bc4d75a3cd255539721d3b6168f369531af0fe5df834288926d5055875d",
+        "GeneratedSearchModels.cs": "f542eadfc0ca04ea2cb9dd7fe80efb21954f30ffdfba482c77d93e43085aff08",
+        "Models/ShippingItem.cs": "7b982a788c1b90799898e5804da7c3ed20979d17a7b775fd135e290fb214882f",
+        "Models/ShippingOrder.cs": "5ce9b4a960ade2dbf6db35877e9cdc328055ef3933b99fca2acb2be55337a70e",
+        "Models/Warehouse.cs": "e88e07d6b189ee6f675a4454fadb67580fe2d972814a84262139143759752e9a",
+        "Q.cs": "bb6df3ce19b8422c3f1bad84c062f995eed3edb4b07bb85e092ab61da7cfb111",
+        "Requests/ShippingItemRequest.cs": "d158eeb9c03afb42b17041e20819d6c21eeaa5b9c8b8955aa1d26a34c5d164c1",
+        "Requests/ShippingOrderRequest.cs": "f8a5f2df1a0c1c095872a9655adf2772fd7c75c841efcc7f8fcfa4bbf16b40ae",
+        "Requests/WarehouseRequest.cs": "e1c46e2f70426110d7201973d7ff238d4e7cb334effc16025742594fa6d65e11",
+        "teaql-i18n.json": "265b09a09700921bd6d7ce1ea7829868f7988f1ed57d3cc95e38f09d2bd2d104",
+        "teaql/checker-model.json": "aa0d292b0463327e2914084844700ac734ee9ae717b17ac7ff180ab9d9895ae7",
+        "teaql/model-provenance.json": "4df9515d9f6f86364b587f1201d6ab7781441d2d8da7e2666a1a0e0cf53895d4"
+      },
+      "model": "examples/runtime-logging/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "c1674bffb58f7cce2fa9f15eabf8e32e75ec73e00ab1bcfa1248bf4d9327c12e",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:3d4a6010b6a9799f26379b6db0c94195d53613b51a65fd1812a3284511f51669",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "shipping-order-logging-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/scalar-type-probe/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "4323f6d056e13548e9afb018e5d8a4a32ee4953977ce032827d70bb1b1c2752c",
+        "teaql/model-provenance.json": "61a512fa5e7f92dbdd9c4ff8b63445ea3025d470d6815dd15c0a55927e1a795d"
+      },
+      "model": "examples/scalar-type-probe/freight-quote.xml",
+      "modelEntrypoint": "freight-quote.xml",
+      "modelSHA256": "076fdf926be1a8b71e61cdfaf66b539f54c1ac2182e1f2bc75897dfab52d6d38",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:833c5fc594652f4247ab0587040cdcba5da043d91c9d16cb602e28863fe69ca5",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "c4bdec4c12f70011f921a09d7ab8d6cb88989b6748fef1ac202efce25bf3e5de",
+          "sourceSHA256": "c4bdec4c12f70011f921a09d7ab8d6cb88989b6748fef1ac202efce25bf3e5de"
+        },
+        "Program.cs": {
+          "emittedSHA256": "138b408e7c5c3dbc8aec5fe1e564b3914891ab93cac5138fca7e6651df206e2d",
+          "sourceSHA256": "aea329f41542ada894b386b6be38992d1fe8f94801142169e98229bde5fe0bb3"
+        },
+        "README.md": {
+          "emittedSHA256": "09e3eefeb4b90dc2b1a72be48b07c19fa1f3565eb948c4d023550e44f8683aac",
+          "sourceSHA256": "09e3eefeb4b90dc2b1a72be48b07c19fa1f3565eb948c4d023550e44f8683aac"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "freight-quote-settlement-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7b1c218c1749441e926068db13f00b132067144ccb958a3c3d49a3364ab9b561"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "29159b1a0cfdb1a194e974f31e13246943003f423421c59c7e80d6188dc9b019",
+          "sourceSHA256": "29159b1a0cfdb1a194e974f31e13246943003f423421c59c7e80d6188dc9b019"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/scalar-type-probe/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "483ba657525151c4ee849b7d42a5e5d9de5881152fcb031393cec79a06ea6dcb",
+        "GeneratedRuntimeModule.cs": "08f0b0d7c2b8205319d2c94e35034e0d49b29003b66b392cbe02a4b568d85e22",
+        "GeneratedSearchModels.cs": "a8ebbe1f47ceb6fc50cd8d151eea4bea1a6872cbab4b46c6d844eabf6f246951",
+        "Models/FreightQuote.cs": "6c3d1e0f55ce3bf3d367dc58d63e7b4d05786a2ddbd314f89c068c2ae72f9107",
+        "Models/Platform.cs": "0f5837bba241d77617a0ac9104f2a3298fa6d2685797dee3caef7b9e712bb140",
+        "Q.cs": "cd5628e13ded761238ae6f4ba27d82359d4a1dbf836e6f154524cbff956bb46f",
+        "Requests/FreightQuoteRequest.cs": "60469d84d027a2094d81e4c1f8bb841f18cdd362a6edd8813d393b03ffe94d88",
+        "Requests/PlatformRequest.cs": "6fdbd467a1d1ba23c75a3609415446e5ecd22d9b620839cda18b3dab0d721250",
+        "teaql-i18n.json": "29159b1a0cfdb1a194e974f31e13246943003f423421c59c7e80d6188dc9b019",
+        "teaql/checker-model.json": "4323f6d056e13548e9afb018e5d8a4a32ee4953977ce032827d70bb1b1c2752c",
+        "teaql/model-provenance.json": "61a512fa5e7f92dbdd9c4ff8b63445ea3025d470d6815dd15c0a55927e1a795d"
+      },
+      "model": "examples/scalar-type-probe/freight-quote.xml",
+      "modelEntrypoint": "freight-quote.xml",
+      "modelSHA256": "076fdf926be1a8b71e61cdfaf66b539f54c1ac2182e1f2bc75897dfab52d6d38",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:833c5fc594652f4247ab0587040cdcba5da043d91c9d16cb602e28863fe69ca5",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "freight-quote-settlement-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/schema-customization/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "7170c27308464abcedaa042e12751f05505d9b5c7b4623d5aa2f4350117fe6e8",
+        "teaql/model-provenance.json": "77eb9ba634089d2debbbb3b4d63ce863f17d8f2e24241a6c9698b0dc52476fda"
+      },
+      "model": "examples/schema-customization/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "5b1004dad1635a7fa24a1e8539a704d7a2c271a3af0b731b60cb8f243db4d322",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fbed4c6715fd7feaed8e5d8d6ede0c2f5770d5ebe735dff8390e90b24c612655",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "21b9b4844e2dbca073da304f272c5ad83a1978b593ae10d4f0eb0ad10fb78f51",
+          "sourceSHA256": "21b9b4844e2dbca073da304f272c5ad83a1978b593ae10d4f0eb0ad10fb78f51"
+        },
+        "Program.cs": {
+          "emittedSHA256": "00ad8235d069ae130b43d0c153ddced4c9a14f70741057c43ad8bc0f40aa7a95",
+          "sourceSHA256": "84452ca1b35ac75e570bf44d37f2084c69efccfa08a70349c9fda428af45e105"
+        },
+        "README.md": {
+          "emittedSHA256": "985b3376193fa8dab08f3135d86fab9bde58618cf2dd869f273f3468bda084f3",
+          "sourceSHA256": "985b3376193fa8dab08f3135d86fab9bde58618cf2dd869f273f3468bda084f3"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "school-schema-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "4ce9da890a14bce9b582fab5e1a0c32704aac9a8c18f97e2674bd00736dcc528"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "665d6bcdf955638db179f78d34f7e6c370c153dd01760c02643dc785b05cd501",
+          "sourceSHA256": "665d6bcdf955638db179f78d34f7e6c370c153dd01760c02643dc785b05cd501"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/schema-customization/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "911a6ea055125c625ce786a98cb43fac1e91035d2d3eeecc13c4dad680f571eb",
+        "GeneratedRuntimeModule.cs": "c8443ff54a80667e0e42047f569d99991e0fd9fe30ce65b818cccae73f8d6d29",
+        "GeneratedSearchModels.cs": "9a4f81e5b6af942e12c7cf9a50c440aabafb6784f55647ec04553dd623be63a2",
+        "Models/Platform.cs": "800d4821430ef7b81cca62eaa379b2a34b98f3143ee70578a0009d87866f4685",
+        "Models/School.cs": "68e14725e2ff3e6c5349a58f0eadf018f5e191992dfcfad8d065763d00bb9cd2",
+        "Q.cs": "0b3262053d17682909343ac811178ee54add68bfe95e35d267aa5369dafd34eb",
+        "Requests/PlatformRequest.cs": "4a96c7c0d6d94d8443bf6df8fbf52352b6ee4494093e98057256c56264f90deb",
+        "Requests/SchoolRequest.cs": "70b5949d7c5306652a43efd775b32d3926b14a5094e938c1a74afef05490017e",
+        "teaql-i18n.json": "665d6bcdf955638db179f78d34f7e6c370c153dd01760c02643dc785b05cd501",
+        "teaql/checker-model.json": "7170c27308464abcedaa042e12751f05505d9b5c7b4623d5aa2f4350117fe6e8",
+        "teaql/model-provenance.json": "77eb9ba634089d2debbbb3b4d63ce863f17d8f2e24241a6c9698b0dc52476fda"
+      },
+      "model": "examples/schema-customization/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "5b1004dad1635a7fa24a1e8539a704d7a2c271a3af0b731b60cb8f243db4d322",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fbed4c6715fd7feaed8e5d8d6ede0c2f5770d5ebe735dff8390e90b24c612655",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "school-schema-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/school-management/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
+        "teaql/model-provenance.json": "64afef3716a34e89207c9b6d182a9bce8965325a2994d41e763f77b917842a2f"
+      },
+      "model": "examples/school-management/models/school-model.xml",
+      "modelEntrypoint": "school-model.xml",
+      "modelSHA256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:5d2fc608b6317e2cbd4c0e4bd58bbe0dba4f7dc60a35e4cccabd1c83a4dfd810",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "fd0327f87fe845a37b8d06f897202b1febc24d12ee50b278dbd6ea7becef5a1b",
+          "sourceSHA256": "fd0327f87fe845a37b8d06f897202b1febc24d12ee50b278dbd6ea7becef5a1b"
+        },
+        "Program.cs": {
+          "emittedSHA256": "334ff406e24363acc70b54e0513c151c9c7b1166a3b042f59f17d093745bf39a",
+          "sourceSHA256": "39baa3dae7265245e2ae2a455ff2ce0d1bf602b6b81cd4d1914e6137d2cf1eb8"
+        },
+        "README.md": {
+          "emittedSHA256": "7f67448b64cec615986aa2cf9e25e6a10c59fd90d413108356978f1d2d8c5198",
+          "sourceSHA256": "7f67448b64cec615986aa2cf9e25e6a10c59fd90d413108356978f1d2d8c5198"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "school-management-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "3ca460058eec83a7bd579fc88e660dd8f4f361a1e5f39704c83c1703f772d809"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
+          "sourceSHA256": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/school-management/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
+        "GeneratedRuntimeModule.cs": "5331337c0dcd075e4db592f5cbae009fbf194ef5bf2701ac37ff3219c84fd674",
+        "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
+        "Models/Platform.cs": "accb001ee51834de0f37087ad7ca0d60083921eefb61b0ceacde48c39f34cfc2",
+        "Models/School.cs": "70bdd57d477ce3b1581270bfd8662c410cf08858494312e2c60afa26cba85b7a",
+        "Models/SchoolType.cs": "da9ed1aed679b8b5c655293d3007241928d844c6b0267d3f8f3a3e38537c7d1e",
+        "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97",
+        "Requests/PlatformRequest.cs": "43040fc9844dd0d04dc8e0af86965b6b7a3392a939143fb0d8e755dd49e40c55",
+        "Requests/SchoolRequest.cs": "65fe52f792b95687fdf4bcffaf929b60a90d75a0765af8be142e6e54ac101236",
+        "Requests/SchoolTypeRequest.cs": "809bfb54e9d49be334150cfbfd89842fbd5f316f64bb2086919648b764fee598",
+        "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
+        "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
+        "teaql/model-provenance.json": "64afef3716a34e89207c9b6d182a9bce8965325a2994d41e763f77b917842a2f"
+      },
+      "model": "examples/school-management/models/school-model.xml",
+      "modelEntrypoint": "school-model.xml",
+      "modelSHA256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:5d2fc608b6317e2cbd4c0e4bd58bbe0dba4f7dc60a35e4cccabd1c83a4dfd810",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "school-management-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/security-foundations/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "00812d3887691b2e4f42f14d99e21c6465ed6c2f6bdbb78127b6c6e92c3fdf84",
+        "teaql/model-provenance.json": "64b5bfee38a095faab4d2fb91162213fad646bf95cbbff201b5ea19e2324fad4"
+      },
+      "model": "examples/security-foundations/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "4bd3524659417a530665b6bcbfec928ee3e5845f2e96570346193fd64981551a",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fb96f88e8c6c737598d67e52cd0cb49e174286ab83ba418b0a041f42ecd3b4e8",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "fd0bf46a0ad3393de46e0328cc83fae6f2d2907b031cf4b4c8cc9a3cf449bcdf",
+          "sourceSHA256": "fd0bf46a0ad3393de46e0328cc83fae6f2d2907b031cf4b4c8cc9a3cf449bcdf"
+        },
+        "Program.cs": {
+          "emittedSHA256": "2d6c218d5c0f72f3ece8a8f57a3b7fd53ce3ebfeb414bd23c85637c67ac87066",
+          "sourceSHA256": "b3b68d695f56daf1563f21083476565c1e5e0c75a9f5f8b72e4bf7711ab05b8d"
+        },
+        "README.md": {
+          "emittedSHA256": "bab38dba917f4c72d1bb69e298838f750fad0e17b99206b5388affef88c95e27",
+          "sourceSHA256": "bab38dba917f4c72d1bb69e298838f750fad0e17b99206b5388affef88c95e27"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "merchant-order-privacy-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7ab88d32dc2f8d856aa08135e5e82ebd572a8bdf0dea94c71c26f8bd85b465b3"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "1fd0388bee97c6c9a9ed936df26d9783e00b61d519efb93f2cc31035cb9c9497",
+          "sourceSHA256": "1fd0388bee97c6c9a9ed936df26d9783e00b61d519efb93f2cc31035cb9c9497"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/security-foundations/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "183c098299c4380b3189d5883a875b2ec6c0e76b0228fece071c52d64097ed1c",
+        "GeneratedRuntimeModule.cs": "6a9619f7eee32ccbc9f1677c715b6ca0e97f824682ffd4fc6d5488ed17bc2c4a",
+        "GeneratedSearchModels.cs": "a5c839d85b6a5f4bf0f56d54e9f38b754605de5078238c9950c3de7191a23e03",
+        "Models/CustomerOrder.cs": "35217f0305a88f6f20ab875e6b68ea801407b0b9590a04ee8503c29bced50e98",
+        "Models/CustomerProfile.cs": "e123ef0bf25ae48756cb2dc76bdcf280740772c68594d4c701dd4888b5bdab6f",
+        "Models/Merchant.cs": "d76d00b6d7c214ea49641b1d00d8a78fd620ca135728e423a3a87907c0029f2a",
+        "Q.cs": "0160326725d383eabf010486d4383f35d5f74c0d4561369736bff7a4588789f3",
+        "Requests/CustomerOrderRequest.cs": "365669f0c7de55415c4f44919bbebc797af84ce22ebba50351742ff46922eac8",
+        "Requests/CustomerProfileRequest.cs": "834cfb8d4a06b54f802d4d51bd4164625fe6ccbdf88d6048b3fba2573d1067c7",
+        "Requests/MerchantRequest.cs": "765d0d8d59d4ebffcd5c7dcf80023fef53cace07b1e950ab3fcbc827ab02aad2",
+        "teaql-i18n.json": "1fd0388bee97c6c9a9ed936df26d9783e00b61d519efb93f2cc31035cb9c9497",
+        "teaql/checker-model.json": "00812d3887691b2e4f42f14d99e21c6465ed6c2f6bdbb78127b6c6e92c3fdf84",
+        "teaql/model-provenance.json": "64b5bfee38a095faab4d2fb91162213fad646bf95cbbff201b5ea19e2324fad4"
+      },
+      "model": "examples/security-foundations/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "4bd3524659417a530665b6bcbfec928ee3e5845f2e96570346193fd64981551a",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fb96f88e8c6c737598d67e52cd0cb49e174286ab83ba418b0a041f42ecd3b4e8",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "merchant-order-privacy-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/task_board/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "b49897830ad712d77109345903474626ce0ff55dce27a2d51f9fc5b9075e3ae4",
+        "teaql/model-provenance.json": "3351f4f4416f562ebace243fc2bc3cc7466cd0aabadbe250b66ee48036d597a7"
+      },
+      "model": "examples/task_board/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "4a1ec513cb362e4c25a5bc9479fe27a2034558633a9e5760245919af7c601856",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fc9023e6b4773fdd2649a594903116a2943e7c9f985eaae5cef2378b93b0f3bd",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "de79ade2aabe1eb327d7011325055045e313e88df360ab81cd2d43168897e01c",
+          "sourceSHA256": "de79ade2aabe1eb327d7011325055045e313e88df360ab81cd2d43168897e01c"
+        },
+        "Program.cs": {
+          "emittedSHA256": "04325a9e7e02c6b3d2798e1e25ecc39635485765daf1dfcd601fa54bccb6400f",
+          "sourceSHA256": "497f756613e30595e27b8fe919b6f010db538673e15b5eecc624e03d4e4f5b28"
+        },
+        "README.md": {
+          "emittedSHA256": "f4e33432f775328db1741e810d5301c2ba60abed245a5c3441ca7d126dbf32b7",
+          "sourceSHA256": "f4e33432f775328db1741e810d5301c2ba60abed245a5c3441ca7d126dbf32b7"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "robot-task-board-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "d1531e0b0e7460d6cb0afd93f39e6b1f0ef7ad6f261a9ec147ba7d5f5cab7fc9"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "79b420e04edf1c1e1b9f4d04ddfc0ec8a6e2a2458e6a337a8c046bacb64c3a8d",
+          "sourceSHA256": "79b420e04edf1c1e1b9f4d04ddfc0ec8a6e2a2458e6a337a8c046bacb64c3a8d"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/task_board/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "2709673b9edef448ce134a160cf76cd129f84dbdac2e68c5c0f3df84d85985d8",
+        "GeneratedRuntimeModule.cs": "492901be63417aefe347089ee185f586b91c08bebda320d6a0e925e786d24a49",
+        "GeneratedSearchModels.cs": "d136d0b7174846ae524143ea964cb3767d9b6b538ca79b2619bfe6e2b8818241",
+        "Models/Platform.cs": "f8e9ffb0694dff2635905f64e081938987218dbb3d3f0e10567b924830d7c97d",
+        "Models/Task.cs": "d5e6c2a277457fb8b441d313c25c4c8ed1c96d8273c85f67a8143e447d37afe3",
+        "Models/TaskExecutionLog.cs": "3e23143d39cc433ec78aa1239888e8293cce2a01804dc3266592cd2d6e500fbf",
+        "Models/TaskStatus.cs": "2f81df3516e999a9ab582c8372f2559da745ee35bae1e12b6182d50f4a597a08",
+        "Q.cs": "1266be8e87db79f7c5c64cf84761745bde5ec6bea2c4aee016c28ee70c3bb58e",
+        "Requests/PlatformRequest.cs": "c8f2ea5b4e3783fab01b65f629075920800f3178a52c9ad3ae076146f9138553",
+        "Requests/TaskExecutionLogRequest.cs": "24de07406387f0f9a492e25810d097cd74e1d6df4d12e2868a1fbcabc4b8d5eb",
+        "Requests/TaskRequest.cs": "2bf65a9599973a0d7d862ad5eb50238f2a4a4c1546ff4b0eacb7ec13a391716f",
+        "Requests/TaskStatusRequest.cs": "198ecfe030cae0187d30b66aa2438080d61d2c1d13bc44e195ef723cd9538045",
+        "teaql-i18n.json": "79b420e04edf1c1e1b9f4d04ddfc0ec8a6e2a2458e6a337a8c046bacb64c3a8d",
+        "teaql/checker-model.json": "b49897830ad712d77109345903474626ce0ff55dce27a2d51f9fc5b9075e3ae4",
+        "teaql/model-provenance.json": "3351f4f4416f562ebace243fc2bc3cc7466cd0aabadbe250b66ee48036d597a7"
+      },
+      "model": "examples/task_board/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "4a1ec513cb362e4c25a5bc9479fe27a2034558633a9e5760245919af7c601856",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fc9023e6b4773fdd2649a594903116a2943e7c9f985eaae5cef2378b93b0f3bd",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "robot-task-board-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/trace-chain/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "4e3a105f6a25a68a4565f8bb5addf7bb560cc2d53f113c300689986959ad8ec0",
+        "teaql/model-provenance.json": "4b38697cd8682884413337920222272dd08ab05eaa58dc42ce32e0a9e44d2c6c"
+      },
+      "model": "examples/trace-chain/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "c9743d776718c7b27c97792f75f492fdc99bf427e4bd0c24bf3492de6520c9a2",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:0b866ad8968101e3bf9429741f62228178182bf20d17f1092221810fd1a46e67",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "d0bbe31c29c4e0160ff438a63cb3166980952c31d12a402bbe689fd369277fb9",
+          "sourceSHA256": "d0bbe31c29c4e0160ff438a63cb3166980952c31d12a402bbe689fd369277fb9"
+        },
+        "Program.cs": {
+          "emittedSHA256": "abbce5e8da3e6ddba833af51c8df02618aad5f98e7039659f774b85d3d6bf8d6",
+          "sourceSHA256": "8970b77cbebf22814e83913d52daa45d3b6625225a2488e5a64c6ee2c34adcbf"
+        },
+        "README.md": {
+          "emittedSHA256": "961cd007727d0f487c5c7145223ca0071a4a566a34bf5c22571c27753e9fc8d1",
+          "sourceSHA256": "961cd007727d0f487c5c7145223ca0071a4a566a34bf5c22571c27753e9fc8d1"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
+          "sourceSHA256": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3"
+        },
+        "trace-chain-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "d7ae3db6cabfb4d1f566a8cbe46d18b88910340c03c896f2f4e6008cb11aef18"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/trace-chain/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
+        "GeneratedRuntimeModule.cs": "c2316f54425b7e9ce53e521f5a9da1fe5f690b3ed40d68f8b52cf351652c54a7",
+        "GeneratedSearchModels.cs": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332",
+        "Models/CustomerOrder.cs": "e39876eece88536009a1e65ed2e18c2f24f91ac3d8402bd441ad7cd957c29a8e",
+        "Models/OrderItem.cs": "5dca53c6811ea882ae0ae3b3c6a7dd8d5d7247d8740e565b3cbb911e16ce2c94",
+        "Models/Payment.cs": "acae9befa27167dcf029009def5f8afd6c17def73ba2ed5044c70961835312c1",
+        "Models/PaymentAttempt.cs": "b9e74a0ffb78f179d56bd94dd74a45e1461f601b5732fd553d3d28f32c7c44e5",
+        "Models/Platform.cs": "d938b11dfd71523538867aba75a7cba88cd1e7eb0535f7c5ca1c96c4816abef8",
+        "Models/Shipment.cs": "5a46b3d6c3be53d4a9aedec92cfd33d53cb41ff7aebb4ca927bcbbb7eaf13537",
+        "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134",
+        "Requests/CustomerOrderRequest.cs": "39bf5d30800fde52a3c13b758b8af1fe7441b25f584d10448ca5535a4b115cfd",
+        "Requests/OrderItemRequest.cs": "dadfd6804d7adbedff0a3108832fef49fccc61b543f7000216b95fd0b77dbff2",
+        "Requests/PaymentAttemptRequest.cs": "16d537ecc067c2bad2fb599f5016894e26111aaf85cdbb979588a6b13193d98b",
+        "Requests/PaymentRequest.cs": "12de269c8fc037416860c54e0fdf53d7d563830731f0227da26a1f3e437b1172",
+        "Requests/PlatformRequest.cs": "29d3d16cd8eec3ccb5602ea59e7911c624461c10726ea4c6d44735aa3e11e70d",
+        "Requests/ShipmentRequest.cs": "b951554d775b34ed5fa1c4ad452531d09d9589036bcd9a3ad2c5b92da04add2d",
+        "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
+        "teaql/checker-model.json": "4e3a105f6a25a68a4565f8bb5addf7bb560cc2d53f113c300689986959ad8ec0",
+        "teaql/model-provenance.json": "4b38697cd8682884413337920222272dd08ab05eaa58dc42ce32e0a9e44d2c6c"
+      },
+      "model": "examples/trace-chain/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "c9743d776718c7b27c97792f75f492fdc99bf427e4bd0c24bf3492de6520c9a2",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:0b866ad8968101e3bf9429741f62228178182bf20d17f1092221810fd1a46e67",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "trace-chain-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/trace-chain/standard-graph/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "4e3a105f6a25a68a4565f8bb5addf7bb560cc2d53f113c300689986959ad8ec0",
+        "teaql/model-provenance.json": "4182a0f83a707c40e564dd8e635d6e1ab50bfbd972ad83e7213c40bcbf927017"
+      },
+      "model": "examples/trace-chain/standard-graph/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "242882959e9b196aa7461abc40cc743455a77798ed49fcd0f3c6b4acb2bf1ed9",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fc3671959115d08663b03f0f93ed26f3976c4404a834b7ce9952be7be0f0ab9d",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "d0bbe31c29c4e0160ff438a63cb3166980952c31d12a402bbe689fd369277fb9",
+          "sourceSHA256": "d0bbe31c29c4e0160ff438a63cb3166980952c31d12a402bbe689fd369277fb9"
+        },
+        "Program.cs": {
+          "emittedSHA256": "abbce5e8da3e6ddba833af51c8df02618aad5f98e7039659f774b85d3d6bf8d6",
+          "sourceSHA256": "9f7b1a6866f77f14c8b6735f928a6884b1d7dd02c6b7bd4c00ea6e51cdc877c9"
+        },
+        "README.md": {
+          "emittedSHA256": "961cd007727d0f487c5c7145223ca0071a4a566a34bf5c22571c27753e9fc8d1",
+          "sourceSHA256": "961cd007727d0f487c5c7145223ca0071a4a566a34bf5c22571c27753e9fc8d1"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
+          "sourceSHA256": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3"
+        },
+        "trace-chain-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "ceb93efa9cf9ab808fdcdcb0c4488ffc6c0188acba58acee64d1b3fefad0a386"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/trace-chain/standard-graph/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "9ddd9dc829e17b3cd9707998e4eea2291baf2b3b93af8cb641c6460a29bcf889",
+        "GeneratedRuntimeModule.cs": "ec13382cb4d1f1caa231b879cfeaf29fc82769056a30cea35578ac25102ab826",
+        "GeneratedSearchModels.cs": "bd29cacb5e91cc2b4e7eea3f08937df93cbeaf7d1379c93c7be3aa0b7e178332",
+        "Models/CustomerOrder.cs": "e39876eece88536009a1e65ed2e18c2f24f91ac3d8402bd441ad7cd957c29a8e",
+        "Models/OrderItem.cs": "5dca53c6811ea882ae0ae3b3c6a7dd8d5d7247d8740e565b3cbb911e16ce2c94",
+        "Models/Payment.cs": "acae9befa27167dcf029009def5f8afd6c17def73ba2ed5044c70961835312c1",
+        "Models/PaymentAttempt.cs": "b9e74a0ffb78f179d56bd94dd74a45e1461f601b5732fd553d3d28f32c7c44e5",
+        "Models/Platform.cs": "d938b11dfd71523538867aba75a7cba88cd1e7eb0535f7c5ca1c96c4816abef8",
+        "Models/Shipment.cs": "5a46b3d6c3be53d4a9aedec92cfd33d53cb41ff7aebb4ca927bcbbb7eaf13537",
+        "Q.cs": "b5c5a623ad2edfe4d25603ebd1c58bf6ddbd2a34383a686108c17a2f1eed4134",
+        "Requests/CustomerOrderRequest.cs": "39bf5d30800fde52a3c13b758b8af1fe7441b25f584d10448ca5535a4b115cfd",
+        "Requests/OrderItemRequest.cs": "dadfd6804d7adbedff0a3108832fef49fccc61b543f7000216b95fd0b77dbff2",
+        "Requests/PaymentAttemptRequest.cs": "16d537ecc067c2bad2fb599f5016894e26111aaf85cdbb979588a6b13193d98b",
+        "Requests/PaymentRequest.cs": "12de269c8fc037416860c54e0fdf53d7d563830731f0227da26a1f3e437b1172",
+        "Requests/PlatformRequest.cs": "29d3d16cd8eec3ccb5602ea59e7911c624461c10726ea4c6d44735aa3e11e70d",
+        "Requests/ShipmentRequest.cs": "b951554d775b34ed5fa1c4ad452531d09d9589036bcd9a3ad2c5b92da04add2d",
+        "teaql-i18n.json": "5ff4a2f49563da43619a3bde0da4d3b73105e87824aef4851ba050b0509272d3",
+        "teaql/checker-model.json": "4e3a105f6a25a68a4565f8bb5addf7bb560cc2d53f113c300689986959ad8ec0",
+        "teaql/model-provenance.json": "4182a0f83a707c40e564dd8e635d6e1ab50bfbd972ad83e7213c40bcbf927017"
+      },
+      "model": "examples/trace-chain/standard-graph/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "242882959e9b196aa7461abc40cc743455a77798ed49fcd0f3c6b4acb2bf1ed9",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:fc3671959115d08663b03f0f93ed26f3976c4404a834b7ce9952be7be0f0ab9d",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "trace-chain-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    },
+    "examples/trace-chain/standard-order/dotnet-app-console": {
+      "emitted": {
+        "teaql/checker-model.json": "11e9102d94684fd30e13941514301d2cf6f20522c275cfa36eece9842ff1014e",
+        "teaql/model-provenance.json": "a2c3b5d80fa0bfd1efd751cf5159b77c4103a5f3dd8a90e1dd0ee3517623a408"
+      },
+      "model": "examples/trace-chain/standard-order/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:a7e84071ea8c35db440948aebd9700a04acc3921a0b6611e23c9997fa3ab8712",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "AGENTS.md": {
+          "emittedSHA256": "70a26128b550bd22b4a1bc4f8771ed0f05c8564c9ba26ddebf6fb12d6da19895",
+          "sourceSHA256": "70a26128b550bd22b4a1bc4f8771ed0f05c8564c9ba26ddebf6fb12d6da19895"
+        },
+        "Program.cs": {
+          "emittedSHA256": "fcd596f8f5894b82eb47deba3d0846c14acdaf828161f555c556f0a7cb3100de",
+          "sourceSHA256": "053c411a5afb65f24420ce56f035f6ae1cefccdd3c5fa71e4e63e9e7cdc4fccf"
+        },
+        "README.md": {
+          "emittedSHA256": "b2c95886e2c53660029ccbfc9fac741c53b6d30c3b5b51e6857f9ac13b10417c",
+          "sourceSHA256": "b2c95886e2c53660029ccbfc9fac741c53b6d30c3b5b51e6857f9ac13b10417c"
+        },
+        "STANDARD_TELEMETRY.md": {
+          "emittedSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be",
+          "sourceSHA256": "fa189a2b53c0da0bf4ee3af74fc7fb82574f733cbdcc7fa9cec2b140efb1a5be"
+        },
+        "request-tree-order-service-console.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7c0f7ddbfc207d6ea1cd78f760578345fca1fd3ed052afb368fe3e5997cd5188"
+        },
+        "teaql-i18n.json": {
+          "emittedSHA256": "ee5dc28e916a8907555d5d5a4d0e3cf2fa37aad047af37abed0800582af18d96",
+          "sourceSHA256": "ee5dc28e916a8907555d5d5a4d0e3cf2fa37aad047af37abed0800582af18d96"
+        }
+      },
+      "scope": "dotnet-app-console"
+    },
+    "examples/trace-chain/standard-order/dotnet-lib-core": {
+      "emitted": {
+        "E.cs": "bbd0d3fd38ce8f04ac3893ef8e376a8ab70d0b0a01e1d2039c3b265e7bc42ce6",
+        "GeneratedRuntimeModule.cs": "a5db3e8295241e56829251ae379195a657967f79dae90b2700aa125d014ee1ad",
+        "GeneratedSearchModels.cs": "9048fb8f3e24d4cad00ebff0d626589d6e57c066d1dfa75b97063b355b1191c0",
+        "Models/Customer.cs": "53da4de6a223455a5f0849826b91f083f1eea8995fe9b9e0ad5539534b119bcd",
+        "Models/CustomerOrder.cs": "618889ee17e1a0bd113fb637ca7ff641dbb6be10e03551dd42f7e745a0c8dd56",
+        "Models/OrderItem.cs": "ae6100cfdc0e087cd2c4c09813c9b94c4ccb8c25283a8122349be0bbdd2a79db",
+        "Models/OrderStatus.cs": "693567d8eae8d30fa930e7176a62b544d82a21f72e9a92419a6e96eb339307c7",
+        "Models/Platform.cs": "1e5d735912a81a84d5c75fc2e4e8b5b11af74a5d0344351d44850ed580bda7e4",
+        "Q.cs": "7c9cdcea15557409e9e69b7957fd8dc43d15369dc63b8c3addc86f66b84fd530",
+        "Requests/CustomerOrderRequest.cs": "10f831bda0f47fb6c92e78e8b5ac2346468fee2748f2e3804fae5ba15822e9e9",
+        "Requests/CustomerRequest.cs": "179876ed4cba000e78392be8313abf47d7c59bd9b1423b54a589f67c4c39ca33",
+        "Requests/OrderItemRequest.cs": "7857f03f903ae6be7a0477ff4684ba2c2a268ca643fa2bb70c1479cbdee8c9cd",
+        "Requests/OrderStatusRequest.cs": "f5dbe3165855a53e661c9b6034c54f66728d44d6dd952e7268ba014835cf1af0",
+        "Requests/PlatformRequest.cs": "dc90a9bff7ab987ec7cb07d07ed26fc8f9f42976f8cb96473d2a8cf20b92f7a5",
+        "teaql-i18n.json": "ee5dc28e916a8907555d5d5a4d0e3cf2fa37aad047af37abed0800582af18d96",
+        "teaql/checker-model.json": "11e9102d94684fd30e13941514301d2cf6f20522c275cfa36eece9842ff1014e",
+        "teaql/model-provenance.json": "a2c3b5d80fa0bfd1efd751cf5159b77c4103a5f3dd8a90e1dd0ee3517623a408"
+      },
+      "model": "examples/trace-chain/standard-order/model.xml",
+      "modelEntrypoint": "model.xml",
+      "modelSHA256": "9e60ff448b17cbbc38035565643f44e6618841632cf4f08fdc089dc961c3a62c",
+      "provenance": {
+        "generatorVersion": "80fe610d",
+        "modelUuid": null,
+        "revisionHash": "sha256:a7e84071ea8c35db440948aebd9700a04acc3921a0b6611e23c9997fa3ab8712",
+        "schemaVersion": 1
+      },
+      "retainedWorkspaceFiles": {
+        "request-tree-order-service-lib.csproj": {
+          "emittedSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+          "sourceSHA256": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0"
+        }
+      },
+      "scope": "dotnet-lib-core"
+    }
+  },
+  "sourceCommit": "80fe610d358e923724ddccac84a48d6e4ec5c806"
+}

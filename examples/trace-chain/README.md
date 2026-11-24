@@ -1,5 +1,9 @@
 # Generated Trace Chain SQLite example
 
+The executable order graph and its checks now live in `dotnet-app-console`.
+The verification commands below replay the same domain with the generated library.
+
+
 This example verifies the branch-local Trace Chain contract against the local
 .NET runtime and an unchanged generated six-entity library. It is local-source
 evidence, not a claim about the published 0.2.9 packages.
@@ -95,7 +99,7 @@ COUNT), no child canary in safe SQL/comment/purpose, independent root/child
 saves and persisted version checks. The model marks `order_item.name` as masked.
 `TEAQL_TRACE_CHAIN_SCENARIO=page` runs this focused acceptance only; the full
 verifier ignores that selector. Direct `dotnet run --project
-examples/trace-chain/trace-chain.csproj -- --database /absolute/path.sqlite`
+examples/trace-chain/dotnet-app-console/trace-chain-service-console.csproj -- --database /absolute/path.sqlite`
 also propagates its local runtime path to the generated project reference.
 
 Hydration records original versions without leaving temporary new keys. Graph

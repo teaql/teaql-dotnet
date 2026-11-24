@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public ScalarTypeProbeRequest()
@@ -326,55 +326,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdIs(long val)
+                public ScalarTypeProbeRequest WithIdIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdIsNot(long val)
+                public ScalarTypeProbeRequest WithIdIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdIn(params long[] vals)
+                public ScalarTypeProbeRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("id", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdGreaterThan(long val)
+                public ScalarTypeProbeRequest WithIdGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithIdGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdLessThan(long val)
+                public ScalarTypeProbeRequest WithIdLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithIdLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithIdBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithIdBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -427,49 +427,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("required_string", TeaqlQueryValue(val)));
                     return this;
                 }
-                public ScalarTypeProbeRequest WithRequiredStringIsNot(string val)
+                public ScalarTypeProbeRequest WithRequiredStringIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredStringIn(params string[] vals)
+                public ScalarTypeProbeRequest WithRequiredStringIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_string", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_string", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredStringNotIn(params string[] vals)
+                public ScalarTypeProbeRequest WithRequiredStringNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_string", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_string", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredStringGreaterThan(string val)
+                public ScalarTypeProbeRequest WithRequiredStringGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredStringGreaterThanOrEqualTo(string val)
+                public ScalarTypeProbeRequest WithRequiredStringGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredStringLessThan(string val)
+                public ScalarTypeProbeRequest WithRequiredStringLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredStringLessThanOrEqualTo(string val)
+                public ScalarTypeProbeRequest WithRequiredStringLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredStringBetween(string lower, string upper)
+                public ScalarTypeProbeRequest WithRequiredStringBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_string", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -533,49 +533,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("optional_string", TeaqlQueryValue(val)));
                     return this;
                 }
-                public ScalarTypeProbeRequest WithOptionalStringIsNot(string val)
+                public ScalarTypeProbeRequest WithOptionalStringIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalStringIn(params string[] vals)
+                public ScalarTypeProbeRequest WithOptionalStringIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_string", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_string", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalStringNotIn(params string[] vals)
+                public ScalarTypeProbeRequest WithOptionalStringNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_string", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_string", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalStringGreaterThan(string val)
+                public ScalarTypeProbeRequest WithOptionalStringGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalStringGreaterThanOrEqualTo(string val)
+                public ScalarTypeProbeRequest WithOptionalStringGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalStringLessThan(string val)
+                public ScalarTypeProbeRequest WithOptionalStringLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalStringLessThanOrEqualTo(string val)
+                public ScalarTypeProbeRequest WithOptionalStringLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_string", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalStringBetween(string lower, string upper)
+                public ScalarTypeProbeRequest WithOptionalStringBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_string", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -639,49 +639,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("large_text", TeaqlQueryValue(val)));
                     return this;
                 }
-                public ScalarTypeProbeRequest WithLargeTextIsNot(string val)
+                public ScalarTypeProbeRequest WithLargeTextIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("large_text", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithLargeTextIn(params string[] vals)
+                public ScalarTypeProbeRequest WithLargeTextIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("large_text", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("large_text", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithLargeTextNotIn(params string[] vals)
+                public ScalarTypeProbeRequest WithLargeTextNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("large_text", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("large_text", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithLargeTextGreaterThan(string val)
+                public ScalarTypeProbeRequest WithLargeTextGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("large_text", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithLargeTextGreaterThanOrEqualTo(string val)
+                public ScalarTypeProbeRequest WithLargeTextGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("large_text", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithLargeTextLessThan(string val)
+                public ScalarTypeProbeRequest WithLargeTextLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("large_text", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithLargeTextLessThanOrEqualTo(string val)
+                public ScalarTypeProbeRequest WithLargeTextLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("large_text", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithLargeTextBetween(string lower, string upper)
+                public ScalarTypeProbeRequest WithLargeTextBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("large_text", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -745,49 +745,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("required_boolean", false));
                     return this;
                 }
-                public ScalarTypeProbeRequest WithRequiredBooleanIsNot(bool val)
+                public ScalarTypeProbeRequest WithRequiredBooleanIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredBooleanIn(params bool[] vals)
+                public ScalarTypeProbeRequest WithRequiredBooleanIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_boolean", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_boolean", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredBooleanNotIn(params bool[] vals)
+                public ScalarTypeProbeRequest WithRequiredBooleanNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_boolean", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_boolean", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredBooleanGreaterThan(bool val)
+                public ScalarTypeProbeRequest WithRequiredBooleanGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredBooleanGreaterThanOrEqualTo(bool val)
+                public ScalarTypeProbeRequest WithRequiredBooleanGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredBooleanLessThan(bool val)
+                public ScalarTypeProbeRequest WithRequiredBooleanLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredBooleanLessThanOrEqualTo(bool val)
+                public ScalarTypeProbeRequest WithRequiredBooleanLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredBooleanBetween(bool lower, bool upper)
+                public ScalarTypeProbeRequest WithRequiredBooleanBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_boolean", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -816,49 +816,49 @@ namespace Generated.Requests
                     _query.AndFilter(Expr.Eq("optional_boolean", false));
                     return this;
                 }
-                public ScalarTypeProbeRequest WithOptionalBooleanIsNot(bool val)
+                public ScalarTypeProbeRequest WithOptionalBooleanIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalBooleanIn(params bool[] vals)
+                public ScalarTypeProbeRequest WithOptionalBooleanIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_boolean", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_boolean", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalBooleanNotIn(params bool[] vals)
+                public ScalarTypeProbeRequest WithOptionalBooleanNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_boolean", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_boolean", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalBooleanGreaterThan(bool val)
+                public ScalarTypeProbeRequest WithOptionalBooleanGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalBooleanGreaterThanOrEqualTo(bool val)
+                public ScalarTypeProbeRequest WithOptionalBooleanGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalBooleanLessThan(bool val)
+                public ScalarTypeProbeRequest WithOptionalBooleanLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalBooleanLessThanOrEqualTo(bool val)
+                public ScalarTypeProbeRequest WithOptionalBooleanLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_boolean", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalBooleanBetween(bool lower, bool upper)
+                public ScalarTypeProbeRequest WithOptionalBooleanBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_boolean", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -876,55 +876,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerIs(long val)
+                public ScalarTypeProbeRequest WithRequiredIntegerIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("required_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerIsNot(long val)
+                public ScalarTypeProbeRequest WithRequiredIntegerIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerIn(params long[] vals)
+                public ScalarTypeProbeRequest WithRequiredIntegerIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_integer", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_integer", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithRequiredIntegerNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_integer", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_integer", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerGreaterThan(long val)
+                public ScalarTypeProbeRequest WithRequiredIntegerGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithRequiredIntegerGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerLessThan(long val)
+                public ScalarTypeProbeRequest WithRequiredIntegerLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithRequiredIntegerLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredIntegerBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithRequiredIntegerBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_integer", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -942,55 +942,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerIs(long val)
+                public ScalarTypeProbeRequest WithOptionalIntegerIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("optional_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerIsNot(long val)
+                public ScalarTypeProbeRequest WithOptionalIntegerIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerIn(params long[] vals)
+                public ScalarTypeProbeRequest WithOptionalIntegerIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_integer", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_integer", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithOptionalIntegerNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_integer", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_integer", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerGreaterThan(long val)
+                public ScalarTypeProbeRequest WithOptionalIntegerGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithOptionalIntegerGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerLessThan(long val)
+                public ScalarTypeProbeRequest WithOptionalIntegerLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithOptionalIntegerLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_integer", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalIntegerBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithOptionalIntegerBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_integer", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1008,55 +1008,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongIs(long val)
+                public ScalarTypeProbeRequest WithRequiredLongIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("required_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongIsNot(long val)
+                public ScalarTypeProbeRequest WithRequiredLongIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongIn(params long[] vals)
+                public ScalarTypeProbeRequest WithRequiredLongIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_long", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_long", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithRequiredLongNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_long", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_long", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongGreaterThan(long val)
+                public ScalarTypeProbeRequest WithRequiredLongGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithRequiredLongGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongLessThan(long val)
+                public ScalarTypeProbeRequest WithRequiredLongLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithRequiredLongLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredLongBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithRequiredLongBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_long", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1074,55 +1074,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongIs(long val)
+                public ScalarTypeProbeRequest WithOptionalLongIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("optional_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongIsNot(long val)
+                public ScalarTypeProbeRequest WithOptionalLongIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongIn(params long[] vals)
+                public ScalarTypeProbeRequest WithOptionalLongIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_long", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_long", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithOptionalLongNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_long", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_long", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongGreaterThan(long val)
+                public ScalarTypeProbeRequest WithOptionalLongGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithOptionalLongGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongLessThan(long val)
+                public ScalarTypeProbeRequest WithOptionalLongLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithOptionalLongLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_long", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalLongBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithOptionalLongBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_long", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1140,55 +1140,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalIs(decimal val)
+                public ScalarTypeProbeRequest WithRequiredDecimalIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("required_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalIsNot(decimal val)
+                public ScalarTypeProbeRequest WithRequiredDecimalIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalIn(params decimal[] vals)
+                public ScalarTypeProbeRequest WithRequiredDecimalIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_decimal", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_decimal", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalNotIn(params decimal[] vals)
+                public ScalarTypeProbeRequest WithRequiredDecimalNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_decimal", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_decimal", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalGreaterThan(decimal val)
+                public ScalarTypeProbeRequest WithRequiredDecimalGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalGreaterThanOrEqualTo(decimal val)
+                public ScalarTypeProbeRequest WithRequiredDecimalGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalLessThan(decimal val)
+                public ScalarTypeProbeRequest WithRequiredDecimalLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalLessThanOrEqualTo(decimal val)
+                public ScalarTypeProbeRequest WithRequiredDecimalLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDecimalBetween(decimal lower, decimal upper)
+                public ScalarTypeProbeRequest WithRequiredDecimalBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_decimal", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1206,55 +1206,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalIs(decimal val)
+                public ScalarTypeProbeRequest WithOptionalDecimalIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("optional_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalIsNot(decimal val)
+                public ScalarTypeProbeRequest WithOptionalDecimalIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalIn(params decimal[] vals)
+                public ScalarTypeProbeRequest WithOptionalDecimalIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_decimal", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_decimal", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalNotIn(params decimal[] vals)
+                public ScalarTypeProbeRequest WithOptionalDecimalNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_decimal", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_decimal", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalGreaterThan(decimal val)
+                public ScalarTypeProbeRequest WithOptionalDecimalGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalGreaterThanOrEqualTo(decimal val)
+                public ScalarTypeProbeRequest WithOptionalDecimalGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalLessThan(decimal val)
+                public ScalarTypeProbeRequest WithOptionalDecimalLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalLessThanOrEqualTo(decimal val)
+                public ScalarTypeProbeRequest WithOptionalDecimalLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_decimal", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDecimalBetween(decimal lower, decimal upper)
+                public ScalarTypeProbeRequest WithOptionalDecimalBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_decimal", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1272,55 +1272,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatIs(double val)
+                public ScalarTypeProbeRequest WithRequiredFloatIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("required_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatIsNot(double val)
+                public ScalarTypeProbeRequest WithRequiredFloatIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatIn(params double[] vals)
+                public ScalarTypeProbeRequest WithRequiredFloatIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_float", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_float", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatNotIn(params double[] vals)
+                public ScalarTypeProbeRequest WithRequiredFloatNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_float", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_float", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatGreaterThan(double val)
+                public ScalarTypeProbeRequest WithRequiredFloatGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatGreaterThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithRequiredFloatGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatLessThan(double val)
+                public ScalarTypeProbeRequest WithRequiredFloatLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatLessThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithRequiredFloatLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredFloatBetween(double lower, double upper)
+                public ScalarTypeProbeRequest WithRequiredFloatBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_float", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1338,55 +1338,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatIs(double val)
+                public ScalarTypeProbeRequest WithOptionalFloatIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("optional_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatIsNot(double val)
+                public ScalarTypeProbeRequest WithOptionalFloatIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatIn(params double[] vals)
+                public ScalarTypeProbeRequest WithOptionalFloatIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_float", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_float", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatNotIn(params double[] vals)
+                public ScalarTypeProbeRequest WithOptionalFloatNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_float", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_float", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatGreaterThan(double val)
+                public ScalarTypeProbeRequest WithOptionalFloatGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatGreaterThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithOptionalFloatGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatLessThan(double val)
+                public ScalarTypeProbeRequest WithOptionalFloatLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatLessThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithOptionalFloatLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_float", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalFloatBetween(double lower, double upper)
+                public ScalarTypeProbeRequest WithOptionalFloatBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_float", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1404,55 +1404,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleIs(double val)
+                public ScalarTypeProbeRequest WithRequiredDoubleIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("required_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleIsNot(double val)
+                public ScalarTypeProbeRequest WithRequiredDoubleIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleIn(params double[] vals)
+                public ScalarTypeProbeRequest WithRequiredDoubleIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_double", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_double", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleNotIn(params double[] vals)
+                public ScalarTypeProbeRequest WithRequiredDoubleNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_double", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_double", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleGreaterThan(double val)
+                public ScalarTypeProbeRequest WithRequiredDoubleGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleGreaterThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithRequiredDoubleGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleLessThan(double val)
+                public ScalarTypeProbeRequest WithRequiredDoubleLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleLessThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithRequiredDoubleLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDoubleBetween(double lower, double upper)
+                public ScalarTypeProbeRequest WithRequiredDoubleBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_double", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1470,55 +1470,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleIs(double val)
+                public ScalarTypeProbeRequest WithOptionalDoubleIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("optional_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleIsNot(double val)
+                public ScalarTypeProbeRequest WithOptionalDoubleIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleIn(params double[] vals)
+                public ScalarTypeProbeRequest WithOptionalDoubleIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_double", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_double", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleNotIn(params double[] vals)
+                public ScalarTypeProbeRequest WithOptionalDoubleNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_double", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_double", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleGreaterThan(double val)
+                public ScalarTypeProbeRequest WithOptionalDoubleGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleGreaterThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithOptionalDoubleGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleLessThan(double val)
+                public ScalarTypeProbeRequest WithOptionalDoubleLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleLessThanOrEqualTo(double val)
+                public ScalarTypeProbeRequest WithOptionalDoubleLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_double", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDoubleBetween(double lower, double upper)
+                public ScalarTypeProbeRequest WithOptionalDoubleBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_double", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1536,57 +1536,57 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateIs(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDateIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("required_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Eq("required_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateIsNot(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDateIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("required_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Ne("required_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithRequiredDateIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_date", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateNotIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithRequiredDateNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_date", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateGreaterThan(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDateGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("required_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Gt("required_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateGreaterThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDateGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("required_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Gte("required_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateLessThan(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDateLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("required_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Lt("required_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateLessThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDateLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("required_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Lte("required_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDateBetween(DateTime lower, DateTime upper)
+                public ScalarTypeProbeRequest WithRequiredDateBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("required_date", new Value.DateValue(lower), new Value.DateValue(upper)));
+                    _query.AndFilter(Expr.Between("required_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -1602,57 +1602,57 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateIs(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDateIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("optional_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Eq("optional_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateIsNot(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDateIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("optional_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Ne("optional_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithOptionalDateIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_date", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateNotIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithOptionalDateNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_date", vals.Select(val => new Value.DateValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_date", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateGreaterThan(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDateGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("optional_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Gt("optional_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateGreaterThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDateGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("optional_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Gte("optional_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateLessThan(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDateLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("optional_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Lt("optional_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateLessThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDateLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("optional_date", new Value.DateValue(val)));
+                    _query.AndFilter(Expr.Lte("optional_date", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDateBetween(DateTime lower, DateTime upper)
+                public ScalarTypeProbeRequest WithOptionalDateBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("optional_date", new Value.DateValue(lower), new Value.DateValue(upper)));
+                    _query.AndFilter(Expr.Between("optional_date", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
@@ -1668,55 +1668,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeIs(TimeSpan val)
+                public ScalarTypeProbeRequest WithRequiredTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("required_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeIsNot(TimeSpan val)
+                public ScalarTypeProbeRequest WithRequiredTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeIn(params TimeSpan[] vals)
+                public ScalarTypeProbeRequest WithRequiredTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeNotIn(params TimeSpan[] vals)
+                public ScalarTypeProbeRequest WithRequiredTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeGreaterThan(TimeSpan val)
+                public ScalarTypeProbeRequest WithRequiredTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeGreaterThanOrEqualTo(TimeSpan val)
+                public ScalarTypeProbeRequest WithRequiredTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeLessThan(TimeSpan val)
+                public ScalarTypeProbeRequest WithRequiredTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeLessThanOrEqualTo(TimeSpan val)
+                public ScalarTypeProbeRequest WithRequiredTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredTimeBetween(TimeSpan lower, TimeSpan upper)
+                public ScalarTypeProbeRequest WithRequiredTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1734,55 +1734,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeIs(TimeSpan val)
+                public ScalarTypeProbeRequest WithOptionalTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("optional_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeIsNot(TimeSpan val)
+                public ScalarTypeProbeRequest WithOptionalTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeIn(params TimeSpan[] vals)
+                public ScalarTypeProbeRequest WithOptionalTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeNotIn(params TimeSpan[] vals)
+                public ScalarTypeProbeRequest WithOptionalTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeGreaterThan(TimeSpan val)
+                public ScalarTypeProbeRequest WithOptionalTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeGreaterThanOrEqualTo(TimeSpan val)
+                public ScalarTypeProbeRequest WithOptionalTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeLessThan(TimeSpan val)
+                public ScalarTypeProbeRequest WithOptionalTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeLessThanOrEqualTo(TimeSpan val)
+                public ScalarTypeProbeRequest WithOptionalTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalTimeBetween(TimeSpan lower, TimeSpan upper)
+                public ScalarTypeProbeRequest WithOptionalTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1800,55 +1800,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeIs(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDatetimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("required_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeIsNot(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDatetimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("required_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithRequiredDatetimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("required_datetime", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("required_datetime", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeNotIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithRequiredDatetimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("required_datetime", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("required_datetime", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeGreaterThan(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDatetimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("required_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeGreaterThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDatetimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("required_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeLessThan(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDatetimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("required_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeLessThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithRequiredDatetimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("required_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithRequiredDatetimeBetween(DateTime lower, DateTime upper)
+                public ScalarTypeProbeRequest WithRequiredDatetimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("required_datetime", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1866,55 +1866,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeIs(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDatetimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("optional_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeIsNot(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDatetimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("optional_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithOptionalDatetimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("optional_datetime", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("optional_datetime", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeNotIn(params DateTime[] vals)
+                public ScalarTypeProbeRequest WithOptionalDatetimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("optional_datetime", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("optional_datetime", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeGreaterThan(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDatetimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("optional_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeGreaterThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDatetimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("optional_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeLessThan(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDatetimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("optional_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeLessThanOrEqualTo(DateTime val)
+                public ScalarTypeProbeRequest WithOptionalDatetimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("optional_datetime", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithOptionalDatetimeBetween(DateTime lower, DateTime upper)
+                public ScalarTypeProbeRequest WithOptionalDatetimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("optional_datetime", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1932,55 +1932,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeIs(long val)
+                public ScalarTypeProbeRequest WithCreateTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeIsNot(long val)
+                public ScalarTypeProbeRequest WithCreateTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeIn(params long[] vals)
+                public ScalarTypeProbeRequest WithCreateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithCreateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeGreaterThan(long val)
+                public ScalarTypeProbeRequest WithCreateTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithCreateTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeLessThan(long val)
+                public ScalarTypeProbeRequest WithCreateTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithCreateTimeBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithCreateTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -1998,55 +1998,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeIs(long val)
+                public ScalarTypeProbeRequest WithUpdateTimeIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeIsNot(long val)
+                public ScalarTypeProbeRequest WithUpdateTimeIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeIn(params long[] vals)
+                public ScalarTypeProbeRequest WithUpdateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithUpdateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("update_time", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeGreaterThan(long val)
+                public ScalarTypeProbeRequest WithUpdateTimeGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithUpdateTimeGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeLessThan(long val)
+                public ScalarTypeProbeRequest WithUpdateTimeLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithUpdateTimeLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("update_time", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithUpdateTimeBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithUpdateTimeBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("update_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -2064,55 +2064,55 @@ namespace Generated.Requests
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionIs(long val)
+                public ScalarTypeProbeRequest WithVersionIs(object val)
                 {
                     _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionIsNot(long val)
+                public ScalarTypeProbeRequest WithVersionIsNot(object val)
                 {
                     _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionIn(params long[] vals)
+                public ScalarTypeProbeRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionNotIn(params long[] vals)
+                public ScalarTypeProbeRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn("version", vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionGreaterThan(long val)
+                public ScalarTypeProbeRequest WithVersionGreaterThan(object val)
                 {
                     _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionGreaterThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionLessThan(long val)
+                public ScalarTypeProbeRequest WithVersionLessThan(object val)
                 {
                     _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionLessThanOrEqualTo(long val)
+                public ScalarTypeProbeRequest WithVersionLessThanOrEqualTo(object val)
                 {
                     _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public ScalarTypeProbeRequest WithVersionBetween(long lower, long upper)
+                public ScalarTypeProbeRequest WithVersionBetween(object lower, object upper)
                 {
                     _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
@@ -3253,8 +3253,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy("id"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByTypePlatform()
@@ -3265,8 +3264,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByTypePlatformAs(string retName)
                 {
-                    _query.GroupBy("type_platform");
-                    _query.ProjectExpr(retName, Expr.Column("type_platform"));
+                    _query.GroupBy("type_platform"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredString()
@@ -3277,8 +3275,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredStringAs(string retName)
                 {
-                    _query.GroupBy("required_string");
-                    _query.ProjectExpr(retName, Expr.Column("required_string"));
+                    _query.GroupBy("required_string"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalString()
@@ -3289,8 +3286,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalStringAs(string retName)
                 {
-                    _query.GroupBy("optional_string");
-                    _query.ProjectExpr(retName, Expr.Column("optional_string"));
+                    _query.GroupBy("optional_string"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByLargeText()
@@ -3301,8 +3297,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByLargeTextAs(string retName)
                 {
-                    _query.GroupBy("large_text");
-                    _query.ProjectExpr(retName, Expr.Column("large_text"));
+                    _query.GroupBy("large_text"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredBoolean()
@@ -3313,8 +3308,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredBooleanAs(string retName)
                 {
-                    _query.GroupBy("required_boolean");
-                    _query.ProjectExpr(retName, Expr.Column("required_boolean"));
+                    _query.GroupBy("required_boolean"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalBoolean()
@@ -3325,8 +3319,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalBooleanAs(string retName)
                 {
-                    _query.GroupBy("optional_boolean");
-                    _query.ProjectExpr(retName, Expr.Column("optional_boolean"));
+                    _query.GroupBy("optional_boolean"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredInteger()
@@ -3337,8 +3330,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredIntegerAs(string retName)
                 {
-                    _query.GroupBy("required_integer");
-                    _query.ProjectExpr(retName, Expr.Column("required_integer"));
+                    _query.GroupBy("required_integer"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalInteger()
@@ -3349,8 +3341,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalIntegerAs(string retName)
                 {
-                    _query.GroupBy("optional_integer");
-                    _query.ProjectExpr(retName, Expr.Column("optional_integer"));
+                    _query.GroupBy("optional_integer"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredLong()
@@ -3361,8 +3352,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredLongAs(string retName)
                 {
-                    _query.GroupBy("required_long");
-                    _query.ProjectExpr(retName, Expr.Column("required_long"));
+                    _query.GroupBy("required_long"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalLong()
@@ -3373,8 +3363,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalLongAs(string retName)
                 {
-                    _query.GroupBy("optional_long");
-                    _query.ProjectExpr(retName, Expr.Column("optional_long"));
+                    _query.GroupBy("optional_long"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredDecimal()
@@ -3385,8 +3374,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredDecimalAs(string retName)
                 {
-                    _query.GroupBy("required_decimal");
-                    _query.ProjectExpr(retName, Expr.Column("required_decimal"));
+                    _query.GroupBy("required_decimal"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalDecimal()
@@ -3397,8 +3385,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalDecimalAs(string retName)
                 {
-                    _query.GroupBy("optional_decimal");
-                    _query.ProjectExpr(retName, Expr.Column("optional_decimal"));
+                    _query.GroupBy("optional_decimal"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredFloat()
@@ -3409,8 +3396,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredFloatAs(string retName)
                 {
-                    _query.GroupBy("required_float");
-                    _query.ProjectExpr(retName, Expr.Column("required_float"));
+                    _query.GroupBy("required_float"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalFloat()
@@ -3421,8 +3407,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalFloatAs(string retName)
                 {
-                    _query.GroupBy("optional_float");
-                    _query.ProjectExpr(retName, Expr.Column("optional_float"));
+                    _query.GroupBy("optional_float"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredDouble()
@@ -3433,8 +3418,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredDoubleAs(string retName)
                 {
-                    _query.GroupBy("required_double");
-                    _query.ProjectExpr(retName, Expr.Column("required_double"));
+                    _query.GroupBy("required_double"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalDouble()
@@ -3445,8 +3429,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalDoubleAs(string retName)
                 {
-                    _query.GroupBy("optional_double");
-                    _query.ProjectExpr(retName, Expr.Column("optional_double"));
+                    _query.GroupBy("optional_double"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredDate()
@@ -3457,8 +3440,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredDateAs(string retName)
                 {
-                    _query.GroupBy("required_date");
-                    _query.ProjectExpr(retName, Expr.Column("required_date"));
+                    _query.GroupBy("required_date"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalDate()
@@ -3469,8 +3451,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalDateAs(string retName)
                 {
-                    _query.GroupBy("optional_date");
-                    _query.ProjectExpr(retName, Expr.Column("optional_date"));
+                    _query.GroupBy("optional_date"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredTime()
@@ -3481,8 +3462,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredTimeAs(string retName)
                 {
-                    _query.GroupBy("required_time");
-                    _query.ProjectExpr(retName, Expr.Column("required_time"));
+                    _query.GroupBy("required_time"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalTime()
@@ -3493,8 +3473,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalTimeAs(string retName)
                 {
-                    _query.GroupBy("optional_time");
-                    _query.ProjectExpr(retName, Expr.Column("optional_time"));
+                    _query.GroupBy("optional_time"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByRequiredDatetime()
@@ -3505,8 +3484,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByRequiredDatetimeAs(string retName)
                 {
-                    _query.GroupBy("required_datetime");
-                    _query.ProjectExpr(retName, Expr.Column("required_datetime"));
+                    _query.GroupBy("required_datetime"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByOptionalDatetime()
@@ -3517,8 +3495,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByOptionalDatetimeAs(string retName)
                 {
-                    _query.GroupBy("optional_datetime");
-                    _query.ProjectExpr(retName, Expr.Column("optional_datetime"));
+                    _query.GroupBy("optional_datetime"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByCreateTime()
@@ -3529,8 +3506,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time");
-                    _query.ProjectExpr(retName, Expr.Column("create_time"));
+                    _query.GroupBy("create_time"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByUpdateTime()
@@ -3541,8 +3517,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByUpdateTimeAs(string retName)
                 {
-                    _query.GroupBy("update_time");
-                    _query.ProjectExpr(retName, Expr.Column("update_time"));
+                    _query.GroupBy("update_time"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest GroupByVersion()
@@ -3553,8 +3528,7 @@ namespace Generated.Requests
 
                 public ScalarTypeProbeRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy("version"); 
                     return this;
                 }
                 public ScalarTypeProbeRequest FacetByTypePlatformAs(
@@ -3580,29 +3554,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.ScalarTypeProbe?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.ScalarTypeProbe.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.ScalarTypeProbe>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.ScalarTypeProbe>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.ScalarTypeProbe>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.ScalarTypeProbe>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -3624,6 +3603,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.ScalarTypeProbe.FromRecord(row, new EntityRoot()), request.Query),
@@ -3673,11 +3654,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("ScalarTypeProbe").ConfigureAwait(false));
-            var entity = Generated.Models.ScalarTypeProbe.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("ScalarTypeProbe", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("ScalarTypeProbe", Generated.Models.ScalarTypeProbe.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 
