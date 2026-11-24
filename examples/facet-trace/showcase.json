@@ -1,0 +1,60 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/facet-trace",
+  "library": {
+    "generatedFilesManifestSHA256": "9ec26b00a58edf235af80f356d1246ced13cb54c6294a6cfd3536047cc7ae415",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "9fc6724c828e10aca8cea9f53b65460f26577f74ba5396f04376ad4f20ddc30e"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build; not a public release",
+      "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
+      "qualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
+      "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+      "tag": "unreleased-source-021b1ed8"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/facet-remaining-generation/receipt.json",
+    "receiptSHA256": "45c7ecfe08aa1f8b0d1a77c8476f2a3133d1f70220ec4f5f2738a5f4b0343d77"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-facet/runtime/facet-trace/business-receipt.json",
+    "businessReceiptSHA256": "9aede849b96f02c4cdfcc5934ad72768d3c6fe69eb69238be62c3c0acf77395a",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-facet/receipt.json",
+    "nativeReceiptSHA256": "84520c7fe0108e358ae2e7fdedc1f4e706a4c72aa8ca5de4b5c3eb324d54bba0",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
+  },
+  "scene": "School catalog Facets, full membership counts and retained business/privacy assertions",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "verify.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "school-management-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/School.cs",
+      "Models/SchoolType.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/SchoolRequest.cs",
+      "Requests/SchoolTypeRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "81a28cd354d2ad9de775d734d0afbba47233e9c2baaab89ee57dd1b984e59cef",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

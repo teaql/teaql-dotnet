@@ -1,0 +1,50 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/expression-profiles",
+  "library": {
+    "generatedFilesManifestSHA256": "0199491c6925ea67fb2f8627baaa790c2f95a6598a469978fa15f46a69281552",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "9ef6fdfe684a40e0d027e70c4a819a96a2ea9a8bb5d8ccb9132ac783414ecb48"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build",
+      "jarSHA256": "029f602cf0e2de4ec0910495c340fbeb41f11772b6aca875569f498811158e7d",
+      "qualificationReceiptSHA256": "1012520de60d49cfc1e45c7e08fcf204dd2db36a163909e1e36752065a31047a",
+      "sourceCommit": "99d6bde2351d79b7d8b1b1c5cbc78c5dc777b6f2",
+      "tag": "unreleased-source-99d6bde2"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dispatch-document-profiles-generation/receipt.json",
+    "receiptSHA256": "11b1084da4040d1a68378b9ee879d98dd18d61b7eace2700c2e3dc207276c1b3"
+  },
+  "scene": "Read a dispatch order in snake_case",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "covered-by-parent-qualification",
+  "verification": [
+    "bash",
+    "examples/expression-profiles/verify-dispatch.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "dispatch-document-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/DispatchOrder.cs",
+      "Models/DistributionCenter.cs",
+      "Q.cs",
+      "Requests/DispatchOrderRequest.cs",
+      "Requests/DistributionCenterRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "9e41458988479c2570944d8c5143599047db726a3d25eaed972b1c6ecf451444",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

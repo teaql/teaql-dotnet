@@ -1,0 +1,70 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/trace-chain",
+  "library": {
+    "generatedFilesManifestSHA256": "8c132637421a82a20bf641f7a94781ce642b7ef276c99f72b6037afef19709c4",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "242882959e9b196aa7461abc40cc743455a77798ed49fcd0f3c6b4acb2bf1ed9"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "unsigned unpublished versioned source candidate; not a released artifact",
+      "baseRelease": "v4.2.0",
+      "candidatePreparationReceiptSHA256": "52b4c2042be58624c08d07186b7081cf6ad4c0fccfc8e9724bee7f9280b5c02f",
+      "candidateVersion": "4.3.0",
+      "jarSHA256": "3a4988ada43aeb01d5cbba5901c1eef64c58b2bd4142c99fd7692cf1dc413e9e",
+      "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+      "sourceQualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
+      "tag": "unsigned-candidate-v4.3.0"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-trace-chain-native-scope-pairs/receipt.json",
+    "receiptSHA256": "88e5095ee58df80c857ebb1e55f3972eaea832052ccc7d34fca10fc104b16338"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-trace-chain-native-scopes/runtime/trace-chain/receipt.json",
+    "businessReceiptSHA256": "10f8051a5b53f2e3de840e170647bb142d5f8d684a9749deac7044a976b52ba0",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-trace-chain-native-scopes/receipt.json",
+    "nativeReceiptSHA256": "e966e1a9ca157661210ba7f00fd0644e6b57edc3bc2b14a0fc8f3a2a5331d49d",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "9c38ec65e86666ba2f3bb981dcf791dc3596e013",
+    "standardCase": "graph"
+  },
+  "scene": "Order graph and observations at real query, commit, rollback and restart boundaries",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "scripts/verify-trace-chain-example.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "trace-chain-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/CustomerOrder.cs",
+      "Models/OrderItem.cs",
+      "Models/Payment.cs",
+      "Models/PaymentAttempt.cs",
+      "Models/Platform.cs",
+      "Models/Shipment.cs",
+      "Q.cs",
+      "Requests/CustomerOrderRequest.cs",
+      "Requests/OrderItemRequest.cs",
+      "Requests/PaymentAttemptRequest.cs",
+      "Requests/PaymentRequest.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/ShipmentRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "31badbe667da7dea494de5025f4d4f48d18d1f0e06612a4432a12dd6f2992cbd",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

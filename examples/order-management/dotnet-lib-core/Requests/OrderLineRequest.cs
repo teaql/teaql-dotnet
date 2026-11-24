@@ -19,7 +19,7 @@ namespace Generated.Requests
         private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
         private static object TeaqlQueryValue(object value) =>
             value is TimeSpan time
-                ? time.ToString("c", System.Globalization.CultureInfo.InvariantCulture)
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
                 : value;
 
         public OrderLineRequest()
@@ -120,21 +120,21 @@ namespace Generated.Requests
 
         public OrderLineRequest SelectSelfFields()
         {
-            _query.Project("id");
-            _query.Project("customer_order");
-            _query.Project("product");
-            _query.Project("product_name");
-            _query.Project("sku");
-            _query.Project("quantity");
-            _query.Project("commerce_platform");
-            _query.Project("create_time");
-            _query.Project("version");
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY);
             return this;
         }
 
                 public OrderLineRequest SelectId()
                 {
-                    _query.Project("id");
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -142,32 +142,32 @@ namespace Generated.Requests
 
                 public OrderLineRequest SelectProductName()
                 {
-                    _query.Project("product_name");
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest SelectSku()
                 {
-                    _query.Project("sku");
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest SelectQuantity()
                 {
-                    _query.Project("quantity");
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
                     return this;
                 }
 
 
                 public OrderLineRequest SelectCreateTime()
                 {
-                    _query.Project("create_time");
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest SelectVersion()
                 {
-                    _query.Project("version");
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
@@ -178,10 +178,10 @@ namespace Generated.Requests
 
                 public OrderLineRequest SelectCustomerOrderWith(CustomerOrderRequest related)
                 {
-                    _query.Project("customer_order");
-                    _query.ForwardRelationQuery("CustomerOrder", "CustomerOrder", "customer_order", related.GetQuery());
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, "CustomerOrder", global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCustomerOrderWith", Relation: "CustomerOrder")
+                        Operation = new QueryOperation("relation", "SelectCustomerOrderWith", Relation: global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER)
                     };
                     return this;
                 }
@@ -192,10 +192,10 @@ namespace Generated.Requests
 
                 public OrderLineRequest SelectProductWith(ProductRequest related)
                 {
-                    _query.Project("product");
-                    _query.ForwardRelationQuery("Product", "Product", "product", related.GetQuery());
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_MEMBER, "Product", global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectProductWith", Relation: "Product")
+                        Operation = new QueryOperation("relation", "SelectProductWith", Relation: global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_MEMBER)
                     };
                     return this;
                 }
@@ -206,604 +206,604 @@ namespace Generated.Requests
 
                 public OrderLineRequest SelectCommercePlatformWith(CommercePlatformRequest related)
                 {
-                    _query.Project("commerce_platform");
-                    _query.ForwardRelationQuery("CommercePlatform", "CommercePlatform", "commerce_platform", related.GetQuery());
+                    _query.Project(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
+                    _query.ForwardRelationQuery(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, "CommercePlatform", global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, related.GetQuery());
                     _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
-                        Operation = new QueryOperation("relation", "SelectCommercePlatformWith", Relation: "CommercePlatform")
+                        Operation = new QueryOperation("relation", "SelectCommercePlatformWith", Relation: global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER)
                     };
                     return this;
                 }
                 public OrderLineRequest WithCustomerOrderMatching(CustomerOrderRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("customer_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderLineRequest WithoutCustomerOrderMatching(CustomerOrderRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("customer_order", GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CustomerOrder")!, related.GetQuery(), "id"));
                     return this;
                 }
                 public OrderLineRequest WithProductMatching(ProductRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("product", GeneratedRuntimeModule.Module.Metadata.GetEntity("Product")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Product")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderLineRequest WithoutProductMatching(ProductRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("product", GeneratedRuntimeModule.Module.Metadata.GetEntity("Product")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("Product")!, related.GetQuery(), "id"));
                     return this;
                 }
                 public OrderLineRequest WithCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.InSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.InSubquery(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
                 public OrderLineRequest WithoutCommercePlatformMatching(CommercePlatformRequest related)
                 {
-                    _query.AndFilter(Expr.NotInSubquery("commerce_platform", GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
+                    _query.AndFilter(Expr.NotInSubquery(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, GeneratedRuntimeModule.Module.Metadata.GetEntity("CommercePlatform")!, related.GetQuery(), "id"));
                     return this;
                 }
 
-                public OrderLineRequest WithIdIs(long val)
+                public OrderLineRequest WithIdIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithIdIsNot(long val)
+                public OrderLineRequest WithIdIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithIdIn(params long[] vals)
+                public OrderLineRequest WithIdIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithIdNotIn(params long[] vals)
+                public OrderLineRequest WithIdNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("id", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithIdGreaterThan(long val)
+                public OrderLineRequest WithIdGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithIdGreaterThanOrEqualTo(long val)
+                public OrderLineRequest WithIdGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithIdLessThan(long val)
+                public OrderLineRequest WithIdLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithIdLessThanOrEqualTo(long val)
+                public OrderLineRequest WithIdLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("id", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithIdBetween(long lower, long upper)
+                public OrderLineRequest WithIdBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("id", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderLineRequest WithIdIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("id"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithIdIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("id"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest FilterByCustomerOrder(object val)
                 {
-                    _query.AndFilter(Expr.Eq("customer_order", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest FilterByCustomerOrderIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("customer_order", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public OrderLineRequest WithCustomerOrderIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("customer_order"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithCustomerOrderIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("customer_order"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest FilterByProduct(object val)
                 {
-                    _query.AndFilter(Expr.Eq("product", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest FilterByProductIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("product", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public OrderLineRequest WithProductIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("product"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithProductIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("product"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("product_name", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("product_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderLineRequest WithProductNameIsNot(string val)
+                public OrderLineRequest WithProductNameIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("product_name", TeaqlQueryValue(val)));
-                    return this;
-                }
-
-                public OrderLineRequest WithProductNameIn(params string[] vals)
-                {
-                    _query.AndFilter(Expr.In("product_name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithProductNameNotIn(params string[] vals)
+                public OrderLineRequest WithProductNameIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("product_name", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithProductNameGreaterThan(string val)
+                public OrderLineRequest WithProductNameNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.Gt("product_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithProductNameGreaterThanOrEqualTo(string val)
+                public OrderLineRequest WithProductNameGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gte("product_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithProductNameLessThan(string val)
+                public OrderLineRequest WithProductNameGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lt("product_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithProductNameLessThanOrEqualTo(string val)
+                public OrderLineRequest WithProductNameLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lte("product_name", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithProductNameBetween(string lower, string upper)
+                public OrderLineRequest WithProductNameLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Between("product_name", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public OrderLineRequest WithProductNameBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("product_name"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("product_name"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderLineRequest WithProductNameNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("product_name", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("product_name", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("product_name", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("product_name", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("product_name", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithProductNameSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("product_name", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuContaining(string val)
                 {
-                    _query.AndFilter(Expr.Contain("sku", val));
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuIs(string val)
                 {
-                    _query.AndFilter(Expr.Eq("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
-                public OrderLineRequest WithSkuIsNot(string val)
+                public OrderLineRequest WithSkuIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("sku", TeaqlQueryValue(val)));
-                    return this;
-                }
-
-                public OrderLineRequest WithSkuIn(params string[] vals)
-                {
-                    _query.AndFilter(Expr.In("sku", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithSkuNotIn(params string[] vals)
+                public OrderLineRequest WithSkuIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("sku", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithSkuGreaterThan(string val)
+                public OrderLineRequest WithSkuNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.Gt("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithSkuGreaterThanOrEqualTo(string val)
+                public OrderLineRequest WithSkuGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gte("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithSkuLessThan(string val)
+                public OrderLineRequest WithSkuGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lt("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithSkuLessThanOrEqualTo(string val)
+                public OrderLineRequest WithSkuLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lte("sku", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithSkuBetween(string lower, string upper)
+                public OrderLineRequest WithSkuLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Between("sku", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public OrderLineRequest WithSkuBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("sku"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("sku"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY));
                     return this;
                 }
                 public OrderLineRequest WithSkuNotContaining(string val)
                 {
-                    _query.AndFilter(Expr.NotContain("sku", val));
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.BeginWith("sku", val));
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuNotStartingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotBeginWith("sku", val));
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.EndWith("sku", val));
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuNotEndingWith(string val)
                 {
-                    _query.AndFilter(Expr.NotEndWith("sku", val));
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest WithSkuSoundingLike(string val)
                 {
-                    _query.AndFilter(Expr.SoundLike("sku", val));
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, val));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityIs(long val)
+                public OrderLineRequest WithQuantityIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityIsNot(long val)
+                public OrderLineRequest WithQuantityIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityIn(params long[] vals)
+                public OrderLineRequest WithQuantityIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("quantity", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityNotIn(params long[] vals)
+                public OrderLineRequest WithQuantityNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("quantity", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityGreaterThan(long val)
+                public OrderLineRequest WithQuantityGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityGreaterThanOrEqualTo(long val)
+                public OrderLineRequest WithQuantityGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityLessThan(long val)
+                public OrderLineRequest WithQuantityLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityLessThanOrEqualTo(long val)
+                public OrderLineRequest WithQuantityLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("quantity", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithQuantityBetween(long lower, long upper)
+                public OrderLineRequest WithQuantityBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("quantity", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderLineRequest WithQuantityIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("quantity"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithQuantityIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("quantity"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest FilterByCommercePlatform(object val)
                 {
-                    _query.AndFilter(Expr.Eq("commerce_platform", val));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, val));
                     return this;
                 }
 
                 public OrderLineRequest FilterByCommercePlatformIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("commerce_platform", vals));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY, vals));
                     return this;
                 }
 
                 public OrderLineRequest WithCommercePlatformIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("commerce_platform"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithCommercePlatformIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("commerce_platform"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeIs(long val)
+                public OrderLineRequest WithCreateTimeIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeIsNot(long val)
+                public OrderLineRequest WithCreateTimeIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeIn(params long[] vals)
+                public OrderLineRequest WithCreateTimeIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeNotIn(params long[] vals)
+                public OrderLineRequest WithCreateTimeNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("create_time", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeGreaterThan(long val)
+                public OrderLineRequest WithCreateTimeGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeGreaterThanOrEqualTo(long val)
+                public OrderLineRequest WithCreateTimeGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeLessThan(long val)
+                public OrderLineRequest WithCreateTimeLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeLessThanOrEqualTo(long val)
+                public OrderLineRequest WithCreateTimeLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("create_time", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithCreateTimeBetween(long lower, long upper)
+                public OrderLineRequest WithCreateTimeBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("create_time", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderLineRequest WithCreateTimeIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("create_time"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithCreateTimeIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("create_time"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionIs(long val)
+                public OrderLineRequest WithVersionIs(object val)
                 {
-                    _query.AndFilter(Expr.Eq("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionIsNot(long val)
+                public OrderLineRequest WithVersionIsNot(object val)
                 {
-                    _query.AndFilter(Expr.Ne("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionIn(params long[] vals)
+                public OrderLineRequest WithVersionIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.In("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.In(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionNotIn(params long[] vals)
+                public OrderLineRequest WithVersionNotIn(params object[] vals)
                 {
-                    _query.AndFilter(Expr.NotIn("version", vals.Select(val => TeaqlQueryValue(val)).ToArray()));
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionGreaterThan(long val)
+                public OrderLineRequest WithVersionGreaterThan(object val)
                 {
-                    _query.AndFilter(Expr.Gt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionGreaterThanOrEqualTo(long val)
+                public OrderLineRequest WithVersionGreaterThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Gte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionLessThan(long val)
+                public OrderLineRequest WithVersionLessThan(object val)
                 {
-                    _query.AndFilter(Expr.Lt("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionLessThanOrEqualTo(long val)
+                public OrderLineRequest WithVersionLessThanOrEqualTo(object val)
                 {
-                    _query.AndFilter(Expr.Lte("version", TeaqlQueryValue(val)));
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
                     return this;
                 }
 
-                public OrderLineRequest WithVersionBetween(long lower, long upper)
+                public OrderLineRequest WithVersionBetween(object lower, object upper)
                 {
-                    _query.AndFilter(Expr.Between("version", TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    _query.AndFilter(Expr.Between(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
                     return this;
                 }
 
                 public OrderLineRequest WithVersionIsKnown()
                 {
-                    _query.AndFilter(Expr.IsNotNull("version"));
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest WithVersionIsUnknown()
                 {
-                    _query.AndFilter(Expr.IsNull("version"));
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY));
                     return this;
                 }
 
                 public OrderLineRequest OrderByIdAscending()
                 {
-                    _query.OrderBy("id", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderLineRequest OrderByIdDescending()
                 {
-                    _query.OrderBy("id", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -811,62 +811,62 @@ namespace Generated.Requests
 
                 public OrderLineRequest OrderByProductNameAscending()
                 {
-                    _query.OrderBy("product_name", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderLineRequest OrderByProductNameDescending()
                 {
-                    _query.OrderBy("product_name", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderLineRequest OrderBySkuAscending()
                 {
-                    _query.OrderBy("sku", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderLineRequest OrderBySkuDescending()
                 {
-                    _query.OrderBy("sku", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderLineRequest OrderByQuantityAscending()
                 {
-                    _query.OrderBy("quantity", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderLineRequest OrderByQuantityDescending()
                 {
-                    _query.OrderBy("quantity", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
 
                 public OrderLineRequest OrderByCreateTimeAscending()
                 {
-                    _query.OrderBy("create_time", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderLineRequest OrderByCreateTimeDescending()
                 {
-                    _query.OrderBy("create_time", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
                 public OrderLineRequest OrderByVersionAscending()
                 {
-                    _query.OrderBy("version", "asc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
                     return this;
                 }
 
                 public OrderLineRequest OrderByVersionDescending()
                 {
-                    _query.OrderBy("version", "desc");
+                    _query.OrderBy(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
                     return this;
                 }
 
@@ -891,7 +891,7 @@ namespace Generated.Requests
 
                 public OrderLineRequest MinQuantityAs(string retName)
                 {
-                    _query.Aggregate("min", "quantity", retName);
+                    _query.Aggregate("min", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest MaxQuantity()
@@ -901,7 +901,7 @@ namespace Generated.Requests
 
                 public OrderLineRequest MaxQuantityAs(string retName)
                 {
-                    _query.Aggregate("max", "quantity", retName);
+                    _query.Aggregate("max", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest SumQuantity()
@@ -911,7 +911,7 @@ namespace Generated.Requests
 
                 public OrderLineRequest SumQuantityAs(string retName)
                 {
-                    _query.Aggregate("sum", "quantity", retName);
+                    _query.Aggregate("sum", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest AvgQuantity()
@@ -921,7 +921,7 @@ namespace Generated.Requests
 
                 public OrderLineRequest AvgQuantityAs(string retName)
                 {
-                    _query.Aggregate("avg", "quantity", retName);
+                    _query.Aggregate("avg", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest StandardDeviationQuantity()
@@ -931,7 +931,7 @@ namespace Generated.Requests
 
                 public OrderLineRequest StandardDeviationQuantityAs(string retName)
                 {
-                    _query.Aggregate("stddev", "quantity", retName);
+                    _query.Aggregate("stddev", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest SquareRootOfPopulationStandardDeviationQuantity()
@@ -941,7 +941,7 @@ namespace Generated.Requests
 
                 public OrderLineRequest SquareRootOfPopulationStandardDeviationQuantityAs(string retName)
                 {
-                    _query.Aggregate("stddev_pop", "quantity", retName);
+                    _query.Aggregate("stddev_pop", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest SampleVarianceQuantity()
@@ -951,7 +951,7 @@ namespace Generated.Requests
 
                 public OrderLineRequest SampleVarianceQuantityAs(string retName)
                 {
-                    _query.Aggregate("var_samp", "quantity", retName);
+                    _query.Aggregate("var_samp", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest SamplePopulationVarianceQuantity()
@@ -961,115 +961,106 @@ namespace Generated.Requests
 
                 public OrderLineRequest SamplePopulationVarianceQuantityAs(string retName)
                 {
-                    _query.Aggregate("var_pop", "quantity", retName);
+                    _query.Aggregate("var_pop", global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY, retName);
                     return this;
                 }
                 public OrderLineRequest GroupById()
                 {
-                    _query.GroupBy("id");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByIdAs(string retName)
                 {
-                    _query.GroupBy("id");
-                    _query.ProjectExpr(retName, Expr.Column("id"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.ID_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupByCustomerOrder()
                 {
-                    _query.GroupBy("customer_order");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByCustomerOrderAs(string retName)
                 {
-                    _query.GroupBy("customer_order");
-                    _query.ProjectExpr(retName, Expr.Column("customer_order"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupByProduct()
                 {
-                    _query.GroupBy("product");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByProductAs(string retName)
                 {
-                    _query.GroupBy("product");
-                    _query.ProjectExpr(retName, Expr.Column("product"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupByProductName()
                 {
-                    _query.GroupBy("product_name");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByProductNameAs(string retName)
                 {
-                    _query.GroupBy("product_name");
-                    _query.ProjectExpr(retName, Expr.Column("product_name"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_NAME_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupBySku()
                 {
-                    _query.GroupBy("sku");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupBySkuAs(string retName)
                 {
-                    _query.GroupBy("sku");
-                    _query.ProjectExpr(retName, Expr.Column("sku"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.SKU_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupByQuantity()
                 {
-                    _query.GroupBy("quantity");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByQuantityAs(string retName)
                 {
-                    _query.GroupBy("quantity");
-                    _query.ProjectExpr(retName, Expr.Column("quantity"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.QUANTITY_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupByCommercePlatform()
                 {
-                    _query.GroupBy("commerce_platform");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByCommercePlatformAs(string retName)
                 {
-                    _query.GroupBy("commerce_platform");
-                    _query.ProjectExpr(retName, Expr.Column("commerce_platform"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupByCreateTime()
                 {
-                    _query.GroupBy("create_time");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByCreateTimeAs(string retName)
                 {
-                    _query.GroupBy("create_time");
-                    _query.ProjectExpr(retName, Expr.Column("create_time"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.CREATE_TIME_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest GroupByVersion()
                 {
-                    _query.GroupBy("version");
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
 
                 public OrderLineRequest GroupByVersionAs(string retName)
                 {
-                    _query.GroupBy("version");
-                    _query.ProjectExpr(retName, Expr.Column("version"));
+                    _query.GroupBy(global::Generated.Models.OrderLine.__TeaqlFields.VERSION_PROPERTY_QUERY);
                     return this;
                 }
                 public OrderLineRequest FacetByCustomerOrderAs(
@@ -1077,8 +1068,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "CustomerOrder", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCustomerOrderAs", name, "customer_order")
+                        name, global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCustomerOrderAs", name, global::Generated.Models.OrderLine.__TeaqlFields.CUSTOMER_ORDER_PROPERTY_QUERY)
                     });
                     return this;
                 }
@@ -1088,8 +1079,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "Product", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByProductAs", name, "product")
+                        name, global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByProductAs", name, global::Generated.Models.OrderLine.__TeaqlFields.PRODUCT_PROPERTY_QUERY)
                     });
                     return this;
                 }
@@ -1099,8 +1090,8 @@ namespace Generated.Requests
                     bool includeAllFacets = true)
                 {
                     _query.Facets.Add(new FacetRequest(
-                        name, "CommercePlatform", request.GetQuery(), includeAllFacets) {
-                        Operation = new QueryOperation("facet", "FacetByCommercePlatformAs", name, "commerce_platform")
+                        name, global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_MEMBER, request.GetQuery(), includeAllFacets) {
+                        Operation = new QueryOperation("facet", "FacetByCommercePlatformAs", name, global::Generated.Models.OrderLine.__TeaqlFields.COMMERCE_PLATFORM_PROPERTY_QUERY)
                     });
                     return this;
                 }
@@ -1117,29 +1108,34 @@ namespace Generated.Requests
 
         private async Task<Generated.Models.OrderLine?> ExecuteForOneInternalAsync(UserContext context)
         {
-            EnsureIntent();
-            var service = context.RequireResource<IDataService>();
-            var query = _query.CloneForExecution();
-            query.Limit(1);
-            var req = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
-            var result = await service.QueryAsync(req);
-            if (result.Rows.Count == 0) return null;
-            return global::TeaQL.Runtime.EntityQueryProperties.Capture(
-                Generated.Models.OrderLine.FromRecord(result.Rows[0], new EntityRoot()), req.Query);
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
         }
 
-        private async Task<SmartList<Generated.Models.OrderLine>> ExecuteForListWithMetadataInternalAsync(
-            UserContext context)
+        private Task<SmartList<Generated.Models.OrderLine>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.OrderLine>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
         {
             EnsureIntent();
             var service = context.RequireResource<IDataService>();
             var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
             var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
             SmartList<Record> result;
             if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
             else {
                 var rows = await service.QueryAsync(request);
                 result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
             }
             var entities = new SmartList<Generated.Models.OrderLine>() {
                 TotalCount = result.TotalCount, Aggregations = result.Aggregations,
@@ -1161,6 +1157,8 @@ namespace Generated.Requests
             if (service is not IStreamQueryExecutor streaming)
                 throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
             var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
             return RuntimeDataService.StreamEntities(context, request,
                 row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
                     Generated.Models.OrderLine.FromRecord(row, new EntityRoot()), request.Query),
@@ -1210,11 +1208,9 @@ namespace Generated.Requests
             _ensureIntent();
             ArgumentNullException.ThrowIfNull(context);
             var identity = checked((long)await context.NextIdAsync("OrderLine").ConfigureAwait(false));
-            var entity = Generated.Models.OrderLine.TeaqlNewWithReservedId(identity);
-            return context.InitializeEntity("OrderLine", entity,
-                initialized => initialized.TeaqlValidateReservedIdentity(identity));
+            return context.InitializeEntity("OrderLine", Generated.Models.OrderLine.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
         }
-
         public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
             => _executeForRows(context);
 

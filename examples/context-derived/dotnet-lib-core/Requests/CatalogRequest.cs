@@ -1,0 +1,655 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using TeaQL.Core;
+using TeaQL.Runtime;
+using Generated.Models;
+
+namespace Generated.Requests
+{
+    public class CatalogRequest
+    {
+        private SelectQuery _query;
+        private string? _purpose;
+        private string? _comment;
+        private bool _countRequested;
+        private readonly List<DynamicSearchWarning> _dynamicSearchWarnings = new();
+        private static object TeaqlQueryValue(object value) =>
+            value is TimeSpan time
+                ? time.ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture)
+                : value;
+
+        public CatalogRequest()
+        {
+            _query = new SelectQuery("Catalog");
+            _query.Project("id");
+            _query.Project("version");
+            _query.AndFilter(new FilterExpression { Operator = "gt", Field = "version", Expected = 0L });
+        }
+
+        public SelectQuery GetQuery() => _query;
+
+        public CatalogRequest FilterByJson(string source, Action<DynamicSearchWarning>? warn = null)
+        {
+            var result = DynamicSearch.MergeGeneratedScalar(_query, source, GeneratedSearchModels.Models, warn);
+            _query = result.Query;
+            _dynamicSearchWarnings.AddRange(result.Warnings);
+            return this;
+        }
+
+        public IReadOnlyList<DynamicSearchWarning> DynamicSearchWarnings => _dynamicSearchWarnings.ToArray();
+
+        public CatalogRequest WithDeletedRows()
+        {
+            _query.Filters.RemoveAll(filter => filter.Field == "version" && filter.Operator == "gt");
+            return this;
+        }
+
+        public CatalogRequest DeletedRowsOnly()
+        {
+            WithDeletedRows();
+            _query.AndFilter(new FilterExpression { Operator = "lt", Field = "version", Expected = 0L });
+            return this;
+        }
+
+        public CatalogRequest Comment(string c)
+        {
+            _query.Comment(c);
+            _comment = c;
+            return this;
+        }
+
+        public ExecutableCatalogRequest Purpose(string p)
+        {
+            p = QueryIntent.RequirePurpose(p);
+            _query.Purpose(p);
+            _purpose = p;
+            return new ExecutableCatalogRequest(
+                ExecuteForListInternalAsync,
+                ExecuteForOneInternalAsync,
+                ExecuteForListWithMetadataInternalAsync,
+                ExecuteForStreamInternalAsync,
+                c => Comment(c),
+                EnsureIntent);
+        }
+
+        public CatalogRequest OptimizeForContinuousPageFetch()
+        {
+            _query.OptimizeForContinuousPageFetch();
+            return this;
+        }
+
+        public CatalogRequest OptimizeForContinuousPageFetchWith(string namespaceName, int ttlSeconds)
+        {
+            _query.OptimizeForContinuousPageFetchWith(namespaceName, ttlSeconds);
+            return this;
+        }
+
+        public CatalogRequest OptimizePaginationWithIdSet()
+        {
+            _query.OptimizePaginationWithIdSet();
+            return this;
+        }
+
+        public CatalogRequest OptimizePaginationWithIdSet(string namespaceName, int ttlSeconds, int maxIds)
+        {
+            _query.OptimizePaginationWithIdSet(namespaceName, ttlSeconds, maxIds);
+            return this;
+        }
+
+        public CatalogRequest TopNProbeParentThreshold(int threshold)
+        {
+            _query.TopNProbeParentThreshold(threshold);
+            return this;
+        }
+
+        public CatalogRequest Limit(int n)
+        {
+            _query.Limit(n);
+            return this;
+        }
+
+        public CatalogRequest Offset(int n)
+        {
+            _query.Offset(n);
+            return this;
+        }
+
+        public CatalogRequest SelectSelfFields()
+        {
+            _query.Project(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY);
+            _query.Project(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY);
+            return this;
+        }
+
+                public CatalogRequest SelectId()
+                {
+                    _query.Project(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY);
+                    return this;
+                }
+
+                public CatalogRequest SelectName()
+                {
+                    _query.Project(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY);
+                    return this;
+                }
+
+                public CatalogRequest SelectVersion()
+                {
+                    _query.Project(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY);
+                    return this;
+                }
+
+
+                public CatalogRequest WithIdIs(object val)
+                {
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithIdIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithIdIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.In(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
+                    return this;
+                }
+
+                public CatalogRequest WithIdNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
+                    return this;
+                }
+
+                public CatalogRequest WithIdGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithIdGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithIdLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithIdLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithIdBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    return this;
+                }
+
+                public CatalogRequest WithIdIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY));
+                    return this;
+                }
+
+                public CatalogRequest WithIdIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY));
+                    return this;
+                }
+
+                public CatalogRequest WithNameContaining(string val)
+                {
+                    _query.AndFilter(Expr.Contain(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, val));
+                    return this;
+                }
+
+                public CatalogRequest WithNameIs(string val)
+                {
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+                public CatalogRequest WithNameIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithNameIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.In(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
+                    return this;
+                }
+
+                public CatalogRequest WithNameNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
+                    return this;
+                }
+
+                public CatalogRequest WithNameGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithNameGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithNameLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithNameLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithNameBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    return this;
+                }
+
+                public CatalogRequest WithNameIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY));
+                    return this;
+                }
+
+                public CatalogRequest WithNameIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY));
+                    return this;
+                }
+                public CatalogRequest WithNameNotContaining(string val)
+                {
+                    _query.AndFilter(Expr.NotContain(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, val));
+                    return this;
+                }
+
+                public CatalogRequest WithNameStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.BeginWith(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, val));
+                    return this;
+                }
+
+                public CatalogRequest WithNameNotStartingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotBeginWith(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, val));
+                    return this;
+                }
+
+                public CatalogRequest WithNameEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.EndWith(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, val));
+                    return this;
+                }
+
+                public CatalogRequest WithNameNotEndingWith(string val)
+                {
+                    _query.AndFilter(Expr.NotEndWith(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, val));
+                    return this;
+                }
+
+                public CatalogRequest WithNameSoundingLike(string val)
+                {
+                    _query.AndFilter(Expr.SoundLike(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, val));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionIs(object val)
+                {
+                    _query.AndFilter(Expr.Eq(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionIsNot(object val)
+                {
+                    _query.AndFilter(Expr.Ne(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.In(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionNotIn(params object[] vals)
+                {
+                    _query.AndFilter(Expr.NotIn(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, vals.Select(TeaqlQueryValue).ToArray()));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionGreaterThan(object val)
+                {
+                    _query.AndFilter(Expr.Gt(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionGreaterThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Gte(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionLessThan(object val)
+                {
+                    _query.AndFilter(Expr.Lt(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionLessThanOrEqualTo(object val)
+                {
+                    _query.AndFilter(Expr.Lte(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(val)));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionBetween(object lower, object upper)
+                {
+                    _query.AndFilter(Expr.Between(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, TeaqlQueryValue(lower), TeaqlQueryValue(upper)));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionIsKnown()
+                {
+                    _query.AndFilter(Expr.IsNotNull(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY));
+                    return this;
+                }
+
+                public CatalogRequest WithVersionIsUnknown()
+                {
+                    _query.AndFilter(Expr.IsNull(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY));
+                    return this;
+                }
+
+                public CatalogRequest OrderByIdAscending()
+                {
+                    _query.OrderBy(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, "asc");
+                    return this;
+                }
+
+                public CatalogRequest OrderByIdDescending()
+                {
+                    _query.OrderBy(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY, "desc");
+                    return this;
+                }
+
+                public CatalogRequest OrderByNameAscending()
+                {
+                    _query.OrderBy(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, "asc");
+                    return this;
+                }
+
+                public CatalogRequest OrderByNameDescending()
+                {
+                    _query.OrderBy(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY, "desc");
+                    return this;
+                }
+
+                public CatalogRequest OrderByVersionAscending()
+                {
+                    _query.OrderBy(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, "asc");
+                    return this;
+                }
+
+                public CatalogRequest OrderByVersionDescending()
+                {
+                    _query.OrderBy(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY, "desc");
+                    return this;
+                }
+
+
+        public CatalogRequest Count()
+        {
+            return CountAs("count");
+        }
+
+        public CatalogRequest CountAs(string retName)
+        {
+            _countRequested = true;
+            _query.Aggregate("Count", "id", retName);
+            _query.PageCountOperation = new QueryOperation("count", "CountAs", retName);
+            return this;
+        }
+
+                public CatalogRequest GroupById()
+                {
+                    _query.GroupBy(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY);
+                    return this;
+                }
+
+                public CatalogRequest GroupByIdAs(string retName)
+                {
+                    _query.GroupBy(global::Generated.Models.Catalog.__TeaqlFields.ID_PROPERTY_QUERY);
+                    return this;
+                }
+                public CatalogRequest GroupByName()
+                {
+                    _query.GroupBy(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY);
+                    return this;
+                }
+
+                public CatalogRequest GroupByNameAs(string retName)
+                {
+                    _query.GroupBy(global::Generated.Models.Catalog.__TeaqlFields.NAME_PROPERTY_QUERY);
+                    return this;
+                }
+                public CatalogRequest GroupByVersion()
+                {
+                    _query.GroupBy(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY);
+                    return this;
+                }
+
+                public CatalogRequest GroupByVersionAs(string retName)
+                {
+                    _query.GroupBy(global::Generated.Models.Catalog.__TeaqlFields.VERSION_PROPERTY_QUERY);
+                    return this;
+                }
+                public CatalogRequest SelectEntryList()
+                {
+                    return SelectEntryListWith(new EntryRequest());
+                }
+
+                public CatalogRequest SelectEntryListWith(EntryRequest child)
+                {
+                    _query.RelationQuery("EntryList", "Entry", "catalog", true, child.GetQuery());
+                    _query.RelationLoads[^1] = _query.RelationLoads[^1] with {
+                        Operation = new QueryOperation("relation", "SelectEntryListWith", Relation: "EntryList")
+                    };
+                    return this;
+                }
+                public CatalogRequest HaveEntries()
+                    => WithEntryListMatching(new EntryRequest());
+
+                public CatalogRequest HaveNoEntries()
+                    => WithoutEntryListMatching(new EntryRequest());
+
+                public CatalogRequest WithEntryListMatching(EntryRequest child)
+                {
+                    _query.AndFilter(Expr.InSubquery("id", GeneratedRuntimeModule.Module.Metadata.GetEntity("Entry")!, child.GetQuery(), "catalog"));
+                    return this;
+                }
+
+                public CatalogRequest WithoutEntryListMatching(EntryRequest child)
+                {
+                    _query.AndFilter(Expr.NotInSubquery("id", GeneratedRuntimeModule.Module.Metadata.GetEntity("Entry")!, child.GetQuery(), "catalog"));
+                    return this;
+                }
+                public CatalogRequest CountEntries()
+                    => CountEntriesAs("countEntries");
+
+                public CatalogRequest CountEntriesAs(string alias)
+                {
+                    CountEntriesWith(alias, new EntryRequest());
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("count", "CountEntriesAs", alias, "EntryList")
+                    };
+                    return this;
+                }
+
+                public CatalogRequest CountEntriesWith(string alias, EntryRequest child)
+                {
+                    var query = child.GetQuery().CloneForExecution();
+                    query.AggregateItems.Clear(); query.CountField("id", alias);
+                    _query.RelationAggregate("EntryList", "Entry", "catalog", alias, query, true);
+                    _query.RelationAggregates[^1] = _query.RelationAggregates[^1] with {
+                        Operation = new QueryOperation("count", "CountEntriesWith", alias, "EntryList")
+                    };
+                    return this;
+                }
+
+
+
+        private async Task<QueryResult> ExecuteForListInternalAsync(UserContext context)
+        {
+            EnsureIntent();
+            var service = context.RequireResource<IDataService>();
+            var req = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            // The runtime owns authorized membership, recursive Facets and SQL provenance.
+            return await service.QueryAsync(req);
+        }
+
+        private async Task<Generated.Models.Catalog?> ExecuteForOneInternalAsync(UserContext context)
+        {
+            var entities = await ExecuteTypedListInternalAsync(context, true);
+            return entities.Count == 0 ? null : entities[0];
+        }
+
+        private Task<SmartList<Generated.Models.Catalog>> ExecuteForListWithMetadataInternalAsync(UserContext context)
+            => ExecuteTypedListInternalAsync(context, false);
+
+        private async Task<SmartList<Generated.Models.Catalog>> ExecuteTypedListInternalAsync(UserContext context, bool limitOne)
+        {
+            EnsureIntent();
+            var service = context.RequireResource<IDataService>();
+            var query = _query.CloneForExecution();
+            if (limitOne) query.Limit(1);
+            var request = context.PrepareQueryRequest(new QueryRequest(query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Grouped projections require ExecuteForRowsAsync");
+            SmartList<Record> result;
+            if (_countRequested) result = await RuntimeDataService.FetchPageAsync(service, context, request);
+            else {
+                var rows = await service.QueryAsync(request);
+                result = new SmartList<Record>(rows.Rows) { Facets = rows.Facets };
+            }
+            var alias = _countRequested ? request.Query.PageCountOperation?.Alias : null;
+            var aggregateOnly = request.Query.AggregateItems.Any(item =>
+                !(alias != null && item.Function == AggregateFunction.Count && item.Alias == alias));
+            if (aggregateOnly) {
+                if (result.Count > 0) foreach (var pair in result[0]) result.Aggregations[pair.Key] = pair.Value;
+                result.Clear();
+            }
+            var entities = new SmartList<Generated.Models.Catalog>() {
+                TotalCount = result.TotalCount, Aggregations = result.Aggregations,
+                Summary = result.Summary, Facets = result.Facets
+            };
+            foreach (var row in result)
+                entities.Add(Generated.Models.Catalog.FromRecord(row, new EntityRoot()));
+            global::TeaQL.Runtime.EntityQueryProperties.CaptureList(entities, request.Query);
+            return entities;
+        }
+
+        private IAsyncEnumerable<Generated.Models.Catalog> ExecuteForStreamInternalAsync(
+            UserContext context,
+            int chunkSize,
+            CancellationToken cancellationToken = default)
+        {
+            EnsureIntent();
+            var service = context.RequireResource<IDataService>();
+            if (service is not IStreamQueryExecutor streaming)
+                throw new NotSupportedException("The configured data service does not provide a local streaming cursor; federation streaming requires a separate protocol");
+            var request = context.PrepareQueryRequest(new QueryRequest(_query, new QueryIntent(_comment, _purpose)));
+            if (request.Query.AggregateItems.Count > 0 || request.Query.GroupByItems.Count > 0 || request.Query.ObjectGroupBys.Count > 0)
+                throw new InvalidOperationException("Entity streams require entity rows; use a record or aggregation query");
+            return RuntimeDataService.StreamEntities(context, request,
+                row => global::TeaQL.Runtime.EntityQueryProperties.Capture(
+                    Generated.Models.Catalog.FromRecord(row, new EntityRoot()), request.Query),
+                chunkSize, cancellationToken);
+        }
+
+        private void EnsureIntent()
+        {
+            _ = new QueryIntent(_comment, _purpose);
+        }
+
+    }
+
+    public sealed class ExecutableCatalogRequest
+    {
+        private readonly Func<UserContext, Task<QueryResult>> _executeForRows;
+        private readonly Func<UserContext, Task<Generated.Models.Catalog?>> _executeForOne;
+        private readonly Func<UserContext, Task<SmartList<Generated.Models.Catalog>>> _executeForList;
+        private readonly Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.Catalog>> _executeForStream;
+        private readonly Action<string> _comment;
+        private readonly Action _ensureIntent;
+
+        internal ExecutableCatalogRequest(
+            Func<UserContext, Task<QueryResult>> executeForRows,
+            Func<UserContext, Task<Generated.Models.Catalog?>> executeForOne,
+            Func<UserContext, Task<SmartList<Generated.Models.Catalog>>> executeForList,
+            Func<UserContext, int, CancellationToken, IAsyncEnumerable<Generated.Models.Catalog>> executeForStream,
+            Action<string> comment,
+            Action ensureIntent)
+        {
+            _executeForRows = executeForRows;
+            _executeForOne = executeForOne;
+            _executeForList = executeForList;
+            _executeForStream = executeForStream;
+            _comment = comment;
+            _ensureIntent = ensureIntent;
+        }
+
+        public ExecutableCatalogRequest Comment(string c)
+        {
+            _comment(c);
+            return this;
+        }
+
+        public async Task<Generated.Models.Catalog> NewEntityAsync(UserContext context)
+        {
+            _ensureIntent();
+            ArgumentNullException.ThrowIfNull(context);
+            var identity = checked((long)await context.NextIdAsync("Catalog").ConfigureAwait(false));
+            return context.InitializeEntity("Catalog", Generated.Models.Catalog.TeaqlNewWithReservedId(identity),
+                entity => entity.TeaqlValidateReservedIdentity(identity));
+        }
+        public Task<QueryResult> ExecuteForRowsAsync(UserContext context)
+            => _executeForRows(context);
+
+        public Task<SmartList<Generated.Models.Catalog>> ExecuteForListAsync(UserContext context)
+            => _executeForList(context);
+
+        public IAsyncEnumerable<Generated.Models.Catalog> ExecuteForStreamAsync(
+            UserContext context,
+            int chunkSize = 1000,
+            CancellationToken cancellationToken = default)
+            => _executeForStream(context, chunkSize, cancellationToken);
+
+        public Task<Generated.Models.Catalog?> ExecuteForOneAsync(
+            UserContext context)
+            => _executeForOne(context);
+    }
+
+}

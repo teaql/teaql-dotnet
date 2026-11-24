@@ -1,0 +1,14 @@
+{
+  "E.cs": "911a6ea055125c625ce786a98cb43fac1e91035d2d3eeecc13c4dad680f571eb",
+  "GeneratedRuntimeModule.cs": "c8443ff54a80667e0e42047f569d99991e0fd9fe30ce65b818cccae73f8d6d29",
+  "GeneratedSearchModels.cs": "9a4f81e5b6af942e12c7cf9a50c440aabafb6784f55647ec04553dd623be63a2",
+  "Models/Platform.cs": "800d4821430ef7b81cca62eaa379b2a34b98f3143ee70578a0009d87866f4685",
+  "Models/School.cs": "68e14725e2ff3e6c5349a58f0eadf018f5e191992dfcfad8d065763d00bb9cd2",
+  "Q.cs": "0b3262053d17682909343ac811178ee54add68bfe95e35d267aa5369dafd34eb",
+  "Requests/PlatformRequest.cs": "4a96c7c0d6d94d8443bf6df8fbf52352b6ee4494093e98057256c56264f90deb",
+  "Requests/SchoolRequest.cs": "70b5949d7c5306652a43efd775b32d3926b14a5094e938c1a74afef05490017e",
+  "school-schema-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+  "teaql-i18n.json": "665d6bcdf955638db179f78d34f7e6c370c153dd01760c02643dc785b05cd501",
+  "teaql/checker-model.json": "7170c27308464abcedaa042e12751f05505d9b5c7b4623d5aa2f4350117fe6e8",
+  "teaql/model-provenance.json": "77eb9ba634089d2debbbb3b4d63ce863f17d8f2e24241a6c9698b0dc52476fda"
+}

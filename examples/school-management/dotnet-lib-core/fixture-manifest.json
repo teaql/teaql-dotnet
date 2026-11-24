@@ -1,0 +1,33 @@
+{
+  "applicationManifestsPreserved": false,
+  "evaluatedScope": "dotnet-lib-core",
+  "evaluationErrors": 0,
+  "files": {
+    "E.cs": "ca9d47f700f7e8c60b946b172227e27dab25d6790674c89f5c2481b1c9210788",
+    "GeneratedRuntimeModule.cs": "5331337c0dcd075e4db592f5cbae009fbf194ef5bf2701ac37ff3219c84fd674",
+    "GeneratedSearchModels.cs": "b32a38067a5daf9c690e763d94492d9698269e0b77e60c5a73fbd71fe305138b",
+    "Models/Platform.cs": "accb001ee51834de0f37087ad7ca0d60083921eefb61b0ceacde48c39f34cfc2",
+    "Models/School.cs": "70bdd57d477ce3b1581270bfd8662c410cf08858494312e2c60afa26cba85b7a",
+    "Models/SchoolType.cs": "da9ed1aed679b8b5c655293d3007241928d844c6b0267d3f8f3a3e38537c7d1e",
+    "Q.cs": "23544e2f4b5ef34415fb0c29d94c51d4877c6476ab8cdbed5c130952ca8ceb97",
+    "Requests/PlatformRequest.cs": "43040fc9844dd0d04dc8e0af86965b6b7a3392a939143fb0d8e755dd49e40c55",
+    "Requests/SchoolRequest.cs": "65fe52f792b95687fdf4bcffaf929b60a90d75a0765af8be142e6e54ac101236",
+    "Requests/SchoolTypeRequest.cs": "809bfb54e9d49be334150cfbfd89842fbd5f316f64bb2086919648b764fee598",
+    "school-management-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+    "teaql-i18n.json": "785b10a761a7e3d13b88878bc8702546b19f9bc637d28e76fa780fc79f97ca3d",
+    "teaql/checker-model.json": "8e28ee16cddc21191816ed05999142fccb870bf42795f5a1f21268ebd4469e71",
+    "teaql/model-provenance.json": "64afef3716a34e89207c9b6d182a9bce8965325a2994d41e763f77b917842a2f"
+  },
+  "generationReceipt": "../../generator-v5.0.2.json",
+  "generatorCommit": "80fe610d358e923724ddccac84a48d6e4ec5c806",
+  "generatorJarSHA256": "107fb340c0534fb2548dc0b7228554ce3fc080524353df6a9f6d7ad9388471bb",
+  "generatorRelease": "v5.0.2",
+  "modelSha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4",
+  "modelSource": "examples/school-management/models/school-model.xml",
+  "previousOrigin": {
+    "commit": "e62edea17a950c837e6be2cab2db10f703ec72bd",
+    "path": "examples/school-management/dotnet-lib-core/fixture-manifest.json",
+    "sha256": "2ec8ac37f8bb70f1a5bf3de0ba3916bd11809e6f992e859197534061d7af4a50"
+  },
+  "schema": "teaql.retained-example-fixture/v1"
+}

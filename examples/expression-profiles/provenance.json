@@ -1,12 +1,12 @@
 {
-  "generatorCommit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-  "generatorGitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4",
-  "producerReportSha256": "c0173318dc4c85e9ae7407dd02e65fe3483bc7e7cd9278704372b3f5c01a0e9f",
-  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9",
-  "manifestSha256": "5d97c96a6ec92f8261f82387730b10dda6910fa976a17920b9145db3904a70df",
-  "producer": {
-    "commit": "9ad423c9045f8d5f1e511b11e395e46d762c940c",
-    "gitTreeContentsSha256": "36b8328b503c917622a6737aa7218279ec4bec6d7cf34e51744870bfa00091c4"
+  "generatorCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+  "generatorJarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
+  "generatorRelease": "unreleased-source-021b1ed8",
+  "manifestSha256": "b0cafcc0a962a0906014720e46c32dfb74bcb927615bfaea8f1ef876cb916825",
+  "previousManifestSha256": "c9684ea614eec3b69f879aeff2cd3b859f2f29f1cadcb456f8ab260c37916c92",
+  "previousOrigin": {
+    "commit": "05c15c780ab263d4162ff74a9960c0dcebfb61b4",
+    "path": "examples/expression-profiles/provenance.json"
   },
-  "previousManifestSha256": "c9684ea614eec3b69f879aeff2cd3b859f2f29f1cadcb456f8ab260c37916c92"
+  "producerManifestSha256": "66ac95534a5d3877412d48c0d39ecd1a9c6d9f17a9a8ce0cc24a6d364d0503a9"
 }

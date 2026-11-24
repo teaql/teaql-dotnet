@@ -1,0 +1,70 @@
+{
+  "expected": {
+    "bootstrapSameDatabaseRounds": 2,
+    "constantIdentities": [
+      1001,
+      1002
+    ],
+    "preexistingBusinessDatabasePreserved": true,
+    "rootIdentity": 1
+  },
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/school-management",
+  "library": {
+    "generatedFilesManifestSHA256": "087fdf0f099818b1267756d40c9af796de0c8c1c06e33dc42d93963fb20544ad",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "models/school-model.xml",
+    "sha256": "b5cd06ae44464fc29ed24de82654b47c80f546110496756aa15923cee1c511b4"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build; not a public release",
+      "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
+      "qualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
+      "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+      "tag": "unreleased-source-021b1ed8"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/school-generation/receipt.json",
+    "receiptSHA256": "86cdc634a758fdf746de3323e8cd5c4fd32a050e50c0b7b04c5e64b397a1165f"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-school/runtime/school-management/business-receipt.json",
+    "businessReceiptSHA256": "e07c0b5031ec8ab7b4023319ebe27d7c801e75df05ce3567b31d4d90bde02951",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-school/receipt.json",
+    "nativeReceiptSHA256": "8f50bd4c49500d7cabeaeddeb74631b2db50e8d776fde3243c163963e6c57941",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
+  },
+  "scene": "School startup, constant reconciliation and governed School queries",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "bash",
+    "verify.sh"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "BootstrapEvidence.cs",
+      "school-management-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/School.cs",
+      "Models/SchoolType.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/SchoolRequest.cs",
+      "Requests/SchoolTypeRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "5a8bd0b61ae253bc7a619156ab02ddac2843dfad8e83be979add943104a29c4c",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

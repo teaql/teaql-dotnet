@@ -1,0 +1,18 @@
+{
+  "E.cs": "2709673b9edef448ce134a160cf76cd129f84dbdac2e68c5c0f3df84d85985d8",
+  "GeneratedRuntimeModule.cs": "492901be63417aefe347089ee185f586b91c08bebda320d6a0e925e786d24a49",
+  "GeneratedSearchModels.cs": "d136d0b7174846ae524143ea964cb3767d9b6b538ca79b2619bfe6e2b8818241",
+  "Models/Platform.cs": "f8e9ffb0694dff2635905f64e081938987218dbb3d3f0e10567b924830d7c97d",
+  "Models/Task.cs": "d5e6c2a277457fb8b441d313c25c4c8ed1c96d8273c85f67a8143e447d37afe3",
+  "Models/TaskExecutionLog.cs": "3e23143d39cc433ec78aa1239888e8293cce2a01804dc3266592cd2d6e500fbf",
+  "Models/TaskStatus.cs": "2f81df3516e999a9ab582c8372f2559da745ee35bae1e12b6182d50f4a597a08",
+  "Q.cs": "1266be8e87db79f7c5c64cf84761745bde5ec6bea2c4aee016c28ee70c3bb58e",
+  "Requests/PlatformRequest.cs": "c8f2ea5b4e3783fab01b65f629075920800f3178a52c9ad3ae076146f9138553",
+  "Requests/TaskExecutionLogRequest.cs": "24de07406387f0f9a492e25810d097cd74e1d6df4d12e2868a1fbcabc4b8d5eb",
+  "Requests/TaskRequest.cs": "2bf65a9599973a0d7d862ad5eb50238f2a4a4c1546ff4b0eacb7ec13a391716f",
+  "Requests/TaskStatusRequest.cs": "198ecfe030cae0187d30b66aa2438080d61d2c1d13bc44e195ef723cd9538045",
+  "robot-task-board-service-lib.csproj": "7f564a88a1eee675aa48593f9306c03c510cd8d5d058b6bc0e03538e9c0a4fe0",
+  "teaql-i18n.json": "79b420e04edf1c1e1b9f4d04ddfc0ec8a6e2a2458e6a337a8c046bacb64c3a8d",
+  "teaql/checker-model.json": "b49897830ad712d77109345903474626ce0ff55dce27a2d51f9fc5b9075e3ae4",
+  "teaql/model-provenance.json": "3351f4f4416f562ebace243fc2bc3cc7466cd0aabadbe250b66ee48036d597a7"
+}

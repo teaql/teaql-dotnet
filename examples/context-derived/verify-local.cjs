@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const {currentLibraryInputs}=require('./current-library.cjs');
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), cp = require('node:child_process'), crypto = require('node:crypto'), assert = require('node:assert/strict');
 const {createOwnedRunner, ownedBytes} = require('../fix-e-alignment/owned-command.cjs');
 const example = __dirname, repo = path.resolve(example, '../..'), fixture = path.join(example, 'fixture');
@@ -42,13 +43,13 @@ const report = {schema:'teaql.dotnet-context-derived-mutation/v1',passed:false,c
 async function main() {
   try {
     const disk=fs.statfsSync(scratch);assert(disk.bavail*disk.bsize > 4*1024**3);
-    report.fixture=fingerprint(); report.sourceSha256=sourceHash();
+    report.currentLibrary=currentLibraryInputs();report.fixture=fingerprint(); report.sourceSha256=sourceHash();
     report.sourceCommit=cp.execFileSync('git',['-C',repo,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
-    report.applicationSha256=sha(fs.readFileSync(path.join(example,'Program.cs')));
-    const generated=path.join(scratch,'generated'), consumer=path.join(scratch,'consumer'), artifacts=path.join(scratch,'artifacts');
-    fs.cpSync(fixture,generated,{recursive:true}); fs.mkdirSync(consumer); fs.copyFileSync(path.join(example,'Program.cs'),path.join(consumer,'Program.cs'));
-    const project=path.join(consumer,'ContextFixExample.csproj');
-    fs.writeFileSync(project,'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup><ItemGroup><ProjectReference Include="../generated/context-fix-service-lib.csproj" /></ItemGroup></Project>\n');
+    report.applicationSha256=sha(fs.readFileSync(path.join(example,'dotnet-app-console/showcase/Program.cs')));
+    const generated=path.join(scratch,'dotnet-lib-core'),consumer=path.join(scratch,'dotnet-app-console'),artifacts=path.join(scratch,'artifacts');
+    fs.cpSync(path.join(example,'dotnet-lib-core'),generated,{recursive:true});
+    fs.cpSync(path.join(example,'dotnet-app-console'),consumer,{recursive:true});
+    const project=path.join(consumer,"context-fix-service-console.csproj");
     const properties=['-p:UseArtifactsOutput=true','-p:ArtifactsPath='+artifacts,'-p:TeaQLRuntimeSourceRoot='+repo];
     const env={...process.env,DOTNET_CLI_USE_MSBUILD_SERVER:'0',TEAQL_CONTEXT_FIX_DB:path.join(evidence,'fixture.sqlite')};
     async function run(command,log,timeout=120000) {
@@ -77,7 +78,7 @@ async function main() {
       assert.equal(rows.length,1);const row=rows[0];
       for(const key of ['passed','typedQ','typedE','objectLocation','graphRollback','fixOnce'])assert.equal(row[key],true,key);
       assert.equal(row.noOpProviderCalls,0);assert.equal(row.failedCheckProviderCalls,0);assert.equal(row.updateAudits,1);
-      report.rounds.push({round,observations:row}); assert.deepEqual(fingerprint(),report.fixture);assert.equal(sourceHash(),report.sourceSha256);
+      report.rounds.push({round,observations:row}); assert.deepEqual(currentLibraryInputs(),report.currentLibrary);assert.deepEqual(fingerprint(),report.fixture);assert.equal(sourceHash(),report.sourceSha256);
     }
     report.passed=true;report.sameDatabase=true;report.databaseSha256=sha(fs.readFileSync(env.TEAQL_CONTEXT_FIX_DB));
   } catch(error) {report.error=String(error);process.exitCode=1;console.error(error);}
@@ -86,7 +87,7 @@ async function main() {
     report.disposableBytesRemoved=runner.safeToClean ? ownedBytes(scratch) : 0;
     if(runner.safeToClean) fs.rmSync(scratch,{recursive:true});
     else report.unsafeBuildRetention={path:scratch,processGroup:runner.unsafeGroup};
-    runner.dispose();
+    report.scratchRemoved=!fs.existsSync(scratch);runner.dispose();
     fs.writeFileSync(path.join(evidence,'receipt.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({passed:report.passed,evidence,rounds:report.rounds.length}));
   }
 }

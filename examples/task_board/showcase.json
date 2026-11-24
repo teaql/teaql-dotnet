@@ -1,0 +1,61 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/task_board",
+  "library": {
+    "generatedFilesManifestSHA256": "66c09cdce2a4573c98d46c86322cd8bc068aa038a15ffc8c3b8d63b8b94d719f",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "4a1ec513cb362e4c25a5bc9479fe27a2034558633a9e5760245919af7c601856"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build",
+      "jarSHA256": "029f602cf0e2de4ec0910495c340fbeb41f11772b6aca875569f498811158e7d",
+      "qualificationReceiptSHA256": "1012520de60d49cfc1e45c7e08fcf204dd2db36a163909e1e36752065a31047a",
+      "sourceCommit": "99d6bde2351d79b7d8b1b1c5cbc78c5dc777b6f2",
+      "tag": "unreleased-source-99d6bde2"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/robot-task-board-generation/receipt.json",
+    "receiptSHA256": "7289a98fb719c2c8eece8ffa3d218725e125d766f659f78b4bc4cd2dbca3b635"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-robot-task-board-native/runtime/task-board/receipt.json",
+    "businessReceiptSHA256": "43eb815eed73a5e59644fea4d46d3c52bb422eb7e10683c79cbd4ab6dcb2f381",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-robot-task-board-native/receipt.json",
+    "nativeReceiptSHA256": "3ca2dcdad3ae138e01ab4c5c5b219e2583ad161f5d7968c96fcc15ceba9f38d6",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "906d68b2916396f2468d8b4fce86787f157103f4"
+  },
+  "scene": "Robot task creation, rename and execution history",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "dotnet-app-console/Program.cs"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "Program.cs",
+      "robot-task-board-service-console.csproj"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/Platform.cs",
+      "Models/Task.cs",
+      "Models/TaskExecutionLog.cs",
+      "Models/TaskStatus.cs",
+      "Q.cs",
+      "Requests/PlatformRequest.cs",
+      "Requests/TaskExecutionLogRequest.cs",
+      "Requests/TaskRequest.cs",
+      "Requests/TaskStatusRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "28b42fdd7028bde309e5c17e1eb7472ba86c7209de4419e7207fb9acffdaee63",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}

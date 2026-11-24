@@ -1,4 +1,13 @@
-# School Management bootstrap example
+# School startup and query showcase
+
+`models/school-model.xml` owns the exact generated `dotnet-lib-core` and
+`dotnet-app-console` scopes. The workspace retains the original request-intent,
+School creation/query and bootstrap evidence consumers. `showcase.json` is the
+current provenance declaration; the root fixture snapshot remains historical.
+Run `bash verify.sh` from this scene. It builds against current source projects
+in disposable artifact storage, runs the full business application, checks its
+actual SQLite rows, and runs bootstrap twice per logging mode on the same files.
+A retained full-business database is never silently overwritten or deleted.
 
 This generated console example retains the shared `models/school-model.xml`
 fixture. `dotnet run` verifies explicit SQLite schema creation, Platform and

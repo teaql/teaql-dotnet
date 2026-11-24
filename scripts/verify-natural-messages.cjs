@@ -30,7 +30,7 @@ function fingerprint() {
   return result;
 }
 function fixtureGuard() {
-  const root = path.join(example,'automatic-fixture'), manifest = JSON.parse(fs.readFileSync(path.join(root,'generated-files.json')));
+  const root = path.join(example,'dotnet-lib-core'), manifest = JSON.parse(fs.readFileSync(path.join(root,'generated-files.json')));
   const assists=JSON.parse(fs.readFileSync(path.join(root,'assist-files.json'))),origin=JSON.parse(fs.readFileSync(path.join(root,'generation.json')));
   function noBuild(dir) { for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
     assert(!entry.isSymbolicLink()); if (entry.isDirectory()) { assert(!['bin','obj'].includes(entry.name)); noBuild(path.join(dir,entry.name)); }
@@ -44,7 +44,7 @@ function fixtureGuard() {
   assert.equal(JSON.parse(fs.readFileSync(path.join(root,'evaluation.json'))).errors.length,0);
   assert.equal(origin.modelSha256,hash(fs.readFileSync(path.join(root,'model.xml'))));
   assert(!origin.implementationHandEdited&&!origin.publicPublication);
-  const application=fs.readFileSync(path.join(example,'Program.cs'),'utf8');
+  const application=fs.readFileSync(path.join(example,'dotnet-app-console/showcase/Program.cs'),'utf8');
   for(const forbidden of ['.CheckerPresentation(', 'CheckerPresentationModel.', 'BindingFlags.', 'new AppChecker', 'class AppChecker',
     '.Checker(', 'new RuntimeModule(', 'new EntityDescriptor('])
     assert(!application.includes(forbidden),'automatic composition replaced in application: '+forbidden);
@@ -52,12 +52,14 @@ function fixtureGuard() {
     fixtureInputHashes:Object.fromEntries(files(root).map(name=>[name,hash(fs.readFileSync(path.join(root,name)))])),generation:origin};
 }
 async function main() {
-  const args = process.argv.slice(2); let output, full=false;
+  const args = process.argv.slice(2); let output, full=false, exampleOnly=false;
   for (let i=0;i<args.length;i++) {
     if (args[i]==='--full') full=true;
+    else if (args[i]==='--example-only') exampleOnly=true;
     else if (args[i]==='--output' && args[i+1]) output=args[++i];
-    else throw new Error('Usage: node scripts/verify-natural-messages.cjs [--full] [--output /new/evidence]');
+    else throw new Error('Usage: node scripts/verify-natural-messages.cjs [--full | --example-only] [--output /new/evidence]');
   }
+  assert(!(full&&exampleOnly),'full native and example-only gates are distinct');
   if (output) { assert(path.isAbsolute(output) && !fs.existsSync(output)); fs.mkdirSync(output,{recursive:true}); }
   else output=fs.mkdtempSync(path.join(os.tmpdir(),'teaql-dotnet-natural-evidence-'));
   const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'teaql-dotnet-natural-build-')), runner=createOwnedRunner();
@@ -66,11 +68,10 @@ async function main() {
     const disk=fs.statfsSync(scratch); assert(disk.bavail*disk.bsize>4*1024**3);
     receipt.sourceCommit=cp.execFileSync('git',['-C',repo,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
     receipt.sourceFiles=fingerprint(); Object.assign(receipt,fixtureGuard()); receipt.automaticComposition=true;
-    const generated=path.join(scratch,'generated'), consumer=path.join(scratch,'consumer'), artifacts=path.join(scratch,'artifacts');
-    fs.cpSync(path.join(example,'automatic-fixture'),generated,{recursive:true}); fs.mkdirSync(consumer);
-    fs.copyFileSync(path.join(example,'Program.cs'),path.join(consumer,'Program.cs'));
-    const project=path.join(consumer,'NaturalMessagesExample.csproj');
-    fs.writeFileSync(project,'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup><ItemGroup><ProjectReference Include="../generated/checker-natural-message-service-lib.csproj" /></ItemGroup></Project>\n');
+    const generated=path.join(scratch,'dotnet-lib-core'),consumer=path.join(scratch,'dotnet-app-console'),artifacts=path.join(scratch,'artifacts');
+    fs.cpSync(path.join(example,'dotnet-lib-core'),generated,{recursive:true});
+    fs.cpSync(path.join(example,'dotnet-app-console'),consumer,{recursive:true});
+    const project=path.join(consumer,"checker-natural-message-service-console.csproj");
     const dotnet=process.env.DOTNET_EXE||'dotnet';
     const properties=['-p:UseArtifactsOutput=true','-p:ArtifactsPath='+artifacts,'-p:TeaQLRuntimeSourceRoot='+repo,'-p:UseSharedCompilation=false'];
     const env={...process.env,DOTNET_CLI_USE_MSBUILD_SERVER:'0',MSBUILDDISABLENODEREUSE:'1',
@@ -83,6 +84,7 @@ async function main() {
       assert.equal(result.status,0,bytes.toString().slice(-12000));return bytes.toString();
     }
     receipt.testProjects=inspect(repo);
+    if(!exampleOnly){
     const tests=full ? path.join(repo,'TeaQL.sln') : path.join(repo,'src/TeaQL.Runtime.Tests/TeaQL.Runtime.Tests.csproj');
     const nativeLog=await run([dotnet,'test',tests,'--disable-build-servers','-m:2','--verbosity','minimal',
       ...(full?[]:['--filter','FullyQualifiedName~Checker']),...properties], 'native-tests.log',600000);
@@ -90,6 +92,8 @@ async function main() {
     const summaries=[...nativeLog.matchAll(/Passed!\s+- Failed:\s+(\d+), Passed:\s+(\d+), Skipped:\s+(\d+), Total:\s+(\d+)/g)];
     assert.equal(summaries.length,full?receipt.testProjects.length:1);assert(summaries.every(row=>Number(row[1])===0&&Number(row[3])===0));
     receipt.nativeSummary={projects:summaries.length,passed:summaries.reduce((total,row)=>total+Number(row[2]),0),failed:0,skipped:0};
+    }
+    receipt.exampleOnly=exampleOnly;
     await run([dotnet,'build',project,'--disable-build-servers','-m:2','--verbosity','minimal',...properties],'build.log');
     const binary=(await run([dotnet,'msbuild',project,'-nologo','-getProperty:TargetPath',...properties],'target-path.log')).trim();
     assert(binary.startsWith(artifacts+path.sep)&&fs.existsSync(binary));
@@ -127,7 +131,7 @@ async function main() {
   finally {
     receipt.disposableBytesRemoved=runner.safeToClean?ownedBytes(scratch):0;
     if(runner.safeToClean)fs.rmSync(scratch,{recursive:true});else receipt.unsafeBuildRetention={path:scratch,processGroup:runner.unsafeGroup};
-    runner.dispose();fs.writeFileSync(path.join(output,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');
+    receipt.scratchRemoved=!fs.existsSync(scratch);runner.dispose();fs.writeFileSync(path.join(output,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');
     console.log(JSON.stringify({passed:receipt.passed,evidence:output,rounds:receipt.rounds.length,fullSolution:receipt.fullSolution}));
   }
 }

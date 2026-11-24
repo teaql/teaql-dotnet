@@ -1,17 +1,17 @@
-# Mutation Policy example
+# Approve a customer profile and contact preference
 
-This focused example proves the .NET runtime's governed graph-mutation boundary:
+Install the customer approval policy and its exact approval in the trusted
+Context. The generated Q APIs prepare a customer and contact preference, then
+save them together with a business audit reason. The approved pair is read
+back by email and customer ID. The blocked email is denied with
+`CUSTOMER_EMAIL_BLOCKED` and neither record is saved. The application observes
+the two operations at policy review and checks the successful audit snapshot.
 
-- a customer policy receives the complete immutable graph plan;
-- an exact policy identity approval is recorded;
-- an allowed graph commits atomically;
-- a denied graph performs zero provider mutations and rolls back;
-- policy identity, approval status and operation count reach application audit.
+- `model.xml` owns the domain model.
+- `dotnet-lib-core/` holds the generated domain library.
+- `dotnet-app-console/Program.cs` runs the business scenario.
+- `dotnet-app-console/calibration/` retains the original runtime probe.
 
-Run against the local runtime source:
-
-```bash
-dotnet run --project examples/mutation-policy/mutation-policy.csproj
-```
-
-The success marker is `DOTNET_MUTATION_POLICY_PASS`.
+The SDK inventory runs both entry points. The focused Conformance gate runs
+the console twice against one fresh SQLite database and independently checks
+the persisted records.

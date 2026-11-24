@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="dotnet-app-console/**/*.cs;dotnet-lib-core/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../../src/TeaQL.Provider.Sqlite/TeaQL.Provider.Sqlite.csproj" />
     <ProjectReference Include="../../src/TeaQL.TfpEndpoint/TeaQL.TfpEndpoint.csproj" />
   </ItemGroup>

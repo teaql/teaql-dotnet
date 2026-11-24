@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<root teaql_dotnet_version="0.5.0-dev.0" name="checker-fix-advanced" org="teaql" data_service="sqlite">
+<root name="checker-fix-advanced" org="teaql" data_service="sqlite">
   <tenant name="Tenant Name|[1,80]"/>
   <purchase_order
       tenant="tenant(contextRoot=true)"

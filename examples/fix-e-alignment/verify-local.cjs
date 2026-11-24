@@ -2,6 +2,7 @@
 "use strict";
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), cp = require('node:child_process'), crypto = require('node:crypto'), assert = require('node:assert/strict');
 const example = __dirname, repo = path.resolve(example, '../..'), sha = b => crypto.createHash('sha256').update(b).digest('hex');
+const workspace=path.join(example,'dotnet-app-console'),application=path.join(workspace,'showcase');
 function fingerprint() {
   const m = JSON.parse(fs.readFileSync(path.join(example, 'fixture-manifest.json')));
   assert.equal(m.language, 'dotnet'); assert.equal(m.evaluationErrors, 0);
@@ -11,8 +12,8 @@ function fingerprint() {
     const name = path.join(prefix, e.name), file = path.join(dir, e.name); assert(!e.isSymbolicLink());
     if (e.isDirectory()) visit(file, name); else { assert(e.isFile()); actual.push(name); }
   } }
-  visit(path.join(example, 'generated')); assert.deepEqual(actual.sort(), Object.keys(m.files).sort());
-  for (const [name, expected] of Object.entries(m.files)) assert.equal(sha(fs.readFileSync(path.join(example, 'generated', name))), expected, name);
+  visit(path.join(example, 'dotnet-lib-core')); assert.deepEqual(actual.sort(), Object.keys(m.files).sort());
+  for (const [name, expected] of Object.entries(m.files)) assert.equal(sha(fs.readFileSync(path.join(example, 'dotnet-lib-core', name))), expected, name);
   return m;
 }
 const requested = process.env.TEAQL_FIX_E_EVIDENCE_DIR;
@@ -26,22 +27,21 @@ async function main() {
 try {
   const disk = fs.statfsSync(scratch); assert(disk.bavail * disk.bsize > 4 * 1024 ** 3);
   const m = fingerprint(); report.modelSha256 = m.modelSha256;
-  report.expressionBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ExpressionBoundaryProbe.cs')));
-  report.partialAncestorApplicationSha256 = sha(fs.readFileSync(path.join(example, 'PartialAncestorProbe.cs')));
-  report.partialRootApplicationSha256 = sha(fs.readFileSync(path.join(example, 'PartialRootProbe.cs')));
-  report.projectionApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ProjectionViewsProbe.cs')));
-  report.unchangedViewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'UnchangedViewsProbe.cs')));
-  report.checkerBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CheckerBoundaryProbe.cs')));
-  report.graphFixLifecycleApplicationSha256 = sha(fs.readFileSync(path.join(example, 'GraphFixLifecycleProbe.cs')));
-  report.concurrentQueryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'ConcurrentQueryProbe.cs')));
-  report.cancelledNewApplicationSha256 = sha(fs.readFileSync(path.join(example, 'CancelledNewProbe.cs')));
-  report.graphReentryApplicationSha256 = sha(fs.readFileSync(path.join(example, 'GraphSaveReentrancyProbe.cs')));
-  const generated = path.join(scratch, 'generated'), consumer = path.join(scratch, 'consumer');
-  fs.cpSync(path.join(example, 'generated'), generated, {recursive: true}); fs.mkdirSync(consumer);
-  for (const file of fs.readdirSync(example).filter(file => file.endsWith('.cs'))) fs.copyFileSync(path.join(example, file), path.join(consumer, file));
-  const project = '<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup><ItemGroup><ProjectReference Include="../generated/checker-fix-advanced-lib.csproj" /></ItemGroup></Project>\n';
-  const projectPath = path.join(consumer, 'TeaqlFixEExample.csproj'), artifacts = path.join(scratch, 'artifacts');
-  fs.writeFileSync(projectPath, project); fs.writeFileSync(path.join(evidence, 'consumer-project.xml'), project);
+  report.expressionBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(application, 'ExpressionBoundaryProbe.cs')));
+  report.partialAncestorApplicationSha256 = sha(fs.readFileSync(path.join(application, 'PartialAncestorProbe.cs')));
+  report.partialRootApplicationSha256 = sha(fs.readFileSync(path.join(application, 'PartialRootProbe.cs')));
+  report.projectionApplicationSha256 = sha(fs.readFileSync(path.join(application, 'ProjectionViewsProbe.cs')));
+  report.unchangedViewApplicationSha256 = sha(fs.readFileSync(path.join(application, 'UnchangedViewsProbe.cs')));
+  report.checkerBoundaryApplicationSha256 = sha(fs.readFileSync(path.join(application, 'CheckerBoundaryProbe.cs')));
+  report.graphFixLifecycleApplicationSha256 = sha(fs.readFileSync(path.join(application, 'GraphFixLifecycleProbe.cs')));
+  report.concurrentQueryApplicationSha256 = sha(fs.readFileSync(path.join(application, 'ConcurrentQueryProbe.cs')));
+  report.cancelledNewApplicationSha256 = sha(fs.readFileSync(path.join(application, 'CancelledNewProbe.cs')));
+  report.graphReentryApplicationSha256 = sha(fs.readFileSync(path.join(application, 'GraphSaveReentrancyProbe.cs')));
+  const generated = path.join(scratch, 'dotnet-lib-core'), consumer = path.join(scratch, 'dotnet-app-console');
+  fs.cpSync(path.join(example, 'dotnet-lib-core'), generated, {recursive: true}); fs.cpSync(workspace, consumer, {recursive: true});
+  const projectPath = path.join(consumer, 'checker-fix-advanced-console.csproj'), artifacts = path.join(scratch, 'artifacts');
+  const project = fs.readFileSync(projectPath,'utf8');
+  fs.writeFileSync(path.join(evidence, 'consumer-project.xml'), project);
   const properties = ['-p:UseArtifactsOutput=true', '-p:ArtifactsPath=' + artifacts, '-p:TeaQLRuntimeSourceRoot=' + repo];
   const env = {...process.env, DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER: '1', TEAQL_FIX_E_DB: path.join(evidence, 'fixture.sqlite')};
   async function run(command, log, timeout = 120000) {

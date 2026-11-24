@@ -1,16 +1,16 @@
-# Context-owned Schema SPI
+# Register a school through a custom schema executor
 
-This focused example replaces schema execution with a typed decorator while
-keeping SQLite query/mutation execution as a separate data service. The public
-application entry point remains `context.EnsureSchemaAsync()`; no generated
-domain-library source or direct provider schema call is needed.
+The district installs an application-owned Schema decorator separately from
+the SQLite query and mutation provider. The decorator receives both modeled
+entities on each of two ensures. The application registers a school through
+generated Q and audited save, then reads it back. An injected School schema
+failure is observed at the decorator while the saved school remains readable.
 
-```bash
-dotnet run --project examples/schema-customization/schema-customization.csproj
-```
+- `model.xml` owns the domain model.
+- `dotnet-lib-core/` holds the generated domain library.
+- `dotnet-app-console/Program.cs` runs the business scenario.
+- `dotnet-app-console/calibration/` retains the original runtime probe.
 
-It runs `EnsureSchemaAsync` twice without deleting the in-memory database, then
-executes a bounded query through the independently installed data service.
-The companion `SchemaCompositionTests` cover both installation orders,
-unsupported-provider replacement, and failure before generated bootstrap.
-This proves the local-source extension cut, not a public NuGet release.
+The SDK inventory runs both entry points. The focused Conformance gate runs
+the console twice against one fresh SQLite database and independently checks
+the persisted records.

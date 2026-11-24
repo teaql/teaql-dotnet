@@ -1,0 +1,75 @@
+{
+  "generatedDomainLibraryHandEdited": false,
+  "goalId": "dotnet:examples/fix-e-alignment",
+  "library": {
+    "generatedFilesManifestSHA256": "1771be7551302f67d8260d3faf13954662a3a01e65005722667567fc4cf59de7",
+    "root": "dotnet-lib-core",
+    "scope": "dotnet-lib-core"
+  },
+  "model": {
+    "path": "model.xml",
+    "sha256": "a2cf4c907cb084cb0946e993eeba586c8c0701a89fdc4a849808aa743be033b7"
+  },
+  "producer": {
+    "generator": {
+      "artifactKind": "qualified source build; not a public release",
+      "jarSHA256": "34dd804dccf05470dad46d086d58412e4a9dfcd0a1c6ed34f8f90c55ff478220",
+      "qualificationReceiptSHA256": "5119b9f3a5c95fb84f527885fdd5bac0fe79a56352a55b8acf116f67fd12787d",
+      "sourceCommit": "021b1ed8bee5db7eef38a6b1e3a3ef2e7ac69daa",
+      "tag": "unreleased-source-021b1ed8"
+    },
+    "receipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/purchase-order-fix-generation/receipt.json",
+    "receiptSHA256": "920c683d71de38e609d2be2c3d8b7f2fb6c014e3b123edd5c4ea694fc6e91a48"
+  },
+  "qualification": {
+    "businessReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-purchase-order/runtime/fix-e/receipt.json",
+    "businessReceiptSHA256": "1f79083477ad5ad4239d1068e463398e000c01ad70aedbd7f70c35681a724779",
+    "nativeReceipt": "teaql-conformance/evidence/2026-11-20-example-showcase-remediation/dotnet-shared-governance-replay-purchase-order/receipt.json",
+    "nativeReceiptSHA256": "c36fe14b5b7f46d6e202669241ceb6be00716ba5338b2aa907c8ae4bf85b7da4",
+    "remainingFullRuntimeInventory": true,
+    "sourceCommit": "a87bca67e92aefdb59500a682bd3a6be96d926fe"
+  },
+  "scene": "Purchase order Fix, loaded-state and transaction-safe graph mutation boundaries",
+  "schema": "teaql.model-workspace-showcase/v1",
+  "status": "focused-verified",
+  "verification": [
+    "node",
+    "verify-local.cjs"
+  ],
+  "workspace": {
+    "applicationOwnedFiles": [
+      "checker-fix-advanced-console.csproj",
+      "showcase/OwnershipProbe.cs",
+      "showcase/ConcurrentQueryProbe.cs",
+      "showcase/CheckerBoundaryProbe.cs",
+      "showcase/VersionProbe.cs",
+      "showcase/ExpressionBoundaryProbe.cs",
+      "showcase/CheckerMetadataProbe.cs",
+      "showcase/ProjectionViewsProbe.cs",
+      "showcase/UnchangedViewsProbe.cs",
+      "showcase/GraphSaveReentrancyProbe.cs",
+      "showcase/PartialAncestorProbe.cs",
+      "showcase/PageStreamOwnershipProbe.cs",
+      "showcase/Program.cs",
+      "showcase/PartialRootProbe.cs",
+      "showcase/LoadingProbe.cs",
+      "showcase/CancelledNewProbe.cs",
+      "showcase/GraphFixLifecycleProbe.cs"
+    ],
+    "domainSourcesFromLibrary": [
+      "E.cs",
+      "GeneratedRuntimeModule.cs",
+      "GeneratedSearchModels.cs",
+      "Models/OrderItem.cs",
+      "Models/PurchaseOrder.cs",
+      "Models/Tenant.cs",
+      "Q.cs",
+      "Requests/OrderItemRequest.cs",
+      "Requests/PurchaseOrderRequest.cs",
+      "Requests/TenantRequest.cs"
+    ],
+    "generatedFilesManifestSHA256": "258767be1617e1d4f183ba7c98ea66be2f6a64cf032ca27cff02cee66d728373",
+    "root": "dotnet-app-console",
+    "scope": "dotnet-app-console"
+  }
+}
